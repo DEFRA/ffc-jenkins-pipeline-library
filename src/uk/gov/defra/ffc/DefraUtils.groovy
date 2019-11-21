@@ -98,7 +98,7 @@ def deployChart(credentialsId, registry, imageName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     def deploymentName = "$imageName-$tag"
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-    sh "helm upgrade $deploymentName --install --namespace $deploymentName --recreate-pods --atomic ./helm/$imageName --set image=$registry/$imageName:$tag $extraCommands"
+    sh "helm upgrade $deploymentName --install --namespace $deploymentName --atomic ./helm/$imageName --set image=$registry/$imageName:$tag $extraCommands"
   }
 }
 
