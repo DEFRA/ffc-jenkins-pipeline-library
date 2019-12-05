@@ -67,6 +67,10 @@ def setGithubStatusFailure(message = '') {
   updateGithubCommitStatus(message, 'FAILURE')
 }
 
+def lintHelm(imageName) {
+  sh "helm lint ./helm/$imageName"
+}
+
 def buildTestImage(name, suffix) {
   sh 'docker image prune -f || echo could not prune images'
   sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache $name"

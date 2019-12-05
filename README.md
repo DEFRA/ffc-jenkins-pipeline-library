@@ -128,6 +128,20 @@ Example usage:
 defraUtils.setGithubStatusFailure(error.message)
 ```
 
+### lintHelm
+Lints Helm chart within repository.  
+
+By convention Helm charts are stored in the folder `helm` in a subfolder the same name as the image, service, and repository.
+
+Takes one parameter:
+- container image name
+
+Example usage:
+
+```
+defraUtils.lintHelm('ffc-demo-web')
+```
+
 ### buildTestImage
 Builds the test image using the docker-compose files in the repository. By convention the services are named the same as the image.
 
