@@ -177,6 +177,8 @@ Triggers static code analysis using SonarQube.
 
 Dependent on integration between Jenkins and SonarQube being configured.
 
+This step should run after any test tasks so the test coverage output can be assessed.
+
 Takes three parameters:
 - name of SonarQube environment configured in Jenkins plugin
 - name of SonarScanner configured in Jenkins plugin
@@ -193,6 +195,8 @@ defraUtils.analyseCode(sonarQubeEnv, sonarScanner, ['sonar.projectKey' : 'ffc-de
 Waits for static code analysis result via SonarQube webhook.  
 
 Dependent on integration between Jenkins and SonarQube being configured.
+
+This step should run after `analyseCode` as it is dependent on the SonarQube run ID generated from that task to know which result to wait for.  
 
 Takes one parameters:
 - timeout in minutes pipeline should wait for webhook response before aborting.
