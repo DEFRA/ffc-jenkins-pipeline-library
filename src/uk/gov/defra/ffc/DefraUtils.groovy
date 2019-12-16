@@ -90,6 +90,27 @@ def runTests(name, suffix) {
   }
 }
 
+def analyseCode(sonarQubeEnv, sonarScanner, params) {
+  def scannerHome = tool sonarScanner
+  withSonarQubeEnv(sonarQubeEnv) { 
+    def args = ''   
+    params.each { param ->
+      args = args + " -D$param.key=$param.value"
+    }
+
+    sh "${scannerHome}/bin/sonar-scanner$args"
+  }
+}
+
+def waitForQualityGateResult(timeoutInMinutes) {
+  timeout(time: timeoutInMinutes, unit: 'MINUTES') {
+    def qualityGateResult = waitForQualityGate()
+    if (qualityGateResult.status != 'OK') {
+      error "Pipeline aborted due to quality gate failure: ${qualityGateResult.status}"
+    }
+  }
+}
+
 def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   docker.withRegistry("https://$registry", credentialsId) {
     sh "docker-compose build --no-cache"
