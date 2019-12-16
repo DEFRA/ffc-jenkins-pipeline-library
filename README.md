@@ -171,6 +171,38 @@ Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 defraUtils.runTests('ffc-demo-web', BUILD_NUMBER)
 ```
 
+### analyseCode
+
+Triggers static code analysis using SonarQube.  
+
+Dependent on integration between Jenkins and SonarQube being configured.
+
+Takes three parameters:
+- name of SonarQube environment configured in Jenkins plugin
+- name of SonarScanner configured in Jenkins plugin
+- additional parameters to be added to SonarScanner command.  Of which `sonar.projectKey` and `sonar.Sources` are mandatory
+
+Example usage:
+
+```
+defraUtils.analyseCode(sonarQubeEnv, sonarScanner, ['sonar.projectKey' : 'ffc-demo-web', 'sonar.sources' : '.'])
+```
+
+### waitForCodeAnalysisResult
+
+Waits for static code analysis result via SonarQube webhook.  
+
+Dependent on integration between Jenkins and SonarQube being configured.
+
+Takes one parameters:
+- timeout in minutes pipeline should wait for webhook response before aborting.
+
+Example usage:
+
+```
+defraUtils.waitForQualityGateResult(5)
+```
+
 ### buildAndPushContainerImage
 
 Builds the image from the docker-compose file and pushes it to a repository.
