@@ -7,6 +7,10 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
+def replaceInFile(from, to, file) {
+  sh "sed -i -e 's/$from/$to/g' $file"  
+}
+
 def getMergedPrNo() {
     def mergedPrNo = sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
     return mergedPrNo ? "pr$mergedPrNo" : ''
@@ -85,9 +89,12 @@ def runTests(name, suffix) {
   } finally {
     sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml down -v"
     junit 'test-output/junit.xml'
-    // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
-    sh "docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"
   }
+}
+
+def deleteTestOutput(name) {
+    // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
+    sh "docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"  
 }
 
 def analyseCode(sonarQubeEnv, sonarScanner, params) {

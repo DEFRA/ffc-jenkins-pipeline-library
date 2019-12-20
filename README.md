@@ -35,6 +35,26 @@ defraUtils.updateGithubCommitStatus('Build started', 'PENDING')
 ```
 ## Functions
 
+### replaceInFile
+
+Utility method to globally substitute text in a file. 
+
+The function takes three parameters:
+- `from`: the text to match
+- `to`: the new text to replace the matched text
+- `file`: path to file
+
+The `from` and `to` values are used directly in a sed command, so wildcards may be used.
+
+It can be tricky to correctly escape characters for sed. For example the forward slash `/` 
+needs to be escaped with a back slash, which itself need to be escaped with a back slash so the valid encoding for `/` is  `\\/`.
+
+Forward slashes in the final `file` parameter do not need escaping.
+
+Example usage to replace the path `/usr/src/app` with `./app` a path in the file `./lcov.info`:
+
+`replaceInFile('\\/usr\\/src\\/app', '.\\/app', './lcov.info')`
+
 ### getMergedPrNo
 
 Parses the local commit log to obtain the merged PR number from the message. This is reliant on the standard github merge message of the PR name followed by the PR number, i.e.
