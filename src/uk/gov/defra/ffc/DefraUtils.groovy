@@ -87,9 +87,12 @@ def runTests(name, suffix) {
     sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml run $name"
 
   } finally {
-    sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml down -v"
-    junit 'test-output/junit.xml'
+    sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml down -v"    
   }
+}
+
+def createTestReportJUnit(){
+  junit 'test-output/junit.xml'
 }
 
 def deleteTestOutput(name) {
