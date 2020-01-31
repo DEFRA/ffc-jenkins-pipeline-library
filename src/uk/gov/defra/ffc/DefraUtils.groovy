@@ -181,25 +181,26 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
 
 def notifySlackBuildFailure(exception, channel) {
   if(JOB_NAME.contains("/master/")) {
+    
     def msg = """@here BUILD FAILED 
               ${JOB_NAME}/${BUILD_NUMBER}
               ${exception}
               (<${BUILD_URL}|Open>)"""
 
-    slackSend channel: "#masterbuildfailures",
-              color: "#ff0000",
-              message: msg.replace("  ", "")
+    channel = "#masterbuildfailures"
   }
   else {
+
     def msg = """BUILD FAILED 
               ${JOB_NAME}/${BUILD_NUMBER}
               ${exception}
               (<${BUILD_URL}|Open>)"""
-
-    slackSend channel: channel,
-              color: "#ff0000",
-              message: msg.replace("  ", "")
   }
+
+  slackSend channel: channel,
+            color: "#ff0000",
+            message: msg.replace("  ", "")
+
 }
 
 return this
