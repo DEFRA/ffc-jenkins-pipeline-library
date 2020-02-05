@@ -313,3 +313,17 @@ Example usage:
 ```
 defraUtils.triggerDeploy((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chartVersion':'1.0.0'])
 ```
+
+### notifySlackBuildFailure
+
+Sends a message to the ffc-notifications Slack workspace when the jenkins build fails.
+
+Takes 2 parameters:
+- the failure reason to display in the slack notification e.g. `e.message`
+- optional channel name for none master branch build failures to be reported in, must contain the # before the channel name e.g. `#generalbuildfailures`
+
+Example usage:
+
+```
+defraUtils.notifySlackBuildFailure(e.message, "#generalbuildfailures")
+```
