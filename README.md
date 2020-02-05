@@ -318,7 +318,7 @@ defraUtils.triggerDeploy((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chart
 
 Sends a message to the ffc-notifications Slack workspace when the jenkins build fails.
 
-Takes 2 parameters:
+Takes two parameters:
 - the failure reason to display in the slack notification e.g. `e.message`
 - optional channel name for none master branch build failures to be reported in, must contain the # before the channel name e.g. `#generalbuildfailures`
 
