@@ -187,7 +187,7 @@ def notifySlackBuildFailure(exception, channel) {
           (<${BUILD_URL}|Open>)"""
 
   if(!JOB_NAME.contains("/master/")) {
-    '@here '.concat(msg);
+    msg = '@here '.concat(msg);
     channel = "#masterbuildfailures"
   }
 
