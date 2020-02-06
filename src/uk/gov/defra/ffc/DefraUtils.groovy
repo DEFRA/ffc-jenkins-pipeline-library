@@ -7,6 +7,10 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
+def getPackageJsonVersion() {
+   return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
+}
+
 def replaceInFile(from, to, file) {
   sh "sed -i -e 's/$from/$to/g' $file"  
 }

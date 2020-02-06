@@ -35,6 +35,10 @@ defraUtils.updateGithubCommitStatus('Build started', 'PENDING')
 ```
 ## Functions
 
+### getPackageJsonVersion
+
+Returns the package version from the `package.json` file.
+
 ### replaceInFile
 
 Utility method to globally substitute text in a file. 
