@@ -7,6 +7,14 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
+def getCSProjVersion(projName) {
+  def version = sh(returnStdout: true, script: "xmllint $projName/$projName\.csproj --xpath '//Project/PropertyGroup/Version/text()'")
+  if (version == '') {
+    version = sh(returnStdout: true, script: "xmllint $projName/$projName\.csproj --xpath 'concat(//Project/PropertyGroup/VersionPrefix/text(), \"-\", //Project/PropertyGroup/VersionSuffix/text())'")
+  }
+  return version
+}
+
 def getPackageJsonVersion() {
    return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
 }
