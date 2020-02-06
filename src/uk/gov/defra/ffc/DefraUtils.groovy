@@ -8,9 +8,9 @@ def commitSha = ''
 def workspace
 
 def getCSProjVersion(projName) {
-  def version = sh(returnStdout: true, script: "xmllint $projName/$projName\.csproj --xpath '//Project/PropertyGroup/Version/text()'")
+  def version = sh(returnStdout: true, script: "xmllint $projName/$projName\.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
   if (version == '') {
-    version = sh(returnStdout: true, script: "xmllint $projName/$projName\.csproj --xpath 'concat(//Project/PropertyGroup/VersionPrefix/text(), \"-\", //Project/PropertyGroup/VersionSuffix/text())'")
+    version = sh(returnStdout: true, script: "xmllint $projName/$projName\.csproj --xpath 'concat(//Project/PropertyGroup/VersionPrefix/text(), \"-\", //Project/PropertyGroup/VersionSuffix/text())'").trim()
   }
   return version
 }
