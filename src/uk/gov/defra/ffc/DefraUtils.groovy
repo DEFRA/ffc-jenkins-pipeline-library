@@ -179,5 +179,22 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
   sh(script: "curl -k $url")
 }
 
+def notifySlackBuildFailure(exception, channel) {
+
+  def msg = """BUILD FAILED 
+          ${JOB_NAME}/${BUILD_NUMBER}
+          ${exception}
+          (<${BUILD_URL}|Open>)"""
+
+  if(JOB_NAME.contains("/master/")) {
+    msg = '@here '.concat(msg);
+    channel = "#masterbuildfailures"
+  }
+
+  slackSend channel: channel,
+            color: "#ff0000",
+            message: msg.replace("  ", "")
+
+}
 
 return this
