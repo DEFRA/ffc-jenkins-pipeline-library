@@ -39,7 +39,7 @@ def verifyCommitBuildable() {
       echo "Building master branch"
     } else {
       currentBuild.result = 'ABORTED'
-      error("Build aborted - not a PR or a master branch, PR value is: $pr branch is: $branch")
+      error('Build aborted - not a PR or a master branch')
     }
 }
 
