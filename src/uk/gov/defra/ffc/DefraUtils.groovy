@@ -40,6 +40,7 @@ def verifyCommitBuildable() {
     } else {
       currentBuild.result = 'ABORTED'
       error('Build aborted - not a PR or a master branch')
+      error("PR value is: $pr branch is: $branch")
     }
 }
 
