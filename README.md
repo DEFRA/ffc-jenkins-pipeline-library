@@ -35,6 +35,10 @@ defraUtils.updateGithubCommitStatus('Build started', 'PENDING')
 ```
 ## Functions
 
+### getCSProjVersion
+
+Returns the project version from the `[projectName].csproj` file. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
+
 ### getPackageJsonVersion
 
 Returns the package version from the `package.json` file.
