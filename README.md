@@ -35,6 +35,10 @@ defraUtils.updateGithubCommitStatus('Build started', 'PENDING')
 ```
 ## Functions
 
+### getCSProjVersion
+
+Returns the project version from the `[projectName].csproj` file. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
+
 ### getPackageJsonVersion
 
 Returns the package version from the `package.json` file.
@@ -84,15 +88,19 @@ If the build is not for a PR or the master branch an error will be thrown with t
 
 ### getVariables
 
-Takes the repository name as a parameter, i.e. `ffc-demo-web`, and returns information required by the build steps as an array
+Takes the repository name as a parameter, i.e. `ffc-demo-web`, as well as the name of the relevant function to call depending on the project type.
+
+It returns information required by the build steps as an array
 - the PR number, i.e. `53`
-- the container tag, either the branch name or the PR number prefixed with pr, i.e. `pr53`
+- the container tag, either the semver number (for master branch) or the PR number prefixed with pr, i.e. `pr53`
 - the merged PR number
 
 Example usage:
 
 ```
-(pr, containerTag, mergedPrNo) = defraUtils.getVariables('ffc-demo-web')
+(pr, containerTag, mergedPrNo) = defraUtils.getVariables('ffc-demo-payment-service', defraUtils.getPackageJsonVersion())
+    or
+(pr, containerTag, mergedPrNo) = defraUtils.getVariables('ffc-demo-payment-service-core', defraUtils.getCSProjVersion())
 ```
 
 ### updateGithubCommitStatus
