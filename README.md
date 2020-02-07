@@ -88,7 +88,7 @@ If the build is not for a PR or the master branch an error will be thrown with t
 
 ### getVariables
 
-Takes the repository name as a parameter, i.e. `ffc-demo-web`, as well as the name of the relevant function to call depending on the project type.
+Takes the repository name as a parameter, i.e. `ffc-demo-web`, as well as the relevant version parameter to call depending on the project type.
 
 It returns information required by the build steps as an array
 - the PR number, i.e. `53`
