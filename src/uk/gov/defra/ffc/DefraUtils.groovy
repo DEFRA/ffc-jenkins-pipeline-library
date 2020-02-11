@@ -183,6 +183,37 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
   sh(script: "curl -k $url")
 }
 
+def releaseExists(containerTag, repoName, token){
+    result = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/latest/tags/$containerTag")
+    if (result != 0){
+      echo "Release does not exist for $repoName"
+      return false
+    } else {
+      echo "Release does exist for $repoName"
+      return true
+    }
+}
+
+def triggerRelease(containerTag, repoName, releaseDescription, token){
+    if (releaseExists(containerTag, repoName, releaseDescription, token)){
+      echo "The release already exists so not creating new one!"
+      return
+    }
+
+    //need to create new function to check if there is an existing release with same tag if so dont create new release just skip.
+
+    echo "Triggering release for $repoName"
+    def outfile = 'stdout.out'
+    result = sh(returnStatus: true, script: "curl -X POST -H 'Authorization: token $token'  -d '{'tag_name': $containerTag, 'name':'Release $containerTag,'body':$releaseDescription}'  https://api.github.com/repos/DEFRA/$repoName/releases >${outfile} 2>&1")
+    def output = readFile(outfile).trim()
+    if (result != 0){
+      echo "Failed to trigger release for $repoName"
+      throw new Exception (output)
+    } else {
+      echo "Release for $repoName successfully completed"
+    }
+}
+
 def notifySlackBuildFailure(exception, channel) {
 
   def msg = """BUILD FAILED 
