@@ -7,6 +7,24 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
+def provisionInfrastructure(target, item, parameters) {
+  if (target.toLowerCase() === "aws") {
+    switch (item) {
+      case "sqs":
+        // git clone repo...
+        sh("git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git")
+        // cd into repo...
+        sh("cd ffc-terraform/london/sqs")
+        // run terragrunt...
+        sh("terragrunt apply --var \"pr_code=${parameters["pr_code"]}\" --state=${parameters["pr_code"]}_sqs.tfstate")
+      default:
+        error("provisionInfrastructure error: unsupported item ${item}")
+    }
+  } else {
+    error("provisionInfrastructure error: unsupported target ${target}")
+  }
+}
+
 def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
 }
