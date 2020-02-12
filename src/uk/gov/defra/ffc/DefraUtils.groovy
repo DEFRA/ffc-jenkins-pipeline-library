@@ -184,14 +184,24 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
 }
 
 def releaseExists(containerTag, repoName, token){
-    result = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/latest/tags/$containerTag")
-    if (result != 0){
-      echo "Release does not exist for $repoName"
-      return false
-    } else {
+    
+    try{
+      sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/latest/tags/$containerTag")
       echo "Release does exist for $repoName"
       return true
     }
+    catch{
+      echo "Release does not exist for $repoName"
+      return false
+    }
+    // result = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/latest/tags/$containerTag")
+    // if (result != 0){
+    //   echo "Release does not exist for $repoName"
+    //   return false
+    // } else {
+    //   echo "Release does exist for $repoName"
+    //   return true
+    // }
 }
 
 def triggerRelease(containerTag, repoName, releaseDescription, token){
