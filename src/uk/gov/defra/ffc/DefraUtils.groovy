@@ -192,7 +192,7 @@ def releaseExists(containerTag, repoName, token){
 def triggerRelease(containerTag, repoName, releaseDescription, token){
 
     //temp
-    containerTag = "1.0.1"
+    containerTag = "1.0.2"
     //temp
 
     if (releaseExists(containerTag, repoName, token)){
