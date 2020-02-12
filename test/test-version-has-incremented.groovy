@@ -9,5 +9,6 @@ assert defraUtils.versionHasIncremented('1.1.0', '1.0.0') == false
 assert defraUtils.versionHasIncremented('1.0.1', '1.0.0') == false
 assert defraUtils.versionHasIncremented('1.0.0', '1.0.0') == false
 assert defraUtils.versionHasIncremented('1x.0.0', '2.0.0') == false
+assert defraUtils.versionHasIncremented('1.0.0', '2x.0.0') == false
 assert defraUtils.versionHasIncremented('1.0.0.0', '2.0.0') == false
 assert defraUtils.versionHasIncremented('1.0.0', '2.0.0.0') == false
