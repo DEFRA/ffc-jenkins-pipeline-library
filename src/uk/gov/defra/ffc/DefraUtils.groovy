@@ -186,7 +186,7 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
 def releaseExists(containerTag, repoName, token){
     
     //temp
-    containerTag = "1.0.1"
+    containerTag = "1.0.4"
     boolean doesReleaseExist = false
      //latestReleaseNum = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/latest |jq '.tag_name'")  
     doesReleaseExist = sh(returnStdout: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases | jq '.[].tag_name | index(\"$containerTag\") | select (. != null) | tostring | test(\"0\")'").trim()
@@ -207,6 +207,9 @@ def triggerRelease(containerTag, repoName, releaseDescription, token){
       return
     }
 
+    //tmp dont keep creating releases while testing
+    return
+    //
     //need to create new function to check if there is an existing release with same tag if so dont create new release just skip.
 
     echo "Triggering release for $repoName"
