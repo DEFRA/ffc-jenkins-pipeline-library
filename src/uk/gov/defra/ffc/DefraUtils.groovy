@@ -188,13 +188,14 @@ def releaseExists(containerTag, repoName, token){
     //temp
     containerTag = "1.0.1"
 
-     //latestReleaseNum = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/latest |jq '.tag_name'")
-    doesReleaseExist = false
+     //latestReleaseNum = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/latest |jq '.tag_name'")  
     doesReleaseExist = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases |jq '.[].tag_name | index($containerTag) | select (. != null) | tostring | test("0")'")
-
     echo "doesReleaseExist value is $doesReleaseExist"
-
-    return doesReleaseExist
+    if (doesReleaseExist){
+      return true
+    } else {
+      return false
+    }
 }
 
 def triggerRelease(containerTag, repoName, releaseDescription, token){
