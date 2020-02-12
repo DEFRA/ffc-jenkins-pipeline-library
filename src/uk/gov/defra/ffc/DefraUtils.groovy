@@ -192,29 +192,31 @@ def releaseExists(containerTag, repoName, token){
 def triggerRelease(containerTag, repoName, releaseDescription, token){
 
     //temp
-    containerTag = "1.0.2"
+    containerTag = "1.0.5"
     //temp
 
     if (releaseExists(containerTag, repoName, token)){
-      echo "The release already exists so not creating new one!"
+      echo "Release $containerTag already exists"
       return
     }
 
-    //tmp dont keep creating releases while testing
-    echo "Creating new release!"
-    return
-    //
+    echo "Triggering release $containerTag for $repoName"
+    boolean result = false
+    //def outfile = 'stdout.out'
+    //result = sh(returnStdout: true, script: "curl -X POST -H 'Authorization: token $token'  -d '{'tag_name': $containerTag, 'name':'Release $containerTag,'body':$releaseDescription}'  https://api.github.com/repos/DEFRA/$repoName/releases >${outfile} 2>&1")
+    
+    result = sh(returnStdout: true, script: "curl --silent -X POST -H 'Authorization: token $token'  -d '{'tag_name': $containerTag, 'name': 'Release $containerTag','body': $releaseDescription}' https://api.github.com/repos/DEFRA/$repoName/releases | jq '.tag_name | tostring | test(\"$containerTag\")'").trim()
+    
+    //sh(returnStdout: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases | jq '.[].tag_name | index(\"$containerTag\") | select (. != null) | tostring | test(\"0\")'").trim()
+    echo "The release result is $result"
 
-    echo "Triggering release for $repoName"
-    def outfile = 'stdout.out'
-    result = sh(returnStatus: true, script: "curl -X POST -H 'Authorization: token $token'  -d '{'tag_name': $containerTag, 'name':'Release $containerTag,'body':$releaseDescription}'  https://api.github.com/repos/DEFRA/$repoName/releases >${outfile} 2>&1")
-    def output = readFile(outfile).trim()
-    if (result != 0){
-      echo "Failed to trigger release for $repoName"
-      throw new Exception (output)
-    } else {
-      echo "Release for $repoName successfully completed"
-    }
+    // def output = readFile(outfile).trim()
+    // if (result != 0){
+    //   echo "Failed to trigger release for $repoName"
+    //   throw new Exception (output)
+    // } else {
+    //   echo "Release for $repoName successfully completed"
+    // }
 }
 
 def notifySlackBuildFailure(exception, channel) {
