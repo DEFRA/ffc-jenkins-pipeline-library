@@ -209,7 +209,19 @@ def notifySlackBuildFailure(exception, channel) {
   slackSend channel: channel,
             color: "#ff0000",
             message: msg.replace("  ", "")
+}
 
+def versionHasIncremented(currVers, newVers) {
+  try {
+    currVersList = currVers.tokenize('.').collect { it.toInteger() }
+    newVersList = newVers.tokenize('.').collect { it.toInteger() }
+    return currVersList.size() == 3 &&
+           newVersList.size() == 3 &&
+           [0, 1, 2].any { newVersList[it] > currVersList[it] }
+  }
+  catch (Exception ex) {
+    return false
+  }
 }
 
 return this
