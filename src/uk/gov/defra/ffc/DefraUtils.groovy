@@ -187,8 +187,7 @@ def releaseExists(containerTag, repoName, token){
     
     //temp
     containerTag = "1.0.5"
-    doesReleaseExist = false
-     //latestReleaseNum = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/latest |jq '.tag_name'")  
+    boolean doesReleaseExist = false 
     doesReleaseExist = sh(returnStdout: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases | jq '.[].tag_name | index(\"$containerTag\") | select (. != null) | tostring | test(\"0\")'").trim()
     echo "containerTag value is $containerTag"
     echo "doesReleaseExist value is $doesReleaseExist"
