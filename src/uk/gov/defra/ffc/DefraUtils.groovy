@@ -11,6 +11,10 @@ def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
 }
 
+def getCSProjVersionMaster(projName) {
+  return sh(returnStdout: true, script: "git show origin/master:${projName}/${projName}.csproj | xmllint --xpath '//Project/PropertyGroup/Version/text()' -").trim()
+}
+
 def getPackageJsonVersion() {
    return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
 }
