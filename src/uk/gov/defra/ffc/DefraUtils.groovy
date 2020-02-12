@@ -186,8 +186,8 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
 def releaseExists(containerTag, repoName, token){
     
     //temp
-    containerTag = "1.0.4"
-
+    containerTag = "1.0.1"
+    doesReleaseExist = false
      //latestReleaseNum = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/latest |jq '.tag_name'")  
     doesReleaseExist = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases | jq '.[].tag_name | index(\"$containerTag\") | select (. != null) | tostring | test(\"0\")'")
     echo "containerTag value is $containerTag"
