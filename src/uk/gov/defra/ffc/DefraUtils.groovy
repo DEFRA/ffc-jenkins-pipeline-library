@@ -188,12 +188,14 @@ def releaseExists(containerTag, repoName, token){
     
     result = sh(returnStatus: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases | jq '.[].tag_name | index(\"$containerTag\") | select (. != null) | tostring'").trim()
     //echo $result
+    echo "test2"
     if (result == "0"){
       echo "Release exists!"
       doesReleaseExist = true
     } else {
       echo "Release does not exist!"
     }
+    echo "test2"
     
     return doesReleaseExist
 }
