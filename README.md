@@ -33,6 +33,16 @@ Functions can be called on the instantiated library:
 ```
 defraUtils.updateGithubCommitStatus('Build started', 'PENDING')
 ```
+
+## Testing
+
+A simple test harness may be run to unit test functions that are purely `groovy` code. This uses a groovy docker image and may be run via
+```
+./scripts/test
+```
+
+Currently this only tests the `versionHasIncremented` function.
+
 ## Functions
 
 ### getCSProjVersion
