@@ -12,24 +12,24 @@ def provisionInfrastructure(target, item, parameters) {
   if (target.toLowerCase() == "aws") {
     switch (item) {
       case "sqs":
-        sh "pushd ~/repos/"
-        echo "cloning terraform repo"
-        // git clone repo...
-        sh "git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git"
-        echo "copy queue dir into new dir"
-        // cd into repo...
-        sh "cd terragrunt_sqs_queues/london/eu-west-2/ffc/"
-        // copy queue dir into new dir...
-        sh "cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
-        sh "cd pr${parameters["pr_code"]}" 
-        // run terragrunt...
-        echo "provision infrastructure"
-        sh "pwd"
-        //sh("terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve")
-        echo "apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-        echo "infrastructure successfully provisioned"
-        sh "popd" 
-        sh "pwd"
+        dir('/home/ubuntu/repos') {
+          sh "pwd"
+          echo "cloning terraform repo"
+          // git clone repo...
+          sh "git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git"
+          echo "copy queue dir into new dir"
+          // cd into repo...
+          sh "cd terragrunt_sqs_queues/london/eu-west-2/ffc/"
+          // copy queue dir into new dir...
+          sh "cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
+          sh "cd pr${parameters["pr_code"]}" 
+          // run terragrunt...
+          echo "provision infrastructure"
+          sh "pwd"
+          //sh("terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve")
+          echo "apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
+          echo "infrastructure successfully provisioned"
+        }
         break;
       default:
         error("provisionInfrastructure error: unsupported item ${item}")
