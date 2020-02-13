@@ -8,15 +8,20 @@ def commitSha = ''
 def workspace
 
 def provisionInfrastructure(target, item, parameters) {
-  if (target.toLowerCase() === "aws") {
+  if (target.toLowerCase() == "aws") {
     switch (item) {
       case "sqs":
+        sh("cd ~/repos/")
         // git clone repo...
         sh("git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git")
         // cd into repo...
-        sh("cd ffc-terraform/london/sqs")
+        sh("cd terragrunt_sqs_queues/london/eu-west-2/ffc/")
+        // copy queue dir into new dir...
+        sh("mkdir pr${parameters["pr_code"]}")
+        sh("cp -r standard_sqs_queues/* pr${parameters["pr_code"]}/")
+        sh("cd pr${parameters["pr_code"]}")
         // run terragrunt...
-        sh("terragrunt apply --var \"pr_code=${parameters["pr_code"]}\" --state=${parameters["pr_code"]}_sqs.tfstate")
+        sh("terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -state=${parameters["pr_code"]}_sqs.tfstate")
       default:
         error("provisionInfrastructure error: unsupported item ${item}")
     }
