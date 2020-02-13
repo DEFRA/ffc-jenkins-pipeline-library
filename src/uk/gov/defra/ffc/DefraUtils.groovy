@@ -7,9 +7,9 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
-def provisionInfrastructure(target, item, parameters) {
+/*def provisionInfrastructure(target, item, parameters) {
   println "provisionInfrastructure"
-  /* if (target.toLowerCase() == "aws") {
+  if (target.toLowerCase() == "aws") {
     switch (item) {
       case "sqs":
         println "cloning terraform repo"
@@ -33,8 +33,8 @@ def provisionInfrastructure(target, item, parameters) {
     }
   } else {
     error("provisionInfrastructure error: unsupported target ${target}")
-  } */
-}
+  } 
+}*/
 
 def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
