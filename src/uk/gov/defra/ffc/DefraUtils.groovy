@@ -8,7 +8,7 @@ def commitSha = ''
 def workspace
 
 def provisionInfrastructure(target, item, parameters) {
-  println target + ':' + item
+  println "provisionInfrastructure"
   /* if (target.toLowerCase() == "aws") {
     switch (item) {
       case "sqs":
