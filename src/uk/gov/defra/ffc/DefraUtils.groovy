@@ -202,7 +202,7 @@ def releaseExists(containerTag, repoName, token){
 def triggerRelease(containerTag, repoName, releaseDescription, token){
 
     //temp
-    containerTag = "1.0.12"
+    containerTag = "1.0.13"
     //temp
 
     if (releaseExists(containerTag, repoName, token)){
