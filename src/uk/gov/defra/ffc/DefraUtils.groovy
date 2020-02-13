@@ -26,6 +26,7 @@ def provisionInfrastructure(target, item, parameters) {
         println "provision infrastructure"
         sh("terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -state=${parameters["pr_code"]}_sqs.tfstate")
         println "infrastructure successfully provisioned"
+        break;
       default:
         error("provisionInfrastructure error: unsupported item ${item}")
     }
