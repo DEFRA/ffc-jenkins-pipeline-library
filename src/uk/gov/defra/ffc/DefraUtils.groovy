@@ -185,8 +185,7 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
 
 def releaseExists(containerTag, repoName, token){
     def doesReleaseExist = false
-    def result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$containerTag | jq '.tag_name'")
-    result.waitFor()
+    def result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$containerTag | jq '.tag_name'").execute()
     echo "The result is $result"
     if (result == containerTag){
       echo "Release exists!"
@@ -211,8 +210,7 @@ def triggerRelease(containerTag, repoName, releaseDescription, token){
 
     echo "Triggering release $containerTag for $repoName"
     boolean result = false
-    result = sh(returnStdout: true, script: "curl -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$containerTag\", \"name\" : \"Release $containerTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
-    result.waitFor()
+    result = sh(returnStdout: true, script: "curl -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$containerTag\", \"name\" : \"Release $containerTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases").execute()
     echo "The release result is $result"
 
     if (releaseExists(containerTag, repoName, token)){
