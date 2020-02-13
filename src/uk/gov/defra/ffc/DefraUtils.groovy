@@ -202,7 +202,7 @@ def triggerRelease(containerTag, repoName, releaseDescription, token){
 
     echo "Triggering release $containerTag for $repoName"
     boolean result = false
-    result = sh(returnStdout: true, script: "curl -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$containerTag\", \"name\" : \"Release $containerTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases | jq '.tag_name | tostring | test(\"$containerTag\")'").trim()
+    result = sh(returnStdout: true, script: "curl -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$containerTag\", \"name\" : \"Release $containerTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases | jq '.properties.tag_name | tostring | test(\"$containerTag\")'").trim()
     echo "The release result is $result"
 
     // def output = readFile(outfile).trim()
