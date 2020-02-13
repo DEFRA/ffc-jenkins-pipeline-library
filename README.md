@@ -83,6 +83,16 @@ If the version has not incremented correctly, or is invalid, an error will be th
 
 `version increment invalid '1.0.0' -> '1.0.0'`.
 
+### versionHasIncremented
+
+Function used internally in the `verifyCSProjVersionIncremented` and `verifyPackageJsonVersionIncremented` functions.
+
+Takes two parameters of the versions to compare, typically master version and branch version.
+
+The function returns `true` if both versions are valid semvers, and the second version is higher than the first.
+
+The function returns `false` if either version is invalid, or the second version is not higher than the first. 
+
 ### errorOnNoVersionIncrement
 
 Convenience method shared by `verifyPackageJsonVersionIncremented` and `verifyCSProjVersionIncremented` to throw error when the version has not been incremented, or is invalid. 
