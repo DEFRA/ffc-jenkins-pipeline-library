@@ -7,26 +7,29 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
-/*def provisionInfrastructure(target, item, parameters) {
-  println "provisionInfrastructure"
+def provisionInfrastructure(target, item, parameters) {
+  echo "provisionInfrastructure"
   if (target.toLowerCase() == "aws") {
     switch (item) {
       case "sqs":
-        println "cloning terraform repo"
-        sh("cd ~/repos/")
+        sh "pushd ~/repos/"
+        echo "cloning terraform repo"
         // git clone repo...
-        sh("git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git")
-        println "copy queue dir into new dir"
+        sh "git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git"
+        echo "copy queue dir into new dir"
         // cd into repo...
-        sh("cd terragrunt_sqs_queues/london/eu-west-2/ffc/")
+        sh "cd terragrunt_sqs_queues/london/eu-west-2/ffc/"
         // copy queue dir into new dir...
-        sh("mkdir pr${parameters["pr_code"]}")
-        sh("cp -r standard_sqs_queues/* pr${parameters["pr_code"]}/")
-        sh("cd pr${parameters["pr_code"]}")
+        sh "cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
+        sh "cd pr${parameters["pr_code"]}" 
         // run terragrunt...
-        println "provision infrastructure"
-        sh("terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -state=${parameters["pr_code"]}_sqs.tfstate")
-        println "infrastructure successfully provisioned"
+        echo "provision infrastructure"
+        sh "pwd"
+        //sh("terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve")
+        echo "apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
+        echo "infrastructure successfully provisioned"
+        sh "popd" 
+        sh "pwd"
         break;
       default:
         error("provisionInfrastructure error: unsupported item ${item}")
@@ -34,7 +37,7 @@ def workspace
   } else {
     error("provisionInfrastructure error: unsupported target ${target}")
   } 
-}*/
+}
 
 def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
