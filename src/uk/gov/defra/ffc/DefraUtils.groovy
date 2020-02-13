@@ -8,7 +8,8 @@ def commitSha = ''
 def workspace
 
 def provisionInfrastructure(target, item, parameters) {
-  if (target.toLowerCase() == "aws") {
+  println target + ':' + item
+  /* if (target.toLowerCase() == "aws") {
     switch (item) {
       case "sqs":
         println "cloning terraform repo"
@@ -32,7 +33,7 @@ def provisionInfrastructure(target, item, parameters) {
     }
   } else {
     error("provisionInfrastructure error: unsupported target ${target}")
-  }
+  } */
 }
 
 def getCSProjVersion(projName) {
