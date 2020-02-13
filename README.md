@@ -39,9 +39,45 @@ defraUtils.updateGithubCommitStatus('Build started', 'PENDING')
 
 Returns the project version from the `[projectName].csproj` file. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
 
+### getCSProjVersionMaster
+
+Returns the project version from the `[projectName].csproj` file in the master branch. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
+
+### verifyCSProjVersionIncremented
+Compares the master version with the branch version from the provided project name.
+If the version has been incremented correctly a message will be `echoed` displaying the new and the old version, i.e.
+
+`version increment valid '1.0.0' -> '1.0.1'`.
+
+If the version has not incremented correctly, or is invalid, an error will be thrown containing the new and the old versions, i.e.
+
+`version increment invalid '1.0.0' -> '1.0.0'`.
+
+The function requires the project name to be passed as a parameter.
+
 ### getPackageJsonVersion
 
 Returns the package version from the `package.json` file.
+
+### getPackageJsonVersionMaster
+
+Returns the package version from the `package.json` file in the master branch.
+
+### verifyPackageJsonVersionIncremented
+Compares the master version with the branch version of the `package.json`.
+If the version has been incremented correctly message will be `echoed` displaying the new and the old version, i.e.
+
+`version increment valid '1.0.0' -> '1.0.1'`.
+
+If the version has not incremented correctly, or is invalid, an error will be thrown containing the new and the old versions, i.e.
+
+`version increment invalid '1.0.0' -> '1.0.0'`.
+
+### errorOnNoVersionIncrement
+
+Convenience method shared by `verifyPackageJsonVersionIncremented` and `verifyCSProjVersionIncremented` to throw error when the version has not been incremented, or is invalid. 
+
+Takes two parameters - master version and branch version.
 
 ### replaceInFile
 
