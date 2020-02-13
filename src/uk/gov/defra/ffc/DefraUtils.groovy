@@ -205,6 +205,8 @@ def triggerRelease(containerTag, repoName, releaseDescription, token){
     result = sh(returnStdout: true, script: "curl -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$containerTag\", \"name\" : \"Release $containerTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
     echo "The release result is $result"
 
+
+
     // def output = readFile(outfile).trim()
     // if (result != 0){
     //   echo "Failed to trigger release for $repoName"
