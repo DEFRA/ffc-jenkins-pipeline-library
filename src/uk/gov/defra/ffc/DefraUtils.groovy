@@ -185,11 +185,10 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
 
 def releaseExists(containerTag, repoName, token){
     def doesReleaseExist = false
-    String containerTagString = containerTag.toString()
     String result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$containerTag | jq '.tag_name'") 
-    echo "The container tagg is $containerTagString"
+    echo "The container tagg is $containerTag"
     echo "The result is $result"
-    if (result == containerTagString){
+    if (result == containerTag){
       echo "Release exists!"
       doesReleaseExist = true
     } else {
@@ -202,7 +201,7 @@ def releaseExists(containerTag, repoName, token){
 def triggerRelease(containerTag, repoName, releaseDescription, token){
 
     //temp
-    containerTag = "1.0.14"
+    containerTag = '1.0.14'
     //temp
 
     if (releaseExists(containerTag, repoName, token)){
