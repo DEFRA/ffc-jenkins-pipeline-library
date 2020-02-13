@@ -16,11 +16,31 @@ def getCSProjVersionMaster(projName) {
 }
 
 def getPackageJsonVersion() {
-   return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
+  return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
 }
 
 def getPackageJsonVersionMaster() {
-   return sh(returnStdout: true, script: "git show origin/master:package.json | jq -r '.version'").trim()
+  return sh(returnStdout: true, script: "git show origin/master:package.json | jq -r '.version'").trim()
+}
+
+def verifyCSProjVersionIncremented(projectName) {
+  def masterVersion = getCSProjVersionMaster(projectName)
+  def version = getCSProjVersion(projectName)
+  errorOnNoVersionIncrement(masterVersion, version)
+}
+
+def verifyPackageJsonVersionIncremented() {
+  def masterVersion = defraUtils.getPackageJsonVersionMaster()
+  def version = defraUtils.getPackageJsonVersion()
+  errorOnNoVersionIncrement(masterVersion, version)
+}
+
+def errorOnNoVersionIncrement(masterVersion, version){
+  if (versionHasIncremented(masterVersion, version)) {
+    echo "version increment valid '$masterVersion' -> '$version'"
+  } else {
+    error( "version increment invalid '$masterVersion' -> '$version'")
+  }
 }
 
 def replaceInFile(from, to, file) {
