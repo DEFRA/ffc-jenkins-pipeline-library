@@ -206,7 +206,7 @@ def triggerRelease(containerTag, repoName, releaseDescription, token){
     //result = sh(returnStdout: true, script: "curl -X POST -H 'Authorization: token $token'  -d '{'tag_name': $containerTag, 'name':'Release $containerTag,'body':$releaseDescription}'  https://api.github.com/repos/DEFRA/$repoName/releases >${outfile} 2>&1")
     
     //result = 
-    sh(returnStdout: true, script: "curl -g -X POST -H 'Authorization: token $token' -d '{'tag_name': $containerTag, 'name': $containerTag, 'body': $releaseDescription}' https://api.github.com/repos/DEFRA/$repoName/releases") // | jq '.tag_name | tostring | test(\"$containerTag\")'").trim()
+    sh(returnStdout: true, script: "curl -g -X POST -H \"Authorization: token $token\" -d \"{\"tag_name\": \"$containerTag\", \"name\": \"$containerTag\", \"body\": \"$releaseDescription\"\"}\" https://api.github.com/repos/DEFRA/$repoName/releases") // | jq '.tag_name | tostring | test(\"$containerTag\")'").trim()
     
     //sh(returnStdout: true, script: "curl --silent -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases | jq '.[].tag_name | index(\"$containerTag\") | select (. != null) | tostring | test(\"0\")'").trim()
     echo "The release result is $result"
