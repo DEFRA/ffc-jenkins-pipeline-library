@@ -211,6 +211,7 @@ def triggerRelease(containerTag, repoName, releaseDescription, token){
     echo "Triggering release $containerTag for $repoName"
     boolean result = false
     result = sh(returnStdout: true, script: "curl -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$containerTag\", \"name\" : \"Release $containerTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
+    result.waitFor()
     echo "The release result is $result"
 
     if (releaseExists(containerTag, repoName, token)){
