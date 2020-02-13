@@ -12,7 +12,7 @@ def provisionInfrastructure(target, item, parameters) {
   if (target.toLowerCase() == "aws") {
     switch (item) {
       case "sqs":
-        dir('/home/ubuntu/repos') {
+        dir('/tmp/jenkins-test') {
           sh "pwd"
           echo "cloning terraform repo"
           // git clone repo...
