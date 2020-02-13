@@ -186,8 +186,8 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
 def releaseExists(containerTag, repoName, token){
     def doesReleaseExist = false
     def result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$containerTag | jq '.tag_name'") 
-    echo "The container tag is " $containerTag
-    echo "The result is " $result
+    echo "The container tag is $containerTag"
+    echo "The result is $result"
     if (result.toString().equals(containerTag.toString())){
       echo "Release exists!"
       doesReleaseExist = true
