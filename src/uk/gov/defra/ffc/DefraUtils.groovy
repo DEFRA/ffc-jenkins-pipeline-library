@@ -30,8 +30,8 @@ def verifyCSProjVersionIncremented(projectName) {
 }
 
 def verifyPackageJsonVersionIncremented() {
-  def masterVersion = defraUtils.getPackageJsonVersionMaster()
-  def version = defraUtils.getPackageJsonVersion()
+  def masterVersion = getPackageJsonVersionMaster()
+  def version = getPackageJsonVersion()
   errorOnNoVersionIncrement(masterVersion, version)
 }
 
