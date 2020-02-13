@@ -190,8 +190,10 @@ def releaseExists(containerTag, repoName, token){
     echo $result
     if (result == "0"){
       doesReleaseExist = true
-    } 
-    echo $doesReleaseExist
+      echo "Release exists!"
+    } else {
+      echo "Release dont exist!"
+    }
     
     return doesReleaseExist
 }
