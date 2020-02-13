@@ -33,15 +33,71 @@ Functions can be called on the instantiated library:
 ```
 defraUtils.updateGithubCommitStatus('Build started', 'PENDING')
 ```
+
+## Testing
+
+A simple test harness may be run to unit test functions that are purely `groovy` code. This uses a groovy docker image and may be run via
+```
+./scripts/test
+```
+
+Currently this only tests the `versionHasIncremented` function.
+
 ## Functions
 
 ### getCSProjVersion
 
 Returns the project version from the `[projectName].csproj` file. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
 
+### getCSProjVersionMaster
+
+Returns the project version from the `[projectName].csproj` file in the master branch. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
+
+### verifyCSProjVersionIncremented
+Compares the master version with the branch version from the provided project name.
+If the version has been incremented correctly a message will be `echoed` displaying the new and the old version, i.e.
+
+`version increment valid '1.0.0' -> '1.0.1'`.
+
+If the version has not incremented correctly, or is invalid, an error will be thrown containing the new and the old versions, i.e.
+
+`version increment invalid '1.0.0' -> '1.0.0'`.
+
+The function requires the project name to be passed as a parameter.
+
 ### getPackageJsonVersion
 
 Returns the package version from the `package.json` file.
+
+### getPackageJsonVersionMaster
+
+Returns the package version from the `package.json` file in the master branch.
+
+### verifyPackageJsonVersionIncremented
+Compares the master version with the branch version of the `package.json`.
+If the version has been incremented correctly message will be `echoed` displaying the new and the old version, i.e.
+
+`version increment valid '1.0.0' -> '1.0.1'`.
+
+If the version has not incremented correctly, or is invalid, an error will be thrown containing the new and the old versions, i.e.
+
+`version increment invalid '1.0.0' -> '1.0.0'`.
+
+### versionHasIncremented
+
+Function used internally in the `verifyCSProjVersionIncremented` and `verifyPackageJsonVersionIncremented` functions.
+
+Takes two parameters of the versions to compare, typically master version and branch version.
+
+The function returns `true` if both versions are valid semvers, and the second version is higher than the first.
+
+The function returns `false` if either version is invalid, or the second version is not higher than the first. 
+
+### errorOnNoVersionIncrement
+
+Convenience method shared by `verifyPackageJsonVersionIncremented` and `verifyCSProjVersionIncremented` to throw error when the version has not been incremented, or is invalid. 
+
+Takes two parameters - master version and branch version.
 
 ### replaceInFile
 

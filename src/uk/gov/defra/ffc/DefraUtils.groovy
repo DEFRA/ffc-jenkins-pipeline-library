@@ -11,8 +11,36 @@ def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
 }
 
+def getCSProjVersionMaster(projName) {
+  return sh(returnStdout: true, script: "git show origin/master:${projName}/${projName}.csproj | xmllint --xpath '//Project/PropertyGroup/Version/text()' -").trim()
+}
+
 def getPackageJsonVersion() {
-   return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
+  return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
+}
+
+def getPackageJsonVersionMaster() {
+  return sh(returnStdout: true, script: "git show origin/master:package.json | jq -r '.version'").trim()
+}
+
+def verifyCSProjVersionIncremented(projectName) {
+  def masterVersion = getCSProjVersionMaster(projectName)
+  def version = getCSProjVersion(projectName)
+  errorOnNoVersionIncrement(masterVersion, version)
+}
+
+def verifyPackageJsonVersionIncremented() {
+  def masterVersion = getPackageJsonVersionMaster()
+  def version = getPackageJsonVersion()
+  errorOnNoVersionIncrement(masterVersion, version)
+}
+
+def errorOnNoVersionIncrement(masterVersion, version){
+  if (versionHasIncremented(masterVersion, version)) {
+    echo "version increment valid '$masterVersion' -> '$version'"
+  } else {
+    error( "version increment invalid '$masterVersion' -> '$version'")
+  }
 }
 
 def replaceInFile(from, to, file) {
@@ -112,7 +140,7 @@ def createTestReportJUnit(){
 
 def deleteTestOutput(name) {
     // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
-    sh "docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"  
+    sh "[ -d \"$WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"  
 }
 
 def analyseCode(sonarQubeEnv, sonarScanner, params) {
@@ -209,7 +237,19 @@ def notifySlackBuildFailure(exception, channel) {
   slackSend channel: channel,
             color: "#ff0000",
             message: msg.replace("  ", "")
+}
 
+def versionHasIncremented(currVers, newVers) {
+  try {
+    currVersList = currVers.tokenize('.').collect { it.toInteger() }
+    newVersList = newVers.tokenize('.').collect { it.toInteger() }
+    return currVersList.size() == 3 &&
+           newVersList.size() == 3 &&
+           [0, 1, 2].any { newVersList[it] > currVersList[it] }
+  }
+  catch (Exception ex) {
+    return false
+  }
 }
 
 return this
