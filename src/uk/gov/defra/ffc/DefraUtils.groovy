@@ -140,7 +140,7 @@ def createTestReportJUnit(){
 
 def deleteTestOutput(name) {
     // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
-    sh "docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"  
+    sh "[ -d \"$WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"  
 }
 
 def analyseCode(sonarQubeEnv, sonarScanner, params) {
