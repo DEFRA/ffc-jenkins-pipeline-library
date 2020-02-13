@@ -11,9 +11,11 @@ def provisionInfrastructure(target, item, parameters) {
   if (target.toLowerCase() == "aws") {
     switch (item) {
       case "sqs":
+        println "cloning terraform repo"
         sh("cd ~/repos/")
         // git clone repo...
         sh("git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git")
+        println "copy queue dir into new dir"
         // cd into repo...
         sh("cd terragrunt_sqs_queues/london/eu-west-2/ffc/")
         // copy queue dir into new dir...
@@ -21,7 +23,9 @@ def provisionInfrastructure(target, item, parameters) {
         sh("cp -r standard_sqs_queues/* pr${parameters["pr_code"]}/")
         sh("cd pr${parameters["pr_code"]}")
         // run terragrunt...
+        println "provision infrastructure"
         sh("terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -state=${parameters["pr_code"]}_sqs.tfstate")
+        println "infrastructure successfully provisioned"
       default:
         error("provisionInfrastructure error: unsupported item ${item}")
     }
