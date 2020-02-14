@@ -18,7 +18,7 @@ sshagent(['helm-chart-creds']) {
             git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'            
             // terragrunt destroy
             echo "HORROR!!! destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-            // sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
+            sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
             // delete the pr dir
             echo "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
             //sh "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
