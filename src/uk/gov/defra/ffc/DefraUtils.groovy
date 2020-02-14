@@ -7,6 +7,38 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
+def destroyInfrastructure(target, item, parameters) {
+sshagent(['helm-chart-creds']) {
+    echo "destroyInfrastructure"
+    if (target.toLowerCase() == "aws") {
+      switch (item) {
+        case "sqs":
+          dir('terragrunt') {
+            // git clone repo...
+            git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'            
+            // terragrunt destroy
+            echo "HORROR!!! destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
+            // sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
+            // delete the pr dir
+            echo "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
+            //sh "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
+            // commit the changes back
+            echo "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"
+            //sh "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"            
+            echo "infrastructure successfully destroyed"
+            // Recursively delete the current dir (which should be terragrunt in the current job workspace)
+            deleteDir()
+          }
+          break;
+        default:
+          error("destroyInfrastructure error: unsupported item ${item}")
+      }
+    } else {
+      error("destroyInfrastructure error: unsupported target ${target}")
+    } 
+  }
+}
+
 def provisionInfrastructure(target, item, parameters) {
   sshagent(['helm-chart-creds']) {
     echo "provisionInfrastructure"
