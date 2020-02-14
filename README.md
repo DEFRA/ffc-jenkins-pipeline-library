@@ -136,6 +136,10 @@ Obtains the remote URL of the current repository, i.e. `https://github.com/DEFRA
 
 Return the SHA hash of the latest commit for the current repository, i.e. `9fd0a77d3eaa3d4370d3f31158f37dd8abd19fae`
 
+### getCommitMessage
+
+Return the message of the latest commit for the current repository.
+
 ### verifyCommitBuildable
 
 If the build is a branch with a Pull Request (PR), or the master branch a message will be `echoed` describing the type of build.
