@@ -189,10 +189,10 @@ def releaseExists(containerTag, repoName, token){
       def result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' httpsZZZ://api.github.com/repos/DEFRA/$repoName/releases/tags/$containerTag | jq '.tag_name'").trim().replaceAll (/"/, '') == "$containerTag" ? true : false
       return doesReleaseExist
     }
-    catch
+    catch(Exception ex)
     {
-      //echo "Failed to check release status on github"
-      throw new Exception ("Failed to check github release status")
+      echo "Failed to check release status on github"
+      throw new Exception (ex)
     }
     // echo "The container tagg is ($containerTag)"
     // echo "The result is ($result)"
