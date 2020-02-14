@@ -190,6 +190,7 @@ def releaseExists(containerTag, repoName, token){
     }
     catch(Exception ex) {
       echo "Failed to check release status on github"
+      echo $ex
       throw new Exception (ex)
     }  
 }
