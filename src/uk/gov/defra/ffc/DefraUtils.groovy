@@ -29,7 +29,7 @@ def provisionInfrastructure(target, item, parameters) {
             echo "provision infrastructure"
             //sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; pwd"
             sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
-            sh "cd london/eu-west-2/ffc ; git add pr${parameters["pr_code"]} ; git commit -m \"pr${parameters["pr_code"]}\" ; git push"
+            sh "cd london/eu-west-2/ffc ; git add pr${parameters["pr_code"]} ; git commit -m \"pr${parameters["pr_code"]}\" ; git push --set-upstream origin master"
             echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
             echo "infrastructure successfully provisioned"
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
