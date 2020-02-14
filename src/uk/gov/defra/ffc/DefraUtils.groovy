@@ -195,7 +195,7 @@ def releaseExists(containerTag, repoName, token){
     }  
 }
 
-def triggerRelease(containerTag, repoName, releaseDescription, token){
+def triggerRelease(String containerTag, repoName, releaseDescription, token){
 
     //temp
     //containerTag = '1.0.16'
