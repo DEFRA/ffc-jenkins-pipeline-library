@@ -184,26 +184,14 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
 }
 
 def releaseExists(containerTag, repoName, token){
-    try
-    {
-      def result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' httpsZZZ://api.github.com/repos/DEFRA/$repoName/releases/tags/$containerTag | jq '.tag_name'").trim().replaceAll (/"/, '') == "$containerTag" ? true : false
+    try {
+      def result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$containerTag | jq '.tag_name'").trim().replaceAll (/"/, '') == "$containerTag" ? true : false
       return doesReleaseExist
     }
-    catch(Exception ex)
-    {
+    catch(Exception ex) {
       echo "Failed to check release status on github"
       throw new Exception (ex)
-    }
-    // echo "The container tagg is ($containerTag)"
-    // echo "The result is ($result)"
-    // if (result){
-    //   echo "Release exists!"
-    //   doesReleaseExist = true
-    // } else {
-    //   echo "Release does not exist!"
-    // }
-    
-    
+    }  
 }
 
 def triggerRelease(containerTag, repoName, releaseDescription, token){
@@ -224,17 +212,7 @@ def triggerRelease(containerTag, repoName, releaseDescription, token){
 
     if (releaseExists(containerTag, repoName, token)){
       echo "Release Successful"
-    } else {
-      echo "Release Failed"
     }
-
-    // def output = readFile(outfile).trim()
-    // if (result != 0){
-    //   echo "Failed to trigger release for $repoName"
-    //   throw new Exception (output)
-    // } else {
-    //   echo "Release for $repoName successfully completed"
-    // }
 }
 
 def notifySlackBuildFailure(exception, channel) {
