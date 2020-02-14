@@ -26,9 +26,9 @@ def provisionInfrastructure(target, item, parameters) {
           // sh "cd pr${parameters["pr_code"]}" 
           // run terragrunt...
           echo "provision infrastructure"
-          // sh "pwd"
-          //sh("terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve")
-          echo "apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
+          sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; pwd"
+          //sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
+          echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
           echo "infrastructure successfully provisioned"
         }
         break;
