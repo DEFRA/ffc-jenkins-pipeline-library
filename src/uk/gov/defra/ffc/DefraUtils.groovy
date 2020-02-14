@@ -8,36 +8,38 @@ def commitSha = ''
 def workspace
 
 def provisionInfrastructure(target, item, parameters) {
-  echo "provisionInfrastructure"
-  if (target.toLowerCase() == "aws") {
-    switch (item) {
-      case "sqs":
-        dir('terragrunt') {
-          sh "pwd"
-          echo "cloning terraform repo"
-          // git clone repo...
-          git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
-          // sh "git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git"
-          echo "copy queue dir into new dir"
-          // cd into repo...
-          sh "cd london/eu-west-2/ffc/ ; cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
-          // copy queue dir into new dir...
-          // sh "cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
-          // sh "cd pr${parameters["pr_code"]}" 
-          // run terragrunt...
-          echo "provision infrastructure"
-          //sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; pwd"
-          sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
-          echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-          echo "infrastructure successfully provisioned"
-        }
-        break;
-      default:
-        error("provisionInfrastructure error: unsupported item ${item}")
-    }
-  } else {
-    error("provisionInfrastructure error: unsupported target ${target}")
-  } 
+  sshagent(['helm-chart-creds']) {
+    echo "provisionInfrastructure"
+    if (target.toLowerCase() == "aws") {
+      switch (item) {
+        case "sqs":
+          dir('terragrunt') {
+            sh "pwd"
+            echo "cloning terraform repo"
+            // git clone repo...
+            git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
+            // sh "git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git"
+            echo "copy queue dir into new dir"
+            // cd into repo...
+            sh "cd london/eu-west-2/ffc/ ; cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
+            // copy queue dir into new dir...
+            // sh "cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
+            // sh "cd pr${parameters["pr_code"]}" 
+            // run terragrunt...
+            echo "provision infrastructure"
+            //sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; pwd"
+            sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
+            echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
+            echo "infrastructure successfully provisioned"
+          }
+          break;
+        default:
+          error("provisionInfrastructure error: unsupported item ${item}")
+      }
+    } else {
+      error("provisionInfrastructure error: unsupported target ${target}")
+    } 
+  }
 }
 
 def getCSProjVersion(projName) {
