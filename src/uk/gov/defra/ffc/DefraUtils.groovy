@@ -190,16 +190,11 @@ def releaseExists(containerTag, repoName, token){
     }
     catch(Exception ex) {
       echo "Failed to check release status on github"
-      echo "$ex"
       throw new Exception (ex)
     }  
 }
 
-def triggerRelease(String containerTag, repoName, releaseDescription, token){
-
-    //temp
-    //containerTag = '1.0.16'
-    //temp
+def triggerRelease(containerTag, repoName, releaseDescription, token){
 
     if (releaseExists(containerTag, repoName, token)){
       echo "Release $containerTag already exists"
@@ -210,7 +205,7 @@ def triggerRelease(String containerTag, repoName, releaseDescription, token){
     boolean result = false
     result = sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$containerTag\", \"name\" : \"Release $containerTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
     echo "The release result is $result"
-
+    
     if (releaseExists(containerTag, repoName, token)){
       echo "Release Successful"
     }
