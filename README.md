@@ -343,7 +343,7 @@ Takes four parameters:
 - the GitHub connection token secret text
 
 ```
-triggerRelease(ontainerTag, repoName, releaseDescription, token)
+triggerRelease(containerTag, repoName, releaseDescription, token)
 ```
 
 
