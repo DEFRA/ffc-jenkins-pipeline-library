@@ -77,15 +77,15 @@ def getVariables(repoName, version) {
     // Note: This will cause issues if one branch has two open PRs
     pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
     verifyCommitBuildable()
-      
-    def rawTag
+    
     if (branch == "master") {
-      rawTag = version
+      containerTag = version
     } else {
-      rawTag = pr == '' ? branch : "pr$pr"
+
+      def rawTag = pr == '' ? branch : "pr$pr"
+      containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
-    containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
     commitSha = getCommitSha()
