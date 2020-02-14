@@ -60,6 +60,10 @@ def getCommitSha() {
   return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
 }
 
+def getCommitMessage() {
+  return sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
+}
+
 def verifyCommitBuildable() {
     if (pr) {
       echo "Building PR$pr"
