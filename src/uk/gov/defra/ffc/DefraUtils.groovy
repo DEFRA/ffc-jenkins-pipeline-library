@@ -53,7 +53,7 @@ def provisionInfrastructure(target, item, parameters) {
             if (fileExists("london/eu-west-2/ffc/pr${parameters["pr_code"]}/terraform.tfvars")) {
               echo "pr${parameters["pr_code"]} directory exists, so infrastructure has already been provisioned"
             } else {
-              echo "pr${parameters["pr_code]} directory doesn't exist, so provisioning infrastructure"
+              echo "pr${parameters["pr_code"]} directory doesn't exist, so provisioning infrastructure"
               echo "copy queue dir into new dir"
               // cd into repo, copy queue dir into new dir...
               sh "cd london/eu-west-2/ffc/ ; cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
