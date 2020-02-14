@@ -318,6 +318,35 @@ Example usage:
 defraUtils.triggerDeploy((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chartVersion':'1.0.0'])
 ```
 
+
+### checkReleaseExists
+
+Checks GitHub to determine if a given Release Tag already exists for that repo.
+
+Takes three parameters:
+- the container tag in semver format to check for on GitHub e.g 1.0.0
+- the repository name to check
+- the GitHub connection token secret text
+
+```
+releaseExists(containerTag, repoName, token)
+```
+
+### triggerRelease
+
+Triggers a release to be created on GitHub for a given repo only where a release with the identical semver does not already exist
+
+Takes four parameters:
+- the container tag in semver format to check for on GitHub e.g 1.0.0
+- the repository name to check
+- the release description text
+- the GitHub connection token secret text
+
+```
+triggerRelease(ontainerTag, repoName, releaseDescription, token)
+```
+
+
 ### notifySlackBuildFailure
 
 Sends a message to the ffc-notifications Slack workspace when the jenkins build fails.
