@@ -31,6 +31,8 @@ def provisionInfrastructure(target, item, parameters) {
             sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
             echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
             echo "infrastructure successfully provisioned"
+            // Recursively delete the current dir (which should be terragrunt in the current job workspace)
+            deleteDir()
           }
           break;
         default:
