@@ -319,7 +319,7 @@ defraUtils.triggerDeploy((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chart
 ```
 
 
-### checkReleaseExists
+### releaseExists
 
 Checks GitHub to determine if a given Release Tag already exists for that repo.
 
