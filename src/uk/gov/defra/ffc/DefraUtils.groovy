@@ -21,7 +21,7 @@ def provisionInfrastructure(target, item, parameters) {
             // sh "git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git"
             echo "copy queue dir into new dir"
             // cd into repo...
-            sh "cd london/eu-west-2/ffc/ ; cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
+            sh "cd london/eu-west-2/ffc/ ; cp -fr standard_sqs_queues/* pr${parameters["pr_code"]}"
             // copy queue dir into new dir...
             // sh "cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
             // sh "cd pr${parameters["pr_code"]}" 
@@ -29,6 +29,7 @@ def provisionInfrastructure(target, item, parameters) {
             echo "provision infrastructure"
             //sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; pwd"
             sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
+            sh "cd london/eu-west-2/ffc ; git add pr${parameters["pr_code"]} ; git commit -m \"pr${parameters["pr_code"]}\" ; git push"
             echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
             echo "infrastructure successfully provisioned"
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
