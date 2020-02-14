@@ -12,7 +12,7 @@ def provisionInfrastructure(target, item, parameters) {
   if (target.toLowerCase() == "aws") {
     switch (item) {
       case "sqs":
-        dir('/tmp/jenkins-test') {
+        dir('terragrunt') {
           sh "pwd"
           echo "cloning terraform repo"
           // git clone repo...
@@ -26,8 +26,8 @@ def provisionInfrastructure(target, item, parameters) {
           // sh "cd pr${parameters["pr_code"]}" 
           // run terragrunt...
           echo "provision infrastructure"
-          sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; pwd"
-          //sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
+          //sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; pwd"
+          sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
           echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
           echo "infrastructure successfully provisioned"
         }
