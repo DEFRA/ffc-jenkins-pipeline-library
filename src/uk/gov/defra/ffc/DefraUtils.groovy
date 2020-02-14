@@ -200,6 +200,7 @@ def publishChart(registry, imageName, containerTag) {
       dir('helm-charts') {
         sh 'helm init -c'
         sh "sed -i -e 's/image: $imageName/image: $registry\\/$imageName:$containerTag/' ../helm/$imageName/values.yaml"
+        sh "sed -i -e 's/version:*/version: $containerTag/' ../helm/$imageName/Chart.yaml"
         sh "helm package ../helm/$imageName"
         sh 'helm repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
@@ -258,7 +259,7 @@ def notifySlackBuildFailure(exception, channel) {
           ${exception}
           (<${BUILD_URL}|Open>)"""
 
-  if(JOB_NAME.contains("/master/")) {
+  if(branch == "master") {
     msg = '@here '.concat(msg);
     channel = "#masterbuildfailures"
   }
