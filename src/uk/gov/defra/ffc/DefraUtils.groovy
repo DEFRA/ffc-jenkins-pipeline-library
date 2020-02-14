@@ -81,7 +81,6 @@ def getVariables(repoName, version) {
     if (branch == "master") {
       containerTag = version
     } else {
-
       def rawTag = pr == '' ? branch : "pr$pr"
       containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
@@ -200,7 +199,7 @@ def publishChart(registry, imageName, containerTag) {
       dir('helm-charts') {
         sh 'helm init -c'
         sh "sed -i -e 's/image: $imageName/image: $registry\\/$imageName:$containerTag/' ../helm/$imageName/values.yaml"
-        sh "sed -i -e 's/version:*/version: $containerTag/' ../helm/$imageName/Chart.yaml"
+        sh "sed -i -e 's/version:.*/version: $containerTag/' ../helm/$imageName/Chart.yaml"
         sh "helm package ../helm/$imageName"
         sh 'helm repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
