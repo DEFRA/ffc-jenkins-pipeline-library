@@ -20,7 +20,7 @@ def provisionInfrastructure(target, item, parameters) {
           // sh "git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git"
           echo "copy queue dir into new dir"
           // cd into repo...
-          sh "cd terragrunt_sqs_queues/london/eu-west-2/ffc/"
+          sh "cd london/eu-west-2/ffc/"
           // copy queue dir into new dir...
           sh "cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
           sh "cd pr${parameters["pr_code"]}" 
