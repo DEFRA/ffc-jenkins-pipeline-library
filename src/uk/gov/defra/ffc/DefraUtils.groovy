@@ -23,8 +23,8 @@ sshagent(['helm-chart-creds']) {
             echo "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
             //sh "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
             // commit the changes back
-            echo "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\""
-            //sh "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\""            
+            echo "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"
+            //sh "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"            
             echo "infrastructure successfully destroyed"
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
             deleteDir()
