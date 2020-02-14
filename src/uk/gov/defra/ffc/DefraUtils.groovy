@@ -16,7 +16,8 @@ def provisionInfrastructure(target, item, parameters) {
           sh "pwd"
           echo "cloning terraform repo"
           // git clone repo...
-          sh "git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git"
+          git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
+          // sh "git clone git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git"
           echo "copy queue dir into new dir"
           // cd into repo...
           sh "cd terragrunt_sqs_queues/london/eu-west-2/ffc/"
