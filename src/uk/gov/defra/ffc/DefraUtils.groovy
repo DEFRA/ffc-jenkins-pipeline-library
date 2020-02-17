@@ -190,6 +190,16 @@ def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   }
 }
 
+def setupRbacForNamespace(cluster, namespace, credentialsId, rolearn, username) {
+
+  echo "${cluster} ${namespace}, ${credentialsId} ${rolearn} ${username}"
+
+  sh "eksctl create iamidentitymapping --cluster ${cluster} --arn ${rolearn} --username ${username}"
+  withKubeConfig([credentialsId: credentialsId]) {
+    sh "kubectl create rolebinding ${username}-EDIT-ROLEBINDING --user ${username} --clusterrole edit --namespace ${namespace}"
+  }
+}
+
 def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
 }
