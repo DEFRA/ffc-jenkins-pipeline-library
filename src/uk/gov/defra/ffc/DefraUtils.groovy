@@ -80,8 +80,36 @@ def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
 }
 
+def getCSProjVersionMaster(projName) {
+  return sh(returnStdout: true, script: "git show origin/master:${projName}/${projName}.csproj | xmllint --xpath '//Project/PropertyGroup/Version/text()' -").trim()
+}
+
 def getPackageJsonVersion() {
-   return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
+  return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
+}
+
+def getPackageJsonVersionMaster() {
+  return sh(returnStdout: true, script: "git show origin/master:package.json | jq -r '.version'").trim()
+}
+
+def verifyCSProjVersionIncremented(projectName) {
+  def masterVersion = getCSProjVersionMaster(projectName)
+  def version = getCSProjVersion(projectName)
+  errorOnNoVersionIncrement(masterVersion, version)
+}
+
+def verifyPackageJsonVersionIncremented() {
+  def masterVersion = getPackageJsonVersionMaster()
+  def version = getPackageJsonVersion()
+  errorOnNoVersionIncrement(masterVersion, version)
+}
+
+def errorOnNoVersionIncrement(masterVersion, version){
+  if (versionHasIncremented(masterVersion, version)) {
+    echo "version increment valid '$masterVersion' -> '$version'"
+  } else {
+    error( "version increment invalid '$masterVersion' -> '$version'")
+  }
 }
 
 def replaceInFile(from, to, file) {
@@ -101,6 +129,10 @@ def getCommitSha() {
   return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
 }
 
+def getCommitMessage() {
+  return sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
+}
+
 def verifyCommitBuildable() {
     if (pr) {
       echo "Building PR$pr"
@@ -118,15 +150,14 @@ def getVariables(repoName, version) {
     // Note: This will cause issues if one branch has two open PRs
     pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
     verifyCommitBuildable()
-
-    def rawTag
+    
     if (branch == "master") {
-      rawTag = version
+      containerTag = version
     } else {
-      rawTag = pr == '' ? branch : "pr$pr"
+      def rawTag = pr == '' ? branch : "pr$pr"
+      containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
-    containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
     commitSha = getCommitSha()
@@ -181,7 +212,7 @@ def createTestReportJUnit(){
 
 def deleteTestOutput(name) {
     // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
-    sh "docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"
+    sh "[ -d \"$WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"  
 }
 
 def analyseCode(sonarQubeEnv, sonarScanner, params) {
@@ -241,6 +272,7 @@ def publishChart(registry, imageName, containerTag) {
       dir('helm-charts') {
         sh 'helm init -c'
         sh "sed -i -e 's/image: $imageName/image: $registry\\/$imageName:$containerTag/' ../helm/$imageName/values.yaml"
+        sh "sed -i -e 's/version:.*/version: $containerTag/' ../helm/$imageName/Chart.yaml"
         sh "helm package ../helm/$imageName"
         sh 'helm repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
@@ -263,6 +295,35 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
   sh(script: "curl -k $url")
 }
 
+def releaseExists(containerTag, repoName, token){
+    try {
+      def result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$containerTag | jq '.tag_name'").trim().replaceAll (/"/, '') == "$containerTag" ? true : false
+      return result
+    }
+      catch(Exception ex) {
+      echo "Failed to check release status on github"
+      throw new Exception (ex)
+    }  
+}
+
+def triggerRelease(containerTag, repoName, releaseDescription, token){
+    if (releaseExists(containerTag, repoName, token)){
+      echo "Release $containerTag already exists"
+      return
+    }
+
+    echo "Triggering release $containerTag for $repoName"
+    boolean result = false
+    result = sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$containerTag\", \"name\" : \"Release $containerTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
+    echo "The release result is $result"
+
+    if (releaseExists(containerTag, repoName, token)){
+      echo "Release Successful"
+    } else {
+      throw new Exception("Release failed")
+    }
+}
+
 def notifySlackBuildFailure(exception, channel) {
 
   def msg = """BUILD FAILED
@@ -270,7 +331,7 @@ def notifySlackBuildFailure(exception, channel) {
           ${exception}
           (<${BUILD_URL}|Open>)"""
 
-  if(JOB_NAME.contains("/master/")) {
+  if(branch == "master") {
     msg = '@here '.concat(msg);
     channel = "#masterbuildfailures"
   }
@@ -278,7 +339,19 @@ def notifySlackBuildFailure(exception, channel) {
   slackSend channel: channel,
             color: "#ff0000",
             message: msg.replace("  ", "")
+}
 
+def versionHasIncremented(currVers, newVers) {
+  try {
+    currVersList = currVers.tokenize('.').collect { it.toInteger() }
+    newVersList = newVers.tokenize('.').collect { it.toInteger() }
+    return currVersList.size() == 3 &&
+           newVersList.size() == 3 &&
+           [0, 1, 2].any { newVersList[it] > currVersList[it] }
+  }
+  catch (Exception ex) {
+    return false
+  }
 }
 
 return this
