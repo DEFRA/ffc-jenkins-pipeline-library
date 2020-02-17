@@ -117,8 +117,8 @@ def setGithubStatusFailure(message = '') {
   updateGithubCommitStatus(message, 'FAILURE')
 }
 
-def lintHelm(projectName) {
-  sh "helm lint ./helm/$projectName"
+def lintHelm(chartName) {
+  sh "helm lint ./helm/$chartName"
 }
 
 def buildTestImage(projectName, serviceName, buildNumber) {
@@ -166,24 +166,24 @@ def waitForQualityGateResult(timeoutInMinutes) {
   }
 }
 
-def buildAndPushContainerImage(credentialsId, registry, projectName, tag) {
+def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   docker.withRegistry("https://$registry", credentialsId) {
     sh "docker-compose -f docker-compose.yaml build --no-cache"
-    sh "docker tag $projectName $registry/$projectName:$tag"
-    sh "docker push $registry/$projectName:$tag"
+    sh "docker tag $imageName $registry/$imageName:$tag"
+    sh "docker push $registry/$imageName:$tag"
   }
 }
 
-def deployChart(credentialsId, registry, projectName, tag, extraCommands) {
+def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
-    def deploymentName = "$projectName-$tag"
+    def deploymentName = "$chartName-$tag"
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-    sh "helm upgrade $deploymentName --install --namespace $deploymentName --atomic ./helm/$projectName --set image=$registry/$projectName:$tag $extraCommands"
+    sh "helm upgrade $deploymentName --install --namespace $deploymentName --atomic ./helm/$chartName --set image=$registry/$chartName:$tag $extraCommands"
   }
 }
 
-def undeployChart(credentialsId, projectName, tag) {
-  def deploymentName = "$projectName-$tag"
+def undeployChart(credentialsId, chartName, tag) {
+  def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
     sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
@@ -191,7 +191,7 @@ def undeployChart(credentialsId, projectName, tag) {
   }
 }
 
-def publishChart(registry, projectName, containerTag) {
+def publishChart(registry, chartName, tag) {
   withCredentials([
     string(credentialsId: 'helm-chart-repo', variable: 'helmRepo')
   ]) {
@@ -201,15 +201,15 @@ def publishChart(registry, projectName, containerTag) {
       sh "git clone $helmRepo"
       dir('helm-charts') {
         sh 'helm init -c'
-        sh "sed -i -e 's/image: $projectName/image: $registry\\/$projectName:$containerTag/' ../helm/$projectName/values.yaml"
-        sh "sed -i -e 's/version:.*/version: $containerTag/' ../helm/$projectName/Chart.yaml"
-        sh "helm package ../helm/$projectName"
+        sh "sed -i -e 's/image: $chartName/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
+        sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
+        sh "helm package ../helm/$chartName"
         sh 'helm repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
         sh 'git config --global user.name "buildserver"'
         sh 'git checkout master'
         sh 'git add -A'
-        sh "git commit -m 'update $projectName helm chart from build job'"
+        sh "git commit -m 'update $chartName helm chart from build job'"
         sh 'git push'
       }
     }
