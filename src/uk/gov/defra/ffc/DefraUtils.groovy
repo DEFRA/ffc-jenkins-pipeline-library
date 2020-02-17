@@ -15,19 +15,19 @@ sshagent(['helm-chart-creds']) {
         case "sqs":
           dir('terragrunt') {
             // git clone repo...
-            git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'            
+            git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
             // terragrunt destroy
             echo "HORROR!!! destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-            sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
+            sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
             // delete the pr dir
             echo "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
-            //sh "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
+            sh "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
             // commit the changes back
             echo "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"
-            //sh "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"            
+            sh "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"
             echo "infrastructure successfully destroyed"
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
-            //deleteDir()
+            // deleteDir()
           }
           break;
         default:
@@ -35,7 +35,7 @@ sshagent(['helm-chart-creds']) {
       }
     } else {
       error("destroyInfrastructure error: unsupported target ${target}")
-    } 
+    }
   }
 }
 
@@ -58,12 +58,12 @@ def provisionInfrastructure(target, item, parameters) {
               // cd into repo, copy queue dir into new dir...
               sh "cd london/eu-west-2/ffc/ ; cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
               echo "provision infrastructure"
-              sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"          
+              sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
               sh "cd london/eu-west-2/ffc ; git add pr${parameters["pr_code"]} ; git commit -m \"pr${parameters["pr_code"]}\" ; git push --set-upstream origin master"
               echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
               echo "infrastructure successfully provisioned"
-              // Recursively delete the current dir (which should be terragrunt in the current job workspace)              
             }
+            // Recursively delete the current dir (which should be terragrunt in the current job workspace)
             deleteDir()
           }
           break;
@@ -72,7 +72,7 @@ def provisionInfrastructure(target, item, parameters) {
       }
     } else {
       error("provisionInfrastructure error: unsupported target ${target}")
-    } 
+    }
   }
 }
 
@@ -85,7 +85,7 @@ def getPackageJsonVersion() {
 }
 
 def replaceInFile(from, to, file) {
-  sh "sed -i -e 's/$from/$to/g' $file"  
+  sh "sed -i -e 's/$from/$to/g' $file"
 }
 
 def getMergedPrNo() {
@@ -118,7 +118,7 @@ def getVariables(repoName, version) {
     // Note: This will cause issues if one branch has two open PRs
     pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
     verifyCommitBuildable()
-      
+
     def rawTag
     if (branch == "master") {
       rawTag = version
@@ -171,7 +171,7 @@ def runTests(name, suffix) {
     sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml run $name"
 
   } finally {
-    sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml down -v"    
+    sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml down -v"
   }
 }
 
@@ -181,13 +181,13 @@ def createTestReportJUnit(){
 
 def deleteTestOutput(name) {
     // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
-    sh "docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"  
+    sh "docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"
 }
 
 def analyseCode(sonarQubeEnv, sonarScanner, params) {
   def scannerHome = tool sonarScanner
-  withSonarQubeEnv(sonarQubeEnv) { 
-    def args = ''   
+  withSonarQubeEnv(sonarQubeEnv) {
+    def args = ''
     params.each { param ->
       args = args + " -D$param.key=$param.value"
     }
@@ -265,7 +265,7 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
 
 def notifySlackBuildFailure(exception, channel) {
 
-  def msg = """BUILD FAILED 
+  def msg = """BUILD FAILED
           ${JOB_NAME}/${BUILD_NUMBER}
           ${exception}
           (<${BUILD_URL}|Open>)"""
