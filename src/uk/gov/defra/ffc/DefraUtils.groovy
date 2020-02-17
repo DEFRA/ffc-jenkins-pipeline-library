@@ -168,7 +168,7 @@ def waitForQualityGateResult(timeoutInMinutes) {
 
 def buildAndPushContainerImage(credentialsId, registry, projectName, tag) {
   docker.withRegistry("https://$registry", credentialsId) {
-    sh "docker-compose build --no-cache"
+    sh "docker-compose -f docker-compose.yaml build --no-cache"
     sh "docker tag $projectName $registry/$projectName:$tag"
     sh "docker push $registry/$projectName:$tag"
   }
