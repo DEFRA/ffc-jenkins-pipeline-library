@@ -201,7 +201,7 @@ def publishChart(registry, chartName, tag) {
       sh "git clone $helmRepo"
       dir('helm-charts') {
         sh 'helm init -c'
-        sh "sed -i -e 's/image: $chartName/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
+        sh "sed -i -e 's/image: $chartName\\.*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
         sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
         sh "helm package ../helm/$chartName"
         sh 'helm repo index .'
