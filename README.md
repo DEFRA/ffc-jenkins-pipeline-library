@@ -91,17 +91,17 @@ Takes two parameters of the versions to compare, typically master version and br
 
 The function returns `true` if both versions are valid semvers, and the second version is higher than the first.
 
-The function returns `false` if either version is invalid, or the second version is not higher than the first. 
+The function returns `false` if either version is invalid, or the second version is not higher than the first.
 
 ### errorOnNoVersionIncrement
 
-Convenience method shared by `verifyPackageJsonVersionIncremented` and `verifyCSProjVersionIncremented` to throw error when the version has not been incremented, or is invalid. 
+Convenience method shared by `verifyPackageJsonVersionIncremented` and `verifyCSProjVersionIncremented` to throw error when the version has not been incremented, or is invalid.
 
 Takes two parameters - master version and branch version.
 
 ### replaceInFile
 
-Utility method to globally substitute text in a file. 
+Utility method to globally substitute text in a file.
 
 The function takes three parameters:
 - `from`: the text to match
@@ -110,7 +110,7 @@ The function takes three parameters:
 
 The `from` and `to` values are used directly in a sed command, so wildcards may be used.
 
-It can be tricky to correctly escape characters for sed. For example the forward slash `/` 
+It can be tricky to correctly escape characters for sed. For example the forward slash `/`
 needs to be escaped with a back slash, which itself need to be escaped with a back slash so the valid encoding for `/` is  `\\/`.
 
 Forward slashes in the final `file` parameter do not need escaping.
@@ -221,12 +221,12 @@ defraUtils.setGithubStatusFailure(error.message)
 ```
 
 ### lintHelm
-Lints Helm chart within repository.  
+Lints Helm chart within repository.
 
 By convention Helm charts are stored in the folder `helm` in a subfolder the same name as the image, service, and repository.
 
 Takes one parameter:
-- container image name
+- chart name
 
 Example usage:
 
@@ -237,14 +237,15 @@ defraUtils.lintHelm('ffc-demo-web')
 ### buildTestImage
 Builds the test image using the docker-compose files in the repository. By convention the services are named the same as the image.
 
-Takes two parameters:
-- container image name
-- a suffix used to run the docker-compose as a unique project name
+Takes three parameters:
+- project name, e.g. `ffc-demo-web`
+- service name to run from the project's docker-compose configuration, e.g. `app`
+- build number
 
 Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
-defraUtils.buildTestImage('ffc-demo-web', BUILD_NUMBER)
+defraUtils.buildTestImage('ffc-demo-web', 'app', BUILD_NUMBER)
 ```
 
 ### runTests
@@ -253,19 +254,20 @@ Uses the image built by the previous command to run tests.
 By convention tests write results out to the folder `test-output`.
 Junit tests are published to Jenkins from the file `test-output/junit.xml`, and the contents of `test-output` are removed after tests are published.
 
-Takes two parameters:
-- container image name
-- a suffix used to run the docker-compose as a unique project name
+Takes three parameters:
+- project name, e.g. `ffc-demo-web`
+- service name to run from the project's docker-compose configuration, e.g. `app`
+- build number
 
 Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
-defraUtils.runTests('ffc-demo-web', BUILD_NUMBER)
+defraUtils.runTests('ffc-demo-web', 'app', BUILD_NUMBER)
 ```
 
 ### analyseCode
 
-Triggers static code analysis using SonarQube.  
+Triggers static code analysis using SonarQube.
 
 Dependent on integration between Jenkins and SonarQube being configured.
 
@@ -284,11 +286,11 @@ defraUtils.analyseCode(sonarQubeEnv, sonarScanner, ['sonar.projectKey' : 'ffc-de
 
 ### waitForCodeAnalysisResult
 
-Waits for static code analysis result via SonarQube webhook.  
+Waits for static code analysis result via SonarQube webhook.
 
 Dependent on integration between Jenkins and SonarQube being configured.
 
-This step should run after `analyseCode` as it is dependent on the SonarQube run ID generated from that task to know which result to wait for.  
+This step should run after `analyseCode` as it is dependent on the SonarQube run ID generated from that task to know which result to wait for.
 
 Takes one parameters:
 - timeout in minutes pipeline should wait for webhook response before aborting.
@@ -307,7 +309,7 @@ Takes four parameters:
 - the ID of the docker registry credentials previously set up in Jenkins
 - registry URL without the protocol
 - the name of the image
-- the image tag
+- container image tag
 
 Example usage:
 
@@ -325,8 +327,8 @@ Development Helm charts are deployed with the name and namespace set to a combin
 Takes five parameters:
 - The ID of the Kubernetes credentials previously setup in Jenkins
 - the registry where the chart's image is stored
-- the name of the image
-- the name of the tag
+- the name of the chart (note this must also be the name of the image to deploy)
+- container image tag to deploy
 - additional command line parameters to send to the Helm deployment
 
 Example usage:
@@ -343,9 +345,8 @@ Both the chart and the namespace are removed when the chart is undeployed.
 
 Takes three parameters:
 - The ID of the Kubernetes credentials previously setup in Jenkins
-- the name of the image
-- the name of the tag
-
+- the name of the chart
+- container image tag that was deployed by this chart
 
 Example usage:
 
@@ -359,8 +360,8 @@ Publishes the local Helm chart to a Helm chart repository implemented in git.
 
 Takes three parameters:
 - docker registry without the protocol
-- container image name
-- container tag
+- chart name
+- container image tag
 
 Example usage:
 
