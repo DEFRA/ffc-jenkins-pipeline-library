@@ -7,8 +7,49 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
+def Boolean __hasKeys(Map mapToCheck, List keys) {
+    def passes = true;
+    for (key in keys) {
+        if (key instanceof Map) {
+            assert key.size() == 1 : "keys to check should not have a Map with more than one key";
+            def keyToCheck = key.keySet()[0];
+            if (mapToCheck.containsKey(keyToCheck)) {
+                if (!__hasKeys(mapToCheck[keyToCheck], key.values()[0])) {
+                    passes = false;
+                }
+            } else {
+                passes = false;
+            }
+        } else {
+            if (!mapToCheck.containsKey(key)) {
+                passes = false;
+            }
+        }
+    }
+    return passes;
+}
+
+def String[] __mapToString(Map map) {
+    def output = [];
+    for (item in map) {
+        if (item.value instanceof String) {
+            output.add("${item.key} = \"${item.value}\"");
+        } else if (item.value instanceof Map) {
+            output.add("${item.key} = { ${__mapToString(item.value).join(", ")} }");
+        } else {
+            output.add("${item.key} = ${item.value}");
+        }
+    }
+    return output;
+}
+
+def String __generateTerraformInputVariables(Map inputs) {
+    def quotedValues = __mapToString(inputs).collect { input -> return "'$input'" }
+    return "-var ${quotedValues.join(" -var ")}"
+}
+
 def destroyInfrastructure(target, item, parameters) {
-sshagent(['helm-chart-creds']) {
+  sshagent(['helm-chart-creds']) {
     echo "destroyInfrastructure"
     if (target.toLowerCase() == "aws") {
       switch (item) {
@@ -45,6 +86,8 @@ def provisionInfrastructure(target, item, parameters) {
     if (target.toLowerCase() == "aws") {
       switch (item) {
         case "sqs":
+          assert __hasKeys(parameters, [['service': ['code', 'name', 'type']], 'pr_code', 'queue_purpose', 'repo_name']) :
+            "parameters should specify pr_code, queue_purpose, repo_name as well as service details (code, name and type)";
           dir('terragrunt') {
             sh "pwd"
             echo "cloning terraform repo"
@@ -58,7 +101,7 @@ def provisionInfrastructure(target, item, parameters) {
               // cd into repo, copy queue dir into new dir...
               sh "cd london/eu-west-2/ffc/ ; cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
               echo "provision infrastructure"
-              sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
+              sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply ${__generateTerraformInputVariables(parameters)} -auto-approve"
               sh "cd london/eu-west-2/ffc ; git add pr${parameters["pr_code"]} ; git commit -m \"pr${parameters["pr_code"]}\" ; git push --set-upstream origin master"
               echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
               echo "infrastructure successfully provisioned"

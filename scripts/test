@@ -1,1 +1,1 @@
-docker run --rm -v "$PWD":/home/groovy/scripts -w /home/groovy/scripts groovy:latest groovy ./test/test-version-has-incremented.groovy -a
+docker run --rm -v "$PWD":/home/groovy/scripts -w /home/groovy/scripts groovy:latest groovy ./test/tests.groovy -a

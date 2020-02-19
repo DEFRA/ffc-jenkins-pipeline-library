@@ -41,7 +41,7 @@ A simple test harness may be run to unit test functions that are purely `groovy`
 ./scripts/test
 ```
 
-Currently this only tests the `versionHasIncremented` function.
+There are tests for `versionHasIncremented` and `hasKeys`, but in two separate files. Only one file can be run at once, switch out the name before running the above command.
 
 ## Functions
 
