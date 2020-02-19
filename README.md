@@ -265,6 +265,24 @@ Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 defraUtils.runTests('ffc-demo-web', 'app', BUILD_NUMBER)
 ```
 
+### createTestReportJUnit
+
+Creates a test report using JUnit
+
+### deleteTestOutput
+
+Deletes the test-output folder from the workspace, acting as a user in a container using a given image.
+
+Takes two parameters:
+- name of the container image to use for the delete command
+- path to the default working directory of the container image
+
+Example:
+
+```
+defraUtils.deleteTestOutput('ffc-demo-web', '/home/node')
+```
+
 ### analyseCode
 
 Triggers static code analysis using SonarQube.
