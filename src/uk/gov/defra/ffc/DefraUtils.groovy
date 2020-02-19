@@ -121,9 +121,9 @@ def lintHelm(chartName) {
   sh "helm lint ./helm/$chartName"
 }
 
-def buildTestImage(projectName, serviceName, buildNumber) {
+def buildTestImage(projectName, buildNumber) {
   sh 'docker image prune -f || echo could not prune images'
-  sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache $serviceName"
+  sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache"
 }
 
 def runTests(projectName, serviceName, buildNumber) {
