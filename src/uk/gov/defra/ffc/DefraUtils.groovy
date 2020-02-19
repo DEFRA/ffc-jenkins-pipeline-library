@@ -190,11 +190,11 @@ def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   }
 }
 
-def setupRbacForNamespace(cluster, namespace, credentialsId, rolearn, username) {
+def setupRbacForNamespace(region, cluster, namespace, credentialsId, rolearn, username) {
 
-  echo "${cluster} ${namespace}, ${credentialsId} ${rolearn} ${username}"
+  echo "${region} ${cluster} ${namespace}, ${credentialsId} ${rolearn} ${username}"
 
-  sh "eksctl create iamidentitymapping --cluster ${cluster} --arn ${rolearn} --username ${username}"
+  sh "eksctl create iamidentitymapping --region ${region} --cluster ${cluster} --arn ${rolearn} --username ${username}"
   withKubeConfig([credentialsId: credentialsId]) {
     sh "kubectl create rolebinding ${username}-EDIT-ROLEBINDING --user ${username} --clusterrole edit --namespace ${namespace}"
   }
