@@ -35,7 +35,7 @@ def String[] __mapToString(Map map) {
         if (item.value instanceof String) {
             output.add("${item.key} = \"${item.value}\"");
         } else if (item.value instanceof Map) {
-            output.add("${item.key} = { ${__mapToString(item.value).join(", ")} }");
+            output.add("${item.key} = {\n\t${__mapToString(item.value).join("\n\t")}\n}");
         } else {
             output.add("${item.key} = ${item.value}");
         }
@@ -44,8 +44,7 @@ def String[] __mapToString(Map map) {
 }
 
 def String __generateTerraformInputVariables(Map inputs) {
-    def quotedValues = __mapToString(inputs).collect { input -> return "'$input'" }
-    return "-var ${quotedValues.join(" -var ")}"
+    return __mapToString(inputs).join("\n")
 }
 
 def destroyInfrastructure(target, item, parameters) {
@@ -96,19 +95,27 @@ def provisionInfrastructure(target, item, parameters) {
             // git clone repo...
             git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
 
-            if (!fileExists("london/eu-west-2/ffc/pr${parameters["pr_code"]}/terraform.tfvars")) {
-              echo "pr${parameters["pr_code"]} directory doesn't exist, creating..."
-              echo "copy queue dir into new dir"
-              // cd into repo, copy queue dir into new dir...
-              sh "cd london/eu-west-2/ffc/ ; cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
-              echo "adding new dir to git repo"
-              sh "cd london/eu-west-2/ffc ; git add pr${parameters["pr_code"]} ; git commit -m \"pr${parameters["pr_code"]}\" ; git push --set-upstream origin master"
+            dir('london/eu-west-2/ffc') {
+              def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}"
+              if (!fileExists("${dirName}/terraform.tfvars")) {
+                echo "${dirName} directory doesn't exist, creating..."
+                echo "copy queue dir into new dir"
+                // cd into repo, copy queue dir into new dir...
+                sh "cp -fr standard_sqs_queues ${dirName}"
+                echo "adding new dir to git repo"
+                sh "git add ${dirName} ; git commit -m \"${dirName}\" ; git push --set-upstream origin master"
+              }
+              def varFileName = "vars-${(new Date()).getTime().toString()}.tfvars"
+              dir(dirName) {
+                writeFile(varFileName, __generateTerraformInputVariables(parameters))
+                // sh "git add ${varFileName} ; git commit -m \"${varFileName}\" ; git push --set-upstream origin master"
+                // echo "provision infrastructure"
+                // sh "terragrunt apply -var-file='${varFileName}' -auto-approve"
+              }
+              echo "infrastructure successfully provisioned"
             }
-            echo "provision infrastructure"
-            sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply ${__generateTerraformInputVariables(parameters)} -auto-approve"
-            echo "infrastructure successfully provisioned"
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
-            deleteDir()
+            // deleteDir()
           }
           break;
         default:
