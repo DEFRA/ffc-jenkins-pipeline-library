@@ -107,7 +107,7 @@ def provisionInfrastructure(target, item, parameters) {
               }
               def varFileName = "vars-${(new Date()).getTime().toString()}.tfvars"
               dir(dirName) {
-                writeFile(varFileName, __generateTerraformInputVariables(parameters))
+                writeFile file: varFileName, text: __generateTerraformInputVariables(parameters)
                 // sh "git add ${varFileName} ; git commit -m \"${varFileName}\" ; git push --set-upstream origin master"
                 // echo "provision infrastructure"
                 // sh "terragrunt apply -var-file='${varFileName}' -auto-approve"
