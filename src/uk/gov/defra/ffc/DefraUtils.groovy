@@ -88,24 +88,25 @@ def provisionInfrastructure(target, item, parameters) {
         case "sqs":
           assert __hasKeys(parameters, [['service': ['code', 'name', 'type']], 'pr_code', 'queue_purpose', 'repo_name']) :
             "parameters should specify pr_code, queue_purpose, repo_name as well as service details (code, name and type)";
+          assert parameters['repo_name'].size() + parameters['pr_code'].toString().size() + parameters['queue_purpose'].size() < 76 :
+            "repo name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
           dir('terragrunt') {
             sh "pwd"
             echo "cloning terraform repo"
             // git clone repo...
             git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
-            if (fileExists("london/eu-west-2/ffc/pr${parameters["pr_code"]}/terraform.tfvars")) {
-              echo "pr${parameters["pr_code"]} directory exists, so infrastructure has already been provisioned"
-            } else {
-              echo "pr${parameters["pr_code"]} directory doesn't exist, so provisioning infrastructure"
+
+            if (!fileExists("london/eu-west-2/ffc/pr${parameters["pr_code"]}/terraform.tfvars")) {
+              echo "pr${parameters["pr_code"]} directory doesn't exist, creating..."
               echo "copy queue dir into new dir"
               // cd into repo, copy queue dir into new dir...
               sh "cd london/eu-west-2/ffc/ ; cp -fr standard_sqs_queues pr${parameters["pr_code"]}"
-              echo "provision infrastructure"
-              sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply ${__generateTerraformInputVariables(parameters)} -auto-approve"
+              echo "adding new dir to git repo"
               sh "cd london/eu-west-2/ffc ; git add pr${parameters["pr_code"]} ; git commit -m \"pr${parameters["pr_code"]}\" ; git push --set-upstream origin master"
-              echo "TERROR!!! apply -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-              echo "infrastructure successfully provisioned"
             }
+            echo "provision infrastructure"
+            sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt apply ${__generateTerraformInputVariables(parameters)} -auto-approve"
+            echo "infrastructure successfully provisioned"
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
             deleteDir()
           }
