@@ -131,6 +131,37 @@ def provisionInfrastructure(target, item, parameters) {
   }
 }
 
+def runSqlCommandOnDatabaseHost(credentialsId, host, username, dbname, sqlCmd) {
+  withCredentials([
+    string(credentialsId: credentialsId, variable: 'PGPASSWORD'),
+    string(credentialsId: username, variable: 'DBUSER'),
+    string(credentialsId: dbname, variable: 'DBNAME'),
+  ]) {
+    sh "psql --host=${host} --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${sqlCmd};\""
+  }
+}
+
+def createDatabase(credentialsId, host, username, dbname, owner) {
+  withCredentials([
+    string(credentialsId: credentialsId, variable: 'PGPASSWORD'),
+    string(credentialsId: username, variable: 'DBUSER'),
+    string(credentialsId: dbname, variable: 'DBNAME'),
+    string(credentialsId: owner, variable: 'DBOWNER'),
+  ]) {
+    echo "createdb --host=${host} --username=\$DBUSER --owner=\$DBOWNER --no-password \$DBNAME"
+  }
+}
+
+def dropDatabase(credentialsId, host, username, dbname) {
+  withCredentials([
+    string(credentialsId: credentialsId, variable: 'PGPASSWORD'),
+    string(credentialsId: username, variable: 'DBUSER'),
+    string(credentialsId: dbname, variable: 'DBNAME'),
+  ]) {
+    echo "dropdb --host=${host} --username=\$DBUSER --no-password \$DBNAME"
+  }
+}
+
 def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
 }
