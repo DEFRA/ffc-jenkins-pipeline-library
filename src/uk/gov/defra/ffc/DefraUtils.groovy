@@ -200,6 +200,16 @@ def setupRbacForNamespace(region, cluster, namespace, credentialsId, rolearn, us
   }
 }
 
+def teardownRbacForNamespace(region, cluster, namespace, credentialsId, rolearn, username) {
+
+  echo "${region} ${cluster} ${namespace}, ${credentialsId} ${rolearn} ${username}"
+
+  sh "eksctl delete iamidentitymapping --region ${region} --cluster ${cluster} --arn ${rolearn}"
+  withKubeConfig([credentialsId: credentialsId]) {
+    sh "kubectl delete rolebinding ${username}-EDIT-ROLEBINDING --namespace ${namespace}"
+  }
+}
+
 def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
 }
