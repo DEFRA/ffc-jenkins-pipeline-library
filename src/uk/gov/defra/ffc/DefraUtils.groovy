@@ -48,6 +48,7 @@ def String __generateTerraformInputVariables(Map inputs) {
 }
 
 def destroyInfrastructure(target, item, parameters) {
+  assert __hasKeys(parameters, ['pr_code', 'repo_name']) : "parameters should specify pr_code and repo_name";
   sshagent(['helm-chart-creds']) {
     echo "destroyInfrastructure"
     if (target.toLowerCase() == "aws") {
@@ -58,16 +59,24 @@ def destroyInfrastructure(target, item, parameters) {
             git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
             // terragrunt destroy
             echo "HORROR!!! destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-            sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-            // delete the pr dir
-            echo "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
-            sh "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
-            // commit the changes back
-            echo "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"
-            sh "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"
-            echo "infrastructure successfully destroyed"
+            dir("london/eu-west-2/ffc") {
+              def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}"
+              dir(dirName) {
+                def varFiles = findFiles glob: 'vars-*.tfvars'
+                for (varFile in varFiles) {
+                  // iterate through all var files in directory...
+                  echo "terragrunt apply -var-file='${varFileName}' -auto-approve"
+                }
+              }
+              // delete the pr dir
+              //sh "git rm -fr ${dirName}"
+              // commit the changes back
+              //echo "git commit -am \"Delete ${dirName} SQS queue config\" ; git push --set-upstream origin master"
+              //sh "git commit -am \"Delete ${dirName} SQS queue config\" ; git push --set-upstream origin master"
+              //echo "infrastructure successfully destroyed"
+            }
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
-            deleteDir()
+            //deleteDir()
           }
           break;
         default:
