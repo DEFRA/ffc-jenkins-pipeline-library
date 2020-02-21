@@ -47,47 +47,17 @@ def String __generateTerraformInputVariables(Map inputs) {
     return __mapToString(inputs).join("\n")
 }
 
-def destroyInfrastructure(target, item, parameters) {
-  sshagent(['helm-chart-creds']) {
-    echo "destroyInfrastructure"
-    if (target.toLowerCase() == "aws") {
-      switch (item) {
-        case "sqs":
-          dir('terragrunt') {
-            // git clone repo...
-            git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
-            // terragrunt destroy
-            echo "HORROR!!! destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-            sh "cd london/eu-west-2/ffc/pr${parameters["pr_code"]} ; terragrunt destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-            // delete the pr dir
-            echo "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
-            sh "cd london/eu-west-2/ffc/ ; git rm -fr pr${parameters["pr_code"]}"
-            // commit the changes back
-            echo "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"
-            sh "git commit -am \"Delete PR${parameters["pr_code"]} SQS queue config\" ; git push --set-upstream origin master"
-            echo "infrastructure successfully destroyed"
-            // Recursively delete the current dir (which should be terragrunt in the current job workspace)
-            deleteDir()
-          }
-          break;
-        default:
-          error("destroyInfrastructure error: unsupported item ${item}")
-      }
-    } else {
-      error("destroyInfrastructure error: unsupported target ${target}")
-    }
-  }
-}
-
 def provisionInfrastructure(target, item, parameters) {
-  sshagent(['helm-chart-creds']) {
-    echo "provisionInfrastructure"
-    if (target.toLowerCase() == "aws") {
-      switch (item) {
-        case "sqs":
+  echo "provisionInfrastructure"
+  if (target.toLowerCase() == "aws") {
+    switch (item) {
+      case "sqs":
+        sshagent(['helm-chart-creds']) {
+          // character limit is actually 80, but four characters are needed for prefixes and separators
+          static final int SQS_NAME_CHAR_LIMIT = 76
           assert __hasKeys(parameters, [['service': ['code', 'name', 'type']], 'pr_code', 'queue_purpose', 'repo_name']) :
             "parameters should specify pr_code, queue_purpose, repo_name as well as service details (code, name and type)";
-          assert parameters['repo_name'].size() + parameters['pr_code'].toString().size() + parameters['queue_purpose'].size() < 76 :
+          assert parameters['repo_name'].size() + parameters['pr_code'].toString().size() + parameters['queue_purpose'].size() < SQS_NAME_CHAR_LIMIT :
             "repo name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
           dir('terragrunt') {
             sh "pwd"
@@ -99,31 +69,37 @@ def provisionInfrastructure(target, item, parameters) {
               def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}"
               if (!fileExists("${dirName}/terraform.tfvars")) {
                 echo "${dirName} directory doesn't exist, creating..."
-                echo "copy queue dir into new dir"
-                // cd into repo, copy queue dir into new dir...
+                echo "create new dir from model dir, then add to git"
+                // create new dir from model dir, add to git...
                 sh "cp -fr standard_sqs_queues ${dirName}"
                 echo "adding new dir to git repo"
                 sh "git add ${dirName} ; git commit -m \"${dirName}\" ; git push --set-upstream origin master"
               }
-              def varFileName = "vars-${(new Date()).getTime().toString()}.tfvars"
-              dir(dirName) {
-                writeFile file: varFileName, text: __generateTerraformInputVariables(parameters)
-                sh "git add ${varFileName} ; git commit -m \"${varFileName}\" ; git push --set-upstream origin master"
-                echo "provision infrastructure"
-                sh "terragrunt apply -var-file='${varFileName}' -auto-approve"
+              def queueName = "${parameters['repo_name']}-pr${parameters['pr_code'].toString()}-${parameters['queue_purpose']}";
+              def varFileName = "vars-queue-${queueName}.tfvars";
+              if (!fileExists("${dirName}/${varFileName}")) {
+                dir(dirName) {
+                  // create file for queue vars
+                  writeFile file: varFileName, text: __generateTerraformInputVariables(parameters)
+                  sh "git add ${varFileName} ; git commit -m \"${varFileName}\" ; git push --set-upstream origin master"
+                  echo "provision infrastructure"
+                  sh "terragrunt apply -var-file='${varFileName}' -auto-approve"
+                }
+                echo "infrastructure successfully provisioned"
+              } else {
+                echo "${queueName} has been provisioned previously"
               }
-              echo "infrastructure successfully provisioned"
             }
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
             deleteDir()
           }
-          break;
-        default:
-          error("provisionInfrastructure error: unsupported item ${item}")
-      }
-    } else {
-      error("provisionInfrastructure error: unsupported target ${target}")
+        }
+        break;
+      default:
+        error("provisionInfrastructure error: unsupported item ${item}")
     }
+  } else {
+    error("provisionInfrastructure error: unsupported target ${target}")
   }
 }
 
