@@ -63,6 +63,7 @@ def destroyInfrastructure(target, item, parameters) {
               def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}"
               dir(dirName) {
                 def varFiles = findFiles glob: 'vars-*.tfvars'
+                echo "found ${varFiles.size()} var files"
                 for (varFile in varFiles) {
                   // iterate through all var files in directory...
                   echo "terragrunt apply -var-file='${varFileName}' -auto-approve"
