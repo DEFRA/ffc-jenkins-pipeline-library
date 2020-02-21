@@ -63,11 +63,15 @@ def destroyInfrastructure(target, item, parameters) {
               def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}"
               dir(dirName) {
                 echo "finding previous var files";
-                def varFiles = findFiles glob: 'vars-*.tfvars';
-                echo "found ${varFiles.size()} var files";
-                for (varFile in varFiles) {
-                  // iterate through all var files in directory...
-                  echo "terragrunt apply -var-file='${varFileName}' -auto-approve"
+                try {
+                  def varFiles = findFiles glob: 'vars-*.tfvars';
+                  echo "found ${varFiles.size()} var files";
+                  for (varFile in varFiles) {
+                    // iterate through all var files in directory...
+                    echo "terragrunt apply -var-file='${varFileName}' -auto-approve"
+                  }
+                } catch (all) {
+                  echo "error finding var files"
                 }
               }
               // delete the pr dir
