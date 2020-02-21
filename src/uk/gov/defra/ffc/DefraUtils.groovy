@@ -168,8 +168,8 @@ def replaceInFile(from, to, file) {
 }
 
 def getMergedPrNo() {
-    def mergedPrNo = sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
-    return mergedPrNo ? "pr$mergedPrNo" : ''
+  def mergedPrNo = sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
+  return mergedPrNo ? "pr$mergedPrNo" : ''
 }
 
 def getRepoUrl() {
@@ -185,14 +185,14 @@ def getCommitMessage() {
 }
 
 def verifyCommitBuildable() {
-    if (pr) {
-      echo "Building PR$pr"
-    } else if (branch == "master") {
-      echo "Building master branch"
-    } else {
-      currentBuild.result = 'ABORTED'
-      error('Build aborted - not a PR or a master branch')
-    }
+  if (pr) {
+    echo "Building PR$pr"
+  } else if (branch == "master") {
+    echo "Building master branch"
+  } else {
+    currentBuild.result = 'ABORTED'
+    error('Build aborted - not a PR or a master branch')
+  }
 }
 
 def getVariables(repoName, version) {
@@ -201,7 +201,7 @@ def getVariables(repoName, version) {
     // Note: This will cause issues if one branch has two open PRs
     pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
     verifyCommitBuildable()
-    
+
     if (branch == "master") {
       containerTag = version
     } else {
@@ -237,23 +237,22 @@ def setGithubStatusFailure(message = '') {
   updateGithubCommitStatus(message, 'FAILURE')
 }
 
-def lintHelm(imageName) {
-  sh "helm lint ./helm/$imageName"
+def lintHelm(chartName) {
+  sh "helm lint ./helm/$chartName"
 }
 
-def buildTestImage(name, suffix) {
+def buildTestImage(projectName, buildNumber) {
   sh 'docker image prune -f || echo could not prune images'
-  sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache $name"
+  sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache"
 }
 
-def runTests(name, suffix) {
+def runTests(projectName, serviceName, buildNumber) {
   try {
     sh 'mkdir -p test-output'
     sh 'chmod 777 test-output'
-    sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml run $name"
-
+    sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName"
   } finally {
-    sh "docker-compose -p $name-$suffix-$containerTag -f docker-compose.yaml -f docker-compose.test.yaml down -v"
+    sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v"
   }
 }
 
@@ -261,9 +260,9 @@ def createTestReportJUnit(){
   junit 'test-output/junit.xml'
 }
 
-def deleteTestOutput(name) {
+def deleteTestOutput(containerImage, containerWorkDir) {
     // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
-    sh "[ -d \"$WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/usr/src/app/test-output $name rm -rf test-output/*"  
+    sh "[ -d \"$WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/$containerWorkDir/test-output $containerImage rm -rf test-output/*"
 }
 
 def analyseCode(sonarQubeEnv, sonarScanner, params) {
@@ -289,22 +288,22 @@ def waitForQualityGateResult(timeoutInMinutes) {
 
 def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   docker.withRegistry("https://$registry", credentialsId) {
-    sh "docker-compose build --no-cache"
+    sh "docker-compose -f docker-compose.yaml build --no-cache"
     sh "docker tag $imageName $registry/$imageName:$tag"
     sh "docker push $registry/$imageName:$tag"
   }
 }
 
-def deployChart(credentialsId, registry, imageName, tag, extraCommands) {
+def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
-    def deploymentName = "$imageName-$tag"
+    def deploymentName = "$chartName-$tag"
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-    sh "helm upgrade $deploymentName --install --namespace $deploymentName --atomic ./helm/$imageName --set image=$registry/$imageName:$tag $extraCommands"
+    sh "helm upgrade $deploymentName --install --namespace $deploymentName --atomic ./helm/$chartName --set image=$registry/$chartName:$tag $extraCommands"
   }
 }
 
-def undeployChart(credentialsId, imageName, tag) {
-  def deploymentName = "$imageName-$tag"
+def undeployChart(credentialsId, chartName, tag) {
+  def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
     sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
@@ -312,7 +311,7 @@ def undeployChart(credentialsId, imageName, tag) {
   }
 }
 
-def publishChart(registry, imageName, containerTag) {
+def publishChart(registry, chartName, tag) {
   withCredentials([
     string(credentialsId: 'helm-chart-repo', variable: 'helmRepo')
   ]) {
@@ -322,15 +321,15 @@ def publishChart(registry, imageName, containerTag) {
       sh "git clone $helmRepo"
       dir('helm-charts') {
         sh 'helm init -c'
-        sh "sed -i -e 's/image: $imageName/image: $registry\\/$imageName:$containerTag/' ../helm/$imageName/values.yaml"
-        sh "sed -i -e 's/version:.*/version: $containerTag/' ../helm/$imageName/Chart.yaml"
-        sh "helm package ../helm/$imageName"
+        sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
+        sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
+        sh "helm package ../helm/$chartName"
         sh 'helm repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
         sh 'git config --global user.name "buildserver"'
         sh 'git checkout master'
         sh 'git add -A'
-        sh "git commit -m 'update $imageName helm chart from build job'"
+        sh "git commit -m 'update $chartName helm chart from build job'"
         sh 'git push'
       }
     }
@@ -354,7 +353,7 @@ def releaseExists(containerTag, repoName, token){
       catch(Exception ex) {
       echo "Failed to check release status on github"
       throw new Exception (ex)
-    }  
+    }
 }
 
 def triggerRelease(containerTag, repoName, releaseDescription, token){
