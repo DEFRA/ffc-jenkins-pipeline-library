@@ -37,8 +37,8 @@ def testTerraformInputVariables(du) {
   def Map inputs2;
   inputs2 = [code: "abc-123", pr_code: 12, foo: [bar: "foo", foo: true]];
 
-  assert du.__generateTerraformInputVariables(inputs1) == "-var 'a = 1' -var 'b = 2' -var 'c = { d = 3, e = 4 }'"
-  assert du.__generateTerraformInputVariables(inputs2) == "-var 'code = \"abc-123\"' -var 'pr_code = 12' -var 'foo = { bar = \"foo\", foo = true }'"
+  assert du.__generateTerraformInputVariables(inputs1) == "a = 1\nb = 2\nc = {\n\td = 3\n\te = 4\n}"
+  assert du.__generateTerraformInputVariables(inputs2) == "code = \"abc-123\"\npr_code = 12\nfoo = {\n\tbar = \"foo\"\n\tfoo = true\n}" // "code = \"abc-123\"\npr_code = 12\nfoo = {\n\tbar = \"foo\"\n\tfoo = true\n}'"
 }
 
 testVersionHasIncremented(defraUtils)
