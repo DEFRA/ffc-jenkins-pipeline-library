@@ -73,6 +73,7 @@ def destroyInfrastructure(target, item, parameters) {
                 } catch (all) {
                   echo "error finding var files"
                 }
+                echo "hello hello hello"
               }
               // delete the pr dir
               //sh "git rm -fr ${dirName}"
