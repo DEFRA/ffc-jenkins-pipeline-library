@@ -115,7 +115,7 @@ def provisionInfrastructure(target, item, parameters) {
               echo "infrastructure successfully provisioned"
             }
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
-            // deleteDir()
+            deleteDir()
           }
           break;
         default:
