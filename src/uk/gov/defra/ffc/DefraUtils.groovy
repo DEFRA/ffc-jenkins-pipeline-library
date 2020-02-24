@@ -66,12 +66,13 @@ def destroyInfrastructure(target, item, parameters) {
                 def varFiles = findFiles glob: "${dirName}/vars.tfvars";
                 echo "found ${varFiles.size()} var files";
                 for (varFile in varFiles) {
+                  def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
                   // iterate through all var files in directory...
-                  echo "terragrunt destroy -var-file='${varFile.getPath()}/${varFile.getName()}' -auto-approve"
-                  /*dir(varFile.path) {
-                    sh("terragrunt destroy -var-file='${varFileName}' -auto-approve")
-                    sh("git rm *.vars")
-                  }*/
+                  dir(path) {
+                    echo "terragrunt destroy -var-file='${varFile.getName()}' -auto-approve"
+                    // sh("terragrunt destroy -var-file='${varFileName}' -auto-approve")
+                    // sh("git rm *.vars")
+                  }
                 }
               } catch (all) {
                 echo "error finding var files"
