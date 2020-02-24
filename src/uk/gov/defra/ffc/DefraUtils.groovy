@@ -74,10 +74,10 @@ def provisionInfrastructure(target, item, parameters) {
                 sh "cp -fr standard_sqs_queues ${dirName}"
                 dir(dirName) {
                   echo "adding queue to git"
-                  writeFile file: varFileName, text: __generateTerraformInputVariables(parameters)
+                  writeFile file: "vars.tfvars", text: __generateTerraformInputVariables(parameters)
                   sh "git add *.tfvars ; git commit -m \"Creating queue ${parameters["queue_purpose"]} for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
                   echo "provision infrastructure"
-                  sh "terragrunt apply -var-file='${varFileName}' -auto-approve"
+                  sh "terragrunt apply -var-file='vars.tfvars' -auto-approve"
                 }
               }
             }
