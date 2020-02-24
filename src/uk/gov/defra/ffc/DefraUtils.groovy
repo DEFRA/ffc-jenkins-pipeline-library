@@ -69,9 +69,8 @@ def destroyInfrastructure(target, item, parameters) {
                   def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
                   // iterate through all var files in directory...
                   dir(path) {
-                    echo "terragrunt destroy -var-file='${varFile.getName()}' -auto-approve"
-                    // sh("terragrunt destroy -var-file='${varFileName}' -auto-approve")
-                    // sh("git rm *.vars")
+                    sh("terragrunt destroy -var-file='${varFileName}' -auto-approve")
+                    sh("git rm *.vars")
                   }
                 }
               } catch (all) {
@@ -80,12 +79,12 @@ def destroyInfrastructure(target, item, parameters) {
               // delete the pr dir
               //sh "git rm -fr ${dirName}"
               // commit the changes back
-              //echo "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code]}\ ; git push --set-upstream origin master"
-              //sh "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code]}\ ; git push --set-upstream origin master"
-              //echo "infrastructure successfully destroyed"
+              echo "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code]}\ ; git push --set-upstream origin master"
+              sh "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code]}\ ; git push --set-upstream origin master"
+              echo "infrastructure successfully destroyed"
             }
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
-            //deleteDir()
+            deleteDir()
           }
           break;
         default:
