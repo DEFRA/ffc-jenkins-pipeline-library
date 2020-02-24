@@ -47,6 +47,7 @@ def String __generateTerraformInputVariables(Map inputs) {
     return __mapToString(inputs).join("\n")
 }
 
+<<<<<<< HEAD
 def destroyInfrastructure(target, item, parameters) {
   assert __hasKeys(parameters, ['pr_code', 'repo_name']) : "parameters should specify pr_code and repo_name";
   sshagent(['helm-chart-creds']) {
@@ -95,15 +96,19 @@ def destroyInfrastructure(target, item, parameters) {
   }
 }
 
+=======
+>>>>>>> feature/PSD-492-create-sqs-queue
 def provisionInfrastructure(target, item, parameters) {
-  sshagent(['helm-chart-creds']) {
-    echo "provisionInfrastructure"
-    if (target.toLowerCase() == "aws") {
-      switch (item) {
-        case "sqs":
+  echo "provisionInfrastructure"
+  if (target.toLowerCase() == "aws") {
+    switch (item) {
+      case "sqs":
+        sshagent(['helm-chart-creds']) {
+          // character limit is actually 80, but four characters are needed for prefixes and separators
+          static final int SQS_NAME_CHAR_LIMIT = 76
           assert __hasKeys(parameters, [['service': ['code', 'name', 'type']], 'pr_code', 'queue_purpose', 'repo_name']) :
             "parameters should specify pr_code, queue_purpose, repo_name as well as service details (code, name and type)";
-          assert parameters['repo_name'].size() + parameters['pr_code'].toString().size() + parameters['queue_purpose'].size() < 76 :
+          assert parameters['repo_name'].size() + parameters['pr_code'].toString().size() + parameters['queue_purpose'].size() < SQS_NAME_CHAR_LIMIT :
             "repo name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
           dir('terragrunt') {
             sh "pwd"
@@ -112,34 +117,31 @@ def provisionInfrastructure(target, item, parameters) {
             git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
 
             dir('london/eu-west-2/ffc') {
-              def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}"
+              def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}-${parameters["queue_purpose"]}"
               if (!fileExists("${dirName}/terraform.tfvars")) {
                 echo "${dirName} directory doesn't exist, creating..."
-                echo "copy queue dir into new dir"
-                // cd into repo, copy queue dir into new dir...
+                echo "create new dir from model dir, then add to git"
+                // create new dir from model dir, add to git...
                 sh "cp -fr standard_sqs_queues ${dirName}"
-                echo "adding new dir to git repo"
-                sh "git add ${dirName} ; git commit -m \"${dirName}\" ; git push --set-upstream origin master"
+                dir(dirName) {
+                  echo "adding queue to git"
+                  writeFile file: "vars.tfvars", text: __generateTerraformInputVariables(parameters)
+                  sh "git add *.tfvars ; git commit -m \"Creating queue ${parameters["queue_purpose"]} for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
+                  echo "provision infrastructure"
+                  sh "terragrunt apply -var-file='vars.tfvars' -auto-approve"
+                }
               }
-              def varFileName = "vars-${(new Date()).getTime().toString()}.tfvars"
-              dir(dirName) {
-                writeFile file: varFileName, text: __generateTerraformInputVariables(parameters)
-                sh "git add ${varFileName} ; git commit -m \"${varFileName}\" ; git push --set-upstream origin master"
-                echo "provision infrastructure"
-                sh "terragrunt apply -var-file='${varFileName}' -auto-approve"
-              }
-              echo "infrastructure successfully provisioned"
             }
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
             deleteDir()
           }
-          break;
-        default:
-          error("provisionInfrastructure error: unsupported item ${item}")
-      }
-    } else {
-      error("provisionInfrastructure error: unsupported target ${target}")
+        }
+        break;
+      default:
+        error("provisionInfrastructure error: unsupported item ${item}")
     }
+  } else {
+    error("provisionInfrastructure error: unsupported target ${target}")
   }
 }
 
