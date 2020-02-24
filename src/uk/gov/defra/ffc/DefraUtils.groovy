@@ -72,7 +72,7 @@ def destroyInfrastructure(repo_name, pr_code) {
         }
         // commit the changes back
         echo "persisting changes in repo"
-        sh "git commit -m \"Removing infrastructure created for ${repo_name]}#${pr_code}\" ; git push --set-upstream origin master"
+        sh "git commit -m \"Removing infrastructure created for ${repo_name}#${pr_code}\" ; git push --set-upstream origin master"
         echo "infrastructure successfully destroyed"
       }
       // Recursively delete the current dir (which should be terragrunt in the current job workspace)
