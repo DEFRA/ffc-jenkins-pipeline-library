@@ -47,48 +47,36 @@ def String __generateTerraformInputVariables(Map inputs) {
     return __mapToString(inputs).join("\n")
 }
 
-def destroyInfrastructure(target, item, parameters) {
-  assert __hasKeys(parameters, ['pr_code', 'repo_name']) : "parameters should specify pr_code and repo_name";
+def destroyInfrastructure(repo_name, pr_code) {
   sshagent(['helm-chart-creds']) {
     echo "destroyInfrastructure"
-    if (target.toLowerCase() == "aws") {
-      switch (item) {
-        case "sqs":
-          dir('terragrunt') {
-            // git clone repo...
-            git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
+    dir('terragrunt') {
+      // git clone repo...
+      git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
+      dir("london/eu-west-2/ffc") {
+        def dirName = "${repo_name}-pr${pr_code}-*"
+        echo "finding previous var files in directories matching ${dirName}";
+        def varFiles = findFiles glob: "${dirName}/vars.tfvars";
+        echo "found ${varFiles.size()} directories to tear down";
+        for (varFile in varFiles) {
+          def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
+          echo "running terragrunt in ${path}"
+          // iterate through all var files in directory...
+          dir(path) {
             // terragrunt destroy
-            echo "HORROR!!! destroy -var \"pr_code=${parameters["pr_code"]}\" -auto-approve"
-            dir("london/eu-west-2/ffc") {
-              def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}-*"
-              echo "finding previous var files in directories matching ${dirName}";
-              def varFiles = findFiles glob: "${dirName}/vars.tfvars";
-              echo "found ${varFiles.size()} var files";
-              for (varFile in varFiles) {
-                def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
-                echo "running terragrunt in ${path}"
-                // iterate through all var files in directory...
-                dir(path) {
-                  echo "terragrunt destroy -var-file='${varFile.getName()}' -auto-approve"
-                  sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
-                }
-                // delete the pr dir
-                sh "git rm -fr ${path}"
-              }
-              // commit the changes back
-              echo "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
-              sh "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
-              echo "infrastructure successfully destroyed"
-            }
-            // Recursively delete the current dir (which should be terragrunt in the current job workspace)
-            deleteDir()
+            sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
           }
-          break;
-        default:
-          error("destroyInfrastructure error: unsupported item ${item}")
+          // delete the pr dir
+          echo "removing from git"
+          sh "git rm -fr ${path}"
+        }
+        // commit the changes back
+        echo "persisting changes in repo"
+        sh "git commit -m \"Removing infrastructure created for ${repo_name]}#${pr_code}\" ; git push --set-upstream origin master"
+        echo "infrastructure successfully destroyed"
       }
-    } else {
-      error("destroyInfrastructure error: unsupported target ${target}")
+      // Recursively delete the current dir (which should be terragrunt in the current job workspace)
+      deleteDir()
     }
   }
 }

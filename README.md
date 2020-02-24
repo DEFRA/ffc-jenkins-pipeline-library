@@ -52,6 +52,9 @@ For SQS queues, the parameters argument should be a map specifying pr_code, queu
 def params = [service: [code: "FFC", name: "Future Farming Services", type: "FFC"], pr_code: 15, queue_purpose: "post-office", repo_name: "my-repo"]
 ```
 
+### destroyInfrastructure
+This will tear down infrastructure provisioned by `provisionInfrastructure` and should be called when a PR is closed. It only requires the repo name and pr number and a single call to tear down all the infrastructure created, which may have taken several calls to `provisionInfrastructure`
+
 ### getCSProjVersion
 
 Returns the project version from the `[projectName].csproj` file. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
