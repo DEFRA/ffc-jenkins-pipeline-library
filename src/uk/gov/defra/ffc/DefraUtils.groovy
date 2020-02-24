@@ -47,7 +47,6 @@ def String __generateTerraformInputVariables(Map inputs) {
     return __mapToString(inputs).join("\n")
 }
 
-<<<<<<< HEAD
 def destroyInfrastructure(target, item, parameters) {
   assert __hasKeys(parameters, ['pr_code', 'repo_name']) : "parameters should specify pr_code and repo_name";
   sshagent(['helm-chart-creds']) {
@@ -96,8 +95,6 @@ def destroyInfrastructure(target, item, parameters) {
   }
 }
 
-=======
->>>>>>> feature/PSD-492-create-sqs-queue
 def provisionInfrastructure(target, item, parameters) {
   echo "provisionInfrastructure"
   if (target.toLowerCase() == "aws") {
