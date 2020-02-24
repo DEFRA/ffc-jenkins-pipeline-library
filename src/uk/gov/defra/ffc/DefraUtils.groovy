@@ -62,19 +62,16 @@ def destroyInfrastructure(target, item, parameters) {
             dir("london/eu-west-2/ffc") {
               def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}-*"
               echo "finding previous var files in directories matching ${dirName}";
-              try {
-                def varFiles = findFiles glob: "${dirName}/vars.tfvars";
-                echo "found ${varFiles.size()} var files";
-                for (varFile in varFiles) {
-                  def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
-                  // iterate through all var files in directory...
-                  dir(path) {
-                    sh("terragrunt destroy -var-file='${varFileName}' -auto-approve")
-                    sh("git rm *.vars")
-                  }
+              def varFiles = findFiles glob: "${dirName}/vars.tfvars";
+              echo "found ${varFiles.size()} var files";
+              for (varFile in varFiles) {
+                def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
+                echo "running terragrunt in ${path}"
+                // iterate through all var files in directory...
+                dir(path) {
+                  sh("terragrunt destroy -var-file='${varFileName}' -auto-approve")
+                  sh("git rm *.vars")
                 }
-              } catch (all) {
-                echo "error finding var files"
               }
               // delete the pr dir
               //sh "git rm -fr ${dirName}"
