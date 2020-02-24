@@ -7,6 +7,93 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
+def Boolean __hasKeys(Map mapToCheck, List keys) {
+    def passes = true;
+    for (key in keys) {
+        if (key instanceof Map) {
+            assert key.size() == 1 : "keys to check should not have a Map with more than one key";
+            def keyToCheck = key.keySet()[0];
+            if (mapToCheck.containsKey(keyToCheck)) {
+                if (!__hasKeys(mapToCheck[keyToCheck], key.values()[0])) {
+                    passes = false;
+                }
+            } else {
+                passes = false;
+            }
+        } else {
+            if (!mapToCheck.containsKey(key)) {
+                passes = false;
+            }
+        }
+    }
+    return passes;
+}
+
+def String[] __mapToString(Map map) {
+    def output = [];
+    for (item in map) {
+        if (item.value instanceof String) {
+            output.add("${item.key} = \"${item.value}\"");
+        } else if (item.value instanceof Map) {
+            output.add("${item.key} = {\n\t${__mapToString(item.value).join("\n\t")}\n}");
+        } else {
+            output.add("${item.key} = ${item.value}");
+        }
+    }
+    return output;
+}
+
+def String __generateTerraformInputVariables(Map inputs) {
+    return __mapToString(inputs).join("\n")
+}
+
+def provisionInfrastructure(target, item, parameters) {
+  echo "provisionInfrastructure"
+  if (target.toLowerCase() == "aws") {
+    switch (item) {
+      case "sqs":
+        sshagent(['helm-chart-creds']) {
+          // character limit is actually 80, but four characters are needed for prefixes and separators
+          static final int SQS_NAME_CHAR_LIMIT = 76
+          assert __hasKeys(parameters, [['service': ['code', 'name', 'type']], 'pr_code', 'queue_purpose', 'repo_name']) :
+            "parameters should specify pr_code, queue_purpose, repo_name as well as service details (code, name and type)";
+          assert parameters['repo_name'].size() + parameters['pr_code'].toString().size() + parameters['queue_purpose'].size() < SQS_NAME_CHAR_LIMIT :
+            "repo name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
+          dir('terragrunt') {
+            sh "pwd"
+            echo "cloning terraform repo"
+            // git clone repo...
+            git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
+
+            dir('london/eu-west-2/ffc') {
+              def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}-${parameters["queue_purpose"]}"
+              if (!fileExists("${dirName}/terraform.tfvars")) {
+                echo "${dirName} directory doesn't exist, creating..."
+                echo "create new dir from model dir, then add to git"
+                // create new dir from model dir, add to git...
+                sh "cp -fr standard_sqs_queues ${dirName}"
+                dir(dirName) {
+                  echo "adding queue to git"
+                  writeFile file: "vars.tfvars", text: __generateTerraformInputVariables(parameters)
+                  sh "git add *.tfvars ; git commit -m \"Creating queue ${parameters["queue_purpose"]} for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
+                  echo "provision infrastructure"
+                  sh "terragrunt apply -var-file='vars.tfvars' -auto-approve"
+                }
+              }
+            }
+            // Recursively delete the current dir (which should be terragrunt in the current job workspace)
+            deleteDir()
+          }
+        }
+        break;
+      default:
+        error("provisionInfrastructure error: unsupported item ${item}")
+    }
+  } else {
+    error("provisionInfrastructure error: unsupported target ${target}")
+  }
+}
+
 def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
 }
