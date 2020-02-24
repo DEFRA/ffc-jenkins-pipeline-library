@@ -66,28 +66,19 @@ def provisionInfrastructure(target, item, parameters) {
             git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
 
             dir('london/eu-west-2/ffc') {
-              def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}"
+              def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}-${parameters["queue_purpose"]}"
               if (!fileExists("${dirName}/terraform.tfvars")) {
                 echo "${dirName} directory doesn't exist, creating..."
                 echo "create new dir from model dir, then add to git"
                 // create new dir from model dir, add to git...
                 sh "cp -fr standard_sqs_queues ${dirName}"
-                echo "adding new dir to git repo"
-                sh "git add ${dirName} ; git commit -m \"${dirName}\" ; git push --set-upstream origin master"
-              }
-              def queueName = "${parameters['repo_name']}-pr${parameters['pr_code'].toString()}-${parameters['queue_purpose']}";
-              def varFileName = "vars-queue-${queueName}.tfvars";
-              if (!fileExists("${dirName}/${varFileName}")) {
                 dir(dirName) {
-                  // create file for queue vars
+                  echo "adding queue to git"
                   writeFile file: varFileName, text: __generateTerraformInputVariables(parameters)
-                  sh "git add ${varFileName} ; git commit -m \"${varFileName}\" ; git push --set-upstream origin master"
+                  sh "git add *.tfvars ; git commit -m \"Creating queue ${parameters["queue_purpose"]} for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
                   echo "provision infrastructure"
                   sh "terragrunt apply -var-file='${varFileName}' -auto-approve"
                 }
-                echo "infrastructure successfully provisioned"
-              } else {
-                echo "${queueName} has been provisioned previously"
               }
             }
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
