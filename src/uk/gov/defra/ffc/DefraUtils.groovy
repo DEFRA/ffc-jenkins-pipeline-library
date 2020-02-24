@@ -67,7 +67,7 @@ def destroyInfrastructure(target, item, parameters) {
                 echo "found ${varFiles.size()} var files";
                 for (varFile in varFiles) {
                   // iterate through all var files in directory...
-                  echo "terragrunt destroy -var-file='${varFile.getName()}' -auto-approve"
+                  echo "terragrunt destroy -var-file='${varFile.getPath()}/${varFile.getName()}' -auto-approve"
                   /*dir(varFile.path) {
                     sh("terragrunt destroy -var-file='${varFileName}' -auto-approve")
                     sh("git rm *.vars")
