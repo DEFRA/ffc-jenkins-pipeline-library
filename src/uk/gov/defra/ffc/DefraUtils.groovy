@@ -67,17 +67,20 @@ def destroyInfrastructure(target, item, parameters) {
                 echo "found ${varFiles.size()} var files";
                 for (varFile in varFiles) {
                   // iterate through all var files in directory...
-                  echo "terragrunt apply -var-file='${varFileName}' -auto-approve"
+                  echo "terragrunt destroy -var-file='${varFile.getName()}' -auto-approve"
+                  /*dir(varFile.path) {
+                    sh("terragrunt destroy -var-file='${varFileName}' -auto-approve")
+                    sh("git rm *.vars")
+                  }*/
                 }
               } catch (all) {
                 echo "error finding var files"
               }
-              echo "hello hello hello"
               // delete the pr dir
               //sh "git rm -fr ${dirName}"
               // commit the changes back
-              //echo "git commit -am \"Delete ${dirName} SQS queue config\" ; git push --set-upstream origin master"
-              //sh "git commit -am \"Delete ${dirName} SQS queue config\" ; git push --set-upstream origin master"
+              //echo "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code]}\ ; git push --set-upstream origin master"
+              //sh "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code]}\ ; git push --set-upstream origin master"
               //echo "infrastructure successfully destroyed"
             }
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
