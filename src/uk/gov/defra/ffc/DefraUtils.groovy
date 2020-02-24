@@ -69,12 +69,12 @@ def destroyInfrastructure(target, item, parameters) {
                 echo "running terragrunt in ${path}"
                 // iterate through all var files in directory...
                 dir(path) {
-                  sh("terragrunt destroy -var-file='${varFileName}' -auto-approve")
-                  sh("git rm *.vars")
+                  echo "terragrunt destroy -var-file='${varFile.getName()}' -auto-approve"
+                  sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
                 }
+                // delete the pr dir
+                sh "git rm -fr ${path}"
               }
-              // delete the pr dir
-              //sh "git rm -fr ${dirName}"
               // commit the changes back
               echo "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
               sh "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
