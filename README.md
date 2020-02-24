@@ -45,6 +45,13 @@ There are tests for `versionHasIncremented` and `hasKeys`, but in two separate f
 
 ## Functions
 
+### provisionInfrastructure
+This will provision infrastructure for a pull request, so any testing of the PR can be carried out in isolation. Currently it just supports a target of 'aws' and an item of 'sqs', but it's envisaged more targets and items will be added in due course. 
+For SQS queues, the parameters argument should be a map specifying pr_code, queue_purpose, repo name and a 'service' map providing code, name and type (for Future Farming, code and type should be 'FFC' and name should be 'Future Farming Services', other projects will have different values). For example:
+```
+def params = [service: [code: "FFC", name: "Future Farming Services", type: "FFC"], pr_code: 15, queue_purpose: "post-office", repo_name: "my-repo"]
+```
+
 ### getCSProjVersion
 
 Returns the project version from the `[projectName].csproj` file. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
