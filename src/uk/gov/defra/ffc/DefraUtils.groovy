@@ -79,8 +79,8 @@ def destroyInfrastructure(target, item, parameters) {
               // delete the pr dir
               //sh "git rm -fr ${dirName}"
               // commit the changes back
-              echo "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code"]}\ ; git push --set-upstream origin master"
-              sh "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code"]}\ ; git push --set-upstream origin master"
+              echo "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
+              sh "git commit -m \"Removing infrastructure created for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
               echo "infrastructure successfully destroyed"
             }
             // Recursively delete the current dir (which should be terragrunt in the current job workspace)
