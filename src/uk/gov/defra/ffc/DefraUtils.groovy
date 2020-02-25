@@ -263,14 +263,6 @@ def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   }
 }
 
-def mapArrayToArgs(args){
-  def mappedArgs = ''
-    args.each { arg ->
-      mappedArgs = mappedArgs + " $arg.key=$arg.value"
-  }
-  return mappedArgs
-}
-
 def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     def deploymentName = "$chartName-$tag"
