@@ -61,7 +61,6 @@ def destroyInfrastructure(repo_name, pr_code) {
         for (varFile in varFiles) {
           def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
           echo "running terragrunt in ${path}"
-          // iterate through all var files in directory...
           dir(path) {
             // terragrunt destroy
             sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
