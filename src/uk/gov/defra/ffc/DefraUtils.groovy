@@ -202,17 +202,15 @@ def setupRbacForNamespace(region, cluster, namespace, credentialsId, rolearn, us
     sh "kubectl config view"
   }
   dir('rbac') {
-    // def kubeconfig = "--kubeconfig ./kube.config"
-    def kubeconfig = ""
     // not using the withKubeConfig plugin so we can generate the config on the fly using eksctl
     // Added ListCluster and DescribeCluster permission to the arn:aws:iam::562955126301:policy/EKSWorkerNodePolicy
-    sh "eksctl utils write-kubeconfig ${kubeconfig} --set-kubeconfig-context=true --cluster ${cluster} --region ${region}"
-    sh "kubectl ${kubeconfig} config set-context --current --namespace=${namespace}"
-    echo "generated config"
-    sh "kubectl ${kubeconfig} config view"
-
-    sh "eksctl create iamidentitymapping --region ${region} --cluster ${cluster} --arn ${rolearn} --username ${username}"
-    sh "kubectl ${kubeconfig} create rolebinding ${roleBindingName} --user ${username} --clusterrole ${clusterRole} --namespace ${namespace}"
+    sh """
+      KUBECONFIG=./kube.config
+      eksctl utils write-kubeconfig --set-kubeconfig-context=true --cluster ${cluster} --region ${region}
+      kubectl config set-context --current --namespace=${namespace}
+      eksctl create iamidentitymapping --region ${region} --cluster ${cluster} --arn ${rolearn} --username ${username}
+      kubectl create rolebinding ${roleBindingName} --user ${username} --clusterrole ${clusterRole} --namespace ${namespace}
+    """
   }
 }
 
@@ -220,13 +218,13 @@ def teardownRbacForNamespace(region, cluster, namespace, credentialsId, rolearn,
 
   def roleBindingName = getRoleBindingName(username, clusterRole)
   dir('rbac') {
-    // def kubeconfig = "--kubeconfig ./kube.config"
-    def kubeconfig = ""
-    sh "eksctl utils write-kubeconfig ${kubeconfig} --set-kubeconfig-context=true --cluster ${cluster} --region ${region}"
-    sh "kubectl ${kubeconfig} config set-context --current --namespace=${namespace}"
-
-    sh "eksctl delete iamidentitymapping --region ${region} --cluster ${cluster} --arn ${rolearn}"
-    sh "kubectl ${kubeconfig} delete rolebinding ${roleBindingName} --namespace ${namespace}"
+    sh """
+      KUBECONFIG=./kube.config
+      eksctl utils write-kubeconfig --set-kubeconfig-context=true --cluster ${cluster} --region ${region}
+      kubectl config set-context --current --namespace=${namespace}
+      eksctl delete iamidentitymapping --region ${region} --cluster ${cluster} --arn ${rolearn}
+      kubectl delete rolebinding ${roleBindingName} --namespace ${namespace}
+    """
   }
 }
 
