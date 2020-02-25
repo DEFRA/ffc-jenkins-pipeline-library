@@ -268,7 +268,7 @@ def buildAndPushContainerImage(credentialsId, registry, imageName, tag, buildArg
 def mapArrayToArgs(args){
   def mappedArgs = ''
     args.each { arg ->
-    mappedArgs = mappedArgs + "\\&amp;$arg.key=$arg.value"
+      mappedArgs = mappedArgs + " $arg.key=$arg.value"
   }
   return mappedArgs
 }
@@ -317,8 +317,9 @@ def publishChart(registry, chartName, tag) {
 
 def triggerDeploy(jenkinsUrl, jobName, token, params) {
   def url = "$jenkinsUrl/job/$jobName/buildWithParameters?token=$token"
-  args = mapArrayToArgs(params)
-  url = url + args
+  params.each { param ->
+    url = url + "\\&amp;$param.key=$param.value"
+  }
   echo "Triggering deployment for $url"
   sh(script: "curl -k $url")
 }
