@@ -208,7 +208,7 @@ def lintHelm(chartName) {
   sh "helm lint ./helm/$chartName"
 }
 
-def buildTestImage(credentialsId, registry, projectName, buildNumber, args) {
+def buildTestImage(credentialsId, registry, projectName, buildNumber, buildArgs = '') {
   docker.withRegistry("https://$registry", credentialsId) {
     sh 'docker image prune -f || echo could not prune images'
     sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache $args"
@@ -255,7 +255,7 @@ def waitForQualityGateResult(timeoutInMinutes) {
   }
 }
 
-def buildAndPushContainerImage(credentialsId, registry, imageName, tag, args) {
+def buildAndPushContainerImage(credentialsId, registry, imageName, tag, buildArgs = '') {
   docker.withRegistry("https://$registry", credentialsId) {
     sh "docker-compose -f docker-compose.yaml build --no-cache $args"
     sh "docker tag $imageName $registry/$imageName:$tag"
