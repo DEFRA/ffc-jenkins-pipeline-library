@@ -202,64 +202,78 @@ def buildNames(cluster, region, namespace, clusterRole) {
     rolearn: "arn:aws:iam::${accountId}:role/${role}",
     username: "${role}-1",
     clusterRole: clusterRole
-  ]
 }
 
-def getRoleBindingName(username, clusterRole) {
- return "${username}-${clusterRole.toUpperCase()}-ROLEBINDING"
+def getClusterRole(group) {
+  def clusterRoleMappings = [
+    developer: 'edit',
+    administrator: 'admin'
+  ]
+  return clusterRoleMappings[group]
+}
+
+def getRole(namespace, group) {
+  return "${namespace}-${group}".toUpperCase()
+}
+
+def getRoleArn(role) {
+  def accountId = sh(returnStdout: true, script: "aws sts get-caller-identity --query Account").replaceAll('"', '')
+  return "arn:aws:iam::${accountId}:role/${role}"
+}
+
+def getUser(role) {
+  return "${role}-1"
+}
+
+def getRoleBindingName(role) {
+ return "${role}-ROLEBINDING"
 }
 
 def createKubeConfig(kubeConfigFile, cluster, region, namespace) {
     // Added ListCluster and DescribeCluster permission to the arn:aws:iam::562955126301:policy/EKSWorkerNodePolicy
     // as write-kubeconfig requires them
-    sh """
-      KUBECONFIG=${kubeConfigFile}
-      eksctl utils write-kubeconfig --set-kubeconfig-context=true --cluster ${cluster} --region ${region}
-      kubectl config set-context --current --namespace=${namespace}
-    """
+    // Should not require region - aws seems to be set to a US region or not specified
+    sh "eksctl utils write-kubeconfig --kubeconfig=${kubeConfigFile} --set-kubeconfig-context=true --cluster ${cluster} --region ${region}"
+    sh "kubectl --kubeconfig=${kubeConfigFile} config set-context --current --namespace=${namespace}"
 }
 
-def createRoleBindings(kubeConfigFile, username, clusterRole, region, cluster, namespace, rolearn) {
-    def roleBindingName = getRoleBindingName(username, clusterRole)
-    sh """
-      KUBECONFIG=${kubeConfigFile}
-      eksctl create iamidentitymapping --region ${region} --cluster ${cluster} --arn ${rolearn} --username ${username}
-      kubectl create rolebinding ${roleBindingName} --user ${username} --clusterrole ${clusterRole} --namespace ${namespace}
-    """
+def createRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, clusterRole, roleArn) {
+    def roleBindingName = getRoleBindingName(role)
+    sh "eksctl create iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --username ${user}"
+    sh "kubectl --kubeconfig=${kubeConfigFile} create rolebinding ${roleBindingName} --user ${user} --clusterrole ${clusterRole} --namespace ${namespace}"
 }
 
-def deleteRoleBindings(kubeConfigFile, region, cluster, namespace, rolearn, username) {
-    def roleBindingName = getRoleBindingName(username, clusterRole)
-    sh """
-      KUBECONFIG=${kubeConfigFile}
-      eksctl delete iamidentitymapping --region ${region} --cluster ${cluster} --arn ${rolearn}
-      kubectl delete rolebinding ${roleBindingName} --namespace ${namespace} --all
-    """
+def deleteRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, roleArn) {
+    def roleBindingName = getRoleBindingName(role)
+    sh "eksctl delete iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --all"
+    sh "kubectl --kubeconfig=${kubeConfigFile} delete rolebinding ${roleBindingName} --namespace ${namespace}"
 }
 
-def setupRbacForNamespace(region, cluster, namespace, credentialsId, rolearn, username, clusterRole) {
+def setupRbacForNamespace(region, cluster, namespace, group) {
 
-  withKubeConfig([credentialsId: credentialsId]) {
-    echo "stored config"
-    sh "kubectl config view"
-  }
   dir('rbac') {
-    def names = buildNames(cluster, region, namespace, clusterRole)
-    echo "$names"
     // not using the withKubeConfig plugin so we can generate the config on the fly using eksctl
     def kubeConfigFile = "./kube.config"
     createKubeConfig(kubeConfigFile, cluster, region, namespace)
-    createRoleBindings(kubeConfigFile, username, clusterRole, region, cluster, namespace, rolearn) 
+
+    def role = getRole(namespace, group)
+    def roleArn = getRoleArn(role)
+    def user = getUser(role)
+    def clusterRole = getClusterRole(group)
+    createRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, clusterRole, roleArn) 
   }
 }
 
-def teardownRbacForNamespace(region, cluster, namespace, credentialsId, rolearn, username, clusterRole) {
+def teardownRbacForNamespace(region, cluster, namespace, group) {
 
   dir('rbac') {
     def kubeConfigFile = "./kube.config"
-    def roleBindingName = getRoleBindingName(username, clusterRole)
     createKubeConfig(kubeConfigFile, cluster, region, namespace)
-    deleteRoleBindings(kubeConfigFile, region, cluster, namespace, rolearn, username) 
+
+    def role = getRole(namespace, group)
+    def roleArn = getRoleArn(role)
+    def user = getUser(role)
+    deleteRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, roleArn) 
   }
 }
 
