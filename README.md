@@ -244,7 +244,7 @@ defraUtils.lintHelm('ffc-demo-web')
 ### buildTestImage
 Builds the test image using the docker-compose files in the repository. By convention the services are named the same as the image.
 
-Takes five parameters:
+Takes four parameters:
 - the ID of the docker registry credentials previously set up in Jenkins
 - registry URL without the protocol
 - project name, e.g. `ffc-demo-web`
