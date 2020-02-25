@@ -308,7 +308,7 @@ def publishChart(registry, chartName, tag) {
 def triggerDeploy(jenkinsUrl, jobName, token, params) {
   def url = "$jenkinsUrl/job/$jobName/buildWithParameters?token=$token"
   params.each { param ->
-    url = url + "%36$param.key=$param.value"
+    url = url + "%26$param.key=$param.value"
   }
   echo "Triggering deployment for $url"
   sh(script: "curl -k $url")
