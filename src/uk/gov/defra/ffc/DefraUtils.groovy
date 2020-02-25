@@ -190,6 +190,21 @@ def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   }
 }
 
+def buildNames(cluster, region, namespace, clusterRole) {
+  def accountId = sh(returnStdout: true, script: "aws sts get-caller-identity --query Account")
+  def role = "${namespace.toUpperCase()}-DEVELOPER"
+  return [
+    accountId: accountId,
+    region: region,
+    cluster: cluster,
+    namespace: namespace,
+    role: role,
+    rolearn: "arn:aws:iam::${accountId}:role/${role}",
+    username: "${role}-1",
+    clusterRole: clusterRole
+  ]
+}
+
 def getRoleBindingName(username, clusterRole) {
  return "${username}-${clusterRole.toUpperCase()}-ROLEBINDING"
 }
@@ -213,7 +228,7 @@ def createRoleBindings(kubeConfigFile, username, clusterRole, region, cluster, n
     """
 }
 
-def deleteRoleBindings(kubeConfigFile, region, cluster, namespace, rolearn) {
+def deleteRoleBindings(kubeConfigFile, region, cluster, namespace, rolearn, username) {
     def roleBindingName = getRoleBindingName(username, clusterRole)
     sh """
       KUBECONFIG=${kubeConfigFile}
@@ -229,6 +244,8 @@ def setupRbacForNamespace(region, cluster, namespace, credentialsId, rolearn, us
     sh "kubectl config view"
   }
   dir('rbac') {
+    def names = buildNames(cluster, region, namespace, clusterRole)
+    echo "$names"
     // not using the withKubeConfig plugin so we can generate the config on the fly using eksctl
     def kubeConfigFile = "./kube.config"
     createKubeConfig(kubeConfigFile, cluster, region, namespace)
@@ -242,7 +259,7 @@ def teardownRbacForNamespace(region, cluster, namespace, credentialsId, rolearn,
     def kubeConfigFile = "./kube.config"
     def roleBindingName = getRoleBindingName(username, clusterRole)
     createKubeConfig(kubeConfigFile, cluster, region, namespace)
-    deleteRoleBindings(kubeConfigFile, region, cluster, namespace, rolearn) 
+    deleteRoleBindings(kubeConfigFile, region, cluster, namespace, rolearn, username) 
   }
 }
 
