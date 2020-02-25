@@ -244,15 +244,16 @@ defraUtils.lintHelm('ffc-demo-web')
 ### buildTestImage
 Builds the test image using the docker-compose files in the repository. By convention the services are named the same as the image.
 
-Takes three parameters:
+Takes four parameters:
+- the ID of the docker registry credentials previously set up in Jenkins
+- registry URL without the protocol
 - project name, e.g. `ffc-demo-web`
-- service name to run from the project's docker-compose configuration, e.g. `app`
 - build number
 
 Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
-defraUtils.buildTestImage('ffc-demo-web', 'app', BUILD_NUMBER)
+defraUtils.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', BUILD_NUMBER)
 ```
 
 ### runTests
