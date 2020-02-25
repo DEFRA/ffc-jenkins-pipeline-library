@@ -208,8 +208,9 @@ def lintHelm(chartName) {
   sh "helm lint ./helm/$chartName"
 }
 
-def buildTestImage(credentialsId, registry, projectName, buildNumber, buildArgs = '') {
+def buildTestImage(credentialsId, registry, projectName, buildNumber, buildArgs) {
   docker.withRegistry("https://$registry", credentialsId) {
+    def args = mapArrayToArgs(buildArgs)
     sh 'docker image prune -f || echo could not prune images'
     sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache $args"
   }
@@ -255,12 +256,21 @@ def waitForQualityGateResult(timeoutInMinutes) {
   }
 }
 
-def buildAndPushContainerImage(credentialsId, registry, imageName, tag, buildArgs = '') {
+def buildAndPushContainerImage(credentialsId, registry, imageName, tag, buildArgs) {
   docker.withRegistry("https://$registry", credentialsId) {
+    def args = mapArrayToArgs(buildArgs)
     sh "docker-compose -f docker-compose.yaml build --no-cache $args"
     sh "docker tag $imageName $registry/$imageName:$tag"
     sh "docker push $registry/$imageName:$tag"
   }
+}
+
+def mapArrayToArgs(args){
+  def mappedArgs = ''
+    args.each { arg ->
+    mappedArgs = mappedArgs + "\\&amp;$arg.key=$arg.value"
+  }
+  return mappedArgs
 }
 
 def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
@@ -307,9 +317,8 @@ def publishChart(registry, chartName, tag) {
 
 def triggerDeploy(jenkinsUrl, jobName, token, params) {
   def url = "$jenkinsUrl/job/$jobName/buildWithParameters?token=$token"
-  params.each { param ->
-    url = url + "\\&amp;$param.key=$param.value"
-  }
+  args = mapArrayToArgs(params)
+  url = url + args
   echo "Triggering deployment for $url"
   sh(script: "curl -k $url")
 }
