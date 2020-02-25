@@ -41,17 +41,6 @@ def testTerraformInputVariables(du) {
   assert du.__generateTerraformInputVariables(inputs2) == "code = \"abc-123\"\npr_code = 12\nfoo = {\n\tbar = \"foo\"\n\tfoo = true\n}" // "code = \"abc-123\"\npr_code = 12\nfoo = {\n\tbar = \"foo\"\n\tfoo = true\n}'"
 }
 
-def testMapArrayToArgsMapsArraySingleValue(du) {
-  assert du.mapArrayToArgs(['--build-arg':'REGISTRY=TestRegistry']) == ' --build-arg REGISTRY=TestRegistry'
-}
-
-def testMapArrayToArgsMapsArrayMultipleValues(du) {
-  assert du.mapArrayToArgs(['--build-arg':'REGISTRY=TestRegistry',
-    '--build-arg':'REGISTRY=TestRegistry2']) == ' --build-arg REGISTRY=TestRegistry --build-arg REGISTRY=TestRegistry2'
-}
-
 testVersionHasIncremented(defraUtils)
 testMapHasKeys(defraUtils)
 testTerraformInputVariables(defraUtils)
-testMapArrayToArgsMapsArraySingleValue(defraUtils)
-testMapArrayToArgsMapsArrayMultipleValues(defraUtils)

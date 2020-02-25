@@ -52,16 +52,6 @@ For SQS queues, the parameters argument should be a map specifying pr_code, queu
 def params = [service: [code: "FFC", name: "Future Farming Services", type: "FFC"], pr_code: 15, queue_purpose: "post-office", repo_name: "my-repo"]
 ```
 
-### mapArrayToArgs
-Map array to list of command arguments.
-
-The below Example usage would output ` --key1=value1 --key2=value2`
-
-```
-mapArrayToArgs(['--key1':'value1','--key2':'value2'])
-```
-
-
 ### getCSProjVersion
 
 Returns the project version from the `[projectName].csproj` file. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
@@ -254,17 +244,15 @@ defraUtils.lintHelm('ffc-demo-web')
 ### buildTestImage
 Builds the test image using the docker-compose files in the repository. By convention the services are named the same as the image.
 
-Takes five parameters:
-- the ID of the docker registry credentials previously set up in Jenkins
-- registry URL without the protocol
+Takes three parameters:
 - project name, e.g. `ffc-demo-web`
+- service name to run from the project's docker-compose configuration, e.g. `app`
 - build number
-- Docker build argument array
 
 Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
-defraUtils.buildAndPushContainerImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', BUILD_NUMBER, ['--build-arg':'MYARG=myArg'])
+defraUtils.buildTestImage('ffc-demo-web', 'app', BUILD_NUMBER)
 ```
 
 ### runTests
@@ -347,12 +335,11 @@ Takes four parameters:
 - registry URL without the protocol
 - the name of the image
 - container image tag
-- Docker build argument array
 
 Example usage:
 
 ```
-defraUtils.buildAndPushContainerImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', 'pr53', ['--build-arg':'MYARG=myArg'])
+defraUtils.buildAndPushContainerImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', 'pr53')
 ```
 
 ### deployChart
