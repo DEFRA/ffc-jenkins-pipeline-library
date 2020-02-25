@@ -88,7 +88,7 @@ def provisionInfrastructure(target, item, parameters) {
       case "sqs":
         sshagent(['helm-chart-creds']) {
           // character limit is actually 80, but four characters are needed for prefixes and separators
-          static final int SQS_NAME_CHAR_LIMIT = 76
+          final int SQS_NAME_CHAR_LIMIT = 76
           assert __hasKeys(parameters, [['service': ['code', 'name', 'type']], 'pr_code', 'queue_purpose', 'repo_name']) :
             "parameters should specify pr_code, queue_purpose, repo_name as well as service details (code, name and type)";
           assert parameters['repo_name'].size() + parameters['pr_code'].toString().size() + parameters['queue_purpose'].size() < SQS_NAME_CHAR_LIMIT :
