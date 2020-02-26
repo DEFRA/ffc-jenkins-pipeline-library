@@ -311,7 +311,7 @@ def triggerDeploy(jenkinsUrl, jobName, token, params) {
     url = url + "&$param.key=$param.value"
   }
   echo "Triggering deployment for $url"
-  sh(script: "curl -k "$url"")
+  sh(script: "curl -k ""$url""")
 }
 
 def releaseExists(containerTag, repoName, token){
