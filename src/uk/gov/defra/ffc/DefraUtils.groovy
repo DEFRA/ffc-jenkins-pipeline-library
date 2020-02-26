@@ -229,7 +229,7 @@ def getRoleBindingName(role) {
  return "${role}-ROLEBINDING"
 }
 
-def createKubeConfig(kubeConfigFile, cluster, region, namespace) {
+def createKubeConfig(kubeConfigFile, region, cluster, namespace) {
     // Added ListCluster and DescribeCluster permission to the arn:aws:iam::562955126301:policy/EKSWorkerNodePolicy
     // as write-kubeconfig requires them
     // Should not require region - aws seems to be set to a US region or not specified
@@ -249,31 +249,31 @@ def deleteRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, r
     sh "kubectl --kubeconfig=${kubeConfigFile} delete rolebinding ${roleBindingName} --namespace ${namespace}"
 }
 
-def setupRbacForNamespace(region, cluster, namespace, group) {
-
+def setupRbacForNamespace(namespace, group) {
+ 
   dir('rbac') {
     // not using the withKubeConfig plugin so we can generate the config on the fly using eksctl
     def kubeConfigFile = "./kube.config"
-    createKubeConfig(kubeConfigFile, cluster, region, namespace)
+    createKubeConfig(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace)
 
     def role = getRole(namespace, group)
     def roleArn = getRoleArn(role)
     def user = getUser(role)
     def clusterRole = getClusterRole(group)
-    createRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, clusterRole, roleArn) 
+    createRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole, roleArn) 
   }
 }
 
-def teardownRbacForNamespace(region, cluster, namespace, group) {
+def teardownRbacForNamespace(namespace, group) {
 
   dir('rbac') {
     def kubeConfigFile = "./kube.config"
-    createKubeConfig(kubeConfigFile, cluster, region, namespace)
+    createKubeConfig(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace)
 
     def role = getRole(namespace, group)
     def roleArn = getRoleArn(role)
     def user = getUser(role)
-    deleteRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, roleArn) 
+    deleteRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn) 
   }
 }
 
