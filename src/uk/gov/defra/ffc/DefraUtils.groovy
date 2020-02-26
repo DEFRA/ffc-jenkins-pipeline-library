@@ -253,17 +253,29 @@ def deleteRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, r
     sh "kubectl --kubeconfig=${kubeConfigFile} delete rolebinding ${roleBindingName} --namespace ${namespace}"
 }
 
+def roleBindingExists(kubeConfigFile, namespace, role) {
+  def roleBindingName = getRoleBindingName(role)
+  def result = sh(
+    returnStatus: true,
+    script: "kubectl --kubeconfig=${kubeConfigFile} get rolebindings ${roleBindingName} --namespace ${namespace}"
+  ) as Integer
+  return result == 0
+}
+
 def setupRbacForNamespace(namespace, groups) {
   dir('rbac') {
     // not using the withKubeConfig plugin so we can generate the config on the fly using eksctl
     def kubeConfigFile = "./kube.config"
     createKubeConfig(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace)
     for (group in groups) {
-        def role = getRole(namespace, group)
-        def roleArn = getRoleArn(role)
-        def user = getUser(role)
-        def clusterRole = getClusterRole(group)
-        createRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole, roleArn) 
+      def role = getRole(namespace, group)
+      def roleArn = getRoleArn(role)
+      def user = getUser(role)
+      def clusterRole = getClusterRole(group)
+      if (roleBindingExists(kubeConfigFile, namespace, role)) {
+        deleteRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn) 
+      }
+      createRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole, roleArn) 
     }
   }
 }
@@ -278,7 +290,9 @@ def teardownRbacForNamespace(namespace, groups) {
       def role = getRole(namespace, group)
       def roleArn = getRoleArn(role)
       def user = getUser(role)
-      deleteRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn) 
+      if (roleBindingExists(kubeConfigFile, namespace, role)) {
+        deleteRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn) 
+      }
     }
   }
 }
