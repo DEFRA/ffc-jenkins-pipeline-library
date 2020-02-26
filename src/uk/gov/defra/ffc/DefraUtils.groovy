@@ -204,6 +204,10 @@ def buildNames(cluster, region, namespace, clusterRole) {
     clusterRole: clusterRole
 }
 
+def getRbacGroups() {
+  return [ 'developer', 'administrator' ]
+}
+
 def getClusterRole(group) {
   def clusterRoleMappings = [
     developer: 'edit',
@@ -249,31 +253,33 @@ def deleteRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, r
     sh "kubectl --kubeconfig=${kubeConfigFile} delete rolebinding ${roleBindingName} --namespace ${namespace}"
 }
 
-def setupRbacForNamespace(namespace, group) {
- 
+def setupRbacForNamespace(namespace, groups) {
   dir('rbac') {
     // not using the withKubeConfig plugin so we can generate the config on the fly using eksctl
     def kubeConfigFile = "./kube.config"
     createKubeConfig(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace)
-
-    def role = getRole(namespace, group)
-    def roleArn = getRoleArn(role)
-    def user = getUser(role)
-    def clusterRole = getClusterRole(group)
-    createRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole, roleArn) 
+    for (group in groups) {
+        def role = getRole(namespace, group)
+        def roleArn = getRoleArn(role)
+        def user = getUser(role)
+        def clusterRole = getClusterRole(group)
+        createRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole, roleArn) 
+    }
   }
 }
 
-def teardownRbacForNamespace(namespace, group) {
+def teardownRbacForNamespace(namespace, groups) {
 
   dir('rbac') {
     def kubeConfigFile = "./kube.config"
     createKubeConfig(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace)
 
-    def role = getRole(namespace, group)
-    def roleArn = getRoleArn(role)
-    def user = getUser(role)
-    deleteRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn) 
+    for (group in groups) {
+      def role = getRole(namespace, group)
+      def roleArn = getRoleArn(role)
+      def user = getUser(role)
+      deleteRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn) 
+    }
   }
 }
 
@@ -453,13 +459,13 @@ def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
     sh "helm upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
   }
-  setupRbacForNamespace(deploymentName, 'developer')
+  setupRbacForNamespace(deploymentName, getRbacGroups())
 }
 
 def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
-  teardownRbacForNamespace(deploymentName, 'developer')
+  teardownRbacForNamespace(deploymentName, getRbacGroups())
   withKubeConfig([credentialsId: credentialsId]) {
     sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
