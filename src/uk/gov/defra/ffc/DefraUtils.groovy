@@ -447,16 +447,19 @@ def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
 }
 
 def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
+  def deploymentName = "$chartName-$tag"
+  echo "deploying deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
-    def deploymentName = "$chartName-$tag"
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
     sh "helm upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
   }
+  setupRbacForNamespace(deploymentName, 'developer')
 }
 
 def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
+  teardownRbacForNamespace(deploymentName, 'developer')
   withKubeConfig([credentialsId: credentialsId]) {
     sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
