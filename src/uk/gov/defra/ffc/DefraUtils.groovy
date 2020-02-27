@@ -131,36 +131,57 @@ def provisionInfrastructure(target, item, parameters) {
   }
 }
 
-def runSqlCommandOnDatabaseHost(credentialsId, host, username, dbname, sqlCmd) {
+def provisionPrRoleAndSchema(host, username, dbname, jenkinsUserCredId, prUserCredId, pr_code) {
   withCredentials([
-    string(credentialsId: credentialsId, variable: 'PGPASSWORD'),
+    string(credentialsId: jenkinsUserCredId, variable: 'PGPASSWORD'),
     string(credentialsId: username, variable: 'DBUSER'),
     string(credentialsId: dbname, variable: 'DBNAME'),
+    string(credentialsId: host, variable: 'DBHOST'),
+    string(credentialsId: prUserCredId, variable: 'PR_USER_PASSWORD'),
   ]) {
-    sh "psql --host=${host} --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${sqlCmd};\""
+    // FIXME: rename the DB vars to something a bit more descriptive
+    def pr_schema = "pr${pr_code}"
+    def pr_user = "${dbname}_${pr_schema}"
+    def set_pwd_cmd = "ALTER USER ${pr_user} WITH PASSWORD '\$PR_USER_PASSWORD'"
+    def create_schema_cmd = "CREATE SCHEMA ${pr_schema}"
+    def grant_privileges_cmd = "GRANT ALL PRIVILEGES ON SCHEMA ${pr_schema} TO ${pr_user}"
+    echo "createuser --host=\$DBHOST --username=\$DBUSER --no-password  --no-createdb --no-createrole ${pr_user}"
+    echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${set_pwd_cmd};\""
+    echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${create_schmea_cmd};\""
+    echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${grant_privileges_cmd};\""
   }
 }
 
-def createDatabase(credentialsId, host, username, dbname, owner) {
-  withCredentials([
-    string(credentialsId: credentialsId, variable: 'PGPASSWORD'),
-    string(credentialsId: username, variable: 'DBUSER'),
-    string(credentialsId: dbname, variable: 'DBNAME'),
-    string(credentialsId: owner, variable: 'DBOWNER'),
-  ]) {
-    echo "createdb --host=${host} --username=\$DBUSER --owner=\$DBOWNER --no-password \$DBNAME"
-  }
-}
+// def runSqlCommandOnDatabaseHost(credentialsId, host, username, dbname, sqlCmd) {
+//   withCredentials([
+//     string(credentialsId: credentialsId, variable: 'PGPASSWORD'),
+//     string(credentialsId: username, variable: 'DBUSER'),
+//     string(credentialsId: dbname, variable: 'DBNAME'),
+//   ]) {
+//     sh "psql --host=${host} --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${sqlCmd};\""
+//   }
+// }
 
-def dropDatabase(credentialsId, host, username, dbname) {
-  withCredentials([
-    string(credentialsId: credentialsId, variable: 'PGPASSWORD'),
-    string(credentialsId: username, variable: 'DBUSER'),
-    string(credentialsId: dbname, variable: 'DBNAME'),
-  ]) {
-    echo "dropdb --host=${host} --username=\$DBUSER --no-password \$DBNAME"
-  }
-}
+// def createDatabase(credentialsId, host, username, dbname, owner) {
+//   withCredentials([
+//     string(credentialsId: credentialsId, variable: 'PGPASSWORD'),
+//     string(credentialsId: username, variable: 'DBUSER'),
+//     string(credentialsId: dbname, variable: 'DBNAME'),
+//     string(credentialsId: owner, variable: 'DBOWNER'),
+//   ]) {
+//     echo "createdb --host=${host} --username=\$DBUSER --owner=\$DBOWNER --no-password \$DBNAME"
+//   }
+// }
+
+// def dropDatabase(credentialsId, host, username, dbname) {
+//   withCredentials([
+//     string(credentialsId: credentialsId, variable: 'PGPASSWORD'),
+//     string(credentialsId: username, variable: 'DBUSER'),
+//     string(credentialsId: dbname, variable: 'DBNAME'),
+//   ]) {
+//     echo "dropdb --host=${host} --username=\$DBUSER --no-password \$DBNAME"
+//   }
+// }
 
 def getCSProjVersion(projName) {
   return sh(returnStdout: true, script: "xmllint ${projName}/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
