@@ -233,13 +233,15 @@ def getRoleBindingName(role) {
  return "${role}-ROLEBINDING"
 }
 
-def createRoleBindings(region, cluster, namespace, user, role, clusterRole, roleArn) {
+def createRoleBindings(region, cluster, namespace, user, role, clusterRole) {
+    def roleArn = getRoleArn(role)
     def roleBindingName = getRoleBindingName(role)
     sh "eksctl create iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --username ${user}"
     sh "kubectl create rolebinding ${roleBindingName} --user ${user} --clusterrole ${clusterRole} --namespace ${namespace}"
 }
 
-def deleteRoleBindings(region, cluster, namespace, user, role, roleArn) {
+def deleteRoleBindings(region, cluster, namespace, user, role) {
+    def roleArn = getRoleArn(role)
     def roleBindingName = getRoleBindingName(role)
     sh "eksctl delete iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --all"
     sh "kubectl delete rolebinding ${roleBindingName} --namespace ${namespace}"
@@ -257,23 +259,21 @@ def roleBindingExists(namespace, role) {
 def setupRbacForNamespace(namespace, groups) {
   for (group in groups) {
     def role = getRole(namespace, group)
-    def roleArn = getRoleArn(role)
     def user = getUser(role)
     def clusterRole = getClusterRole(group)
     if (roleBindingExists(namespace, role)) {
-      deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn)
+      deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role)
     }
-    createRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole, roleArn) 
+    createRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole) 
   }
 }
 
 def teardownRbacForNamespace(namespace, groups) {
   for (group in groups) {
     def role = getRole(namespace, group)
-    def roleArn = getRoleArn(role)
     def user = getUser(role)
     if (roleBindingExists(namespace, role)) {
-      deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn)
+      deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role)
     }
   }
 }
