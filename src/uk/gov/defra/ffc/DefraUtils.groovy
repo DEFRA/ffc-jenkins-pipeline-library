@@ -147,7 +147,7 @@ def provisionPrRoleAndSchema(host, username, dbname, jenkinsUserCredId, prUserCr
     def grant_privileges_cmd = "GRANT ALL PRIVILEGES ON SCHEMA ${pr_schema} TO ${pr_user}"
     echo "createuser --host=\$DBHOST --username=\$DBUSER --no-password  --no-createdb --no-createrole ${pr_user}"
     echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${set_pwd_cmd};\""
-    echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${create_schmea_cmd};\""
+    echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${create_schema_cmd};\""
     echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${grant_privileges_cmd};\""
   }
 }
