@@ -190,11 +190,11 @@ def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   }
 }
 
-def getRbacGroups() {
+def __getRbacGroups() {
   return [ 'developer', 'administrator' ]
 }
 
-def getClusterRole(group) {
+def __getClusterRole(group) {
   def clusterRoleMappings = [
     developer: 'edit',
     administrator: 'admin'
@@ -202,39 +202,39 @@ def getClusterRole(group) {
   return clusterRoleMappings[group]
 }
 
-def getRole(namespace, group) {
+def __getRole(namespace, group) {
   return "${namespace}-${group}".toUpperCase()
 }
 
-def getRoleArn(role) {
+def __getRoleArn(role) {
   def accountId = sh(returnStdout: true, script: "aws sts get-caller-identity --query Account").replaceAll('"', '')
   return "arn:aws:iam::${accountId}:role/${role}"
 }
 
-def getUser(role) {
+def __getUser(role) {
   return "${role}-1"
 }
 
-def getRoleBindingName(role) {
+def __getRoleBindingName(role) {
  return "${role}-ROLEBINDING"
 }
 
-def createRoleBindings(region, cluster, namespace, user, role, clusterRole) {
-    def roleArn = getRoleArn(role)
-    def roleBindingName = getRoleBindingName(role)
+def __createRoleBindings(region, cluster, namespace, user, role, clusterRole) {
+    def roleArn = __getRoleArn(role)
+    def roleBindingName = __getRoleBindingName(role)
     sh "eksctl create iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --username ${user}"
     sh "kubectl create rolebinding ${roleBindingName} --user ${user} --clusterrole ${clusterRole} --namespace ${namespace}"
 }
 
-def deleteRoleBindings(region, cluster, namespace, user, role) {
-    def roleArn = getRoleArn(role)
-    def roleBindingName = getRoleBindingName(role)
+def __deleteRoleBindings(region, cluster, namespace, user, role) {
+    def roleArn = __getRoleArn(role)
+    def roleBindingName = __getRoleBindingName(role)
     sh "eksctl delete iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --all"
     sh "kubectl delete rolebinding ${roleBindingName} --namespace ${namespace}"
 }
 
-def roleBindingExists(namespace, role) {
-  def roleBindingName = getRoleBindingName(role)
+def __roleBindingExists(namespace, role) {
+  def roleBindingName = __getRoleBindingName(role)
   def result = sh(
     returnStatus: true,
     script: "kubectl get rolebindings ${roleBindingName} --namespace ${namespace}"
@@ -242,24 +242,24 @@ def roleBindingExists(namespace, role) {
   return result == 0
 }
 
-def setupRbacForNamespace(namespace, groups) {
+def __setupRbacForNamespace(namespace, groups) {
   for (group in groups) {
-    def role = getRole(namespace, group)
-    def user = getUser(role)
-    def clusterRole = getClusterRole(group)
-    if (roleBindingExists(namespace, role)) {
-      deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role)
+    def role = __getRole(namespace, group)
+    def user = __getUser(role)
+    def clusterRole = __getClusterRole(group)
+    if (__roleBindingExists(namespace, role)) {
+      __deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role)
     }
-    createRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole) 
+    __createRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole) 
   }
 }
 
-def teardownRbacForNamespace(namespace, groups) {
+def __teardownRbacForNamespace(namespace, groups) {
   for (group in groups) {
-    def role = getRole(namespace, group)
-    def user = getUser(role)
-    if (roleBindingExists(namespace, role)) {
-      deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role)
+    def role = __getRole(namespace, group)
+    def user = __getUser(role)
+    if (__roleBindingExists(namespace, role)) {
+      __deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role)
     }
   }
 }
@@ -439,7 +439,7 @@ def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
     sh "helm upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
-    setupRbacForNamespace(deploymentName, getRbacGroups())
+    __setupRbacForNamespace(deploymentName, __getRbacGroups())
   }
 }
 
@@ -447,7 +447,7 @@ def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
-    teardownRbacForNamespace(deploymentName, getRbacGroups())
+    __teardownRbacForNamespace(deploymentName, __getRbacGroups())
     sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
