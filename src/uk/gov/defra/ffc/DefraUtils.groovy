@@ -58,21 +58,25 @@ def destroyInfrastructure(repo_name, pr_code) {
         echo "finding previous var files in directories matching ${dirName}";
         def varFiles = findFiles glob: "${dirName}/vars.tfvars";
         echo "found ${varFiles.size()} directories to tear down";
-        for (varFile in varFiles) {
-          def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
-          echo "running terragrunt in ${path}"
-          dir(path) {
-            // terragrunt destroy
-            sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
+        if (varFiles.size() > 0) {
+          for (varFile in varFiles) {
+            def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
+            echo "running terragrunt in ${path}"
+            dir(path) {
+              // terragrunt destroy
+              sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
+            }
+            // delete the pr dir
+            echo "removing from git"
+            sh "git rm -fr ${path}"
           }
-          // delete the pr dir
-          echo "removing from git"
-          sh "git rm -fr ${path}"
+          // commit the changes back
+          echo "persisting changes in repo"
+          sh "git commit -m \"Removing infrastructure created for ${repo_name}#${pr_code}\" ; git push --set-upstream origin master"
+          echo "infrastructure successfully destroyed"
+        } else {
+          echo "no infrastructure to destroy"
         }
-        // commit the changes back
-        echo "persisting changes in repo"
-        sh "git commit -m \"Removing infrastructure created for ${repo_name}#${pr_code}\" ; git push --set-upstream origin master"
-        echo "infrastructure successfully destroyed"
       }
       // Recursively delete the current dir (which should be terragrunt in the current job workspace)
       deleteDir()
