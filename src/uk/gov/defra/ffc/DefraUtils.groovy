@@ -1,11 +1,4 @@
 package uk.gov.defra.ffc
-def branch = ''
-def pr = ''
-def mergedPrNo = ''
-def containerTag = ''
-def repoUrl = ''
-def commitSha = ''
-def workspace
 
 def Boolean __hasKeys(Map mapToCheck, List keys) {
     def passes = true;
