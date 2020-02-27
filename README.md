@@ -41,8 +41,6 @@ A simple test harness may be run to unit test functions that are purely `groovy`
 ./scripts/test
 ```
 
-There are tests for `versionHasIncremented` and `hasKeys`, but in two separate files. Only one file can be run at once, switch out the name before running the above command.
-
 ## Functions
 
 ### provisionInfrastructure
@@ -51,6 +49,9 @@ For SQS queues, the parameters argument should be a map specifying pr_code, queu
 ```
 def params = [service: [code: "FFC", name: "Future Farming Services", type: "FFC"], pr_code: 15, queue_purpose: "post-office", repo_name: "my-repo"]
 ```
+
+### destroyInfrastructure
+This will tear down infrastructure provisioned by `provisionInfrastructure` and should be called when a PR is closed. It only requires the repo name and pr number and a single call to tear down all the infrastructure created, which may have taken several calls to `provisionInfrastructure`
 
 ### getCSProjVersion
 

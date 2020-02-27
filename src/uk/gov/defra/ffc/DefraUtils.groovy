@@ -47,6 +47,43 @@ def String __generateTerraformInputVariables(Map inputs) {
     return __mapToString(inputs).join("\n")
 }
 
+def destroyInfrastructure(repo_name, pr_code) {
+  sshagent(['helm-chart-creds']) {
+    echo "destroyInfrastructure"
+    dir('terragrunt') {
+      // git clone repo...
+      git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
+      dir("london/eu-west-2/ffc") {
+        def dirName = "${repo_name}-pr${pr_code}-*"
+        echo "finding previous var files in directories matching ${dirName}";
+        def varFiles = findFiles glob: "${dirName}/vars.tfvars";
+        echo "found ${varFiles.size()} directories to tear down";
+        if (varFiles.size() > 0) {
+          for (varFile in varFiles) {
+            def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
+            echo "running terragrunt in ${path}"
+            dir(path) {
+              // terragrunt destroy
+              sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
+            }
+            // delete the pr dir
+            echo "removing from git"
+            sh "git rm -fr ${path}"
+          }
+          // commit the changes back
+          echo "persisting changes in repo"
+          sh "git commit -m \"Removing infrastructure created for ${repo_name}#${pr_code}\" ; git push --set-upstream origin master"
+          echo "infrastructure successfully destroyed"
+        } else {
+          echo "no infrastructure to destroy"
+        }
+      }
+      // Recursively delete the current dir (which should be terragrunt in the current job workspace)
+      deleteDir()
+    }
+  }
+}
+
 def provisionInfrastructure(target, item, parameters) {
   echo "provisionInfrastructure"
   if (target.toLowerCase() == "aws") {
@@ -54,7 +91,7 @@ def provisionInfrastructure(target, item, parameters) {
       case "sqs":
         sshagent(['helm-chart-creds']) {
           // character limit is actually 80, but four characters are needed for prefixes and separators
-          static final int SQS_NAME_CHAR_LIMIT = 76
+          final int SQS_NAME_CHAR_LIMIT = 76
           assert __hasKeys(parameters, [['service': ['code', 'name', 'type']], 'pr_code', 'queue_purpose', 'repo_name']) :
             "parameters should specify pr_code, queue_purpose, repo_name as well as service details (code, name and type)";
           assert parameters['repo_name'].size() + parameters['pr_code'].toString().size() + parameters['queue_purpose'].size() < SQS_NAME_CHAR_LIMIT :
