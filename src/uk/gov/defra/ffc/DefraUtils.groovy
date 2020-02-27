@@ -190,20 +190,6 @@ def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   }
 }
 
-def buildNames(cluster, region, namespace, clusterRole) {
-  def accountId = sh(returnStdout: true, script: "aws sts get-caller-identity --query Account")
-  def role = "${namespace.toUpperCase()}-DEVELOPER"
-  return [
-    accountId: accountId,
-    region: region,
-    cluster: cluster,
-    namespace: namespace,
-    role: role,
-    rolearn: "arn:aws:iam::${accountId}:role/${role}",
-    username: "${role}-1",
-    clusterRole: clusterRole
-}
-
 def getRbacGroups() {
   return [ 'developer', 'administrator' ]
 }
