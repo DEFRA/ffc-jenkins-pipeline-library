@@ -219,17 +219,17 @@ def __getRoleBindingName(role) {
  return "${role}-ROLEBINDING"
 }
 
-def __createRoleBindings(region, cluster, namespace, user, role, clusterRole) {
+def __createRoleBindings(cluster, namespace, user, role, clusterRole) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
-    sh "eksctl create iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --username ${user}"
+    sh "eksctl create iamidentitymapping --cluster ${cluster} --arn \"${roleArn}\" --username ${user}"
     sh "kubectl create rolebinding ${roleBindingName} --user ${user} --clusterrole ${clusterRole} --namespace ${namespace}"
 }
 
-def __deleteRoleBindings(region, cluster, namespace, user, role) {
+def __deleteRoleBindings(cluster, namespace, user, role) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
-    sh "eksctl delete iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --all"
+    sh "eksctl delete iamidentitymapping --cluster ${cluster} --arn \"${roleArn}\" --all"
     sh "kubectl delete rolebinding ${roleBindingName} --namespace ${namespace}"
 }
 
@@ -248,9 +248,9 @@ def __setupRbacForNamespace(namespace, groups) {
     def user = __getUser(role)
     def clusterRole = __getClusterRole(group)
     if (__roleBindingExists(namespace, role)) {
-      __deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role)
+      __deleteRoleBindings(CLUSTER, namespace, user, role)
     }
-    __createRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole) 
+    __createRoleBindings(CLUSTER, namespace, user, role, clusterRole) 
   }
 }
 
@@ -259,7 +259,7 @@ def __teardownRbacForNamespace(namespace, groups) {
     def role = __getRole(namespace, group)
     def user = __getUser(role)
     if (__roleBindingExists(namespace, role)) {
-      __deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role)
+      __deleteRoleBindings(CLUSTER, namespace, user, role)
     }
   }
 }
