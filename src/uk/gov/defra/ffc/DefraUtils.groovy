@@ -169,35 +169,28 @@ def getMergedPrNo() {
   return mergedPrNo ? "pr$mergedPrNo" : ''
 }
 
-def getRepoUrl() {
-  return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
-}
-
-def getCommitSha() {
-  return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
-}
-
 def getCommitMessage() {
   return sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
 }
 
-def verifyCommitBuildable() {
+def verifyCommitBuildable(pr, branch) {
   if (pr) {
-    echo "Building PR$pr"
+    echo "Building $branch branch for PR $pr"
   } else if (branch == "master") {
     echo "Building master branch"
   } else {
     currentBuild.result = 'ABORTED'
-    error('Build aborted - not a PR or a master branch')
+    error("Build aborted - should be either a PR or a master branch build (${branch})")
   }
 }
 
 def getVariables(repoName, version) {
-    branch = BRANCH_NAME
+    def containerTag = ''
+    def branch = BRANCH_NAME
     // use the git API to get the open PR for a branch
     // Note: This will cause issues if one branch has two open PRs
-    pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
-    verifyCommitBuildable()
+    def pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
+    verifyCommitBuildable(pr, branch)
 
     if (branch == "master") {
       containerTag = version
@@ -206,9 +199,7 @@ def getVariables(repoName, version) {
       containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
-    mergedPrNo = getMergedPrNo()
-    repoUrl = getRepoUrl()
-    commitSha = getCommitSha()
+    def mergedPrNo = getMergedPrNo()
     return [pr, containerTag, mergedPrNo]
 }
 
