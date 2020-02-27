@@ -233,66 +233,47 @@ def getRoleBindingName(role) {
  return "${role}-ROLEBINDING"
 }
 
-def createKubeConfig(kubeConfigFile, region, cluster, namespace) {
-    // Added ListCluster and DescribeCluster permission to the arn:aws:iam::562955126301:policy/EKSWorkerNodePolicy
-    // as write-kubeconfig requires them
-    // Should not require region - aws seems to be set to a US region or not specified
-    sh "eksctl utils write-kubeconfig --kubeconfig=${kubeConfigFile} --set-kubeconfig-context=true --cluster ${cluster} --region ${region}"
-    sh "kubectl --kubeconfig=${kubeConfigFile} config set-context --current --namespace=${namespace}"
-}
-
-def createRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, clusterRole, roleArn) {
+def createRoleBindings(region, cluster, namespace, user, role, clusterRole, roleArn) {
     def roleBindingName = getRoleBindingName(role)
     sh "eksctl create iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --username ${user}"
-    sh "kubectl --kubeconfig=${kubeConfigFile} create rolebinding ${roleBindingName} --user ${user} --clusterrole ${clusterRole} --namespace ${namespace}"
+    sh "kubectl create rolebinding ${roleBindingName} --user ${user} --clusterrole ${clusterRole} --namespace ${namespace}"
 }
 
-def deleteRoleBindings(kubeConfigFile, region, cluster, namespace, user, role, roleArn) {
+def deleteRoleBindings(region, cluster, namespace, user, role, roleArn) {
     def roleBindingName = getRoleBindingName(role)
     sh "eksctl delete iamidentitymapping --region ${region} --cluster ${cluster} --arn \"${roleArn}\" --all"
-    sh "kubectl --kubeconfig=${kubeConfigFile} delete rolebinding ${roleBindingName} --namespace ${namespace}"
+    sh "kubectl delete rolebinding ${roleBindingName} --namespace ${namespace}"
 }
 
-def roleBindingExists(kubeConfigFile, namespace, role) {
+def roleBindingExists(namespace, role) {
   def roleBindingName = getRoleBindingName(role)
   def result = sh(
     returnStatus: true,
-    script: "kubectl --kubeconfig=${kubeConfigFile} get rolebindings ${roleBindingName} --namespace ${namespace}"
+    script: "kubectl get rolebindings ${roleBindingName} --namespace ${namespace}"
   ) as Integer
   return result == 0
 }
 
 def setupRbacForNamespace(namespace, groups) {
-  dir('rbac') {
-    // not using the withKubeConfig plugin so we can generate the config on the fly using eksctl
-    def kubeConfigFile = "./kube.config"
-    createKubeConfig(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace)
-    for (group in groups) {
-      def role = getRole(namespace, group)
-      def roleArn = getRoleArn(role)
-      def user = getUser(role)
-      def clusterRole = getClusterRole(group)
-      if (roleBindingExists(kubeConfigFile, namespace, role)) {
-        deleteRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn) 
-      }
-      createRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole, roleArn) 
+  for (group in groups) {
+    def role = getRole(namespace, group)
+    def roleArn = getRoleArn(role)
+    def user = getUser(role)
+    def clusterRole = getClusterRole(group)
+    if (roleBindingExists(namespace, role)) {
+      deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn)
     }
+    createRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, clusterRole, roleArn) 
   }
 }
 
 def teardownRbacForNamespace(namespace, groups) {
-
-  dir('rbac') {
-    def kubeConfigFile = "./kube.config"
-    createKubeConfig(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace)
-
-    for (group in groups) {
-      def role = getRole(namespace, group)
-      def roleArn = getRoleArn(role)
-      def user = getUser(role)
-      if (roleBindingExists(kubeConfigFile, namespace, role)) {
-        deleteRoleBindings(kubeConfigFile, DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn) 
-      }
+  for (group in groups) {
+    def role = getRole(namespace, group)
+    def roleArn = getRoleArn(role)
+    def user = getUser(role)
+    if (roleBindingExists(namespace, role)) {
+      deleteRoleBindings(DEFAULT_AWS_REGION, CLUSTER, namespace, user, role, roleArn)
     }
   }
 }
@@ -472,15 +453,15 @@ def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
     sh "helm upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
+    setupRbacForNamespace(deploymentName, getRbacGroups())
   }
-  setupRbacForNamespace(deploymentName, getRbacGroups())
 }
 
 def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
-  teardownRbacForNamespace(deploymentName, getRbacGroups())
   withKubeConfig([credentialsId: credentialsId]) {
+    teardownRbacForNamespace(deploymentName, getRbacGroups())
     sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
