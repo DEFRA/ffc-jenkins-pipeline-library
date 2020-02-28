@@ -133,22 +133,26 @@ def provisionInfrastructure(target, item, parameters) {
 
 def provisionPrRoleAndSchema(host, username, dbname, jenkinsUserCredId, prUserCredId, pr_code) {
   withCredentials([
-    string(credentialsId: jenkinsUserCredId, variable: 'PGPASSWORD'),
-    string(credentialsId: username, variable: 'DBUSER'),
-    string(credentialsId: dbname, variable: 'DBNAME'),
-    string(credentialsId: host, variable: 'DBHOST'),
-    string(credentialsId: prUserCredId, variable: 'PR_USER_PASSWORD'),
+    usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'DBUSER', passwordVariable: 'PGPASSWORD')
   ]) {
+  // withCredentials([
+  //   string(credentialsId: jenkinsUserCredId, variable: 'PGPASSWORD'),
+  //   string(credentialsId: username, variable: 'DBUSER'),
+  //   string(credentialsId: dbname, variable: 'DBNAME'),
+  //   string(credentialsId: host, variable: 'DBHOST'),
+  //   string(credentialsId: prUserCredId, variable: 'PR_USER_PASSWORD'),
+  // ]) {
     // FIXME: rename the DB vars to something a bit more descriptive
-    def pr_schema = "pr${pr_code}"
-    def pr_user = "${dbname}_${pr_schema}"
-    def set_pwd_cmd = "ALTER USER ${pr_user} WITH PASSWORD '\$PR_USER_PASSWORD'"
-    def create_schema_cmd = "CREATE SCHEMA ${pr_schema}"
-    def grant_privileges_cmd = "GRANT ALL PRIVILEGES ON SCHEMA ${pr_schema} TO ${pr_user}"
-    echo "createuser --host=\$DBHOST --username=\$DBUSER --no-password  --no-createdb --no-createrole ${pr_user}"
-    echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${set_pwd_cmd};\""
-    echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${create_schema_cmd};\""
-    echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${grant_privileges_cmd};\""
+    // def pr_schema = "pr${pr_code}"
+    // def pr_user = "${dbname}_${pr_schema}"
+    // def set_pwd_cmd = "ALTER USER ${pr_user} WITH PASSWORD '\$PR_USER_PASSWORD'"
+    // def create_schema_cmd = "CREATE SCHEMA ${pr_schema}"
+    // def grant_privileges_cmd = "GRANT ALL PRIVILEGES ON SCHEMA ${pr_schema} TO ${pr_user}"
+    // echo "createuser --host=\$DBHOST --username=\$DBUSER --no-password  --no-createdb --no-createrole ${pr_user}"
+    // echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${set_pwd_cmd};\""
+    // echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${create_schema_cmd};\""
+    // echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${grant_privileges_cmd};\""
+    echo "Got DBUSER (${DBUSER}) and PGPASSWORD (${PGPASSWORD})"
   }
 }
 
