@@ -133,7 +133,7 @@ def provisionInfrastructure(target, item, parameters) {
 
 def provisionPrRoleAndSchema(host, dbname, jenkinsUserCredId, prUserCredId, pr_code) {
   withCredentials([
-    usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'DBUSER', passwordVariable: 'PGPASSWORD')
+    usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'DBUSER', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'DBHOST'),
     string(credentialsId: prUserCredId, passwordVariable: 'PR_USER_PASSWORD'),
   ]) {
@@ -157,6 +157,7 @@ def provisionPrRoleAndSchema(host, dbname, jenkinsUserCredId, prUserCredId, pr_c
     echo "Got DBUSER (${DBUSER}) and PGPASSWORD (${PGPASSWORD})"
     echo "Got DBHOST (${DBHOST})"
     echo "Got PR_USER_PASSWORD (${PR_USER_PASSWORD})"
+    echo "Got dbname (${dbname})"
   }
 }
 
