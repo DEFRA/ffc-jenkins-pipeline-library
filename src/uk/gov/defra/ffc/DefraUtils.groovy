@@ -148,9 +148,9 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     // sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$setPasswordCmd;\""
 
     def createSchemaCmd = "CREATE SCHEMA $prSchema"
-    sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$createSchemaCmd;\""
+    // sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$createSchemaCmd;\""
 
-    def grantPrivilegesCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser="
+    def grantPrivilegesCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
     sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$grantPrivilegesCmd;\""
   }
 }
