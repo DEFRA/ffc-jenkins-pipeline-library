@@ -142,16 +142,16 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     echo "Schema: $prSchema"
     echo "User: $prUser"
 
-    // sh "createuser --host=$dbHost --username=$dbUser --no-password  --no-createdb --no-createrole $prUser"
+    sh "createuser --host=$dbHost --username=$dbUser --no-password  --no-createdb --no-createrole $prUser"
 
-    def setPasswordCmd = "ALTER USER $prUser WITH PASSWORD '$prUserPassword'"
-    // sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$setPasswordCmd;\""
+    def setPasswordSqlCmd = "ALTER USER $prUser WITH PASSWORD '$prUserPassword'"
+    sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$setPasswordSqlCmd;\""
 
-    def createSchemaCmd = "CREATE SCHEMA $prSchema"
-    // sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$createSchemaCmd;\""
+    def createSchemaSqlCmd = "CREATE SCHEMA $prSchema"
+    sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$createSchemaSqlCmd;\""
 
-    def grantPrivilegesCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
-    sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$grantPrivilegesCmd;\""
+    def grantPrivilegesSqlCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
+    sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$grantPrivilegesSqlCmd;\""
   }
 }
 
