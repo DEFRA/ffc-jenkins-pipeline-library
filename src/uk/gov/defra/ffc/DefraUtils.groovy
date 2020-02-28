@@ -169,7 +169,7 @@ def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
     (prSchema, prUser) = generatePrNames(dbName, prCode)
 
     def dropSchemaSqlCmd = "DROP SCHEMA $prSchema CASCADE"
-    runPsqlCommand(dbHost, dbUser, dbName, setPasswordSqlCmd)
+    runPsqlCommand(dbHost, dbUser, dbName, dropSchemaSqlCmd)
 
     sh "dropuser --host=$dbHost --username=$dbUser --no-password $prUser"
   }
