@@ -131,6 +131,10 @@ def provisionInfrastructure(target, item, parameters) {
   }
 }
 
+def runPsqlCommand(dbHost, dbUser, dbName, sqlCmd) {
+  sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\""
+}
+
 def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
@@ -139,19 +143,16 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
   ]) {
     def prSchema = "pr$prCode"
     def prUser = "${dbName}_$prSchema"
-    echo "Schema: $prSchema"
-    echo "User: $prUser"
-
     sh "createuser --host=$dbHost --username=$dbUser --no-password  --no-createdb --no-createrole $prUser"
 
     def setPasswordSqlCmd = "ALTER USER $prUser WITH PASSWORD '$prUserPassword'"
-    sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$setPasswordSqlCmd;\""
+    runPsqlCommand(dbHost, dbUser, dbName, setPasswordSqlCmd)
 
     def createSchemaSqlCmd = "CREATE SCHEMA $prSchema"
-    sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$createSchemaSqlCmd;\""
+    runPsqlCommand(dbHost, dbUser, dbName, createSchemaSqlCmd)
 
     def grantPrivilegesSqlCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
-    sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$grantPrivilegesSqlCmd;\""
+    runPsqlCommand(dbHost, dbUser, dbName, grantPrivilegesSqlCmd)
   }
 }
 
