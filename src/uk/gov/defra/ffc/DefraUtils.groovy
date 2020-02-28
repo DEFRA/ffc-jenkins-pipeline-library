@@ -131,6 +131,12 @@ def provisionInfrastructure(target, item, parameters) {
   }
 }
 
+def generatePrNames(dbName, prCode) {
+  def prSchema = "pr$prCode"
+  def prUser = "${dbName}_$prSchema"
+  return [prSchema, prUser]
+}
+
 def runPsqlCommand(dbHost, dbUser, dbName, sqlCmd) {
   sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\""
 }
@@ -139,10 +145,9 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
-    usernamePassword(credentialsId: prUserCredId, usernameVariable: 'tmp', passwordVariable: 'prUserPassword'),
+    usernamePassword(credentialsId: prUserCredId, usernameVariable: 'ignore', passwordVariable: 'prUserPassword'),
   ]) {
-    def prSchema = "pr$prCode"
-    def prUser = "${dbName}_$prSchema"
+    (prSchema, prUser) = generatePrNames(dbName, prCode)
     sh "createuser --host=$dbHost --username=$dbUser --no-password  --no-createdb --no-createrole $prUser"
 
     def setPasswordSqlCmd = "ALTER USER $prUser WITH PASSWORD '$prUserPassword'"
@@ -153,6 +158,20 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
 
     def grantPrivilegesSqlCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
     runPsqlCommand(dbHost, dbUser, dbName, grantPrivilegesSqlCmd)
+  }
+}
+
+def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
+  withCredentials([
+    usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
+    string(credentialsId: host, variable: 'dbHost'),
+  ]) {
+    (prSchema, prUser) = generatePrNames(dbName, prCode)
+
+    def dropSchemaSqlCmd = "DROP SCHEMA $prSchema CASCADE"
+    runPsqlCommand(dbHost, dbUser, dbName, setPasswordSqlCmd)
+
+    sh "dropuser --host=$dbHost --username=$dbUser --no-password $prUser"
   }
 }
 
