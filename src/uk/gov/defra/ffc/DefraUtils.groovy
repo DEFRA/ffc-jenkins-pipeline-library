@@ -138,7 +138,7 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     usernamePassword(credentialsId: prUserCredId, usernameVariable: 'tmp', passwordVariable: 'prUserPassword'),
   ]) {
     def prSchema = "pr$prCode"
-    def prUser = "$dbName_$prSchema"
+    def prUser = "${dbName}_$prSchema"
     echo "Schema: $prSchema"
     echo "User: $prUser"
 
