@@ -135,7 +135,7 @@ def provisionPrRoleAndSchema(host, dbname, jenkinsUserCredId, prUserCredId, pr_c
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'DBUSER', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'DBHOST'),
-    // usernamePassword(credentialsId: prUserCredId, passwordVariable: 'PR_USER_PASSWORD'),
+    usernamePassword(credentialsId: prUserCredId, usernameVariable: 'tmp', passwordVariable: 'PR_USER_PASSWORD'),
   ]) {
   // withCredentials([
   //   string(credentialsId: jenkinsUserCredId, variable: 'PGPASSWORD'),
@@ -156,7 +156,7 @@ def provisionPrRoleAndSchema(host, dbname, jenkinsUserCredId, prUserCredId, pr_c
     // echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${grant_privileges_cmd};\""
     echo "Got DBUSER (${DBUSER}) and PGPASSWORD (${PGPASSWORD})"
     echo "Got DBHOST (${DBHOST})"
-    // echo "Got PR_USER_PASSWORD (${PR_USER_PASSWORD})"
+    echo "Got PR_USER_PASSWORD (${PR_USER_PASSWORD})"
     echo "Got dbname (${dbname})"
   }
 }
