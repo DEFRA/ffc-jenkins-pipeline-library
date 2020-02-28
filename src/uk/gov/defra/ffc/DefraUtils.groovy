@@ -154,7 +154,6 @@ def provisionPrRoleAndSchema(host, dbname, jenkinsUserCredId, prUserCredId, pr_c
     // echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${set_pwd_cmd};\""
     // echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${create_schema_cmd};\""
     // echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${grant_privileges_cmd};\""
-    sh "echo $PR_USER_PASSWORD | base64"
     sh "psql --host=$DBHOST --username=$DBUSER --dbname=$dbname --no-password --command=\"select * from test123;\""
   }
 }
