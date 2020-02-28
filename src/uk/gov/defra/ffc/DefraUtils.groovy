@@ -144,11 +144,11 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
 
     // def create_schema_cmd = "CREATE SCHEMA ${pr_schema}"
     // def grant_privileges_cmd = "GRANT ALL PRIVILEGES ON SCHEMA ${pr_schema} TO ${pr_user}"
-    echo "createuser --host=$dbHost --username=$dbUser --no-password  --no-createdb --no-createrole $prUser"
+    sh "createuser --host=$dbHost --username=$dbUser --no-password  --no-createdb --no-createrole $prUser"
 
     def setPasswordCmd = "ALTER USER $prUser WITH PASSWORD '$prUserPassword'"
-    echo "Password command: $setPasswordCmd"
-    echo "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$setPasswordCmd;\""
+    // echo "Password command: $setPasswordCmd"
+    sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$setPasswordCmd;\""
     // echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${create_schema_cmd};\""
     // echo "psql --host=\$DBHOST --username=\$DBUSER --dbname=\$DBNAME --no-password --command=\"${grant_privileges_cmd};\""
     // sh "psql --host=$DBHOST --username=$DBUSER --dbname=$dbname --no-password --command=\"select * from test123;\""
