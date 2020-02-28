@@ -135,7 +135,7 @@ def provisionPrRoleAndSchema(host, dbname, jenkinsUserCredId, prUserCredId, pr_c
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'DBUSER', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'DBHOST'),
-    string(credentialsId: prUserCredId, passwordVariable: 'PR_USER_PASSWORD'),
+    usernamePassword(credentialsId: prUserCredId, passwordVariable: 'PR_USER_PASSWORD'),
   ]) {
   // withCredentials([
   //   string(credentialsId: jenkinsUserCredId, variable: 'PGPASSWORD'),
