@@ -131,14 +131,14 @@ def provisionInfrastructure(target, item, parameters) {
   }
 }
 
-def provisionPrRoleAndSchema(host, dbname, jenkinsUserCredId, prUserCredId, prCode) {
+def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
     usernamePassword(credentialsId: prUserCredId, usernameVariable: 'tmp', passwordVariable: 'prUserPassword'),
   ]) {
     def prSchema = "pr$prCode"
-    def prUser = "$dbname_$prSchema"
+    def prUser = "$dbName_$prSchema"
     echo "Schema: $prSchema"
     echo "User: $prUser"
 
