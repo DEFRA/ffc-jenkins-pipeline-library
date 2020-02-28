@@ -158,7 +158,8 @@ def provisionPrRoleAndSchema(host, dbname, jenkinsUserCredId, prUserCredId, pr_c
     echo "Got DBHOST (${DBHOST})"
     echo "Got PR_USER_PASSWORD (${PR_USER_PASSWORD})"
     echo "Got dbname (${dbname})"
-    sh "psql --host=$DBHOST --username=$DBUSER --dbname=$dbname --no-password --command=\"select * from test123;\""
+    sh 'echo $DBHOST | base64'
+    // sh "psql --host=$DBHOST --username=$DBUSER --dbname=$dbname --no-password --command=\"select * from test123;\""
   }
 }
 
