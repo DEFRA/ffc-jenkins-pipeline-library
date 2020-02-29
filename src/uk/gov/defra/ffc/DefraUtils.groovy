@@ -147,6 +147,7 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     string(credentialsId: host, variable: 'dbHost'),
     usernamePassword(credentialsId: prUserCredId, usernameVariable: 'ignore', passwordVariable: 'prUserPassword'),
   ]) {
+    sh 'echo cred=$dbHost'
     (prSchema, prUser) = generatePrNames(dbName, prCode)
     sh "createuser --host=$dbHost --username=$dbUser --no-password  --no-createdb --no-createrole $prUser"
 
