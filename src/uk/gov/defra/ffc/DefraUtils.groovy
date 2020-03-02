@@ -161,17 +161,20 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
   }
 }
 
-def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
+def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode, ifExists) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
   ]) {
     (prSchema, prUser) = generatePrNames(dbName, prCode)
 
-    def dropSchemaSqlCmd = "DROP SCHEMA IF EXISTS $prSchema CASCADE"
-    runPsqlCommand(dbHost, dbUser, dbName, dropSchemaSqlCmd)
+    def ifExistsStr = ifExists ? "IF EXISTS" : ""
 
-    sh "dropuser --host=$dbHost --username=$dbUser --no-password --if-exists $prUser"
+    def dropSchemaSqlCmd = "DROP SCHEMA $ifExistsStr $prSchema CASCADE"
+    echo "$dropSchemaSqlCmd"
+    // runPsqlCommand(dbHost, dbUser, dbName, dropSchemaSqlCmd)
+
+    // sh "dropuser --host=$dbHost --username=$dbUser --no-password --if-exists $prUser"
   }
 }
 
