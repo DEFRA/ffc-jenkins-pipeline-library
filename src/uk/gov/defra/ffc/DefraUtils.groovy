@@ -224,20 +224,21 @@ String __getRoleBindingName(role) {
 
 void __deleteRoleBindingIfExists(CLUSTER, namespace, user, role) {
   if (__roleBindingExists(namespace, role)) {
-    __deleteRoleBindings(CLUSTER, namespace, user, role)
+    __deleteRoleBinding(CLUSTER, namespace, user, role)
   }
 }
 
-void __createRoleBindings(cluster, namespace, user, role, clusterRole) {
+void __createRoleBinding(cluster, namespace, user, role, clusterRole) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
     sh "eksctl create iamidentitymapping --cluster ${cluster} --arn \"${roleArn}\" --username ${user}"
     sh "kubectl create rolebinding ${roleBindingName} --user ${user} --clusterrole ${clusterRole} --namespace ${namespace}"
 }
 
-void __deleteRoleBindings(cluster, namespace, user, role) {
+void __deleteRoleBinding(cluster, namespace, user, role) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
+    //Note: there should only ever be one identity mapping for rolearn, the '--all' option is there to ensure this
     sh "eksctl delete iamidentitymapping --cluster ${cluster} --arn \"${roleArn}\" --all"
     sh "kubectl delete rolebinding ${roleBindingName} --namespace ${namespace}"
 }
@@ -256,7 +257,7 @@ void __setupRbacForNamespace(namespace) {
     def role = __getRole(namespace, group)
     def user = __getUser(role)
     __deleteRoleBindingIfExists(CLUSTER, namespace, user, role)
-    __createRoleBindings(CLUSTER, namespace, user, role, clusterRole) 
+    __createRoleBinding(CLUSTER, namespace, user, role, clusterRole)
   }
 }
 
