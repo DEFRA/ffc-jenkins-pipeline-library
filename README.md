@@ -53,7 +53,7 @@ def params = [service: [code: "FFC", name: "Future Farming Services", type: "FFC
 ### destroyInfrastructure
 This will tear down infrastructure provisioned by `provisionInfrastructure` and should be called when a PR is closed. It only requires the repo name and pr number and a single call to tear down all the infrastructure created, which may have taken several calls to `provisionInfrastructure`
 
-### provisionPrRoleAndSchema
+### provisionPrDatabaseRoleAndSchema
 
 Creates a Postgres database role and schema for use by a PR.
 
@@ -69,7 +69,7 @@ It returns a list containing:
 - the PR schema created
 - the PR role created
 
-### destroyPrRoleAndSchema
+### destroyPrDatabaseRoleAndSchema
 
 Drops a Postgres database PR role and schema.
 
