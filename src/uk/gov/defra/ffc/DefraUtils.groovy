@@ -176,9 +176,7 @@ def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode, ifExists) {
     runPsqlCommand(dbHost, dbUser, dbName, dropSchemaSqlCmd)
 
     def dropRoleSqlCmd = "DROP ROLE $ifExistsStr $prUser"
-    runPsqlCommand(dbHost, dbUser, dbName, dropUserSqlCmd)
-
-    // sh "dropuser --host=$dbHost --username=$dbUser --no-password --if-exists $prUser"
+    runPsqlCommand(dbHost, dbUser, dbName, dropRoleSqlCmd)
   }
 }
 
