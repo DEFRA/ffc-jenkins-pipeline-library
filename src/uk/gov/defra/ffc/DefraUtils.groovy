@@ -141,13 +141,15 @@ def runPsqlCommand(dbHost, dbUser, dbName, sqlCmd) {
   sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\""
 }
 
-def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode) {
+def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, ifNotExists) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
     usernamePassword(credentialsId: prUserCredId, usernameVariable: 'ignore', passwordVariable: 'prUserPassword'),
   ]) {
+    def ifNotExistsStr = ifNotExists ? "IF NOT EXISTS" : ""
     (prSchema, prUser) = generatePrNames(dbName, prCode)
+
     sh "createuser --host=$dbHost --username=$dbUser --no-password  --no-createdb --no-createrole $prUser"
 
     def setPasswordSqlCmd = "ALTER USER $prUser WITH PASSWORD '$prUserPassword'"
@@ -171,8 +173,10 @@ def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode, ifExists) {
     def ifExistsStr = ifExists ? "IF EXISTS" : ""
 
     def dropSchemaSqlCmd = "DROP SCHEMA $ifExistsStr $prSchema CASCADE"
-    echo "$dropSchemaSqlCmd"
-    // runPsqlCommand(dbHost, dbUser, dbName, dropSchemaSqlCmd)
+    runPsqlCommand(dbHost, dbUser, dbName, dropSchemaSqlCmd)
+
+    def dropRoleSqlCmd = "DROP ROLE $ifExistsStr $prUser"
+    runPsqlCommand(dbHost, dbUser, dbName, dropUserSqlCmd)
 
     // sh "dropuser --host=$dbHost --username=$dbUser --no-password --if-exists $prUser"
   }
