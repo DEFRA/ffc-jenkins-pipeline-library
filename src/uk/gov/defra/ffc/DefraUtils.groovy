@@ -154,6 +154,7 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     if (useIfNotExists) {
       def selectRoleSqlCmd = "SELECT 1 FROM pg_roles WHERE rolname = '$prUser'"
       def result = runPsqlCommand(dbHost, dbUser, dbName, selectRoleSqlCmd)
+      echo "RESULT: $result"
       roleExists = result.contains("(1 row)")
     }
 
