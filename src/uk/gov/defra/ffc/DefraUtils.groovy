@@ -150,10 +150,8 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     def ifNotExistsStr = ifNotExists ? "IF NOT EXISTS" : ""
     (prSchema, prUser) = generatePrNames(dbName, prCode)
 
-    sh "createuser --host=$dbHost --username=$dbUser --no-password  --no-createdb --no-createrole $prUser"
-
-    def setPasswordSqlCmd = "ALTER USER $prUser WITH PASSWORD '$prUserPassword'"
-    runPsqlCommand(dbHost, dbUser, dbName, setPasswordSqlCmd)
+    def createRoleSqlCmd = "CREATE ROLE $prUser PASSWORD '$prUserPassword' NOSUPERUSER NOCREATEDB CREATEROLE INHERIT LOGIN"
+    runPsqlCommand(dbHost, dbUser, dbName, createRoleSqlCmd)
 
     def createSchemaSqlCmd = "CREATE SCHEMA $prSchema"
     runPsqlCommand(dbHost, dbUser, dbName, createSchemaSqlCmd)
