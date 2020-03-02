@@ -203,6 +203,7 @@ String __getRoleArn(role) {
 }
 
 String __getUser(role) {
+  // Append '1' purely to differentiate from the role when looking at the logs
   "$role-1"
 }
 
