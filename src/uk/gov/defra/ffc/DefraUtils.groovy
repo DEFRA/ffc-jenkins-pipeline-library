@@ -171,6 +171,8 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     def grantPrivilegesSqlCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
     runPsqlCommand(dbHost, dbUser, dbName, grantPrivilegesSqlCmd)
   }
+
+  return generatePrNames(dbName, prCode)
 }
 
 def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode, useIfExists) {
