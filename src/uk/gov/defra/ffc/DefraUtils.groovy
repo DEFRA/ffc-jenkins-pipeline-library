@@ -153,9 +153,7 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     // CREATE ROLE doesn't have a "IF NOT EXISTS" parameter so we have to check for the PR user/role manually
     if (useIfNotExists) {
       def selectRoleSqlCmd = "SELECT 1 FROM pg_roles WHERE rolname = '$prUser'"
-      def result = runPsqlCommand(dbHost, dbUser, dbName, selectRoleSqlCmd)
-      echo "RESULT: $result"
-      roleExists = result.contains("(1 row)")
+      roleExists = runPsqlCommand(dbHost, dbUser, dbName, selectRoleSqlCmd).contains("(1 row)")
     }
 
     if (roleExists) {
