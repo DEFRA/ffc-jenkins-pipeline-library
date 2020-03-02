@@ -73,12 +73,11 @@ It returns a list containing:
 
 Drops a Postgres database PR role and schema.
 
-It takes five parameters:
+It takes four parameters:
 - a string describing the Jenkins secret text credentials ID that contains database host to connect to
 - a string describing the database name containing the schema
 - a string describing the Jenkins usernamePassword credentials ID that contains the database user and password
 - a string describing the PR number, e.g. `53`
-- a boolean to determine if the SQL commands to drop the PR role and schema include the `IF EXISTS` logic. If `true` the SQL commands **will not** error if the schema and/or role do not exist. If `false` the SQL commands **will** error if the schema and/or role do not exist and the pipeline wil exit.
 
 ### getCSProjVersion
 
