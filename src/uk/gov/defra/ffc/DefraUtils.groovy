@@ -1,4 +1,5 @@
 package uk.gov.defra.ffc
+import groovy.transform.Field
 def branch = ''
 def pr = ''
 def mergedPrNo = ''
@@ -6,6 +7,8 @@ def containerTag = ''
 def repoUrl = ''
 def commitSha = ''
 def workspace
+
+@Field def clusterRoleMappings = [ developer: 'edit', administrator: 'admin' ]
 
 def Boolean __hasKeys(Map mapToCheck, List keys) {
     def passes = true;
@@ -242,11 +245,10 @@ def __roleBindingExists(namespace, role) {
   return result == 0
 }
 
-def __setupRbacForNamespace(namespace, groups) {
-  for (group in groups) {
+def __setupRbacForNamespace(namespace) {
+  clusterRoleMappings.each { group, clusterRole ->
     def role = __getRole(namespace, group)
     def user = __getUser(role)
-    def clusterRole = __getClusterRole(group)
     if (__roleBindingExists(namespace, role)) {
       __deleteRoleBindings(CLUSTER, namespace, user, role)
     }
@@ -254,8 +256,8 @@ def __setupRbacForNamespace(namespace, groups) {
   }
 }
 
-def __teardownRbacForNamespace(namespace, groups) {
-  for (group in groups) {
+def __teardownRbacForNamespace(namespace) {
+  clusterRoleMappings.each { group ->
     def role = __getRole(namespace, group)
     def user = __getUser(role)
     if (__roleBindingExists(namespace, role)) {
@@ -439,7 +441,7 @@ def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
     sh "helm upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
-    __setupRbacForNamespace(deploymentName, __getRbacGroups())
+    __setupRbacForNamespace(deploymentName)
   }
 }
 
@@ -447,7 +449,7 @@ def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
-    __teardownRbacForNamespace(deploymentName, __getRbacGroups())
+    __teardownRbacForNamespace(deploymentName)
     sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
