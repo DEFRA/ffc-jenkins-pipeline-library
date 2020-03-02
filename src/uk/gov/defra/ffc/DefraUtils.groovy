@@ -141,7 +141,7 @@ def runPsqlCommand(dbHost, dbUser, dbName, sqlCmd) {
   sh returnStdout: true, script: "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\""
 }
 
-def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, useIfNotExists) {
+def provisionPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, useIfNotExists) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
@@ -175,7 +175,7 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
   return generatePrNames(dbName, prCode)
 }
 
-def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode, useIfExists) {
+def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode, useIfExists) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
