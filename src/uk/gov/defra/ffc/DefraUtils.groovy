@@ -220,7 +220,7 @@ void __deleteRoleBindingIfExists(namespace, user, role) {
 void __createRoleBinding(namespace, user, role, clusterRole) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
-    sh "eksctl create iamidentitymapping --cluster $CLUSTER --arn \"$roleArn\" --username $user"
+    sh "eksctl create iamidentitymapping --cluster $CLUSTER --arn $roleArn --username $user"
     sh "kubectl create rolebinding $roleBindingName --user $user --clusterrole $clusterRole --namespace $namespace"
 }
 
@@ -228,7 +228,7 @@ void __deleteRoleBinding(namespace, user, role) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
     //Note: there should only ever be one identity mapping for rolearn, the '--all' option is there to ensure this
-    sh "eksctl delete iamidentitymapping --cluster $CLUSTER --arn \"$roleArn\" --all"
+    sh "eksctl delete iamidentitymapping --cluster $CLUSTER --arn $roleArn --all"
     sh "kubectl delete rolebinding $roleBindingName --namespace $namespace"
 }
 
