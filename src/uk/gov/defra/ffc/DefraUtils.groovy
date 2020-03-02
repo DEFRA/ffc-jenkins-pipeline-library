@@ -138,7 +138,7 @@ def generatePrNames(dbName, prCode) {
 }
 
 def runPsqlCommand(dbHost, dbUser, dbName, sqlCmd) {
-  sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\""
+  sh returnStdout: true, script: "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\""
 }
 
 def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, useIfNotExists) {
