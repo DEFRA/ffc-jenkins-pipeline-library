@@ -148,10 +148,19 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     usernamePassword(credentialsId: prUserCredId, usernameVariable: 'ignore', passwordVariable: 'prUserPassword'),
   ]) {
     def ifNotExistsStr = ifNotExists ? "IF NOT EXISTS" : ""
+    def roleNotExists = true
     (prSchema, prUser) = generatePrNames(dbName, prCode)
 
-    def createRoleSqlCmd = "CREATE ROLE $prUser PASSWORD '$prUserPassword' NOSUPERUSER NOCREATEDB CREATEROLE INHERIT LOGIN"
-    // runPsqlCommand(dbHost, dbUser, dbName, createRoleSqlCmd)
+    if (ifNotExists) {
+      def selectRoleSqlCmd = "SELECT 1 FROM pg_roles WHERE rolname = '$prUser'"
+      def result = runPsqlCommand(dbHost, dbUser, dbName, selectRoleSqlCmd)
+      echo "$result"
+    }
+
+    if (roleNotExists) {
+      def createRoleSqlCmd = "CREATE ROLE $prUser PASSWORD '$prUserPassword' NOSUPERUSER NOCREATEDB CREATEROLE INHERIT LOGIN"
+      runPsqlCommand(dbHost, dbUser, dbName, createRoleSqlCmd)
+    }
 
     def createSchemaSqlCmd = "CREATE SCHEMA $ifNotExistsStr $prSchema"
     runPsqlCommand(dbHost, dbUser, dbName, createSchemaSqlCmd)
