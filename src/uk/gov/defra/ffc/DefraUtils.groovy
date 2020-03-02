@@ -193,18 +193,6 @@ def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   }
 }
 
-def __getRbacGroups() {
-  return [ 'developer', 'administrator' ]
-}
-
-def __getClusterRole(group) {
-  def clusterRoleMappings = [
-    developer: 'edit',
-    administrator: 'admin'
-  ]
-  return clusterRoleMappings[group]
-}
-
 String __getRole(namespace, group) {
   "$namespace-$group".toUpperCase()
 }
