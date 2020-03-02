@@ -141,27 +141,30 @@ def runPsqlCommand(dbHost, dbUser, dbName, sqlCmd) {
   sh "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\""
 }
 
-def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, ifNotExists) {
+def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, useIfNotExists) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
     usernamePassword(credentialsId: prUserCredId, usernameVariable: 'ignore', passwordVariable: 'prUserPassword'),
   ]) {
-    def ifNotExistsStr = ifNotExists ? "IF NOT EXISTS" : ""
-    def roleNotExists = true
     (prSchema, prUser) = generatePrNames(dbName, prCode)
+    def roleExists = false
 
-    if (ifNotExists) {
+    // CREATE ROLE doesn't have a "IF NOT EXISTS" parameter so we have to check for the user manually
+    if (useIfNotExists) {
       def selectRoleSqlCmd = "SELECT 1 FROM pg_roles WHERE rolname = '$prUser'"
-      def result = runPsqlCommand(dbHost, dbUser, dbName, selectRoleSqlCmd)
-      echo "$result"
+      roleExists = runPsqlCommand(dbHost, dbUser, dbName, selectRoleSqlCmd).contains("(1 row)")
     }
 
-    if (roleNotExists) {
+    if (roleExists) {
+      echo "Role $prUser already exists, skipping"
+    }
+    else {
       def createRoleSqlCmd = "CREATE ROLE $prUser PASSWORD '$prUserPassword' NOSUPERUSER NOCREATEDB CREATEROLE INHERIT LOGIN"
       runPsqlCommand(dbHost, dbUser, dbName, createRoleSqlCmd)
     }
 
+    def ifNotExistsStr = useIfNotExists ? "IF NOT EXISTS" : ""
     def createSchemaSqlCmd = "CREATE SCHEMA $ifNotExistsStr $prSchema"
     runPsqlCommand(dbHost, dbUser, dbName, createSchemaSqlCmd)
 
@@ -170,14 +173,14 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
   }
 }
 
-def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode, ifExists) {
+def destroyPrRoleAndSchema(host, dbName, jenkinsUserCredId, prCode, useIfExists) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
   ]) {
     (prSchema, prUser) = generatePrNames(dbName, prCode)
 
-    def ifExistsStr = ifExists ? "IF EXISTS" : ""
+    def ifExistsStr = useIfExists ? "IF EXISTS" : ""
 
     def dropSchemaSqlCmd = "DROP SCHEMA $ifExistsStr $prSchema CASCADE"
     runPsqlCommand(dbHost, dbUser, dbName, dropSchemaSqlCmd)
