@@ -222,6 +222,12 @@ String __getRoleBindingName(role) {
  "${role}-ROLEBINDING"
 }
 
+void __deleteRoleBindingIfExists(CLUSTER, namespace, user, role) {
+  if (__roleBindingExists(namespace, role)) {
+    __deleteRoleBindings(CLUSTER, namespace, user, role)
+  }
+}
+
 void __createRoleBindings(cluster, namespace, user, role, clusterRole) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
@@ -249,9 +255,7 @@ void __setupRbacForNamespace(namespace) {
   clusterRoleMappings.each { group, clusterRole ->
     def role = __getRole(namespace, group)
     def user = __getUser(role)
-    if (__roleBindingExists(namespace, role)) {
-      __deleteRoleBindings(CLUSTER, namespace, user, role)
-    }
+    __deleteRoleBindingIfExists(CLUSTER, namespace, user, role)
     __createRoleBindings(CLUSTER, namespace, user, role, clusterRole) 
   }
 }
@@ -260,9 +264,7 @@ void __teardownRbacForNamespace(namespace) {
   clusterRoleMappings.each { group ->
     def role = __getRole(namespace, group)
     def user = __getUser(role)
-    if (__roleBindingExists(namespace, role)) {
-      __deleteRoleBindings(CLUSTER, namespace, user, role)
-    }
+    __deleteRoleBindingIfExists(CLUSTER, namespace, user, role)
   }
 }
 
