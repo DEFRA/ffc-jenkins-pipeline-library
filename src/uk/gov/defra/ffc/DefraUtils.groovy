@@ -206,20 +206,20 @@ def __getClusterRole(group) {
 }
 
 String __getRole(namespace, group) {
-  "${namespace}-${group}".toUpperCase()
+  "$namespace-$group".toUpperCase()
 }
 
 String __getRoleArn(role) {
   def accountId = sh(returnStdout: true, script: "aws sts get-caller-identity --query Account").replaceAll('"', '').trim()
-  "arn:aws:iam::${accountId}:role/${role}"
+  "arn:aws:iam::$accountId:role/$role"
 }
 
 String __getUser(role) {
-  "${role}-1"
+  "$role-1"
 }
 
 String __getRoleBindingName(role) {
- "${role}-ROLEBINDING"
+ "$role-ROLEBINDING"
 }
 
 void __deleteRoleBindingIfExists(CLUSTER, namespace, user, role) {
@@ -231,23 +231,23 @@ void __deleteRoleBindingIfExists(CLUSTER, namespace, user, role) {
 void __createRoleBinding(cluster, namespace, user, role, clusterRole) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
-    sh "eksctl create iamidentitymapping --cluster ${cluster} --arn \"${roleArn}\" --username ${user}"
-    sh "kubectl create rolebinding ${roleBindingName} --user ${user} --clusterrole ${clusterRole} --namespace ${namespace}"
+    sh "eksctl create iamidentitymapping --cluster $cluster --arn \"$roleArn\" --username $user"
+    sh "kubectl create rolebinding $roleBindingName --user $user --clusterrole $clusterRole --namespace $namespace"
 }
 
 void __deleteRoleBinding(cluster, namespace, user, role) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
     //Note: there should only ever be one identity mapping for rolearn, the '--all' option is there to ensure this
-    sh "eksctl delete iamidentitymapping --cluster ${cluster} --arn \"${roleArn}\" --all"
-    sh "kubectl delete rolebinding ${roleBindingName} --namespace ${namespace}"
+    sh "eksctl delete iamidentitymapping --cluster $cluster --arn \"$roleArn\" --all"
+    sh "kubectl delete rolebinding $roleBindingName --namespace $namespace"
 }
 
 Boolean __roleBindingExists(namespace, role) {
   def roleBindingName = __getRoleBindingName(role)
   def result = sh(
     returnStatus: true,
-    script: "kubectl get rolebindings ${roleBindingName} --namespace ${namespace}"
+    script: "kubectl get rolebindings $roleBindingName --namespace $namespace"
   ) as Integer
   result == 0
 }
