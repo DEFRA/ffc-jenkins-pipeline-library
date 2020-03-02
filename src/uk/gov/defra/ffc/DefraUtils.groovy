@@ -210,7 +210,7 @@ String __getRole(namespace, group) {
 }
 
 String __getRoleArn(role) {
-  def accountId = sh(returnStdout: true, script: "aws sts get-caller-identity --query Account").replaceAll('"', '')
+  def accountId = sh(returnStdout: true, script: "aws sts get-caller-identity --query Account").replaceAll('"', '').trim()
   "arn:aws:iam::${accountId}:role/${role}"
 }
 
