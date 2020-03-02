@@ -151,9 +151,9 @@ def provisionPrRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCo
     (prSchema, prUser) = generatePrNames(dbName, prCode)
 
     def createRoleSqlCmd = "CREATE ROLE $prUser PASSWORD '$prUserPassword' NOSUPERUSER NOCREATEDB CREATEROLE INHERIT LOGIN"
-    runPsqlCommand(dbHost, dbUser, dbName, createRoleSqlCmd)
+    // runPsqlCommand(dbHost, dbUser, dbName, createRoleSqlCmd)
 
-    def createSchemaSqlCmd = "CREATE SCHEMA $prSchema"
+    def createSchemaSqlCmd = "CREATE SCHEMA $ifNotExistsStr $prSchema"
     runPsqlCommand(dbHost, dbUser, dbName, createSchemaSqlCmd)
 
     def grantPrivilegesSqlCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
