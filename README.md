@@ -44,7 +44,7 @@ A simple test harness may be run to unit test functions that are purely `groovy`
 ## Functions
 
 ### provisionInfrastructure
-This will provision infrastructure for a pull request, so any testing of the PR can be carried out in isolation. Currently it just supports a target of 'aws' and an item of 'sqs', but it's envisaged more targets and items will be added in due course. 
+This will provision infrastructure for a pull request, so any testing of the PR can be carried out in isolation. Currently it just supports a target of 'aws' and an item of 'sqs', but it's envisaged more targets and items will be added in due course.
 For SQS queues, the parameters argument should be a map specifying pr_code, queue_purpose, repo name and a 'service' map providing code, name and type (for Future Farming, code and type should be 'FFC' and name should be 'Future Farming Services', other projects will have different values). For example:
 ```
 def params = [service: [code: "FFC", name: "Future Farming Services", type: "FFC"], pr_code: 15, queue_purpose: "post-office", repo_name: "my-repo"]
@@ -52,6 +52,32 @@ def params = [service: [code: "FFC", name: "Future Farming Services", type: "FFC
 
 ### destroyInfrastructure
 This will tear down infrastructure provisioned by `provisionInfrastructure` and should be called when a PR is closed. It only requires the repo name and pr number and a single call to tear down all the infrastructure created, which may have taken several calls to `provisionInfrastructure`
+
+### provisionPrDatabaseRoleAndSchema
+
+Creates a Postgres database role and schema for use by a PR.
+
+It takes six parameters:
+- a string describing the Jenkins secret text credentials ID that contains database host to connect to
+- a string describing the database name that the schema will be created in
+- a string describing the Jenkins usernamePassword credentials ID that contains the database user and password
+- a string describing the Jenkins usernamePassword credentials ID that contains the password for the role that will be created
+- a string describing the PR number, e.g. `53`
+- (optional, default=`false`) a boolean to determine if the SQL commands to create the PR role and schema include the `IF NOT EXISTS` logic. If `true` the SQL commands **will not** error if the schema and/or role already exist. If `false` (the default) the SQL commands **will** error if the schema and/or role already exist and the pipeline wil exit.
+
+It returns a list containing:
+- the PR schema created
+- the PR role created
+
+### destroyPrDatabaseRoleAndSchema
+
+Drops a Postgres database PR role and schema.
+
+It takes four parameters:
+- a string describing the Jenkins secret text credentials ID that contains database host to connect to
+- a string describing the database name containing the schema
+- a string describing the Jenkins usernamePassword credentials ID that contains the database user and password
+- a string describing the PR number, e.g. `53`
 
 ### getCSProjVersion
 
