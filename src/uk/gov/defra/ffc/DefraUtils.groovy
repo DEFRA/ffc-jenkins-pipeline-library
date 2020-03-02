@@ -205,47 +205,47 @@ def __getClusterRole(group) {
   return clusterRoleMappings[group]
 }
 
-def __getRole(namespace, group) {
-  return "${namespace}-${group}".toUpperCase()
+String __getRole(namespace, group) {
+  "${namespace}-${group}".toUpperCase()
 }
 
-def __getRoleArn(role) {
+String __getRoleArn(role) {
   def accountId = sh(returnStdout: true, script: "aws sts get-caller-identity --query Account").replaceAll('"', '')
-  return "arn:aws:iam::${accountId}:role/${role}"
+  "arn:aws:iam::${accountId}:role/${role}"
 }
 
-def __getUser(role) {
-  return "${role}-1"
+String __getUser(role) {
+  "${role}-1"
 }
 
-def __getRoleBindingName(role) {
- return "${role}-ROLEBINDING"
+String __getRoleBindingName(role) {
+ "${role}-ROLEBINDING"
 }
 
-def __createRoleBindings(cluster, namespace, user, role, clusterRole) {
+void __createRoleBindings(cluster, namespace, user, role, clusterRole) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
     sh "eksctl create iamidentitymapping --cluster ${cluster} --arn \"${roleArn}\" --username ${user}"
     sh "kubectl create rolebinding ${roleBindingName} --user ${user} --clusterrole ${clusterRole} --namespace ${namespace}"
 }
 
-def __deleteRoleBindings(cluster, namespace, user, role) {
+void __deleteRoleBindings(cluster, namespace, user, role) {
     def roleArn = __getRoleArn(role)
     def roleBindingName = __getRoleBindingName(role)
     sh "eksctl delete iamidentitymapping --cluster ${cluster} --arn \"${roleArn}\" --all"
     sh "kubectl delete rolebinding ${roleBindingName} --namespace ${namespace}"
 }
 
-def __roleBindingExists(namespace, role) {
+Boolean __roleBindingExists(namespace, role) {
   def roleBindingName = __getRoleBindingName(role)
   def result = sh(
     returnStatus: true,
     script: "kubectl get rolebindings ${roleBindingName} --namespace ${namespace}"
   ) as Integer
-  return result == 0
+  result == 0
 }
 
-def __setupRbacForNamespace(namespace) {
+void __setupRbacForNamespace(namespace) {
   clusterRoleMappings.each { group, clusterRole ->
     def role = __getRole(namespace, group)
     def user = __getUser(role)
@@ -256,7 +256,7 @@ def __setupRbacForNamespace(namespace) {
   }
 }
 
-def __teardownRbacForNamespace(namespace) {
+void __teardownRbacForNamespace(namespace) {
   clusterRoleMappings.each { group ->
     def role = __getRole(namespace, group)
     def user = __getUser(role)
