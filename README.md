@@ -63,7 +63,7 @@ It takes six parameters:
 - a string describing the Jenkins usernamePassword credentials ID that contains the database user and password
 - a string describing the Jenkins usernamePassword credentials ID that contains the password for the role that will be created
 - a string describing the PR number, e.g. `53`
-- a boolean to determine if the SQL commands to create the PR role and schema include the `IF NOT EXISTS` logic. If `true` the SQL commands **will not** error if the schema and/or role already exist. If `false` the SQL commands **will** error if the schema and/or role already exist and the pipeline wil exit.
+- (optional, default=`false`) a boolean to determine if the SQL commands to create the PR role and schema include the `IF NOT EXISTS` logic. If `true` the SQL commands **will not** error if the schema and/or role already exist. If `false` (the default) the SQL commands **will** error if the schema and/or role already exist and the pipeline wil exit.
 
 It returns a list containing:
 - the PR schema created
