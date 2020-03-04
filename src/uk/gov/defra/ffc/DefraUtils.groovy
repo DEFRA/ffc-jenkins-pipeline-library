@@ -67,7 +67,7 @@ def destroyPrSqsQueues(repoName, prCode) {
   }
 }
 
-def provisionPrSqsQueue(serviceCode, serviceName, serviceDescription, prCode, queuePurpose, repoName) {
+def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName) {
   echo "Provisioning SQS Queue"
   sshagent(['helm-chart-creds']) {
     // character limit is actually 80, but four characters are needed for prefixes and separators
@@ -92,7 +92,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceDescription, prCode, qu
             sh "cp -fr standard_sqs_queues ${dirName}"
             dir(dirName) {
               echo "adding queue to git"
-              writeFile file: "vars.tfvars", text: generateTerraformInputVariables(serviceCode, serviceName, serviceCode, prCode, queuePurpose, repoName)
+              writeFile file: "vars.tfvars", text: generateTerraformInputVariables(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName)
               sh "git add *.tfvars ; git commit -m \"Creating queue ${queuePurpose} for ${serviceName}#${prCode}\" ; git push --set-upstream origin master"
               echo "provision infrastructure"
               sh "terragrunt apply -var-file='vars.tfvars' -auto-approve"
