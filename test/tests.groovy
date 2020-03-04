@@ -15,32 +15,14 @@ def testVersionHasIncremented(du) {
   assert du.versionHasIncremented('1.0.0', '2.0.0.0') == false
 }
 
-def testMapHasKeys(du) {
-  def test
-  def Map sampleMap;
-  sampleMap = [a: 1, b: 2, c: [d: 3, e: 4]];
-  def List theseChecksPass;
-  theseChecksPass = ['a', 'b', [c: ['d', 'e']]];
-  def List theseChecksFail;
-  theseChecksFail = ['a', 'b', [c: ['d', 'e']], 'f'];
-  def List theseChecksAlsoFail;
-  theseChecksAlsoFail = ['a', 'b', [c: ['d', 'e', 'f']]];
-
-  assert du.__hasKeys(sampleMap, theseChecksPass) == true;
-  assert du.__hasKeys(sampleMap, theseChecksFail) == false;
-  assert du.__hasKeys(sampleMap, theseChecksAlsoFail) == false;
-}
-
 def testTerraformInputVariables(du) {
-  def Map inputs1;
-  inputs1 = [a: 1, b: 2, c: [d: 3, e: 4]];
-  def Map inputs2;
-  inputs2 = [code: "abc-123", pr_code: 12, foo: [bar: "foo", foo: true]];
-
-  assert du.__generateTerraformInputVariables(inputs1) == "a = 1\nb = 2\nc = {\n\td = 3\n\te = 4\n}"
-  assert du.__generateTerraformInputVariables(inputs2) == "code = \"abc-123\"\npr_code = 12\nfoo = {\n\tbar = \"foo\"\n\tfoo = true\n}" // "code = \"abc-123\"\npr_code = 12\nfoo = {\n\tbar = \"foo\"\n\tfoo = true\n}'"
+  assert du.generateTerraformInputVariables('AAA', 'desc', 'AAA', 12, 'dole_queue', 'my-repo') ==
+    "service = {\n\tcode = \"AAA\"\n\tname = \"desc\"\n\ttype = \"AAA\"\n}\npr_code = 12\nqueue_purpose = \"dole_queue\"\nrepo_name = \"my-repo\""
+  assert du.generateTerraformInputVariables('FFC', 'descdescdesc', 'CCF', 22, 'post_office', 'repo-B') ==
+    "service = {\n\tcode = \"FFC\"\n\tname = \"descdescdesc\"\n\ttype = \"CCF\"\n}\npr_code = 22\nqueue_purpose = \"post_office\"\nrepo_name = \"repo-B\""
+  assert du.generateTerraformInputVariables('GGT', 'Descy McDescFace', 'TTZ', 1091, 'very_long', 'rep-DD89') ==
+    "service = {\n\tcode = \"GGT\"\n\tname = \"Descy McDescFace\"\n\ttype = \"TTZ\"\n}\npr_code = 1091\nqueue_purpose = \"very_long\"\nrepo_name = \"rep-DD89\""
 }
 
 testVersionHasIncremented(defraUtils)
-testMapHasKeys(defraUtils)
 testTerraformInputVariables(defraUtils)

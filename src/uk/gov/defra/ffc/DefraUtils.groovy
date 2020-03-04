@@ -7,35 +7,13 @@ def repoUrl = ''
 def commitSha = ''
 def workspace
 
-def Boolean __hasKeys(Map mapToCheck, List keys) {
-    def passes = true;
-    for (key in keys) {
-        if (key instanceof Map) {
-            assert key.size() == 1 : "keys to check should not have a Map with more than one key";
-            def keyToCheck = key.keySet()[0];
-            if (mapToCheck.containsKey(keyToCheck)) {
-                if (!__hasKeys(mapToCheck[keyToCheck], key.values()[0])) {
-                    passes = false;
-                }
-            } else {
-                passes = false;
-            }
-        } else {
-            if (!mapToCheck.containsKey(key)) {
-                passes = false;
-            }
-        }
-    }
-    return passes;
-}
-
-def String[] __mapToString(Map map) {
+def String[] mapToString(Map map) {
     def output = [];
     for (item in map) {
         if (item.value instanceof String) {
             output.add("${item.key} = \"${item.value}\"");
         } else if (item.value instanceof Map) {
-            output.add("${item.key} = {\n\t${__mapToString(item.value).join("\n\t")}\n}");
+            output.add("${item.key} = {\n\t${mapToString(item.value).join("\n\t")}\n}");
         } else {
             output.add("${item.key} = ${item.value}");
         }
@@ -43,91 +21,88 @@ def String[] __mapToString(Map map) {
     return output;
 }
 
-def String __generateTerraformInputVariables(Map inputs) {
-    return __mapToString(inputs).join("\n")
+def String generateTerraformInputVariables(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName) {
+  def Map inputs = [service: [code: serviceCode, name: serviceName, type: serviceType], pr_code: prCode, queue_purpose: queuePurpose, repo_name: repoName];
+  return mapToString(inputs).join("\n")
 }
 
-def destroyInfrastructure(repo_name, pr_code) {
+def destroyPrSqsQueues(repoName, prCode) {
   sshagent(['helm-chart-creds']) {
     echo "destroyInfrastructure"
     dir('terragrunt') {
       // git clone repo...
-      git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
-      dir("london/eu-west-2/ffc") {
-        def dirName = "${repo_name}-pr${pr_code}-*"
-        echo "finding previous var files in directories matching ${dirName}";
-        def varFiles = findFiles glob: "${dirName}/vars.tfvars";
-        echo "found ${varFiles.size()} directories to tear down";
-        if (varFiles.size() > 0) {
-          for (varFile in varFiles) {
-            def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
-            echo "running terragrunt in ${path}"
-            dir(path) {
-              // terragrunt destroy
-              sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
+      withCredentials([
+        string(credentialsId: 'terraform_sqs_repo_name', variable: 'tf_repo_name')
+      ]) {
+        git credentialsId: 'helm-chart-creds', url: tf_repo_name
+        dir("london/eu-west-2/ffc") {
+          def dirName = "${repoName}-pr${prCode}-*"
+          echo "finding previous var files in directories matching ${dirName}";
+          def varFiles = findFiles glob: "${dirName}/vars.tfvars";
+          echo "found ${varFiles.size()} directories to tear down";
+          if (varFiles.size() > 0) {
+            for (varFile in varFiles) {
+              def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
+              echo "running terragrunt in ${path}"
+              dir(path) {
+                // terragrunt destroy
+                sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
+              }
+              // delete the pr dir
+              echo "removing from git"
+              sh "git rm -fr ${path}"
             }
-            // delete the pr dir
-            echo "removing from git"
-            sh "git rm -fr ${path}"
+            // commit the changes back
+            echo "persisting changes in repo"
+            sh "git commit -m \"Removing infrastructure created for ${repoName}#${prCode}\" ; git push --set-upstream origin master"
+            echo "infrastructure successfully destroyed"
+          } else {
+            echo "no infrastructure to destroy"
           }
-          // commit the changes back
-          echo "persisting changes in repo"
-          sh "git commit -m \"Removing infrastructure created for ${repo_name}#${pr_code}\" ; git push --set-upstream origin master"
-          echo "infrastructure successfully destroyed"
-        } else {
-          echo "no infrastructure to destroy"
         }
+        // Recursively delete the current dir (which should be terragrunt in the current job workspace)
+        deleteDir()
       }
-      // Recursively delete the current dir (which should be terragrunt in the current job workspace)
-      deleteDir()
     }
   }
 }
 
-def provisionInfrastructure(target, item, parameters) {
-  echo "provisionInfrastructure"
-  if (target.toLowerCase() == "aws") {
-    switch (item) {
-      case "sqs":
-        sshagent(['helm-chart-creds']) {
-          // character limit is actually 80, but four characters are needed for prefixes and separators
-          final int SQS_NAME_CHAR_LIMIT = 76
-          assert __hasKeys(parameters, [['service': ['code', 'name', 'type']], 'pr_code', 'queue_purpose', 'repo_name']) :
-            "parameters should specify pr_code, queue_purpose, repo_name as well as service details (code, name and type)";
-          assert parameters['repo_name'].size() + parameters['pr_code'].toString().size() + parameters['queue_purpose'].size() < SQS_NAME_CHAR_LIMIT :
-            "repo name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
-          dir('terragrunt') {
-            sh "pwd"
-            echo "cloning terraform repo"
-            // git clone repo...
-            git credentialsId: 'helm-chart-creds', url: 'git@gitlab.ffc.aws-int.defra.cloud:terraform_sqs_pipelines/terragrunt_sqs_queues.git'
+def provisionPrSqsQueue(serviceCode, serviceName, serviceDescription, prCode, queuePurpose, repoName) {
+  echo "Provisioning SQS Queue"
+  sshagent(['helm-chart-creds']) {
+    // character limit is actually 80, but four characters are needed for prefixes and separators
+    final int SQS_NAME_CHAR_LIMIT = 76
+    assert serviceName.size() + prCode.toString().size() + queuePurpose.size() < SQS_NAME_CHAR_LIMIT :
+      "service name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
+    dir('terragrunt') {
+      withCredentials([
+        string(credentialsId: 'terraform_sqs_repo_name', variable: 'tf_repo_name')
+      ]) {
+        sh "pwd"
+        echo "cloning terraform repo"
+        // git clone repo...
+        git credentialsId: 'helm-chart-creds', url: tf_repo_name
 
-            dir('london/eu-west-2/ffc') {
-              def dirName = "${parameters["repo_name"]}-pr${parameters["pr_code"]}-${parameters["queue_purpose"]}"
-              if (!fileExists("${dirName}/terraform.tfvars")) {
-                echo "${dirName} directory doesn't exist, creating..."
-                echo "create new dir from model dir, then add to git"
-                // create new dir from model dir, add to git...
-                sh "cp -fr standard_sqs_queues ${dirName}"
-                dir(dirName) {
-                  echo "adding queue to git"
-                  writeFile file: "vars.tfvars", text: __generateTerraformInputVariables(parameters)
-                  sh "git add *.tfvars ; git commit -m \"Creating queue ${parameters["queue_purpose"]} for ${parameters["repo_name"]}#${parameters["pr_code"]}\" ; git push --set-upstream origin master"
-                  echo "provision infrastructure"
-                  sh "terragrunt apply -var-file='vars.tfvars' -auto-approve"
-                }
-              }
+        dir('london/eu-west-2/ffc') {
+          def dirName = "${serviceName}-pr${prCode}-${queuePurpose}"
+          if (!fileExists("${dirName}/terraform.tfvars")) {
+            echo "${dirName} directory doesn't exist, creating..."
+            echo "create new dir from model dir, then add to git"
+            // create new dir from model dir, add to git...
+            sh "cp -fr standard_sqs_queues ${dirName}"
+            dir(dirName) {
+              echo "adding queue to git"
+              writeFile file: "vars.tfvars", text: generateTerraformInputVariables(serviceCode, serviceName, serviceCode, prCode, queuePurpose, repoName)
+              sh "git add *.tfvars ; git commit -m \"Creating queue ${queuePurpose} for ${serviceName}#${prCode}\" ; git push --set-upstream origin master"
+              echo "provision infrastructure"
+              sh "terragrunt apply -var-file='vars.tfvars' -auto-approve"
             }
-            // Recursively delete the current dir (which should be terragrunt in the current job workspace)
-            deleteDir()
           }
         }
-        break;
-      default:
-        error("provisionInfrastructure error: unsupported item ${item}")
+        // Recursively delete the current dir (which should be terragrunt in the current job workspace)
+        deleteDir()
+      }
     }
-  } else {
-    error("provisionInfrastructure error: unsupported target ${target}")
   }
 }
 
