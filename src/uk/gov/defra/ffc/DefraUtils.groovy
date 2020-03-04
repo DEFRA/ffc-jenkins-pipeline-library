@@ -79,7 +79,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
         string(credentialsId: 'terraform_sqs_repo_name', variable: 'tf_repo_name')
       ]) {
         sh "pwd"
-        echo "cloning terraform repo"
+        echo "cloning terraform repo: $tf_repo_name"
         // git clone repo...
         git credentialsId: 'helm-chart-creds', url: tf_repo_name
 
