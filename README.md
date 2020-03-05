@@ -55,7 +55,7 @@ This will tear down infrastructure provisioned by `provisionInfrastructure` and 
 
 ### provisionPrDatabaseRoleAndSchema
 
-Creates a Postgres database role and schema for use by a PR.
+Creates a Postgres database role and schema for use by a PR. See https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres for context.
 
 It takes six parameters:
 - a string describing the Jenkins secret text credentials ID that contains database host to connect to
@@ -71,7 +71,7 @@ It returns a list containing:
 
 ### destroyPrDatabaseRoleAndSchema
 
-Drops a Postgres database PR role and schema.
+Drops a Postgres database PR role and schema. See https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres for context.
 
 It takes four parameters:
 - a string describing the Jenkins secret text credentials ID that contains database host to connect to
