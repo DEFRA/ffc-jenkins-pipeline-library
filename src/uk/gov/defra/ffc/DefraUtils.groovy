@@ -141,6 +141,8 @@ def runPsqlCommand(dbHost, dbUser, dbName, sqlCmd) {
   sh returnStdout: true, script: "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\""
 }
 
+// The design rationale for the behaviour of this function is documented here:
+// https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres
 def provisionPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, useIfNotExists=false) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
@@ -175,6 +177,8 @@ def provisionPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCred
   return generatePrNames(dbName, prCode)
 }
 
+// The design rationale for the behaviour of this function is documented here:
+// https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres
 def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
