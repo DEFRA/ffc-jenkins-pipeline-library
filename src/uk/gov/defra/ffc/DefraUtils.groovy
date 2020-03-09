@@ -193,8 +193,8 @@ def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   }
 }
 
-String __getRole(service, group) {
-  "$service-$group".toUpperCase()
+String __getRole(environment, service, group) {
+  "${environment}${service}-${group}".toUpperCase()
 }
 
 String __getRoleArn(role) {
@@ -262,20 +262,20 @@ void __deleteRoleBinding(namespace, role) {
   }
 }
 
-void __setupRbac(service, tag) {
+void setupRbac(environment, service, tag) {
   String namespace = __getNamespace(service, tag)
   clusterRoleMappings.each { group, clusterRole ->
-    def role = __getRole(service, group)
-    def user = __getUser(role)
+    String role = __getRole(environment, service, group)
+    String user = __getUser(role)
     __createIdentityMapping(role)
     __createRoleBinding(namespace, role, clusterRole)
   }
 }
 
-void __teardownRbac(service, tag) {
+void teardownRbac(environment, service, tag) {
   String namespace = __getNamespace(service, tag)
   clusterRoleMappings.each { group, clusterRole ->
-     String role = __getRole(service, group)
+     String role = __getRole(environment, service, group)
     // the identity mapping should probably only be removed after master has been torn down
     __deleteIdentityMapping(role)
     __deleteRoleBinding(namespace, role)
@@ -457,7 +457,6 @@ def deployChart(credentialsId, registry, serviceName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
     sh "helm upgrade $deploymentName --install --atomic ./helm/$serviceName --set image=$registry/$serviceName:$tag,namespace=$deploymentName $extraCommands"
-    __setupRbac(serviceName, tag)
   }
 }
 
@@ -465,7 +464,6 @@ def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
-    __teardownRbac(chartName, tag)
     sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
