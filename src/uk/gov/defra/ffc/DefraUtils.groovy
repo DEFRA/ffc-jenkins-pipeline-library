@@ -460,8 +460,8 @@ def deployChart(credentialsId, registry, serviceName, tag, extraCommands) {
   }
 }
 
-def undeployChart(credentialsId, chartName, tag) {
-  def deploymentName = "$chartName-$tag"
+def undeployChart(credentialsId, serviceName, tag) {
+  def deploymentName = "$serviceName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
     sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
