@@ -262,8 +262,8 @@ void __deleteRoleBinding(namespace, role) {
   }
 }
 
-void setupRbac(environment, service, tag) {
-  String namespace = __getNamespace(service, tag)
+void setupRbac(environment, service, image, tag) {
+  String namespace = __getNamespace(image, tag)
   clusterRoleMappings.each { group, clusterRole ->
     String role = __getRole(environment, service, group)
     String user = __getUser(role)
@@ -272,8 +272,8 @@ void setupRbac(environment, service, tag) {
   }
 }
 
-void teardownRbac(environment, service, tag) {
-  String namespace = __getNamespace(service, tag)
+void teardownRbac(environment, service, image, tag) {
+  String namespace = __getNamespace(image, tag)
   clusterRoleMappings.each { group, clusterRole ->
      String role = __getRole(environment, service, group)
     // the identity mapping should probably only be removed after master has been torn down
