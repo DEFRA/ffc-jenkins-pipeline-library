@@ -248,6 +248,9 @@ Boolean __roleBindingExists(namespace, role) {
 }
 
 void __createRoleBinding(namespace, role, clusterRole) {
+  // Note: it is possible to create the rolebindings declaratively using helm
+  // charts but doing so would require adding charts (and maintaining them)
+  // for both dev and admin roles to every repo
   def roleBindingName = __getRoleBindingName(role)
   if (!__roleBindingExists(namespace, role)) {
     String user = __getUser(role)
