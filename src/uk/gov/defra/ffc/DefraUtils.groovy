@@ -194,7 +194,7 @@ def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
 }
 
 String __getRole(environment, service, group) {
-  "${environment}${service}-${group}".toUpperCase()
+  "${environment}${service}-${group}-role".toUpperCase()
 }
 
 String __getRoleArn(role) {
