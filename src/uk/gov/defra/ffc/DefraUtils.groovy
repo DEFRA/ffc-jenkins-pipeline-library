@@ -370,15 +370,6 @@ def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   }
 }
 
-def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
-  withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
-    sh "helm repo add ffc-demo $HELM_CHART_REPO"
-    sh "helm repo update"
-    sh "helm fetch --untar ffc-demo/$chartName --version $chartVersion"
-    sh "helm upgrade --install --recreate-pods --wait --atomic $chartName --set namespace=$namespace ./$chartName $extraCommands"
-  }
-}
-
 def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
@@ -410,6 +401,15 @@ def publishChart(registry, chartName, tag) {
         sh 'git push'
       }
     }
+  }
+}
+
+def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
+  withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
+    sh "helm repo add ffc-demo $HELM_CHART_REPO"
+    sh "helm repo update"
+    sh "helm fetch --untar ffc-demo/$chartName --version $chartVersion"
+    sh "helm upgrade --install --recreate-pods --wait --atomic $chartName --set namespace=$namespace ./$chartName $extraCommands"
   }
 }
 

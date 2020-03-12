@@ -422,6 +422,23 @@ Example usage:
  defraUtils.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
 ```
 
+### deployRemoteChart
+
+Deploys a Helm chart from a remote chart repository to Kubernetes.
+
+Takes four parameters:
+- the Kubernetes namespace to deploy into
+- the chart name
+- the chart version
+- additional command line parameters to send to the Helm deployment
+
+Example usage:
+
+```
+def extraCommands = "--values ./helm/ffc-demo-web/aws-values.yaml"
+defraUtils.deployRemoteChart('ffc-demo', 'ffc-demo-web', '1.1.7', extraCommands)
+```
+
 ### triggerDeploy
 
 Triggers the Jenkins deployment job to deploy the built image.
