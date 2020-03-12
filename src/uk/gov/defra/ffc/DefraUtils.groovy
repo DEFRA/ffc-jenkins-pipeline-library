@@ -75,11 +75,11 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
     assert serviceName.size() + prCode.toString().size() + queuePurpose.size() < SQS_NAME_CHAR_LIMIT :
       "service name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
     dir('terragrunt') {
-      /* withCredentials([
+       withCredentials([
         string(credentialsId: 'terraform_sqs_repo_name', variable: 'tf_repo_name')
-      ]) { */
+      ]) {
         sh "pwd"
-        def tf_repo_name = 'git@gitlab-dev.aws-int.defra.cloud:ffc/provisioning/terragrunt_sqs_queues.git'
+        //def tf_repo_name = 'git@gitlab-dev.aws-int.defra.cloud:ffc/provisioning/terragrunt_sqs_queues.git'
         echo "cloning terraform repo: $tf_repo_name"
         // git clone repo...
         git credentialsId: 'helm-chart-creds', url: tf_repo_name
@@ -103,7 +103,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
         }
         // Recursively delete the current dir (which should be terragrunt in the current job workspace)
         deleteDir()
-      //}
+      }
     }
   }
 }
