@@ -79,7 +79,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
       echo "withCredentials"
        withCredentials([
         string(credentialsId: 'ffc-jenkins-pipeline-terragrunt-repo', variable: 'tg_repo_url'),
-        string($class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'devffcprovision-user')
+        [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'devffcprovision-user']
       ]) {
         sh "pwd"
         // git clone repo...
