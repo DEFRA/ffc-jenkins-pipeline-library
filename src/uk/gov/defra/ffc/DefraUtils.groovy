@@ -76,11 +76,10 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
       "service name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
     dir('terragrunt') {
        withCredentials([
-        string(credentialsId: 'ffc-jenkins-pipeline-terragrunt-repo', variable: 'tg_repo_url')
+        string(credentialsId: 'ffc-jenkins-pipeline-terragrunt-repo', variable: 'tg_repo_url'),
+        string($class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'devffcprovision-user', variable: 'AWS_ACCESS_KEY_ID')
       ]) {
         sh "pwd"
-        //def tf_repo_name = 'git@gitlab-dev.aws-int.defra.cloud:ffc/provisioning/terragrunt_sqs_queues.git'
-        echo "cloning terraform repo: ${tg_repo_url.substring(0, 38)} ${tg_repo_url.length()} long, ${tg_repo_url.substring(38)}"
         // git clone repo...
         git credentialsId: 'helm-chart-creds', url: tg_repo_url
         echo "cloned repo"
