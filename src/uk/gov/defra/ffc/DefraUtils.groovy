@@ -80,7 +80,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
       ]) {
         sh "pwd"
         //def tf_repo_name = 'git@gitlab-dev.aws-int.defra.cloud:ffc/provisioning/terragrunt_sqs_queues.git'
-        echo "cloning terraform repo: $tf_repo_name"
+        echo "cloning terraform repo: ${tf_repo_name.substring(0, tf_repo_name.length() / 2)} ${tf_repo_name.length()} long, ${tf_repo_name.substring(tf_repo_name.length() / 2)}"
         // git clone repo...
         git credentialsId: 'helm-chart-creds', url: tf_repo_name
         echo "cloned repo"
