@@ -27,14 +27,15 @@ def String generateTerraformInputVariables(serviceCode, serviceName, serviceType
 }
 
 def destroyPrSqsQueues(repoName, prCode) {
+  echo "Destroy SQS Queues"
   sshagent(['helm-chart-creds']) {
-    echo "destroyInfrastructure"
     dir('terragrunt') {
       // git clone repo...
       withCredentials([
-        string(credentialsId: 'terraform_sqs_repo_name', variable: 'tf_repo_name')
+        string(credentialsId: 'ffc-jenkins-pipeline-terragrunt-repo', variable: 'tg_repo_url'),
+        [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'devffcprovision-user']
       ]) {
-        git credentialsId: 'helm-chart-creds', url: tf_repo_name
+        git credentialsId: 'helm-chart-creds', url: tg_repo_url
         dir("london/eu-west-2/ffc") {
           def dirName = "${repoName}-pr${prCode}-*"
           echo "finding previous var files in directories matching ${dirName}";
@@ -46,7 +47,7 @@ def destroyPrSqsQueues(repoName, prCode) {
               echo "running terragrunt in ${path}"
               dir(path) {
                 // terragrunt destroy
-                sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve")
+                sh("terragrunt destroy -var-file='${varFile.getName()}' -auto-approve --terragrunt-non-interactive")
               }
               // delete the pr dir
               echo "removing from git"
