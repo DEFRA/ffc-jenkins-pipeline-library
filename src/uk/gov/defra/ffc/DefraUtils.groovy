@@ -91,7 +91,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
         dir('london/eu-west-2/ffc') {
           sh "pwd"
           def dirName = "${serviceName}-pr${prCode}-${queuePurpose}"
-          echo "checking for existing dir"
+          echo "checking for existing dir (${dirName})"
           if (!fileExists("${dirName}/terraform.tfvars")) {
             echo "${dirName} directory doesn't exist, creating..."
             echo "create new dir from model dir, then add to git"
