@@ -100,7 +100,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
             dir(dirName) {
               echo "adding queue to git"
               writeFile file: "vars.tfvars", text: generateTerraformInputVariables(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName)
-              // sh "git add *.tfvars ; git commit -m \"Creating queue ${queuePurpose} for ${serviceName}#${prCode}\" ; git push --set-upstream origin master"
+              sh "git add *.tfvars ; git commit -m \"Creating queue ${queuePurpose} for ${serviceName}#${prCode}\" ; git push --set-upstream origin master"
               echo "provision infrastructure"
               sh "terragrunt apply -var-file='vars.tfvars' -auto-approve --terragrunt-non-interactive"
             }
