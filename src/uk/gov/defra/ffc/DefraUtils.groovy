@@ -71,7 +71,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
   echo "Provisioning SQS Queue"
   sshagent(['helm-chart-creds']) {
     echo "cloning tf repo"
-    git credentialsId: 'helm-chart-creds', url: 'git::ssh://git@gitlab-dev.aws-int.defra.cloud:ffc/jenkins/ffc-provisioning-terraform.git'
+    git credentialsId: 'helm-chart-creds', url: 'git@gitlab-dev.aws-int.defra.cloud:ffc/jenkins/ffc-provisioning-terraform.git'
     echo "cloned tf repo"
 
 
