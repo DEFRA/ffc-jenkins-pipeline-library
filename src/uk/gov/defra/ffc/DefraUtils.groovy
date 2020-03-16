@@ -70,6 +70,11 @@ def destroyPrSqsQueues(repoName, prCode) {
 def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName) {
   echo "Provisioning SQS Queue"
   sshagent(['helm-chart-creds']) {
+    echo "cloning tf repo"
+    git credentialsId: 'helm-chart-creds', url: 'git::ssh://git@gitlab-dev.aws-int.defra.cloud:ffc/jenkins/ffc-provisioning-terraform.git'
+    echo "cloned tf repo"
+
+
     // character limit is actually 80, but four characters are needed for prefixes and separators
     final int SQS_NAME_CHAR_LIMIT = 76
     assert serviceName.size() + prCode.toString().size() + queuePurpose.size() < SQS_NAME_CHAR_LIMIT :
