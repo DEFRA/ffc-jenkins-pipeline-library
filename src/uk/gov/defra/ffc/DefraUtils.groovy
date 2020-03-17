@@ -73,8 +73,8 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
   sshagent(['helm-chart-creds']) {
     // character limit is actually 80, but four characters are needed for prefixes and separators
     final int SQS_NAME_CHAR_LIMIT = 76
-    assert serviceName.size() + prCode.toString().size() + queuePurpose.size() < SQS_NAME_CHAR_LIMIT :
-      "service name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
+    assert repoName.size() + prCode.toString().size() + queuePurpose.size() < SQS_NAME_CHAR_LIMIT :
+      "repo name, pr code and queue purpose parameters should have fewer than 76 characters when combined";
     echo "changing to terragrunt dir"
     dir('terragrunt') {
       echo "withCredentials"
@@ -91,7 +91,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
         echo "changing to dir london/eu-west-2/ffc"
         dir('london/eu-west-2/ffc') {
           sh "pwd"
-          def dirName = "${serviceName}-pr${prCode}-${queuePurpose}"
+          def dirName = "${repoName}-pr${prCode}-${queuePurpose}"
           echo "checking for existing dir (${dirName})"
           if (!fileExists("${dirName}/terraform.tfvars")) {
             echo "${dirName} directory doesn't exist, creating..."
@@ -101,7 +101,7 @@ def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurp
             dir(dirName) {
               echo "adding queue to git"
               writeFile file: "vars.tfvars", text: generateTerraformInputVariables(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName)
-              sh "git add *.tfvars ; git commit -m \"Creating queue ${queuePurpose} for ${serviceName}#${prCode}\" ; git push --set-upstream origin master"
+              sh "git add *.tfvars ; git commit -m \"Creating queue ${queuePurpose} for ${repoName}#${prCode}\" ; git push --set-upstream origin master"
               echo "provision infrastructure"
               sh "terragrunt apply -var-file='vars.tfvars' -auto-approve --terragrunt-non-interactive"
             }
