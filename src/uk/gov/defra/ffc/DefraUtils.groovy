@@ -68,7 +68,7 @@ def destroyPrSqsQueues(repoName, prCode) {
   }
 }
 
-def provisionPrSqsQueue(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName) {
+def provisionPrSqsQueue(repoName, prCode, queuePurpose, serviceCode, serviceName, serviceType) {
   echo "Provisioning SQS Queue"
   sshagent(['helm-chart-creds']) {
     // character limit is actually 80, but four characters are needed for prefixes and separators
