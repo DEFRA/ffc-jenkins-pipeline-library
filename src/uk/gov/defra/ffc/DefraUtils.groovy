@@ -289,8 +289,13 @@ def setGithubStatusFailure(message = '') {
   updateGithubCommitStatus(message, 'FAILURE')
 }
 
+<<<<<<< HEAD
 def lintHelm(chartName) {
   sh "helm lint ./helm/$chartName"
+=======
+def lintHelm(imageName) {
+  sh "helm3 lint ./helm/$imageName"
+>>>>>>> Switch to using helm3
 }
 
 def buildTestImage(credentialsId, registry, projectName, buildNumber) {
@@ -351,7 +356,7 @@ def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     def deploymentName = "$chartName-$tag"
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-    sh "helm upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
+    sh "helm3 upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
   }
 }
 
@@ -359,7 +364,7 @@ def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
-    sh "helm uninstall $deploymentName || echo error removing deployment $deploymentName"
+    sh "helm3 uninstall $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
 }
@@ -375,8 +380,8 @@ def publishChart(registry, chartName, tag) {
       dir('helm-charts') {
         sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
         sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
-        sh "helm package ../helm/$imageName"
-        sh 'helm repo index .'
+        sh "helm3 package ../helm/$imageName"
+        sh 'helm3 repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
         sh 'git config --global user.name "buildserver"'
         sh 'git checkout master'
