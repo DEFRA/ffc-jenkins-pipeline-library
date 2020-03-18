@@ -289,13 +289,8 @@ def setGithubStatusFailure(message = '') {
   updateGithubCommitStatus(message, 'FAILURE')
 }
 
-<<<<<<< HEAD
 def lintHelm(chartName) {
-  sh "helm lint ./helm/$chartName"
-=======
-def lintHelm(imageName) {
-  sh "helm3 lint ./helm/$imageName"
->>>>>>> Switch to using helm3
+  sh "helm3 lint ./helm/$chartName"
 }
 
 def buildTestImage(credentialsId, registry, projectName, buildNumber) {
