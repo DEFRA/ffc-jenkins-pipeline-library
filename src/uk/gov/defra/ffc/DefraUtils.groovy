@@ -72,7 +72,7 @@ def setGithubStatusFailure(message = '') {
 }
 
 def lintHelm(imageName) {
-  sh "helm lint ./helm/$imageName"
+  sh "helm3 lint ./helm/$imageName"
 }
 
 def buildTestImage(name, suffix) {
@@ -130,7 +130,7 @@ def deployChart(credentialsId, registry, imageName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     def deploymentName = "$imageName-$tag"
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-    sh "helm upgrade $deploymentName --install --namespace $deploymentName --atomic ./helm/$imageName --set image=$registry/$imageName:$tag $extraCommands"
+    sh "helm3 upgrade $deploymentName --install --namespace $deploymentName --atomic ./helm/$imageName --set image=$registry/$imageName:$tag $extraCommands"
   }
 }
 
@@ -138,7 +138,7 @@ def undeployChart(credentialsId, imageName, tag) {
   def deploymentName = "$imageName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
-    sh "helm uninstall $deploymentName || echo error removing deployment $deploymentName"
+    sh "helm3 uninstall $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
 }
@@ -153,8 +153,8 @@ def publishChart(registry, imageName, containerTag) {
       sh "git clone $helmRepo"
       dir('helm-charts') {
         sh "sed -i -e 's/image: $imageName/image: $registry\\/$imageName:$containerTag/' ../helm/$imageName/values.yaml"
-        sh "helm package ../helm/$imageName"
-        sh 'helm repo index .'
+        sh "helm3 package ../helm/$imageName"
+        sh 'helm3 repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
         sh 'git config --global user.name "buildserver"'
         sh 'git checkout master'
