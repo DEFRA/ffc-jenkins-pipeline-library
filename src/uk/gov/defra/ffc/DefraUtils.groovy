@@ -152,7 +152,6 @@ def publishChart(registry, imageName, containerTag) {
     sshagent(credentials: ['helm-chart-creds']) {
       sh "git clone $helmRepo"
       dir('helm-charts') {
-        sh 'helm init -c'
         sh "sed -i -e 's/image: $imageName/image: $registry\\/$imageName:$containerTag/' ../helm/$imageName/values.yaml"
         sh "helm package ../helm/$imageName"
         sh 'helm repo index .'
