@@ -217,6 +217,12 @@ def verifyPackageJsonVersionIncremented() {
   errorOnNoVersionIncrement(masterVersion, version)
 }
 
+def verifyFileVersionIncremented() {
+  def masterVersion = getFileVersionMaster()
+  def version = getFileVersion()
+  errorOnNoVersionIncrement(masterVersion, version)
+}
+
 def errorOnNoVersionIncrement(masterVersion, version){
   if (versionHasIncremented(masterVersion, version)) {
     echo "version increment valid '$masterVersion' -> '$version'"
