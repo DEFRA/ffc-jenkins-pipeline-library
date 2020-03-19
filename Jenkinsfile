@@ -1,6 +1,6 @@
-@Library('defra-library@psd-593-add-library-build-functions')
-import uk.gov.defra.ffc.DefraUtils
-def defraUtils = new DefraUtils()
+File sourceFile = new File("src/uk/gov/defra/ffc/DefraUtils.groovy");
+Class groovyClass = new GroovyClassLoader(getClass().getClassLoader()).parseClass(sourceFile);
+GroovyObject defraUtils = (GroovyObject) groovyClass.newInstance();
 
 def mergedPrNo = ''
 def pr = ''
@@ -16,7 +16,7 @@ node {
     }
     stage('Set branch, PR, and containerTag variables') {
       (pr, version, mergedPrNo) = defraUtils.getVariables(serviceName, defraUtils.getFileVersion())
-    }    
+    }
     if (pr != '') {
       stage('Verify version incremented') {
         defraUtils.verifyFileVersionIncremented()
