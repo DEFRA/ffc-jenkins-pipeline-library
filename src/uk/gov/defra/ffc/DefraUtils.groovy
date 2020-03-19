@@ -195,6 +195,16 @@ def getPackageJsonVersionMaster() {
   return sh(returnStdout: true, script: "git show origin/master:package.json | jq -r '.version'").trim()
 }
 
+def getFileVersion() {
+  // TODO populate script
+  return sh(returnStdout: true, script: "").trim()
+}
+
+def getFileVersionMaster() {
+  // TODO populate script
+  return sh(returnStdout: true, script: "").trim()
+}
+
 def verifyCSProjVersionIncremented(projectName) {
   def masterVersion = getCSProjVersionMaster(projectName)
   def version = getCSProjVersion(projectName)
@@ -465,5 +475,7 @@ def versionHasIncremented(currVers, newVers) {
     return false
   }
 }
+
+
 
 return this
