@@ -1,6 +1,4 @@
-@Library('defra-library@psd-593-add-library-build-functions')
-import uk.gov.defra.ffc.DefraUtils
-def defraUtils = new DefraUtils()
+def defraUtils
 
 def mergedPrNo = ''
 def pr = ''
@@ -11,9 +9,8 @@ node {
   checkout scm
 
   try {
-    stage('Test load') {
-      code = load 'src/uk/gov/defra/ffc/DefraUtils.groovy'
-      code.tagCommit("test", "test2")
+    stage('Load defraUtils functions') {
+      defraUtils = load 'src/uk/gov/defra/ffc/DefraUtils.groovy'
     }
     stage('Set GitHub status as pending'){
       defraUtils.setGithubStatusPending()
