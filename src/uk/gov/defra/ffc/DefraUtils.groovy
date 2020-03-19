@@ -359,7 +359,7 @@ def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
-    sh "helm uninstall $deploymentName || echo error removing deployment $deploymentName"
+    sh "helm delete --purge $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
 }
@@ -375,6 +375,7 @@ def publishChart(registry, chartName, tag) {
       dir('helm-charts') {
         sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
         sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
+        sh 'helm init -c'
         sh "helm package ../helm/$chartName"
         sh 'helm repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
