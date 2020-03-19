@@ -290,7 +290,7 @@ def setGithubStatusFailure(message = '') {
 }
 
 def lintHelm(chartName) {
-  sh "helm3 lint ./helm/$chartName"
+  sh "helm lint ./helm/$chartName"
 }
 
 def buildTestImage(credentialsId, registry, projectName, buildNumber) {
@@ -351,7 +351,7 @@ def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     def deploymentName = "$chartName-$tag"
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-    sh "helm3 upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
+    sh "helm upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
   }
 }
 
@@ -359,7 +359,7 @@ def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
-    sh "helm3 uninstall $deploymentName || echo error removing deployment $deploymentName"
+    sh "helm uninstall $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
 }
@@ -375,8 +375,8 @@ def publishChart(registry, chartName, tag) {
       dir('helm-charts') {
         sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
         sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
-        sh "helm3 package ../helm/$chartName"
-        sh 'helm3 repo index .'
+        sh "helm package ../helm/$chartName"
+        sh 'helm repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
         sh 'git config --global user.name "buildserver"'
         sh 'git checkout master'
@@ -390,10 +390,10 @@ def publishChart(registry, chartName, tag) {
 
 def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
   withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
-    sh "helm3 repo add ffc-demo $HELM_CHART_REPO"
-    sh "helm3 repo update"
-    sh "helm3 fetch --untar ffc-demo/$chartName --version $chartVersion"
-    sh "helm3 upgrade --install --recreate-pods --wait --atomic $chartName --set namespace=$namespace ./$chartName $extraCommands"
+    sh "helm repo add ffc-demo $HELM_CHART_REPO"
+    sh "helm repo update"
+    sh "helm fetch --untar ffc-demo/$chartName --version $chartVersion"
+    sh "helm upgrade --install --recreate-pods --wait --atomic $chartName --set namespace=$namespace ./$chartName $extraCommands"
   }
 }
 
