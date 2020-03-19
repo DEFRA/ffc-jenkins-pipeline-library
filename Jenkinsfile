@@ -1,6 +1,6 @@
-File sourceFile = new File("src/uk/gov/defra/ffc/DefraUtils.groovy");
-Class groovyClass = new GroovyClassLoader(getClass().getClassLoader()).parseClass(sourceFile);
-GroovyObject defraUtils = (GroovyObject) groovyClass.newInstance();
+@Library('defra-library@psd-593-add-library-build-functions')
+import uk.gov.defra.ffc.DefraUtils
+def defraUtils = new DefraUtils()
 
 def mergedPrNo = ''
 def pr = ''
