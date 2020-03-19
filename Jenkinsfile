@@ -11,6 +11,10 @@ node {
   checkout scm
 
   try {
+    stage('Test load') {
+      code = load 'src/uk/gov/defra/ffc/DefraUtils.groovy'
+      code.tagCommit("test", "test2")
+    }
     stage('Set GitHub status as pending'){
       defraUtils.setGithubStatusPending()
     }
