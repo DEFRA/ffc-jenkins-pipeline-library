@@ -476,6 +476,8 @@ def versionHasIncremented(currVers, newVers) {
   }
 }
 
-
+def tagCommit(version, commitSha) {
+  // TODO take full semver in version parameter, determine major and minor tags and move/create on commit.
+}
 
 return this
