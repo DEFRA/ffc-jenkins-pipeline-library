@@ -373,9 +373,9 @@ def publishChart(registry, chartName, tag) {
     sshagent(credentials: ['helm-chart-creds']) {
       sh "git clone $helmRepo"
       dir('helm-charts') {
+        sh 'helm init -c'
         sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
         sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
-        sh 'helm init -c'
         sh "helm package ../helm/$chartName"
         sh 'helm repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
