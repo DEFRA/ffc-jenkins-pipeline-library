@@ -486,7 +486,6 @@ def attachTag(tag, commitSha) {
   tags = sh(returnStdout: true, script: 'git tag $tag')
   echo "$tags"
   // git push origin <name>
-  }
 }
 
 def tagCommit(version) {
