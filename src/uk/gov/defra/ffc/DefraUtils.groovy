@@ -481,15 +481,10 @@ def versionHasIncremented(currVers, newVers) {
 }
 
 def attachTag(tag, commitSha, credentialsId) {
-  dir('attachTag') {
-    sshagent(['github-test']) {
-
-      checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[credentialsId: 'github-auth-token']]]
-    // sh("git push origin :refs/tags/$tag")
-    // sh("git tag -f $tag $commitSha")
-    // sh("git push origin $tag")
-      deleteDir()
-    }
+  sshagent(['github-test']) {
+    sh("git push origin :refs/tags/$tag")
+    sh("git tag -f $tag $commitSha")
+    sh("git push origin $tag")
   }
 }
 
