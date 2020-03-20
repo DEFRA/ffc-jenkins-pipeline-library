@@ -483,12 +483,12 @@ def versionHasIncremented(currVers, newVers) {
 def attachTag(tag, commitSha) {
   dir('test123') {
     sshagent(['github-test']) {
-      sh("git clone git@github.com:DEFRA/ffc-jenkins-pipeline-library.git .")
+      sh("git clone git@github.com:DEFRA/ffc-jenkins-pipeline-library.git testdir1")
       // sh("git push origin :refs/tags/$tag")
-      sh("git tag -f $tag $commitSha")
-      sh("git push origin $tag")
-      deleteDir()
+      sh("cd testdir1 ; git tag -f $tag $commitSha")
+      sh("cd testdir1 ; git push origin $tag")
     }
+    deleteDir()
   }
 }
 
