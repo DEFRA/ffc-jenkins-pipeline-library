@@ -482,6 +482,10 @@ def versionHasIncremented(currVers, newVers) {
 
 def tagCommit(version) {
   def versionList = version.tokenize('.')
+
+  echo "$version"
+  echo "$versionList"
+
   assert versionList.size() == 3
 
   def majorTag = "${versionList[0]}"
