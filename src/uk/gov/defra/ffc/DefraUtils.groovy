@@ -454,7 +454,8 @@ def notifySlackBuildFailure(exception, channel) {
 }
 
 def versionHasIncremented(currVers, newVers) {
-  // first version is valid, i.e. currVers will be empty
+  // For a newly created empty repository currVers will be empty on first merge to master
+  // consider 'newVers' the first version and return true
   if (currVers == '') {
     return true
   }
