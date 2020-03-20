@@ -481,7 +481,7 @@ def versionHasIncremented(currVers, newVers) {
 }
 
 def attachTag(tag, commitSha, repoName) {
-  dir('test123') {
+  dir('attachTag') {
     sshagent(['github-test']) {
       def dirName = "repo"
       sh("git clone git@github.com:DEFRA/${repoName}.git $dirName")
