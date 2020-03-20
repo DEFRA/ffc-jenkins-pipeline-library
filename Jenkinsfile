@@ -4,6 +4,7 @@ def mergedPrNo = ''
 def pr = ''
 def version = ''
 def serviceName = 'ffc-jenkins-pipeline-library'
+def versionFileName = "VERSION"
 
 node {
   checkout scm
@@ -16,11 +17,11 @@ node {
       defraUtils.setGithubStatusPending()
     }
     stage('Set branch, PR, and containerTag variables') {
-      (pr, version, mergedPrNo) = defraUtils.getVariables(serviceName, defraUtils.getFileVersion())
+      (pr, version, mergedPrNo) = defraUtils.getVariables(serviceName, defraUtils.getFileVersion(versionFileName))
     }
     if (pr != '') {
       stage('Verify version incremented') {
-        defraUtils.verifyFileVersionIncremented()
+        defraUtils.verifyFileVersionIncremented(versionFileName)
       }
     }
     else {
