@@ -481,11 +481,9 @@ def versionHasIncremented(currVers, newVers) {
 }
 
 def attachTag(tag, commitSha) {
-  // git push origin :refs/tags/<name>
+  sh("git push origin :refs/tags/$tag"
   sh("git tag -f $tag $commitSha")
-  tags = sh(returnStdout: true, script: 'git tag $tag')
-  echo "$tags"
-  // git push origin <name>
+  sh("git push origin $tag")
 }
 
 def tagCommit(version) {
