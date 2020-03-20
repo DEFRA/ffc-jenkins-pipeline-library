@@ -17,7 +17,8 @@ node {
       defraUtils.setGithubStatusPending()
     }
     stage('Set PR and version variables') {
-      (pr, version, mergedPrNo) = defraUtils.getVariables(serviceName, defraUtils.getFileVersion(versionFileName))
+      (pr, containerTag, mergedPrNo) = defraUtils.getVariables(serviceName, defraUtils.getFileVersion(versionFileName))
+      version = defraUtils.getFileVersion(versionFileName)
     }
     if (pr != '') {
       stage('Verify version incremented') {
