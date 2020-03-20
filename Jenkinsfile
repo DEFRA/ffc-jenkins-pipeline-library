@@ -24,7 +24,7 @@ node {
       stage('Verify version incremented') {
         defraUtils.verifyFileVersionIncremented(versionFileName)
         // FIXME: this following line is here for testing only
-        defraUtils.tagCommit(version)
+        defraUtils.tagCommit(version, serviceName)
       }
     }
     else {

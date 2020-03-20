@@ -480,19 +480,20 @@ def versionHasIncremented(currVers, newVers) {
   }
 }
 
-def attachTag(tag, commitSha) {
+def attachTag(tag, commitSha, repoName) {
   dir('test123') {
     sshagent(['github-test']) {
-      sh("git clone git@github.com:DEFRA/ffc-jenkins-pipeline-library.git testdir1")
-      // sh("git push origin :refs/tags/$tag")
-      sh("cd testdir1 ; git tag -f $tag $commitSha")
-      sh("cd testdir1 ; git push origin $tag")
+      def dirName = "repo"
+      sh("git clone git@github.com:DEFRA/${repoName}.git $dirName")
+      sh("cd $dirName ; git push origin :refs/tags/$tag")
+      sh("cd $dirName ; git tag -f $tag $commitSha")
+      sh("cd $dirName ; git push origin $tag")
     }
     deleteDir()
   }
 }
 
-def tagCommit(version) {
+def tagCommit(version, repoName) {
   def versionList = version.tokenize('.')
   assert versionList.size() == 3
 
@@ -500,7 +501,8 @@ def tagCommit(version) {
   def minorTag = "${versionList[0]}.${versionList[1]}"
   def commitSha = getCommitSha()
 
-  attachTag(minorTag, commitSha)
+  attachTag(minorTag, commitSha, repoName)
+  attachTag(majorTag, commitSha, repoName)
 }
 
 return this
