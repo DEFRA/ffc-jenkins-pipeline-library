@@ -27,7 +27,6 @@ node {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
         ]) {
-          sh "echo $gitToken | base64"
           defraUtils.tagCommit(version, gitToken)
         }
       }
