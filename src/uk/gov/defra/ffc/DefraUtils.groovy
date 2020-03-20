@@ -195,14 +195,12 @@ def getPackageJsonVersionMaster() {
   return sh(returnStdout: true, script: "git show origin/master:package.json | jq -r '.version'").trim()
 }
 
-def getFileVersion() {
-  // TODO populate script
-  return sh(returnStdout: true, script: "").trim()
+def getFileVersion(fileName) {
+  return sh(returnStdout: true, script: "cat ${fileName}").trim()
 }
 
-def getFileVersionMaster() {
-  // TODO populate script
-  return sh(returnStdout: true, script: "").trim()
+def getFileVersionMaster(fileName) {
+  return sh(returnStdout: true, script: "git show origin/master:${fileName}").trim()
 }
 
 def verifyCSProjVersionIncremented(projectName) {
@@ -217,9 +215,9 @@ def verifyPackageJsonVersionIncremented() {
   errorOnNoVersionIncrement(masterVersion, version)
 }
 
-def verifyFileVersionIncremented() {
-  def masterVersion = getFileVersionMaster()
-  def version = getFileVersion()
+def verifyFileVersionIncremented(fileName) {
+  def masterVersion = getFileVersionMaster(fileName)
+  def version = getFileVersion(fileName)
   errorOnNoVersionIncrement(masterVersion, version)
 }
 
