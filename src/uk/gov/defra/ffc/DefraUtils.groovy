@@ -482,7 +482,7 @@ def versionHasIncremented(currVers, newVers) {
 
 def tagCommit(version) {
   def versionList = version.tokenize('.')
-  assert versionList.size == 3
+  assert versionList.size() == 3
 
   def majorTag = "${versionList[0]}"
   def minorTag = "${versionList[0]}.${versionList[1]}"
