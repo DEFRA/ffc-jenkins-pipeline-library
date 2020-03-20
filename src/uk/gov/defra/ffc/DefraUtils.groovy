@@ -482,7 +482,7 @@ def versionHasIncremented(currVers, newVers) {
 
 def attachTag(tag, commitSha, credentialsId) {
   dir('attachTag') {
-    checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[credentialsId: credentialsId]]]
+    checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[credentialsId: 'github-auth-token']]]
     // sh("git push origin :refs/tags/$tag")
     // sh("git tag -f $tag $commitSha")
     // sh("git push origin $tag")
@@ -490,7 +490,7 @@ def attachTag(tag, commitSha, credentialsId) {
   }
 }
 
-def tagCommit(version, credentialsId) {
+def tagCommit(version, gitToken) {
   def versionList = version.tokenize('.')
   assert versionList.size() == 3
 
@@ -498,7 +498,7 @@ def tagCommit(version, credentialsId) {
   def minorTag = "${versionList[0]}.${versionList[1]}"
   def commitSha = getCommitSha()
 
-  attachTag(minorTag, commitSha, credentialsId)
+  attachTag(minorTag, commitSha, gitToken)
 }
 
 return this
