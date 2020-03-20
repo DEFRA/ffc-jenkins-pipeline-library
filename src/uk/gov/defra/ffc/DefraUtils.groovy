@@ -480,7 +480,7 @@ def versionHasIncremented(currVers, newVers) {
   }
 }
 
-def attachTag(tag, commitSha, credentialsId) {
+def attachTag(tag, commitSha) {
   sshagent(['github-test']) {
     sh("git push origin :refs/tags/$tag")
       // sh("git tag -f $tag $commitSha")
@@ -488,7 +488,7 @@ def attachTag(tag, commitSha, credentialsId) {
   }
 }
 
-def tagCommit(version, gitToken) {
+def tagCommit(version) {
   def versionList = version.tokenize('.')
   assert versionList.size() == 3
 
@@ -496,7 +496,7 @@ def tagCommit(version, gitToken) {
   def minorTag = "${versionList[0]}.${versionList[1]}"
   def commitSha = getCommitSha()
 
-  attachTag(minorTag, commitSha, gitToken)
+  attachTag(minorTag, commitSha)
 }
 
 return this
