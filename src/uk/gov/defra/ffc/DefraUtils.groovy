@@ -481,17 +481,13 @@ def versionHasIncremented(currVers, newVers) {
 }
 
 def attachTag(tag, commitSha) {
-  sh("git push origin :refs/tags/$tag"
+  sh("git push origin :refs/tags/$tag")
   sh("git tag -f $tag $commitSha")
   sh("git push origin $tag")
 }
 
 def tagCommit(version) {
   def versionList = version.tokenize('.')
-
-  echo "$version"
-  echo "$versionList"
-
   assert versionList.size() == 3
 
   def majorTag = "${versionList[0]}"
