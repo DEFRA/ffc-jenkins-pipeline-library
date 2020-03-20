@@ -24,7 +24,11 @@ node {
       stage('Verify version incremented') {
         defraUtils.verifyFileVersionIncremented(versionFileName)
         // FIXME: this following line is here for testing only
-        defraUtils.tagCommit(version, 'github-auth-token')
+        withCredentials([
+          string(credentialsId: 'github-auth-token', variable: 'gitToken')
+        ]) {
+          defraUtils.tagCommit(version, gitToken)
+        }
       }
     }
     else {
