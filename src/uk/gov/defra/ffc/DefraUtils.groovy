@@ -485,7 +485,6 @@ def attachTag(tag, commitSha, credentialsId) {
     sh("git push origin :refs/tags/$tag")
       // sh("git tag -f $tag $commitSha")
       // sh("git push origin $tag")
-    }
   }
 }
 
