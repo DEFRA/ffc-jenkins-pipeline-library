@@ -480,8 +480,17 @@ def versionHasIncremented(currVers, newVers) {
   }
 }
 
-def tagCommit(version, commitSha) {
-  // TODO take full semver in version parameter, determine major and minor tags and move/create on commit.
+def tagCommit(version) {
+  def versionList = version.tokenize('.')
+  assert versionList.size == 3
+
+  def majorTag = "${versionList[0]}"
+  def minorTag = "${versionList[0]}.${versionList[1]}"
+  def commitSha = getCommitSha()
+
+  echo "$commitSha"
+  echo "$majorTag"
+  echo "$minorTag"
 }
 
 return this

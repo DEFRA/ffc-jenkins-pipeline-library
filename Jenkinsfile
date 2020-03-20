@@ -16,12 +16,14 @@ node {
     stage('Set GitHub status as pending'){
       defraUtils.setGithubStatusPending()
     }
-    stage('Set branch, PR, and containerTag variables') {
+    stage('Set PR and version variables') {
       (pr, version, mergedPrNo) = defraUtils.getVariables(serviceName, defraUtils.getFileVersion(versionFileName))
     }
     if (pr != '') {
       stage('Verify version incremented') {
         defraUtils.verifyFileVersionIncremented(versionFileName)
+        // FIXME: this following line is here for testing only
+        defraUtils.tagCommit(version)
       }
     }
     else {
@@ -29,7 +31,8 @@ node {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
         ]) {
-          defraUtils.triggerRelease(containerTag, serviceName, containerTag, gitToken)
+          defraUtils.triggerRelease(version, serviceName, version, gitToken)
+          // defraUtils.tagCommit(version)
         }
       }
     }
