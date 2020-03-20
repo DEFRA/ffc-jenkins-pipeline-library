@@ -454,6 +454,10 @@ def notifySlackBuildFailure(exception, channel) {
 }
 
 def versionHasIncremented(currVers, newVers) {
+  // first version is valid, i.e. currVers will be empty
+  if (currVers == '') {
+    return true
+  }
   try {
     currVersList = currVers.tokenize('.').collect { it.toInteger() }
     newVersList = newVers.tokenize('.').collect { it.toInteger() }
