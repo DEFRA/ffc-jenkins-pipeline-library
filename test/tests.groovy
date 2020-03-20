@@ -13,6 +13,7 @@ def testVersionHasIncremented(du) {
   assert du.versionHasIncremented('1.0.0', '2x.0.0') == false
   assert du.versionHasIncremented('1.0.0.0', '2.0.0') == false
   assert du.versionHasIncremented('1.0.0', '2.0.0.0') == false
+  assert du.versionHasIncremented('', '0.0.1') == true
 }
 
 def testTerraformInputVariables(du) {
