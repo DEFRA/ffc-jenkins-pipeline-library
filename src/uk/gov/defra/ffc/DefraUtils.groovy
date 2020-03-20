@@ -482,7 +482,7 @@ def versionHasIncremented(currVers, newVers) {
 
 def attachTag(tag, commitSha, credentialsId) {
   dir('attachTag') {
-    checkout scm: [credentialsId: credentialsId]
+    checkout scm: [$class: 'GitSCM', credentialsId: credentialsId]
     // sh("git push origin :refs/tags/$tag")
     // sh("git tag -f $tag $commitSha")
     // sh("git push origin $tag")
