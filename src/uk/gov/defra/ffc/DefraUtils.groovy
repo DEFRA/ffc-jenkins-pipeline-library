@@ -483,7 +483,7 @@ def versionHasIncremented(currVers, newVers) {
 def tagCommit(tag, commitSha, repoName) {
   dir('attachTag') {
     sshagent(['github-test']) {
-      git url: repoName
+      git url: "git@github.com:DEFRA/${repoName}.git"
       sh("git push origin :refs/tags/$tag")
       sh("git tag -f $tag $commitSha")
       sh("git push origin $tag")
