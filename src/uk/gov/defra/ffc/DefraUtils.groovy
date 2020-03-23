@@ -458,7 +458,7 @@ def notifySlackBuildFailure(exception, channel) {
           (<${BUILD_URL}|Open>)"""
 
   if(branch == "master") {
-    msg = '@here '.concat(msg);
+    msg = "@here ${msg}"
     channel = "#masterbuildfailures"
   }
 

@@ -30,7 +30,6 @@ node {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
         ]) {
-          defraUtils.verifyFileVersionIncremented(versionFileName)
           defraUtils.triggerRelease(version, serviceName, version, gitToken)
           defraUtils.addSemverTags(version, serviceName)
         }
