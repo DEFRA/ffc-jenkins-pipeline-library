@@ -23,7 +23,6 @@ node {
     if (pr != '') {
       stage('Verify version incremented') {
         defraUtils.verifyFileVersionIncremented(versionFileName)
-        defraUtils.addSemverTags(version, serviceName)
       }
     }
     else {
@@ -31,8 +30,9 @@ node {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
         ]) {
+          defraUtils.verifyFileVersionIncremented(versionFileName)
           defraUtils.triggerRelease(version, serviceName, version, gitToken)
-          // defraUtils.addSemverTags(version, serviceName)
+          defraUtils.addSemverTags(version, serviceName)
         }
       }
     }

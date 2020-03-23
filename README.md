@@ -9,12 +9,15 @@ Common scripts for use in Jenkins pipelines used in build and deployment.
 Register the library as a global pipeline library in the Jenkins Global Configuration.
 
 Import the library with the `@library` annotation, including an optional tag or branch.
+Semver tags are created for each release, so you can target the `MAJOR`, `MINOR` or `PATCH` of a release.
 All the examples below are valid, assuming the global pipeline library has been imported as `defra-library`:
 
 ```
 @Library('defra-library')
 @Library('defra-library@master')
-@Library('defra-library@0.0.1')
+@Library('defra-library@3.1.2')
+@Library('defra-library@3.1')
+@Library('defra-library@3')
 ```
 
 Import and instantiate the library:
@@ -42,6 +45,29 @@ A simple test harness may be run to unit test functions that are purely `groovy`
 ```
 
 ## Functions
+
+### tagCommit
+
+Attaches a tag to a specified commit on a repo in the DEFRA github account. If the provided tag alreay exists on origin, it is deleted and reattached to the given commit SHA. If the tag does not exist on origin, it is created and pushed to origin.
+
+It takes three parameters:
+  * a string containing the tag to attach to the commit
+  * a string containing the commit SHA
+  * a string containing the name of the repository (assumed to be in the DEFRA github account)
+
+### addSemverTags
+
+Attached a `MAJOR` and `MINOR` version tag to the lastest commit to a repo in the DEFRA github account. It uses `tagCommit` to perform the commit tagging on origin.
+
+Examples:
+  * provided with a `PATCH` increment to a verion (e.g. `2.3.5` to `2.3.6`), the `MAJOR` and `MINOR` tags (`2` and `2.3`) will be moved to the latest commit.
+  * provided with a `MINOR` increment to a verion (e.g. `2.3.5` to `2.4.0`), the `MAJOR` tag (`2`) will be moved and the `MINOR` tag (`2.4`) will be created and attached to the latest commit.
+  * provided with a `MAJOR` increment to a verion (e.g. `2.3.5` to `3.0.0`), the `MAJOR` and `MINOR` tags (`3` and `3.0`) will be created and attached to the latest commit.
+
+It takes two parameters:
+  * a string containing the current semver version for the release formatted as `MAJOR.MINOR.PATCH`
+  * a string containing the name of the repository (assumed to be in the DEFRA github account)
+
 
 ### provisionPrSqsQueue
 This will provision sqs queues for a pull request, so any testing of the PR can be carried out in isolation.
@@ -124,9 +150,37 @@ If the version has not incremented correctly, or is invalid, an error will be th
 
 `version increment invalid '1.0.0' -> '1.0.0'`.
 
+### getFileVersion
+
+Returns the contents of a given file. The assumption is that this file contains a single string that is a semver formatted version number: `MAJOR.MINOR.PATCH`.
+
+It takes one parameter:
+  * a string containing the file name of the file containing the version number
+
+### getFileVersionMaster
+
+Returns the contents of a given file in the master branch. The assumption is that this file contains a single string that is a semver formatted version number: `MAJOR.MINOR.PATCH`.
+
+It takes one parameter:
+  * a string containing the file name of the file containing the version number
+
+### verifyFileVersionIncremented
+
+Compares the master version with the branch version defined in a given file.
+If the version has been incremented correctly message will be `echoed` displaying the new and the old version, i.e.
+
+`version increment valid '1.0.0' -> '1.0.1'`.
+
+If the version has not incremented correctly, or is invalid, an error will be thrown containing the new and the old versions, i.e.
+
+`version increment invalid '1.0.0' -> '1.0.0'`.
+
+It takes one parameter:
+  * a string containing the file name of the file containing the version number
+
 ### versionHasIncremented
 
-Function used internally in the `verifyCSProjVersionIncremented` and `verifyPackageJsonVersionIncremented` functions.
+Function used internally in the `verifyCSProjVersionIncremented`, `verifyPackageJsonVersionIncremented` and `verifyFileVersionIncremented` functions.
 
 Takes two parameters of the versions to compare, typically master version and branch version.
 
