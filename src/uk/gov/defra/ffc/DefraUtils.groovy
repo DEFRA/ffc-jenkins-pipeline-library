@@ -487,11 +487,6 @@ def tagCommit(tag, commitSha, repoName) {
       sh("git push origin :refs/tags/$tag")
       sh("git tag -f $tag $commitSha")
       sh("git push origin $tag")
-      // def dirName = "repo"
-      // sh("git clone git@github.com:DEFRA/${repoName}.git $dirName")
-      // sh("cd $dirName ; git push origin :refs/tags/$tag")
-      // sh("cd $dirName ; git tag -f $tag $commitSha")
-      // sh("cd $dirName ; git push origin $tag")
     }
     deleteDir()
   }
