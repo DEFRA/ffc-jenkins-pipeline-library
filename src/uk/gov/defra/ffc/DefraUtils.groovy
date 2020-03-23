@@ -195,6 +195,14 @@ def getPackageJsonVersionMaster() {
   return sh(returnStdout: true, script: "git show origin/master:package.json | jq -r '.version'").trim()
 }
 
+def getFileVersion(fileName) {
+  return sh(returnStdout: true, script: "cat ${fileName}").trim()
+}
+
+def getFileVersionMaster(fileName) {
+  return sh(returnStdout: true, script: "git show origin/master:${fileName}").trim()
+}
+
 def verifyCSProjVersionIncremented(projectName) {
   def masterVersion = getCSProjVersionMaster(projectName)
   def version = getCSProjVersion(projectName)
@@ -204,6 +212,12 @@ def verifyCSProjVersionIncremented(projectName) {
 def verifyPackageJsonVersionIncremented() {
   def masterVersion = getPackageJsonVersionMaster()
   def version = getPackageJsonVersion()
+  errorOnNoVersionIncrement(masterVersion, version)
+}
+
+def verifyFileVersionIncremented(fileName) {
+  def masterVersion = getFileVersionMaster(fileName)
+  def version = getFileVersion(fileName)
   errorOnNoVersionIncrement(masterVersion, version)
 }
 
@@ -469,6 +483,30 @@ def versionHasIncremented(currVers, newVers) {
   catch (Exception ex) {
     return false
   }
+}
+
+def tagCommit(tag, commitSha, repoName) {
+  dir('attachTag') {
+    sshagent(['ffc-jenkins-pipeline-library-deploy-key']) {
+      git credentialsId: 'ffc-jenkins-pipeline-library-deploy-key', url: "git@github.com:DEFRA/${repoName}.git"
+      sh("git push origin :refs/tags/$tag")
+      sh("git tag -f $tag $commitSha")
+      sh("git push origin $tag")
+    }
+    deleteDir()
+  }
+}
+
+def addSemverTags(version, repoName) {
+  def versionList = version.tokenize('.')
+  assert versionList.size() == 3
+
+  def majorTag = "${versionList[0]}"
+  def minorTag = "${versionList[0]}.${versionList[1]}"
+  def commitSha = getCommitSha()
+
+  tagCommit(minorTag, commitSha, repoName)
+  tagCommit(majorTag, commitSha, repoName)
 }
 
 return this
