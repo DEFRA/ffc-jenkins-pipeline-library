@@ -480,20 +480,24 @@ def versionHasIncremented(currVers, newVers) {
   }
 }
 
-def attachTag(tag, commitSha, repoName) {
+def tagCommit(tag, commitSha, repoName) {
   dir('attachTag') {
     sshagent(['github-test']) {
-      def dirName = "repo"
-      sh("git clone git@github.com:DEFRA/${repoName}.git $dirName")
-      sh("cd $dirName ; git push origin :refs/tags/$tag")
-      sh("cd $dirName ; git tag -f $tag $commitSha")
-      sh("cd $dirName ; git push origin $tag")
+      git url: reopName
+      sh("git push origin :refs/tags/$tag")
+      sh("git tag -f $tag $commitSha")
+      sh("git push origin $tag")
+      // def dirName = "repo"
+      // sh("git clone git@github.com:DEFRA/${repoName}.git $dirName")
+      // sh("cd $dirName ; git push origin :refs/tags/$tag")
+      // sh("cd $dirName ; git tag -f $tag $commitSha")
+      // sh("cd $dirName ; git push origin $tag")
     }
     deleteDir()
   }
 }
 
-def tagCommit(version, repoName) {
+def addSemverTags(version, repoName) {
   def versionList = version.tokenize('.')
   assert versionList.size() == 3
 
@@ -501,8 +505,8 @@ def tagCommit(version, repoName) {
   def minorTag = "${versionList[0]}.${versionList[1]}"
   def commitSha = getCommitSha()
 
-  attachTag(minorTag, commitSha, repoName)
-  attachTag(majorTag, commitSha, repoName)
+  tagCommit(minorTag, commitSha, repoName)
+  tagCommit(majorTag, commitSha, repoName)
 }
 
 return this
