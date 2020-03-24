@@ -351,7 +351,7 @@ def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     def deploymentName = "$chartName-$tag"
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-    sh "helm3 upgrade $deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
+    sh "helm3 upgrade $deploymentName --install --atomic                        ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
   }
 }
 
@@ -390,10 +390,9 @@ def publishChart(registry, chartName, tag) {
 
 def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
   withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
-    sh "helm3 repo add ffc-demo $HELM_CHART_REPO"
+    sh "helm3 repo add ffc $HELM_CHART_REPO"
     sh "helm3 repo update"
-    sh "helm3 fetch --untar ffc-demo/$chartName --version $chartVersion"
-    sh "helm3 upgrade --install --recreate-pods --wait --atomic $chartName --set namespace=$namespace ./$chartName $extraCommands"
+    sh "helm3 upgrade $deploymentName --install --atomic $chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
   }
 }
 
