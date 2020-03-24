@@ -392,7 +392,7 @@ def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
   withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
     sh "helm3 repo add ffc $HELM_CHART_REPO"
     sh "helm3 repo update"
-    sh "helm3 upgrade $deploymentName --install --atomic $chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
+    sh "helm3 upgrade --install --atomic $chartName --set namespace=./$chartName $extraCommands"
   }
 }
 
