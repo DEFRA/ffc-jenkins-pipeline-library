@@ -433,7 +433,8 @@ def releaseExists(containerTag, repoName, token){
 
 def triggerRelease(containerTag, repoName, releaseDescription, token){
     if (releaseExists(containerTag, repoName, token)){
-      throw new Exception("Release failed: release $containerTag already exists")
+      echo "Release $containerTag already exists"
+      return false
     }
 
     echo "Triggering release $containerTag for $repoName"
@@ -446,6 +447,8 @@ def triggerRelease(containerTag, repoName, releaseDescription, token){
     } else {
       throw new Exception("Release failed")
     }
+
+    return true
 }
 
 def notifySlackBuildFailure(exception, channel) {
