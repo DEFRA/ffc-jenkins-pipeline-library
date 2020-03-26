@@ -4,6 +4,10 @@
 
 Common scripts for use in Jenkins pipelines used in build and deployment.
 
+## Versioning
+
+The library is versioning following the [semantic versioning specification](https://semver.org/). When updating the library you will need to increment the version number in the `VERSION` file. Upon merge to the master branch a new github release will automatically be created tagged with the `MAJOR`, `MINOR` and `PATCH` versions. For example version `2.4.6` will have the tags `2`, `2.4` and `2.4.6`.
+
 ## Usage
 
 Register the library as a global pipeline library in the Jenkins Global Configuration.
@@ -57,7 +61,7 @@ It takes three parameters:
 
 ### addSemverTags
 
-Attached a `MAJOR` and `MINOR` version tag to the lastest commit to a repo in the DEFRA github account. It uses `tagCommit` to perform the commit tagging on origin.
+Attaches a `MAJOR` and `MINOR` version tag to the lastest commit to a repo in the DEFRA github account. It uses `tagCommit` to perform the commit tagging on origin.
 
 Examples:
   * provided with a `PATCH` increment to a verion (e.g. `2.3.5` to `2.3.6`), the `MAJOR` and `MINOR` tags (`2` and `2.3`) will be moved to the latest commit.
