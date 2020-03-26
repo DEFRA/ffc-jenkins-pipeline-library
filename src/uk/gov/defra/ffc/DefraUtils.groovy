@@ -434,7 +434,7 @@ def releaseExists(containerTag, repoName, token){
 def triggerRelease(containerTag, repoName, releaseDescription, token){
     if (releaseExists(containerTag, repoName, token)){
       echo "Release $containerTag already exists"
-      return
+      throw new Exception("Release failed")
     }
 
     echo "Triggering release $containerTag for $repoName"
