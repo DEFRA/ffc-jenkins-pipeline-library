@@ -30,8 +30,11 @@ node {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
         ]) {
-          defraUtils.triggerRelease(version, serviceName, version, gitToken)
-          defraUtils.addSemverTags(version, serviceName)
+          def releaseSuccess = defraUtils.triggerRelease(version, serviceName, version, gitToken)
+
+          if (releaseSuccess) {
+            defraUtils.addSemverTags(version, serviceName)
+          }
         }
       }
     }
