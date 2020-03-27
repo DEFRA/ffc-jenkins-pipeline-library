@@ -406,7 +406,7 @@ def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
   withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
     sh "helm3 repo add ffc $HELM_CHART_REPO"
     sh "helm3 repo update"
-    sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
+    sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
     sh "helm3 upgrade --namespace=$namespace --install --atomic $chartName --set namespace=$namespace ffc/$chartName $extraCommands"
   }
 }
