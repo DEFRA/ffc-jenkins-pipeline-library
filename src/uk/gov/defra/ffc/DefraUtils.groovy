@@ -365,6 +365,9 @@ def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
   withKubeConfig([credentialsId: credentialsId]) {
     def deploymentName = "$chartName-$tag"
     sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
+    sh "helm3 repo add ffc https://raw.githubusercontent.com/defra/ffc-helm-repository/master/"
+    sh "helm3 repo update"
+    sh "helm3 dependency update ./helm/$chartName"
     sh "helm3 upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
   }
 }
