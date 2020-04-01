@@ -160,7 +160,6 @@ def provisionPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCred
 
     def setSearchPathCmd = "ALTER ROLE $prUser SET search_path TO $prSchema"
     runPsqlCommand(dbHost, dbUser, dbName, setSearchPathCmd)
-
   }
 
   return generatePrNames(dbName, prCode)
