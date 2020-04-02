@@ -1,22 +1,14 @@
-// utility function - not part of public interface
-def updateGithubCommitStatus(message, state) {
-  step([
-    $class: 'GitHubCommitStatusSetter',
-    reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
-    commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
-    errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
-    statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
-  ])
-}
+import uk.gov.defra.ffc.GitHub
+def gh = new GitHub()
 
 def setStatusSuccess(message = 'Build successful') {
-  updateGithubCommitStatus(message, 'SUCCESS')
+  gh.updateCommitStatus(message, 'SUCCESS')
 }
 
 def setStatusPending(message = 'Build started') {
-  updateGithubCommitStatus(message, 'PENDING')
+  gh.updateCommitStatus(message, 'PENDING')
 }
 
 def setStatusFailure(message = '') {
-  updateGithubCommitStatus(message, 'FAILURE')
+  gh.updateCommitStatus(message, 'FAILURE')
 }

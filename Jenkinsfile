@@ -1,4 +1,5 @@
 def defraUtils
+def github
 
 def mergedPrNo = ''
 def pr = ''
@@ -13,8 +14,11 @@ node {
     stage('Load defraUtils functions') {
       defraUtils = load 'src/uk/gov/defra/ffc/DefraUtils.groovy'
     }
+    stage('Load GitHub global vars') {
+      github = load 'github'
+    }
     stage('Set GitHub status as pending'){
-      defraUtils.setGithubStatusPending()
+      github.setStatusPending()
     }
     stage('Set PR and version variables') {
       (pr, containerTag, mergedPrNo) = defraUtils.getVariables(serviceName, defraUtils.getFileVersion(versionFileName))
@@ -39,7 +43,7 @@ node {
       }
     }
     stage('Set GitHub status as success'){
-      defraUtils.setGithubStatusSuccess()
+      github.setStatusSuccess()
     }
   } catch(e) {
     defraUtils.setGithubStatusFailure(e.message)

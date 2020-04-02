@@ -239,12 +239,10 @@ def getMergedPrNo() {
 }
 
 def getRepoUrl() {
-  echo "getRepoUrl..."
   return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
 }
 
 def getCommitSha() {
-  echo "getCommitSha..."
   return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
 }
 
@@ -264,7 +262,6 @@ def verifyCommitBuildable() {
 }
 
 def getVariables(repoName, version) {
-    echo "getVariables..."
     branch = BRANCH_NAME
     // use the git API to get the open PR for a branch
     // Note: This will cause issues if one branch has two open PRs
@@ -285,9 +282,6 @@ def getVariables(repoName, version) {
 }
 
 def updateGithubCommitStatus(message, state) {
-  echo "updateGithubCommitStatus..."
-  echo "repoUrl: $repoUrl"
-  echo "commitSha: $commitSha"
   step([
     $class: 'GitHubCommitStatusSetter',
     reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
@@ -302,9 +296,6 @@ def setGithubStatusSuccess(message = 'Build successful') {
 }
 
 def setGithubStatusPending(message = 'Build started') {
-  echo "setGithubStatusPending..."
-  // echo "repoUrl: $repoUrl"
-  echo "commitSha: $commitSha"
   updateGithubCommitStatus(message, 'PENDING')
 }
 
