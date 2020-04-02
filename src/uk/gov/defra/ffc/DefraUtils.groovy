@@ -247,7 +247,7 @@ def getRepoUrl() {
 }
 
 def getRepoName(repoUrl) {
-  return sh(returnStdout: true, script: "$(basename "$repoUrl" ".${repoUrl##*.}")").trim()
+  return sh(returnStdout: true, script: $(basename "$repoUrl" ".${repoUrl##*.}")).trim()
 }
 
 def getCommitSha() {
