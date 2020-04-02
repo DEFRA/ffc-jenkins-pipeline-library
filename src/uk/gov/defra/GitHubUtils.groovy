@@ -1,4 +1,4 @@
-package uk.gov.defra.ffc
+package uk.gov.defra
 
 def repoUrl
 def commitSha
