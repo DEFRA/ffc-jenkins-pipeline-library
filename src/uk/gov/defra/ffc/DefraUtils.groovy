@@ -239,6 +239,7 @@ def getMergedPrNo() {
 }
 
 def getRepoUrl() {
+  echo "getRepoUrl..."
   return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
 }
 
@@ -262,6 +263,7 @@ def verifyCommitBuildable() {
 }
 
 def getVariables(repoName, version) {
+    echo "getVariables..."
     branch = BRANCH_NAME
     // use the git API to get the open PR for a branch
     // Note: This will cause issues if one branch has two open PRs
