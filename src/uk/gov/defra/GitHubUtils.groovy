@@ -5,6 +5,11 @@ def utils = new Utils()
 
 def serviceName = 'ffc-jenkins-pipeline-library'
 def versionFileName = 'VERSION'
+def pr = ''
+def containerTag = ''
+def mergedPrNo = ''
+def repoUrl = ''
+def commitSha = ''
 
 def updateCommitStatus(message, state) {
   def version = utils.getFileVersion(versionFileName)
