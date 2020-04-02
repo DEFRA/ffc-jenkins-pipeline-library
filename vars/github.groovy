@@ -1,4 +1,4 @@
-import uk.gov.defra.ffc.GitHub
+import uk.gov.defra.GitHub
 def gh = new GitHub()
 
 def setStatusSuccess(message = 'Build successful') {
