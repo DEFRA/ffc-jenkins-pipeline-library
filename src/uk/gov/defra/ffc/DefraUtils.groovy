@@ -246,7 +246,7 @@ def getRepoUrl() {
   return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
 }
 
-def getRepoUrl(repoUrl) {
+def getRepoName(repoUrl) {
   return sh(returnStdout: true, script: "$(basename "$repoUrl" ".${repoUrl##*.}")").trim()
 }
 
