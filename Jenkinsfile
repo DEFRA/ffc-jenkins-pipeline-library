@@ -15,7 +15,7 @@ node {
       defraUtils = load 'src/uk/gov/defra/ffc/DefraUtils.groovy'
     }
     stage('Load GitHub global vars') {
-      github = load 'github'
+      github = load 'github.groovy'
     }
     stage('Set GitHub status as pending'){
       github.setStatusPending()
