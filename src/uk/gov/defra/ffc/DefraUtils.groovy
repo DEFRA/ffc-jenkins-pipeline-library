@@ -3,6 +3,7 @@ def branch = ''
 def pr = ''
 def mergedPrNo = ''
 def containerTag = ''
+def repoName = ''
 def repoUrl = ''
 def commitSha = ''
 def workspace
@@ -284,8 +285,9 @@ def getVariables(repoName, version) {
 
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
+    repoName = getRepoName(repoUrl)
     commitSha = getCommitSha()
-    return [pr, containerTag, mergedPrNo]
+    return [repoName, pr, containerTag, mergedPrNo]
 }
 
 def updateGithubCommitStatus(message, state) {
