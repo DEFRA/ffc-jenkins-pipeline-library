@@ -282,6 +282,9 @@ def getVariables(repoName, version) {
 }
 
 def updateGithubCommitStatus(message, state) {
+  echo "updateGithubCommitStatus..."
+  echo "repoUrl: $repoUrl"
+  echo "commitSha: $commitSha"
   step([
     $class: 'GitHubCommitStatusSetter',
     reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
@@ -296,6 +299,9 @@ def setGithubStatusSuccess(message = 'Build successful') {
 }
 
 def setGithubStatusPending(message = 'Build started') {
+  echo "setGithubStatusPending..."
+  echo "repoUrl: $repoUrl"
+  echo "commitSha: $commitSha"
   updateGithubCommitStatus(message, 'PENDING')
 }
 
