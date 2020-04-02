@@ -245,6 +245,10 @@ def getRepoUrl() {
   return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
 }
 
+def getRepoUrl(repoUrl) {
+  return sh(returnStdout: true, script: "$(basename "$repoUrl" ".${repoUrl##*.}")").trim()
+}
+
 def getCommitSha() {
   return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
 }
