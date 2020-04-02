@@ -1,6 +1,6 @@
 package uk.gov.defra.ffc
 def branch = ''
-def pr = ''
+def pr = 'PSD-622-migrate-to-sonarcloud-poc'
 def mergedPrNo = ''
 def containerTag = ''
 def repoUrl = ''
@@ -341,6 +341,18 @@ def analyseCode(sonarQubeEnv, sonarScanner, params) {
     def args = ''
     params.each { param ->
       args = args + " -D$param.key=$param.value"
+    }
+
+    sh "${scannerHome}/bin/sonar-scanner$args"
+  }
+}
+
+def analyseCodeWithSonarCloud(sonarCloudEnv, sonarScanner, params) {
+  def scannerHome = tool sonarScanner
+  withSonarQubeEnv(sonarCloudEnv) {
+    def args = ''
+    params.each { param ->
+      args = args + " -X -D$param.key=$param.value"
     }
 
     sh "${scannerHome}/bin/sonar-scanner$args"
