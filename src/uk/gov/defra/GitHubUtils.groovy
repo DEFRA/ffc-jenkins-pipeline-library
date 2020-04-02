@@ -1,5 +1,8 @@
 package uk.gov.defra.ffc
 
+def repoUrl
+def commitSha
+
 def updateCommitStatus(message, state) {
   step([
     $class: 'GitHubCommitStatusSetter',
