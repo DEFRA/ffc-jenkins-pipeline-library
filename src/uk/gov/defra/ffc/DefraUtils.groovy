@@ -1,6 +1,6 @@
 package uk.gov.defra.ffc
 def branch = ''
-def pr = 'PSD-622-migrate-to-sonarcloud-poc'
+def pr = '47'
 def mergedPrNo = ''
 def containerTag = ''
 def repoUrl = ''
