@@ -4,6 +4,8 @@ def pr = ''
 def mergedPrNo = ''
 def repoUrl = ''
 def commitSha = ''
+def branch = ''
+def containerTag = ''
 
 def verifyCommitBuildable() {
   if (pr) {
