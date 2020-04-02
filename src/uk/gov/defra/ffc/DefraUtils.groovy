@@ -244,6 +244,7 @@ def getRepoUrl() {
 }
 
 def getCommitSha() {
+  echo "getCommitSha..."
   return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
 }
 
@@ -302,7 +303,7 @@ def setGithubStatusSuccess(message = 'Build successful') {
 
 def setGithubStatusPending(message = 'Build started') {
   echo "setGithubStatusPending..."
-  echo "repoUrl: $repoUrl"
+  // echo "repoUrl: $repoUrl"
   echo "commitSha: $commitSha"
   updateGithubCommitStatus(message, 'PENDING')
 }
