@@ -80,5 +80,3 @@ def setGithubStatusPending(message = 'Build started') {
 def setGithubStatusFailure(message = '') {
   updateGithubCommitStatus(message, 'FAILURE')
 }
-
-return this
