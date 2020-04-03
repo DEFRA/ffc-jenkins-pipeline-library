@@ -11,7 +11,7 @@ def releaseExists(containerTag, repoName, token){
 }
 
 // public
-def triggerRelease(containerTag, repoName, releaseDescription, token){
+def trigger(containerTag, repoName, releaseDescription, token){
   if (releaseExists(containerTag, repoName, token)){
     echo "Release $containerTag already exists"
     return false
