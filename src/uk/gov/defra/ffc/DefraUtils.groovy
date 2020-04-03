@@ -3,7 +3,6 @@ def branch = ''
 def pr = ''
 def mergedPrNo = ''
 def containerTag = ''
-def repoName = ''
 def repoUrl = ''
 def commitSha = ''
 def workspace
@@ -246,10 +245,6 @@ def getRepoUrl() {
   return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
 }
 
-def getRepoName(repoUrl) {
-  return scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.")[0]
-}
-
 def getCommitSha() {
   return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
 }
@@ -285,9 +280,8 @@ def getVariables(repoName, version) {
 
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
-    repoName = getRepoName(repoUrl)
     commitSha = getCommitSha()
-    return [repoName, pr, containerTag, mergedPrNo]
+    return [pr, containerTag, mergedPrNo]
 }
 
 def updateGithubCommitStatus(message, state) {
