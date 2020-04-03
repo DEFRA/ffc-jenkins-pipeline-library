@@ -13,7 +13,7 @@ def runPsqlCommand(dbHost, dbUser, dbName, sqlCmd) {
 // The design rationale for the behaviour of this function is documented here:
 // https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres
 // public
-def provisionPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, useIfNotExists=false) {
+def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, useIfNotExists=false) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
@@ -50,7 +50,7 @@ def provisionPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCred
 // The design rationale for the behaviour of this function is documented here:
 // https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres
 // public
-def destroyPrDatabaseRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
+def destroyPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
