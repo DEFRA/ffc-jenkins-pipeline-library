@@ -4,13 +4,6 @@ def lintHelm(chartName) {
 }
 
 // public
-def buildTestImage(credentialsId, registry, projectName, buildNumber) {
-  docker.withRegistry("https://$registry", credentialsId) {
-    sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache"
-  }
-}
-
-// public
 def runTests(projectName, serviceName, buildNumber) {
   try {
     sh 'mkdir -p test-output'
