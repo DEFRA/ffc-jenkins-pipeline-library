@@ -19,7 +19,7 @@ def getRepoUrl() {
 }
 
 // private
-def getRepoName(repoUrl) {
+def getRepoName() {
   return scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
 }
 
@@ -57,7 +57,7 @@ def getVariables(repoName, version) {
 
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
-    repoName = getRepoName(repoUrl)
+    repoName = getRepoName()
     commitSha = getCommitSha()
     return [repoName, pr, containerTag, mergedPrNo]
 }
