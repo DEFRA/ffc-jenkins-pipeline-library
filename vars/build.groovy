@@ -3,7 +3,6 @@ def pr = ''
 def mergedPrNo = ''
 def containerTag = ''
 def repoUrl = ''
-def repoName = ''
 def commitSha = ''
 def workspace
 
