@@ -29,21 +29,21 @@ def getFileVersionMaster(fileName) {
 }
 
 // public
-def verifyCSProjVersionIncremented(projectName) {
+def verifyCSProjIncremented(projectName) {
   def masterVersion = getCSProjVersionMaster(projectName)
   def version = getCSProjVersion(projectName)
   errorOnNoVersionIncrement(masterVersion, version)
 }
 
 // public
-def verifyPackageJsonVersionIncremented() {
+def verifyPackageJsonIncremented() {
   def masterVersion = getPackageJsonVersionMaster()
   def version = getPackageJsonVersion()
   errorOnNoVersionIncrement(masterVersion, version)
 }
 
 // public
-def verifyFileVersionIncremented(fileName) {
+def verifyFileIncremented(fileName) {
   def masterVersion = getFileVersionMaster(fileName)
   def version = getFileVersion(fileName)
   errorOnNoVersionIncrement(masterVersion, version)
@@ -51,7 +51,7 @@ def verifyFileVersionIncremented(fileName) {
 
 // private
 def errorOnNoVersionIncrement(masterVersion, version){
-  if (versionHasIncremented(masterVersion, version)) {
+  if (hasIncremented(masterVersion, version)) {
     echo "version increment valid '$masterVersion' -> '$version'"
   } else {
     error( "version increment invalid '$masterVersion' -> '$version'")
@@ -59,7 +59,7 @@ def errorOnNoVersionIncrement(masterVersion, version){
 }
 
 // private
-def versionHasIncremented(currVers, newVers) {
+def hasIncremented(currVers, newVers) {
   // For a newly created empty repository currVers will be empty on first merge to master
   // consider 'newVers' the first version and return true
   if (currVers == '') {

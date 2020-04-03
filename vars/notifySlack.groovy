@@ -1,5 +1,5 @@
 // public
-def notifySlackBuildFailure(exception, channel) {
+def buildFailure(exception, channel) {
   def msg = """BUILD FAILED
           ${JOB_NAME}/${BUILD_NUMBER}
           ${exception}
