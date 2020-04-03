@@ -3,6 +3,7 @@ def pr = ''
 def mergedPrNo = ''
 def containerTag = ''
 def repoUrl = ''
+def repoName = ''
 def commitSha = ''
 def workspace
 
@@ -15,6 +16,11 @@ def getMergedPrNo() {
 // private
 def getRepoUrl() {
   return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
+}
+
+// private
+def getRepoName() {
+  return scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
 }
 
 // private
@@ -51,8 +57,9 @@ def getVariables(repoName, version) {
 
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
+    repoName = getRepoName()
     commitSha = getCommitSha()
-    return [pr, containerTag, mergedPrNo]
+    return [repoName, pr, containerTag, mergedPrNo]
 }
 
 // private
