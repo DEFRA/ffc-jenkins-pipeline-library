@@ -413,10 +413,15 @@ def publishChart(registry, chartName, tag) {
 
 def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
   withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
-    sh "helm repo add ffc $HELM_CHART_REPO"
-    sh "helm repo update"
-    sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
-    sh "helm upgrade --namespace=$namespace --install --atomic $chartName --set namespace=$namespace ffc/$chartName $extraCommands"
+    sh "rm -rf tmp && mkdir tmp"
+    dir("tmp") {
+      sh "helm repo add ffc $HELM_CHART_REPO"
+      sh "helm repo update"
+      sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
+      sh "helm fetch --untar ffc/$chartName --version $chartVersion"
+      sh "helm upgrade --namespace=$namespace --install --atomic $chartName --set namespace=$namespace ./$chartName $extraCommands"
+      deleteDir()
+    }
   }
 }
 
