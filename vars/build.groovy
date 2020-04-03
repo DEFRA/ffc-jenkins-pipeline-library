@@ -20,7 +20,7 @@ def getRepoUrl() {
 
 // private
 def getRepoName(repoUrl) {
-  return scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.")[0]
+  return scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
 }
 
 // private
