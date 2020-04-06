@@ -350,9 +350,9 @@ def analyseCode(sonarQubeEnv, sonarScanner, params) {
 def analyseCodeWithSonarCloud(sonarCloudEnv, sonarScanner, params) {
   def scannerHome = tool sonarScanner
   withSonarQubeEnv(sonarCloudEnv) {
-    def args = ''
+    def args = '-X'
     params.each { param ->
-      args = args + " -X -D$param.key=$param.value"
+      args = args + " -D$param.key=$param.value"
     }
 
     sh "${scannerHome}/bin/sonar-scanner$args"
