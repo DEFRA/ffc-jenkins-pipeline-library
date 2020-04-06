@@ -1,8 +1,6 @@
 
 def test() {
-  stage('Print a message') {
-    sh('echo "hello world"')
-  }
+  sh('echo "hello world"')
 }
 
 def nodeStandard() {
