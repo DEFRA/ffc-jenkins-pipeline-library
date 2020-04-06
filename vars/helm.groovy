@@ -1,9 +1,28 @@
+def getExtraCommands(tag) {
+  def helmValues = [
+    /container.redeployOnChange="$pr-$BUILD_NUMBER"/,
+    /labels.version="$tag"/,
+    /pr="$tag"/
+  ].join(',')
+
+  return "--set $helmValues"
+}
+
+
 // public
-def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
+def deployChart(credentialsId, registry, chartName, tag) {
   withKubeConfig([credentialsId: credentialsId]) {
-    def deploymentName = "$chartName-$tag"
-    sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-    sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
+    def devValuesCredentialId = "$chartName-dev-values"
+    def prValuesCredentialId = "$chartName-pr-values"
+    withCredentials([
+      file(credentialsId: devValuesCredentialId, variable: devValues),
+      file(credentialsId: prValuesCredentialId, variable: prValues)
+    ]) {
+      def deploymentName = "$chartName-$tag"
+      def extraCommands = getExtraCommands(tag)
+      sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
+      sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName -f $devValues -f $prValues --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
+    }
   }
 }
 
