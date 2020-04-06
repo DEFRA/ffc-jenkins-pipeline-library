@@ -13,8 +13,8 @@ def deployChart(credentialsId, registry, chartName, tag) {
     def devValuesCredentialId = "$chartName-dev-values"
     def prValuesCredentialId = "$chartName-pr-values"
     withCredentials([
-      file(credentialsId: devValuesCredentialId, variable: 'devValues'),
-      file(credentialsId: prValuesCredentialId, variable: 'prValues')
+      file(credentialsId: '$chartName-dev-values', variable: 'devValues'),
+      file(credentialsId: '$chartName-pr-values', variable: 'prValues')
     ]) {
       def deploymentName = "$chartName-$tag"
       def extraCommands = getExtraCommands(chartName, tag)
