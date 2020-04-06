@@ -4,7 +4,7 @@ def test() {
 }
 
 def nodeStandard() {
-  def containerSrcFolder = '\\/home\\/node'
+  /* def containerSrcFolder = '\\/home\\/node'
   def containerTag = ''
   def dockerTestService = 'app'
   def lcovFile = './test-output/lcov.info'
@@ -22,7 +22,7 @@ def nodeStandard() {
     try {
       stage('Set GitHub status as pending') {
         build.setGithubStatusPending()
-      }
+      } */
       /* stage('Set PR, and containerTag variables') {
         (pr, containerTag, mergedPrNo) = defraUtils.getVariables(serviceName, defraUtils.getPackageJsonVersion())
         // Simulate merge to master
@@ -124,7 +124,7 @@ def nodeStandard() {
           defraUtils.undeployChart(KUBE_CREDENTIALS_ID, serviceName, mergedPrNo)
         }
       } */
-      stage('Set GitHub status as success') {
+      /*stage('Set GitHub status as success') {
         defraUtils.setGithubStatusSuccess()
       }
     } catch(e) {
@@ -134,5 +134,5 @@ def nodeStandard() {
     } finally {
       defraUtils.deleteTestOutput(serviceName, containerSrcFolder)
     }
-  }
+  }*/
 }
