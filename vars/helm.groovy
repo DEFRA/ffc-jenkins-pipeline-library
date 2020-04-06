@@ -1,7 +1,8 @@
-def getExtraCommands(tag) {
+def getExtraCommands(chartName, tag) {
   def helmValues = [
     /container.redeployOnChange="$pr-$BUILD_NUMBER"/,
     /labels.version="$tag"/,
+    /name="$chartName-$tag"/,
     /pr="$tag"/
   ].join(',')
 
@@ -19,7 +20,7 @@ def deployChart(credentialsId, registry, chartName, tag) {
       file(credentialsId: prValuesCredentialId, variable: prValues)
     ]) {
       def deploymentName = "$chartName-$tag"
-      def extraCommands = getExtraCommands(tag)
+      def extraCommands = getExtraCommands(chartName, tag)
       sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
       sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName -f $devValues -f $prValues --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
     }
