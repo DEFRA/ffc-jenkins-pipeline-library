@@ -10,11 +10,9 @@ def getExtraCommands(chartName, tag) {
 // public
 def deployChart(credentialsId, registry, chartName, tag) {
   withKubeConfig([credentialsId: credentialsId]) {
-    def devValuesCredentialId = "$chartName-dev-values"
-    def prValuesCredentialId = "$chartName-pr-values"
     withCredentials([
-      file(credentialsId: '$chartName-dev-values', variable: 'devValues'),
-      file(credentialsId: '$chartName-pr-values', variable: 'prValues')
+      file(credentialsId: "$chartName-dev-values", variable: 'devValues'),
+      file(credentialsId: "$chartName-pr-values", variable: 'prValues')
     ]) {
       def deploymentName = "$chartName-$tag"
       def extraCommands = getExtraCommands(chartName, tag)
@@ -62,9 +60,8 @@ def publishChart(registry, chartName, tag) {
 // public
 def deployRemoteChart(credentialsId, environment, namespace, chartName, chartVersion) {
   withKubeConfig([credentialsId: credentialsId]) {
-    def valuesCredentialId = "$chartName-$environment-values"
     withCredentials([
-      file(credentialsId: valuesCredentialId, variable: 'values')
+      file(credentialsId: "$chartName-$environment-values", variable: 'values')
     ]) {
       def extraCommands = getExtraCommands(chartName, chartVersion)
       sh "helm repo add ffc $HELM_CHART_REPO"
