@@ -1,14 +1,11 @@
 def getExtraCommands(chartName, tag) {
   def helmValues = [
     /container.redeployOnChange="$tag-$BUILD_NUMBER"/,
-    /labels.version="$tag"/,
-    /name="$chartName-$tag"/,
-    /pr="$tag"/
+    /labels.version="$tag"/
   ].join(',')
 
   return "--set $helmValues"
 }
-
 
 // public
 def deployChart(credentialsId, registry, chartName, tag) {
@@ -22,7 +19,7 @@ def deployChart(credentialsId, registry, chartName, tag) {
       def deploymentName = "$chartName-$tag"
       def extraCommands = getExtraCommands(chartName, tag)
       sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-      sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName -f $devValues -f $prValues --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
+      sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName -f $devValues -f $prValues --set image=$registry/$chartName:$tag,namespace=$deploymentName,pr=$tag,name=$chartName-$tag $extraCommands"
     }
   }
 }
@@ -63,11 +60,17 @@ def publishChart(registry, chartName, tag) {
 }
 
 // public
-def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
-  withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
-    sh "helm repo add ffc $HELM_CHART_REPO"
-    sh "helm repo update"
-    sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
-    sh "helm upgrade --namespace=$namespace --install --atomic $chartName --set namespace=$namespace ffc/$chartName $extraCommands"
+def deployRemoteChart(credentialsId, environment, namespace, chartName, chartVersion) {
+  withKubeConfig([credentialsId: credentialsId]) {
+    def valuesCredentialId = "$chartName-$environment-values"
+    withCredentials([
+      file(credentialsId: valuesCredentialId, variable: 'values')
+    ]) {
+      def extraCommands = getExtraCommands(chartName, chartVersion)
+      sh "helm repo add ffc $HELM_CHART_REPO"
+      sh "helm repo update"
+      sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
+      sh "helm upgrade --namespace=$namespace --install --atomic $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
+    }
   }
 }
