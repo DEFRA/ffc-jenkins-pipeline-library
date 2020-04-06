@@ -1,6 +1,6 @@
 
 def test() {
-  sh('echo "hello world"')
+  sh 'echo "hello world"'
 }
 
 def nodeStandard() {
