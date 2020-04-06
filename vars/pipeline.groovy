@@ -1,4 +1,10 @@
 
+def test() {
+  stage('Print a message') {
+    sh('echo "hello world"')
+  }
+}
+
 def nodeStandard() {
   def containerSrcFolder = '\\/home\\/node'
   def containerTag = ''
