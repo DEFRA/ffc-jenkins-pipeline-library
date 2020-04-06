@@ -1,6 +1,6 @@
 def getExtraCommands(chartName, tag) {
   def helmValues = [
-    /container.redeployOnChange="$pr-$BUILD_NUMBER"/,
+    /container.redeployOnChange="$tag-$BUILD_NUMBER"/,
     /labels.version="$tag"/,
     /name="$chartName-$tag"/,
     /pr="$tag"/
