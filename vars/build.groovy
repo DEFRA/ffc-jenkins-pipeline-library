@@ -1,3 +1,5 @@
+import uk.gov.defra.ffc.Utils
+
 def branch = ''
 def pr = ''
 def mergedPrNo = ''
@@ -7,26 +9,26 @@ def repoName = ''
 def commitSha = ''
 def workspace
 
-// private
-def getMergedPrNo() {
-  def mergedPrNo = sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
-  return mergedPrNo ? "pr$mergedPrNo" : ''
-}
+// // private
+// def getMergedPrNo() {
+//   def mergedPrNo = sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
+//   return mergedPrNo ? "pr$mergedPrNo" : ''
+// }
 
-// private
-def getRepoUrl() {
-  return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
-}
+// // private
+// def getRepoUrl() {
+//   return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
+// }
 
-// private
-def getRepoName() {
-  return scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
-}
+// // private
+// def getRepoName() {
+//   return scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
+// }
 
-// private
-def getCommitSha() {
-  return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
-}
+// // private
+// def getCommitSha() {
+//   return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+// }
 
 // private
 def verifyCommitBuildable() {
@@ -41,8 +43,9 @@ def verifyCommitBuildable() {
 }
 
 // public
-def getVariables(repoName, version) {
+def getVariables(version) {
     branch = BRANCH_NAME
+    repoName = Utils.getRepoName()
     // use the git API to get the open PR for a branch
     // Note: This will cause issues if one branch has two open PRs
     pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
@@ -55,10 +58,9 @@ def getVariables(repoName, version) {
       containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
-    mergedPrNo = getMergedPrNo()
-    repoUrl = getRepoUrl()
-    repoName = getRepoName()
-    commitSha = getCommitSha()
+    mergedPrNo = Utils.getMergedPrNo()
+    repoUrl = Utils.getRepoUrl()
+    commitSha = Utils.getCommitSha()
     return [repoName, pr, containerTag, mergedPrNo]
 }
 
