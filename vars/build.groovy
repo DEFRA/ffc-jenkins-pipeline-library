@@ -117,13 +117,11 @@ def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
 
 // public
 def getHelmValuesFileCredentialId() {
-  echo "HERE -> getHelmValuesFileCredentialId"
-  echo "BRANCH_NAME: $BRANCH_NAME"
   def env = ""
   branch = BRANCH_NAME
   repoName = getRepoName()
 
-  if (branch == "master" {
+  if (branch == "master") {
     env = "dev"
   } else {
     env = "pr"
