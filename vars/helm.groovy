@@ -13,7 +13,7 @@ def deployChart(credentialsId, environment, registry, chartName, tag) {
       def extraCommands = getExtraCommands(chartName, tag)
       sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
       sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName -f $envValues -f $prValues --set image=$registry/$chartName:$tag,namespace=$deploymentName,pr=$tag,name=$deploymentName,container.redeployOnChange=$tag-$BUILD_NUMBER $extraCommands"
-      writeUrlIfIngress(chartName)
+      writeUrlIfIngress(chartName, tag)
     }
   }
 }
