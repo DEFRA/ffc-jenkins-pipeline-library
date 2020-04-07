@@ -127,14 +127,14 @@ def nodeStandard() {
         }
       } */
       stage('Set GitHub status as success') {
-        defraUtils.setGithubStatusSuccess()
+        build.setGithubStatusSuccess()
       }
     } catch(e) {
-      defraUtils.setGithubStatusFailure(e.message)
-      defraUtils.notifySlackBuildFailure(e.message, "#generalbuildfailures")
+      build.setGithubStatusFailure(e.message)
+      // defraUtils.notifySlackBuildFailure(e.message, "#generalbuildfailures")
       throw e
     } finally {
-      defraUtils.deleteTestOutput(serviceName, containerSrcFolder)
+      // defraUtils.deleteTestOutput(serviceName, containerSrcFolder)
     }
   }
 }
