@@ -8,10 +8,10 @@ def getExtraCommands(chartName, tag) {
 }
 
 // public
-def deployChart(credentialsId, registry, chartName, tag) {
+def deployChart(credentialsId, environment, registry, chartName, tag) {
   withKubeConfig([credentialsId: credentialsId]) {
     withCredentials([
-      file(credentialsId: "$chartName-dev-values", variable: 'devValues'),
+      file(credentialsId: "$chartName-$environment-values", variable: 'devValues'),
       file(credentialsId: "$chartName-pr-values", variable: 'prValues')
     ]) {
       def deploymentName = "$chartName-$tag"
