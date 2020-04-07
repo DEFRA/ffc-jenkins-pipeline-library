@@ -54,6 +54,9 @@ def call(Map config=[:], Closure body={}) {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
           echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
         }
+        stage('Deploy master') {
+          defraUtils.deployRemoteChart('ffc-demo', 'ffc-demo-web', containerTag)
+        }
       }
       if (pr == '') {
         stage('Publish chart') {
@@ -65,9 +68,6 @@ def call(Map config=[:], Closure body={}) {
           ]) {
             release.trigger(containerTag, containerTag, gitToken)
           }
-        }
-        stage('Deploy master') {
-          defraUtils.deployRemoteChart('ffc-demo', 'ffc-demo-web', containerTag)
         }
       //   stage('Trigger Deployment') {
       //     withCredentials([
