@@ -1,5 +1,5 @@
-def getExtraCommands(chartName, tag) {
-  return "--set labels.version=$tag  --install --atomic"
+def getExtraCommands(tag) {
+  return "--set labels.version=$tag --install --atomic"
 }
 
 def getPrCommands(registry, chartName, tag) {
@@ -22,7 +22,7 @@ def deployChart(credentialsId, environment, registry, chartName, tag) {
       file(credentialsId: "$chartName-pr-values", variable: 'prValues')
     ]) {
       def deploymentName = "$chartName-$tag"
-      def extraCommands = getExtraCommands(chartName, tag)
+      def extraCommands = getExtraCommands(tag)
       def prCommands = getPrCommands(registry, chartName, tag)
       sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
       sh "helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $envValues -f $prValues $prCommands $extraCommands"
@@ -77,7 +77,7 @@ def deployRemoteChart(credentialsId, environment, namespace, chartName, chartVer
     withCredentials([
       file(credentialsId: "$chartName-$environment-values", variable: 'values')
     ]) {
-      def extraCommands = getExtraCommands(chartName, chartVersion)
+      def extraCommands = getExtraCommands(chartVersion)
       sh "helm repo add ffc $HELM_CHART_REPO"
       sh "helm repo update"
       sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
