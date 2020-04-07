@@ -15,8 +15,8 @@ def getPrCommands(registry, chartName, tag) {
 }
 
 // public
-def deployChart(credentialsId, environment, registry, chartName, tag) {
-  withKubeConfig([credentialsId: credentialsId]) {
+def deployChart(environment, registry, chartName, tag) {
+  withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
     withCredentials([
       file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
       file(credentialsId: "$chartName-pr-values", variable: 'prValues')
