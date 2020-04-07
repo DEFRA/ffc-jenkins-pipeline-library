@@ -6,13 +6,13 @@ def getExtraCommands(chartName, tag) {
 def deployChart(credentialsId, environment, registry, chartName, tag) {
   withKubeConfig([credentialsId: credentialsId]) {
     withCredentials([
-      file(credentialsId: "$chartName-$environment-values", variable: 'devValues'),
+      file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
       file(credentialsId: "$chartName-pr-values", variable: 'prValues')
     ]) {
       def deploymentName = "$chartName-$tag"
       def extraCommands = getExtraCommands(chartName, tag)
       sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-      sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName -f $devValues -f $prValues --set image=$registry/$chartName:$tag,namespace=$deploymentName,pr=$tag,name=$chartName-$tag,container.redeployOnChange=$tag-$BUILD_NUMBER $extraCommands"
+      sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName -f $envValues -f $prValues --set image=$registry/$chartName:$tag,namespace=$deploymentName,pr=$tag,name=$deploymentName,container.redeployOnChange=$tag-$BUILD_NUMBER $extraCommands"
     }
   }
 }
