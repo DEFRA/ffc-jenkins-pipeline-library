@@ -1,26 +1,3 @@
-
-/* def setGithubStatusPending = load 'setGithubStatusPending'
-def setGithubStatusSuccess = 'setGithubStatusSuccess'
-def setGithubStatusFailure = 'setGithubStatusFailure'
-def getVariables = load 'getVariables.groovy'
-def getPackageJsonVersion = load 'getPackageJsonVersion'
-def lintHelm = load 'lintHelm'
-def buildTestImage = load 'buildTestImage'
-def runTests = load 'runTests'
-def createTestReportJUnit = load 'createTestReportJUnit'
-def replaceInFile = load 'replaceInFile'
-def sonarQubeEnv = 'SonarQube'
-def sonarScanner = 'SonarScanner'
-def analyseCode = 'analyseCode'
-def waitForQualityGateResult = 'waitForQualityGateResult'
-def buildAndPushContainerImage = 'buildAndPushContainerImage'
-def notifySlackBuildFailure = 'notifySlackBuildFailure'
-def deleteTestOutput = 'deleteTestOutput'
-def verifyPackageJsonVersionIncremented = 'verifyPackageJsonVersionIncremented'
-def undeployChart = 'undeployChart'
-def publishChart = 'publishChart'
-def triggerRelease = 'triggerRelease' */
-
 def call(Map config=[:], Closure body={}) {
   def containerSrcFolder = '\\/home\\/node'
   def localSrcFolder = '.'
@@ -72,36 +49,10 @@ def call(Map config=[:], Closure body={}) {
         stage('Verify version incremented') {
           version.verifyPackageJsonIncremented()
         }
-      //   stage('Helm install') {
-      //     withCredentials([
-      //         string(credentialsId: 'web-alb-tags', variable: 'albTags'),
-      //         string(credentialsId: 'web-alb-security-groups', variable: 'albSecurityGroups'),
-      //         string(credentialsId: 'web-alb-arn', variable: 'albArn'),
-      //         string(credentialsId: 'web-cookie-password', variable: 'cookiePassword')
-      //       ]) {
-
-      //       def helmValues = [
-      //         /container.redeployOnChange="$pr-$BUILD_NUMBER"/,
-      //         /container.redisHostname="$REDIS_HOSTNAME"/,
-      //         /container.redisPartition="ffc-demo-$containerTag"/,
-      //         /cookiePassword="$cookiePassword"/,
-      //         /ingress.alb.tags="$albTags"/,
-      //         /ingress.alb.arn="$albArn"/,
-      //         /ingress.alb.securityGroups="$albSecurityGroups"/,
-      //         /ingress.endpoint="ffc-demo-$containerTag"/,
-      //         /name="ffc-demo-$containerTag"/,
-      //         /labels.version="$containerTag"/
-      //       ].join(',')
-
-      //       def extraCommands = [
-      //         "--values ./helm/$serviceName/jenkins-aws.yaml",
-      //         "--set $helmValues"
-      //       ].join(' ')
-
-      //       defraUtils.deployChart(KUBE_CREDENTIALS_ID, DOCKER_REGISTRY, serviceName, containerTag, extraCommands)
-      //       echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
-      //     }
-      //   }
+        stage('Helm install') {
+          helm.deployChart(KUBE_CREDENTIALS_ID, config.environment, DOCKER_REGISTRY, repoName, containerTag)
+          echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
+        }
       }
       if (pr == '') {
         stage('Publish chart') {
