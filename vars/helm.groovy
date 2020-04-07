@@ -2,7 +2,7 @@ def getExtraCommands(chartName, tag) {
   return "--set labels.version=$tag  --install --atomic"
 }
 
-def getPrCommands(chartName, tag) {
+def getPrCommands(registry, chartName, tag) {
   def helmValues = [
     /image=$registry\/$chartName:$tag/,
     /namespace=$chartName-$tag/,
