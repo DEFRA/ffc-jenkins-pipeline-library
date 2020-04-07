@@ -6,7 +6,7 @@ def test() {
 
 
 def nodeStandard() {
-  def containerSrcFolder = '\\/home\\/node'
+  /* def containerSrcFolder = '\\/home\\/node'
   def containerTag = ''
   def dockerTestService = 'app'
   def lcovFile = './test-output/lcov.info'
@@ -17,12 +17,13 @@ def nodeStandard() {
   def serviceNamespace = 'ffc-elm'
   def sonarQubeEnv = 'SonarQube'
   def sonarScanner = 'SonarScanner'
-  def timeoutInMinutes = 5
+  def timeoutInMinutes = 5 */
 
   node {
     // checkout scm
     try {
       stage('Set GitHub status as pending') {
+        echo 'build.setGithubStatusPending()'
         build.setGithubStatusPending()
       }
       /* stage('Set PR, and containerTag variables') {
@@ -127,9 +128,11 @@ def nodeStandard() {
         }
       } */
       stage('Set GitHub status as success') {
+        echo 'build.setGithubStatusSuccess()'
         build.setGithubStatusSuccess()
       }
     } catch(e) {
+      echo 'build.setGithubStatusFailure(e.message)'
       build.setGithubStatusFailure(e.message)
       // defraUtils.notifySlackBuildFailure(e.message, "#generalbuildfailures")
       throw e
