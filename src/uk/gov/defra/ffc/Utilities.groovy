@@ -1,8 +1,8 @@
 package uk.gov.defra.ffc
 
-class Utils {
+class Utilities {
   def context
-  Utils(context) {
+  Utilities(context) {
     this.context = context
   }
 

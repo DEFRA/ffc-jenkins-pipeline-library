@@ -1,5 +1,5 @@
-import uk.gov.defra.ffc.Utils
-def utils = new Utils(this)
+import uk.gov.defra.ffc.Utilities
+def utilities = new Utilities(this)
 
 def branch = ''
 def pr = ''
@@ -45,7 +45,7 @@ def verifyCommitBuildable() {
 
 // public
 def getVariables() {
-  utils.getVariables()
+  utilities.getVariables()
 
   // branch = BRANCH_NAME
   // repoName = utils.getRepoName()
@@ -69,7 +69,7 @@ def getVariables() {
 
 // private
 def updateGithubCommitStatus(message, state) {
-  repoUrl = utils.getRepoUrl()
+  repoUrl = utilities.getRepoUrl()
   echo "repoUrl: $repoUrl"
   step([
     $class: 'GitHubCommitStatusSetter',
