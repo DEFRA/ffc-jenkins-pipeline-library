@@ -74,8 +74,8 @@ def publishChart(registry, tag) {
 }
 
 // public
-def deployRemoteChart(credentialsId, environment, namespace, chartName, chartVersion) {
-  withKubeConfig([credentialsId: credentialsId]) {
+def deployRemoteChart(environment, namespace, chartName, chartVersion) {
+  withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
     withCredentials([
       file(credentialsId: "$chartName-$environment-values", variable: 'values')
     ]) {

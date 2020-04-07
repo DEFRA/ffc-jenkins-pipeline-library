@@ -66,6 +66,9 @@ def call(Map config=[:], Closure body={}) {
             release.trigger(containerTag, containerTag, gitToken)
           }
         }
+        stage('Deploy master') {
+          defraUtils.deployRemoteChart('ffc-demo', 'ffc-demo-web', containerTag)
+        }
       //   stage('Trigger Deployment') {
       //     withCredentials([
       //       string(credentialsId: 'web-deploy-job-name', variable: 'deployJobName'),
