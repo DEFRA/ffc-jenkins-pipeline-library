@@ -5,9 +5,9 @@ def branch = ''
 def pr = ''
 def mergedPrNo = ''
 def containerTag = ''
-def repoUrl = ''
-def repoName = ''
-def commitSha = ''
+// def repoUrl = ''
+// def repoName = ''
+// def commitSha = ''
 def workspace
 
 // // private
@@ -69,7 +69,10 @@ def getVariables() {
 
 // private
 def updateGithubCommitStatus(message, state) {
-  repoUrl = utilities.getRepoUrl()
+  def util = new Utilities(this)
+  def repoUrl = util.getRepoUrl()
+  def repoName = util.getRepoName()
+  def commitSha = util.getCommitSha()
   echo "repoUrl: $repoUrl"
   step([
     $class: 'GitHubCommitStatusSetter',
