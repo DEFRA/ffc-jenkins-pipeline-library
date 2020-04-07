@@ -55,7 +55,7 @@ def call(Map config=[:], Closure body={}) {
           echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
         }
         stage('Deploy master') {
-          helm.deployRemoteChart('ffc-demo', 'ffc-demo-web', containerTag)
+          helm.deployRemoteChart(config.environment, 'ffc-demo', 'ffc-demo-web', containerTag)
         }
       }
       if (pr == '') {
