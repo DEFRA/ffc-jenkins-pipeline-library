@@ -66,7 +66,6 @@ def getVariables(version) {
 
 // private
 def updateGithubCommitStatus(message, state) {
-  echo "repoUrl: $repoUrl"
   repoUrl = Utils.getRepoUrl(this)
   echo "repoUrl: $repoUrl"
   step([
