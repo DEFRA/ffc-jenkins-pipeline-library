@@ -45,7 +45,7 @@ def verifyCommitBuildable() {
 }
 
 // public
-def getVariables(repoName, version) {
+def getVariables(version) {
     branch = BRANCH_NAME
     // use the git API to get the open PR for a branch
     // Note: This will cause issues if one branch has two open PRs
@@ -61,7 +61,7 @@ def getVariables(repoName, version) {
 
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
-    repoName = getRepoName()
+    def repoName = getRepoName()
     commitSha = getCommitSha()
     return [repoName, pr, containerTag, mergedPrNo]
 }

@@ -44,7 +44,7 @@ def call(Map config=[:], Closure body={}) {
         build.setGithubStatusPending()
       }
       stage('Set PR, and containerTag variables') {
-        (repoName, pr, containerTag, mergedPrNo) = build.getVariables(config.serviceName, version.getPackageJsonVersion())
+        (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
       /*stage('Helm lint') {
         lintHelm.lintHelm(repoName)
