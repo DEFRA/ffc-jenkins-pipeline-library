@@ -51,7 +51,7 @@ def call(Map config=[:], Closure body={}) {
           version.verifyPackageJsonIncremented()
         }
         stage('Helm install') {
-          helm.deployChart(KUBE_CREDENTIALS_ID, config.environment, DOCKER_REGISTRY, repoName, containerTag)
+          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
           echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
         }
       }
