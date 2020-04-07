@@ -1,6 +1,6 @@
 package uk.gov.defra.ffc
 
-class Utilities {
+class Utilities implements Serializable {
   def context
   Utilities(context) {
     this.context = context
