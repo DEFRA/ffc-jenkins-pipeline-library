@@ -1,5 +1,17 @@
 def getExtraCommands(chartName, tag) {
-  return "--set labels.version=$tag"
+  return "--set labels.version=$tag  --install --atomic"
+}
+
+def getPrCommands(chartName, tag) {
+  def helmValues = [
+    /image=$registry\/$chartName:$tag/,
+    /namespace=$chartName-$tag/,
+    /pr=$tag/,
+    /name=$chartName-$tag/,
+    /container.redeployOnChange=$tag-$BUILD_NUMBER/    
+    ].join(',')
+
+    return "--set $helmValues"
 }
 
 // public
@@ -11,8 +23,9 @@ def deployChart(credentialsId, environment, registry, chartName, tag) {
     ]) {
       def deploymentName = "$chartName-$tag"
       def extraCommands = getExtraCommands(chartName, tag)
+      def prCommands = getPrCommands(registry, chartName, tag)
       sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-      sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName -f $envValues -f $prValues --set image=$registry/$chartName:$tag,namespace=$deploymentName,pr=$tag,name=$deploymentName,container.redeployOnChange=$tag-$BUILD_NUMBER $extraCommands"
+      sh "helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $envValues -f $prValues $prCommands $extraCommands"
       writeUrlIfIngress(deploymentName)
     }
   }
@@ -68,7 +81,7 @@ def deployRemoteChart(credentialsId, environment, namespace, chartName, chartVer
       sh "helm repo add ffc $HELM_CHART_REPO"
       sh "helm repo update"
       sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
-      sh "helm upgrade --namespace=$namespace --install --atomic $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
+      sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
     }
   }
 }
