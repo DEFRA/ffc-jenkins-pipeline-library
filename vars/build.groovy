@@ -66,6 +66,9 @@ def getVariables(version) {
 
 // private
 def updateGithubCommitStatus(message, state) {
+  echo "repoUrl: $repoUrl"
+  repoUrl = Utils.getRepoUrl(this)
+  echo "repoUrl: $repoUrl"
   step([
     $class: 'GitHubCommitStatusSetter',
     reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
