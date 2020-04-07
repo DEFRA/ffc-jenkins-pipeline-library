@@ -1,4 +1,5 @@
 import uk.gov.defra.ffc.Utils
+def utils = new Utils(this)
 
 def branch = ''
 def pr = ''
@@ -43,30 +44,32 @@ def verifyCommitBuildable() {
 }
 
 // public
-def getVariables(version) {
-    branch = BRANCH_NAME
-    repoName = Utils.getRepoName(this)
-    // use the git API to get the open PR for a branch
-    // Note: This will cause issues if one branch has two open PRs
-    pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
-    verifyCommitBuildable()
+def getVariables() {
+  utils.getVariables()
 
-    if (branch == "master") {
-      containerTag = version
-    } else {
-      def rawTag = pr == '' ? branch : "pr$pr"
-      containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
-    }
+  // branch = BRANCH_NAME
+  // repoName = utils.getRepoName()
+  // // use the git API to get the open PR for a branch
+  // // Note: This will cause issues if one branch has two open PRs
+  // pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
+  // verifyCommitBuildable()
 
-    mergedPrNo = Utils.getMergedPrNo(this)
-    repoUrl = Utils.getRepoUrl(this)
-    commitSha = Utils.getCommitSha(this)
-    return [repoName, pr, containerTag, mergedPrNo]
+  // if (branch == "master") {
+  //   containerTag = version
+  // } else {
+  //   def rawTag = pr == '' ? branch : "pr$pr"
+  //   containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
+  // }
+
+  // mergedPrNo = utils.getMergedPrNo()
+  // repoUrl = utils.getRepoUrl()
+  // commitSha = utils.getCommitSha()
+  // return [repoName, pr, containerTag, mergedPrNo]
 }
 
 // private
 def updateGithubCommitStatus(message, state) {
-  repoUrl = Utils.getRepoUrl(this)
+  repoUrl = utils.getRepoUrl()
   echo "repoUrl: $repoUrl"
   step([
     $class: 'GitHubCommitStatusSetter',
