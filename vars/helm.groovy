@@ -20,7 +20,7 @@ def deployChart(credentialsId, environment, registry, chartName, tag) {
 
 // private
 def writeUrlIfIngress(serviceName, tag) {
-  sh "if kubectl get ingress --ignore-not-found; then echo 'Build available for review at https://$serviceName-$tag.$INGRESS_SERVER' fi"
+  sh "if kubectl get ingress --ignore-not-found --namespace $serviceName-$tag; then echo 'Build available for review at https://$serviceName-$tag.$INGRESS_SERVER' fi"
 }
 
 // public
