@@ -20,7 +20,7 @@ def call(Map config=[:], Closure body={}) {
       }
       stage('Set PR, and containerTag variables') {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
-        mergedPrNo = 'pr118'
+        //mergedPrNo = 'pr118'
       }
       stage('Helm lint') {
         test.lintHelm()
@@ -88,7 +88,7 @@ def call(Map config=[:], Closure body={}) {
       // notifySlackBuildFailure.notifySlackBuildFailure(e.message, "#generalbuildfailures")
      throw e
     } finally {
-      // deleteTestOutput.deleteTestOutput(repoName, containerSrcFolder)
+      test.deleteOutput(repoName, containerSrcFolder)
     }
   }
   body()
