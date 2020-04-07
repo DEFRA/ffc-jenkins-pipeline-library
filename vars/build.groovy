@@ -45,7 +45,7 @@ def verifyCommitBuildable() {
 // public
 def getVariables(version) {
     branch = BRANCH_NAME
-    repoName = Utils.getRepoName()
+    repoName = Utils.getRepoName(this)
     // use the git API to get the open PR for a branch
     // Note: This will cause issues if one branch has two open PRs
     pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
@@ -58,9 +58,9 @@ def getVariables(version) {
       containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
-    mergedPrNo = Utils.getMergedPrNo()
-    repoUrl = Utils.getRepoUrl()
-    commitSha = Utils.getCommitSha()
+    mergedPrNo = Utils.getMergedPrNo(this)
+    repoUrl = Utils.getRepoUrl(this)
+    commitSha = Utils.getCommitSha(this)
     return [repoName, pr, containerTag, mergedPrNo]
 }
 
