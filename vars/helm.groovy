@@ -1,10 +1,39 @@
+def getExtraCommands(tag) {
+  return "--set labels.version=$tag --install --atomic"
+}
+
+def getPrCommands(registry, chartName, tag) {
+  def helmValues = [
+    /image=$registry\/$chartName:$tag/,
+    /namespace=$chartName-$tag/,
+    /pr=$tag/,
+    /name=$chartName-$tag/,
+    /container.redeployOnChange=$tag-$BUILD_NUMBER/    
+    ].join(',')
+
+    return "--set $helmValues"
+}
+
 // public
-def deployChart(credentialsId, registry, chartName, tag, extraCommands) {
+def deployChart(credentialsId, environment, registry, chartName, tag) {
   withKubeConfig([credentialsId: credentialsId]) {
-    def deploymentName = "$chartName-$tag"
-    sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
-    sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName --set image=$registry/$chartName:$tag,namespace=$deploymentName $extraCommands"
+    withCredentials([
+      file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
+      file(credentialsId: "$chartName-pr-values", variable: 'prValues')
+    ]) {
+      def deploymentName = "$chartName-$tag"
+      def extraCommands = getExtraCommands(tag)
+      def prCommands = getPrCommands(registry, chartName, tag)
+      sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
+      sh "helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $envValues -f $prValues $prCommands $extraCommands"
+      writeUrlIfIngress(deploymentName)
+    }
   }
+}
+
+// private
+def writeUrlIfIngress(deploymentName) {  
+  sh "if kubectl get ingress $deploymentName --ignore-not-found --namespace $deploymentName; then echo 'Build available for review at https://$deploymentName.$INGRESS_SERVER'; fi"
 }
 
 // public
@@ -43,11 +72,16 @@ def publishChart(registry, chartName, tag) {
 }
 
 // public
-def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
-  withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
-    sh "helm repo add ffc $HELM_CHART_REPO"
-    sh "helm repo update"
-    sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
-    sh "helm upgrade --namespace=$namespace --install --atomic $chartName --set namespace=$namespace ffc/$chartName $extraCommands"
+def deployRemoteChart(credentialsId, environment, namespace, chartName, chartVersion) {
+  withKubeConfig([credentialsId: credentialsId]) {
+    withCredentials([
+      file(credentialsId: "$chartName-$environment-values", variable: 'values')
+    ]) {
+      def extraCommands = getExtraCommands(chartVersion)
+      sh "helm repo add ffc $HELM_CHART_REPO"
+      sh "helm repo update"
+      sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
+      sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
+    }
   }
 }
