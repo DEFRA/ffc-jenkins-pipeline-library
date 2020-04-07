@@ -38,7 +38,7 @@ def call(Map config=[:], Closure body={}) {
       stage('Start') {
         echo "pipeline started"
       }
-      stage('Set GitHub status as pending'){
+      stage('Set GitHub status as pending') {
         build.setGithubStatusPending()
       }
       stage('Set PR, and containerTag variables') {
@@ -53,7 +53,7 @@ def call(Map config=[:], Closure body={}) {
       stage('Run tests') {
         build.runTests(BUILD_NUMBER)
       }
-      stage('Create JUnit report'){
+      stage('Create JUnit report') {
         test.createReportJUnit()
       }
       stage('Fix lcov report') {
@@ -122,7 +122,7 @@ def call(Map config=[:], Closure body={}) {
       //       defraUtils.triggerDeploy(JENKINS_DEPLOY_SITE_ROOT, deployJobName, jenkinsToken, ['chartVersion': containerTag])
       //     }
       //   }
-      // }
+      }
       if (mergedPrNo != '') {
         stage('Remove merged PR') {
           helm.undeployChart(KUBE_CREDENTIALS_ID, mergedPrNo)
