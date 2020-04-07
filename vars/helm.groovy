@@ -13,14 +13,14 @@ def deployChart(credentialsId, environment, registry, chartName, tag) {
       def extraCommands = getExtraCommands(chartName, tag)
       sh "kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName"
       sh "helm upgrade $deploymentName --namespace=$deploymentName --install --atomic ./helm/$chartName -f $envValues -f $prValues --set image=$registry/$chartName:$tag,namespace=$deploymentName,pr=$tag,name=$deploymentName,container.redeployOnChange=$tag-$BUILD_NUMBER $extraCommands"
-      writeUrlIfIngress(chartName, tag)
+      writeUrlIfIngress(deploymentName)
     }
   }
 }
 
 // private
-def writeUrlIfIngress(serviceName, tag) {
-  sh "if kubectl get ingress --ignore-not-found --namespace $serviceName-$tag; then echo 'Build available for review at https://$serviceName-$tag.$INGRESS_SERVER' fi"
+def writeUrlIfIngress(deploymentName) {
+  sh "if kubectl get ingress --ignore-not-found --namespace $deploymentName; then echo 'Build available for review at https://$deploymentName.$INGRESS_SERVER' fi"
 }
 
 // public
