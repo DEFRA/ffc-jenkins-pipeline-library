@@ -1,15 +1,3 @@
-def repoName = ''
-def branch = ''
-def pr = ''
-def mergedPrNo = ''
-def containerTag = ''
-def repoUrl = ''
-def commitSha = ''
-def containerSrcFolder = '\\/home\\/node'
-def lcovFile = './test-output/lcov.info'
-def localSrcFolder = '.'
-def timeoutInMinutes = 10
-def workspace
 
 /* def setGithubStatusPending = load 'setGithubStatusPending'
 def setGithubStatusSuccess = 'setGithubStatusSuccess'
@@ -34,6 +22,16 @@ def publishChart = 'publishChart'
 def triggerRelease = 'triggerRelease' */
 
 def call(Map config=[:], Closure body={}) {
+  def containerSrcFolder = '\\/home\\/node'
+  def localSrcFolder = '.'
+  def lcovFile = './test-output/lcov.info'
+  def sonarQubeEnv = 'SonarQube'
+  def sonarScanner = 'SonarScanner'
+  def repoName = ''
+  def pr = ''
+  def containerTag = ''
+  def mergedPrNo = ''
+
   node {
     checkout scm
     try {
@@ -46,33 +44,33 @@ def call(Map config=[:], Closure body={}) {
       stage('Set PR, and containerTag variables') {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
-      /*stage('Helm lint') {
-        lintHelm.lintHelm(repoName)
+      stage('Helm lint') {
+        test.lintHelm()
       }
       stage('Build test image') {
-        buildTestImage.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER)
+        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, BUILD_NUMBER)
       }
       stage('Run tests') {
-        runTests.runTests(repoName, repoName, BUILD_NUMBER)
+        build.runTests(BUILD_NUMBER)
       }
       stage('Create JUnit report'){
-        createTestReportJUnit.createTestReportJUnit()
+        test.createReportJUnit()
       }
       stage('Fix lcov report') {
-        replaceInFile.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
       }
       stage('SonarQube analysis') {
-        analyseCode.analyseCode(sonarQubeEnv, sonarScanner, ['sonar.projectKey' : repoName, 'sonar.sources' : '.'])
+        test.analyseCode(sonarQubeEnv, sonarScanner)
       }
       stage("Code quality gate") {
-        waitForQualityGateResult.waitForQualityGateResult(timeoutInMinutes)
+        test.waitForQualityGateResult(10)
       }
       stage('Push container image') {
-        buildAndPushContainerImage.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, containerTag)
       }
       if (pr != '') {
         stage('Verify version incremented') {
-          verifyPackageJsonVersionIncremented.verifyPackageJsonVersionIncremented()
+          version.verifyPackageJsonIncremented()
         }
       //   stage('Helm install') {
       //     withCredentials([
@@ -107,13 +105,13 @@ def call(Map config=[:], Closure body={}) {
       }
       if (pr == '') {
         stage('Publish chart') {
-          publishChart.publishChart(DOCKER_REGISTRY, repoName, containerTag)
+          helm.publishChart(DOCKER_REGISTRY, containerTag)
         }
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            triggerRelease.triggerRelease(containerTag, repoName, containerTag, gitToken)
+            release.trigger(containerTag, containerTag, gitToken)
           }
         }
       //   stage('Trigger Deployment') {
@@ -127,9 +125,9 @@ def call(Map config=[:], Closure body={}) {
       // }
       if (mergedPrNo != '') {
         stage('Remove merged PR') {
-          undeployChart.undeployChart(KUBE_CREDENTIALS_ID, repoName, mergedPrNo)
+          helm.undeployChart(KUBE_CREDENTIALS_ID, mergedPrNo)
         }
-      }*/
+      }
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
       }

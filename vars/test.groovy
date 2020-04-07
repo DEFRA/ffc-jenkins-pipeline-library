@@ -1,5 +1,6 @@
 // public
-def lintHelm(chartName) {
+def lintHelm() {
+  def chartName = build.getRepoName()
   sh "helm lint ./helm/$chartName"
 }
 
@@ -15,8 +16,13 @@ def deleteOutput(containerImage, containerWorkDir) {
 }
 
 // public
-def analyseCode(sonarQubeEnv, sonarScanner, params) {
+def analyseCode(sonarQubeEnv, sonarScanner) {
   def scannerHome = tool sonarScanner
+  def params = [
+    'sonar.projectKey' : build.getRepoName(),
+    'sonar.sources': '.'
+  ]
+  def projectKey = build.getRepoName()
   withSonarQubeEnv(sonarQubeEnv) {
     def args = ''
     params.each { param ->
