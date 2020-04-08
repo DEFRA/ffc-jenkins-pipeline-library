@@ -1,5 +1,7 @@
 // public
 def lintHelm(chartName) {
+  helm.addHelmRepo('ffc', 'https://raw.githubusercontent.com/defra/ffc-helm-repository/master/')
+  sh "helm dependency update ./helm/$chartName"
   sh "helm lint ./helm/$chartName"
 }
 

@@ -58,6 +58,8 @@ def publishChart(registry, chartName, tag) {
       dir('helm-charts') {
         sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
         sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
+        addHelmRepo('ffc', 'https://raw.githubusercontent.com/defra/ffc-helm-repository/master/')
+        sh "helm dependency update ../helm/$chartName"
         sh "helm package ../helm/$chartName"
         sh 'helm repo index .'
         sh 'git config --global user.email "buildserver@defra.gov.uk"'
@@ -78,10 +80,15 @@ def deployRemoteChart(credentialsId, environment, namespace, chartName, chartVer
       file(credentialsId: "$chartName-$environment-values", variable: 'values')
     ]) {
       def extraCommands = getExtraCommands(chartVersion)
-      sh "helm repo add ffc $HELM_CHART_REPO"
-      sh "helm repo update"
+      addHelmRepo('ffc', $HELM_CHART_REPO)
       sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
       sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
     }
   }
+}
+
+// private
+def addHelmRepo(repoName, url) {
+  sh "helm repo add $repoName $url"
+  sh "helm repo update"
 }
