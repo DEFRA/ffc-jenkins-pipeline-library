@@ -21,6 +21,7 @@ def call(Map config=[:], Closure body={}) {
       stage('Set PR, and containerTag variables') {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
+      echo "branch name: ${branch}"
       notifySlack.buildFailure("I can't do that Dave", "#generalbuildfailures")
       /*stage('Helm lint') {
         test.lintHelm()
