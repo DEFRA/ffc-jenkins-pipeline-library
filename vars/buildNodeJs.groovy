@@ -12,8 +12,7 @@ def call(Map config=[:], Closure body={}) {
   node {
     checkout scm
     try {
-      notifySlack.buildFailure("I can't do that Dave", "#generalbuildfailures")
-      /*stage('Start') {
+      stage('Start') {
         echo "pipeline started"
       }
       stage('Set GitHub status as pending') {
@@ -22,7 +21,8 @@ def call(Map config=[:], Closure body={}) {
       stage('Set PR, and containerTag variables') {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
-      stage('Helm lint') {
+      notifySlack.buildFailure("I can't do that Dave", "#generalbuildfailures")
+      /*stage('Helm lint') {
         test.lintHelm()
       }
       stage('Build test image') {
