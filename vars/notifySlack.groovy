@@ -5,7 +5,7 @@ def buildFailure(exception, channel) {
           ${JOB_NAME}/${BUILD_NUMBER}
           ${exception}
           (<${BUILD_URL}|Open>)"""
-  echo "built message: ${msg}"
+  echo "built message: ${msg}£££"
 
   if(branch == "master") {
     msg = "@here ${msg}"
