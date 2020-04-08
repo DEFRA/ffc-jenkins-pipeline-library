@@ -53,7 +53,7 @@ def call(Map config=[:], Closure body={}) {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
           echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
         }
-        notifySlack.buildFailure("I can't do that Dave", "#homicidalComputer")
+        notifySlack.buildFailure("I can't do that Dave", "#generalbuildfailures")
       }
       if (pr == '') {
         stage('Publish chart') {
