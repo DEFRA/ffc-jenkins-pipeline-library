@@ -6,7 +6,11 @@ def buildFailure(exception, channel) {
           ${exception}
           (<${BUILD_URL}|Open>)"""
   echo "built message: ${msg}£££"
-  echo "branch name ${branch}"
+  try {
+    echo "branch name ${branch}"
+  } catch (e) {
+    echo "Error: ${e.message}"
+  }
 
   if(branch == "master") {
     echo "=== 1 ==="
