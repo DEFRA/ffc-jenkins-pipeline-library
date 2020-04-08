@@ -58,7 +58,7 @@ def publishChart(registry, chartName, tag) {
       dir('helm-charts') {
         sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
         sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
-        addHelmRepo('ffc', 'https://raw.githubusercontent.com/defra/ffc-helm-repository/master/')
+        addHelmRepo('ffc-public', $HELM_CHART_REPO_PUBLIC)
         sh "helm dependency update ../helm/$chartName"
         sh "helm package ../helm/$chartName"
         sh 'helm repo index .'

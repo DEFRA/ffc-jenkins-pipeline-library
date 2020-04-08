@@ -307,7 +307,7 @@ def setGithubStatusFailure(message = '') {
 }
 
 def lintHelm(chartName) {
-  sh "helm repo add ffc https://raw.githubusercontent.com/defra/ffc-helm-repository/master/"
+  sh "helm repo add ffc-public $HELM_CHART_REPO_PUBLIC"
   sh "helm repo update"
   sh "helm dependency update ./helm/$chartName"
   sh "helm lint ./helm/$chartName"
