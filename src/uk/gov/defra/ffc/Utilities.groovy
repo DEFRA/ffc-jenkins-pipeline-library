@@ -52,6 +52,7 @@ class Utilities implements Serializable {
     return context.sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
   }
 
+  @NonCPS
   def verifyCommitBuildable() {
     if (this.pr) {
       echo "Building PR$pr"
