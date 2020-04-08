@@ -25,7 +25,7 @@ If your pipeline has additional steps, pass a callback in the following manner:
 buildNodeJs environment: 'dev'
 ```
 
-Should you have a pipeline where you need to call the various methods individually, these have been moved to individual files:
+Should you have a pipeline where you need to call the various methods individually, these have been moved to individual files. For full details, see the individual function details in the next section.
 | DefraUtils | New Equivalent |
 |------------|:----------------:|
 | destroyPrSqsQueues | queues.destroyPrSqsQueues |
@@ -57,7 +57,6 @@ Should you have a pipeline where you need to call the various methods individual
 | notifySlackBuildFailure | notifySlack.buildFailure |
 | replaceInFile | utils.replaceInFile |
 | getCommitMessage | utils.getCommitMessage |
-The parameters taken by the function haven't changed, just the location.
 
 ### Following build procedure is deprecated and will be removed in v5.0.0
 Register the library as a global pipeline library in the Jenkins Global Configuration.
