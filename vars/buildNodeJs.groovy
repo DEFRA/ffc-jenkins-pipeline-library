@@ -12,7 +12,8 @@ def call(Map config=[:], Closure body={}) {
   node {
     checkout scm
     try {
-      stage('Start') {
+      notifySlack.buildFailure("I can't do that Dave", "#generalbuildfailures")
+      /*stage('Start') {
         echo "pipeline started"
       }
       stage('Set GitHub status as pending') {
@@ -53,7 +54,6 @@ def call(Map config=[:], Closure body={}) {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
           echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
         }
-        notifySlack.buildFailure("I can't do that Dave", "#generalbuildfailures")
       }
       if (pr == '') {
         stage('Publish chart') {
@@ -82,7 +82,7 @@ def call(Map config=[:], Closure body={}) {
       }
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
-      }
+      }*/
     } catch(e) {
       build.setGithubStatusFailure(e.message)
       notifySlack.buildFailure(e.message, "#generalbuildfailures")
