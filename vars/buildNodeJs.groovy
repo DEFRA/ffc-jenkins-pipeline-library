@@ -20,6 +20,7 @@ def call(Map config=[:], Closure body={}) {
       }
       stage('Set PR, and containerTag variables') {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
+        pr = ''
         //mergedPrNo = 'pr118'
       }
       stage('Helm lint') {
@@ -69,14 +70,14 @@ def call(Map config=[:], Closure body={}) {
             release.trigger(containerTag, containerTag, gitToken)
           }
         }
-      //   stage('Trigger Deployment') {
-      //     withCredentials([
-      //       string(credentialsId: 'web-deploy-job-name', variable: 'deployJobName'),
-      //       string(credentialsId: 'web-deploy-token', variable: 'jenkinsToken')
-      //     ]) {
-      //       defraUtils.triggerDeploy(JENKINS_DEPLOY_SITE_ROOT, deployJobName, jenkinsToken, ['chartVersion': containerTag])
-      //     }
-      //   }
+        stage('Trigger Deployment') {
+          withCredentials([
+            string(credentialsId: 'web-deploy-job-name', variable: 'deployJobName'),
+            string(credentialsId: 'web-deploy-token', variable: 'jenkinsToken')
+          ]) {
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deployJobName, jenkinsToken, ['chartVersion': containerTag])
+          }
+        }
       }
       if (mergedPrNo != '') {
         stage('Remove merged PR') {
