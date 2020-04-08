@@ -8,8 +8,11 @@ def buildFailure(exception, channel) {
   echo "built message: ${msg}£££"
 
   if(branch == "master") {
+    echo "=== 1 ==="
     msg = "@here ${msg}"
+    echo "=== 2 ==="
     channel = "#masterbuildfailures"
+    echo "=== 3 ==="
   }
 
   echo "sending to slack"
