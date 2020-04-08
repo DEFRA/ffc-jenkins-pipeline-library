@@ -11,10 +11,10 @@ class Utilities implements Serializable {
 
   Utilities(context) {
     this.context = context
-    this.verifyCommitBuildable();
-
     echo "BRANCH_NAME: $BRANCH_NAME"
     this.branch = BRANCH_NAME
+    this.verifyCommitBuildable();
+
     this.containerTag = this.getContainerTag()
     this.mergedPrNo = this.getMergedPrNo()
     this.pr = this.getPr()
@@ -59,7 +59,7 @@ class Utilities implements Serializable {
     } else if (this.branch == "master") {
       echo "Building master branch"
     } else {
-      currentBuild.result = 'ABORTED'
+      this.context.currentBuild.result = 'ABORTED'
       this.context.error('Build aborted - not a PR or a master branch')
     }
   }
