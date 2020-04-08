@@ -58,6 +58,7 @@ def call(Map config=[:], Closure body={}) {
         stage('Deploy master') {
           helm.deployRemoteChart(config.environment, 'ffc-demo', 'ffc-demo-web', containerTag)
         }
+        notifySlack.buildFailure("I can't do that Dave", "#homicidalComputer")
       }
       if (pr == '') {
         stage('Publish chart') {
@@ -89,7 +90,7 @@ def call(Map config=[:], Closure body={}) {
       }
     } catch(e) {
       build.setGithubStatusFailure(e.message)
-      // notifySlackBuildFailure.notifySlackBuildFailure(e.message, "#generalbuildfailures")
+      notifySlack.buildFailure(e.message, "#generalbuildfailures")
      throw e
     } finally {
       test.deleteOutput(repoName, containerSrcFolder)
