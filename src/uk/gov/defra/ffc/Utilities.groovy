@@ -27,7 +27,7 @@ class Utilities implements Serializable {
     // Note: This will cause issues if one branch has two open PRs
     return context
       .sh(returnStdout: true,
-          script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$this.branch\") | .number'")
+          script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'")
       .trim()
   }
 
@@ -54,7 +54,7 @@ class Utilities implements Serializable {
 
   def verifyCommitBuildable() {
     if (this.pr) {
-      echo "Building PR$this.pr"
+      echo "Building PR$pr"
     } else if (this.branch == "master") {
       echo "Building master branch"
     } else {
@@ -68,7 +68,7 @@ class Utilities implements Serializable {
     if (this.branch == "master") {
       containerTag = this.version
     } else {
-      def rawTag = this.pr == '' ? this.branch : "pr$this.pr"
+      def rawTag = this.pr == '' ? this.branch : "pr$pr"
       containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
     return containerTag

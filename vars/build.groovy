@@ -2,7 +2,7 @@ import uk.gov.defra.ffc.Utilities
 
 def getVariables() {
   def utilities = new Utilities(this)
-  utilities.getVariables()
+  return utilities.getVariables()
 }
 
 def setGithubStatusSuccess(message = 'Build successful') {
