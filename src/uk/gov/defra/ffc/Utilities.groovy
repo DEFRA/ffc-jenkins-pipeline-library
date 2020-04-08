@@ -1,9 +1,34 @@
 package uk.gov.defra.ffc
 
 class Utilities implements Serializable {
+  def branch
+  def containerTag
   def context
+  def mergedPrNo
+  def pr
+  def repoName
+  def version
+
   Utilities(context) {
     this.context = context
+    this.verifyCommitBuildable();
+
+    echo "BRANCH_NAME: $BRANCH_NAME"
+    this.branch = BRANCH_NAME
+    this.containerTag = this.getContainerTag()
+    this.mergedPrNo = this.getMergedPrNo()
+    this.pr = this.getPr()
+    this.repoName = this.getRepoName()
+    this.version = this.getVersion()
+  }
+
+  def getPr() {
+    // use the git API to get the open PR for a branch
+    // Note: This will cause issues if one branch has two open PRs
+    return context
+      .sh(returnStdout: true,
+          script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$this.branch\") | .number'")
+      .trim()
   }
 
   def getRepoUrl() {
@@ -27,27 +52,43 @@ class Utilities implements Serializable {
     return context.sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
   }
 
-  def getVariables() {
-    def branch = BRANCH_NAME
-    context.echo "***************branch: $branch"
-    def repoName = this.getRepoName()
-    def version = this.getVersion()
-    // use the git API to get the open PR for a branch
-    // Note: This will cause issues if one branch has two open PRs
-    def pr = context.sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
-    verifyCommitBuildable()
-
-    def containerTag
-    if (branch == "master") {
-      containerTag = version
+  def verifyCommitBuildable() {
+    if (this.pr) {
+      echo "Building PR$this.pr"
+    } else if (this.branch == "master") {
+      echo "Building master branch"
     } else {
-      def rawTag = pr == '' ? branch : "pr$pr"
+      currentBuild.result = 'ABORTED'
+      this.context.error('Build aborted - not a PR or a master branch')
+    }
+  }
+
+  def getContainerTag() {
+    def containerTag
+    if (this.branch == "master") {
+      containerTag = this.version
+    } else {
+      def rawTag = this.pr == '' ? this.branch : "pr$this.pr"
       containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
+    return containerTag
+  }
 
-    def mergedPrNo = this.getMergedPrNo()
+  def getVariables() {
+    return [this.repoName, this.pr, this.containerTag, this.mergedPrNo]
+  }
+
+  def updateGithubCommitStatus(message, state) {
     def repoUrl = this.getRepoUrl()
+    def repoName = this.getRepoName()
     def commitSha = this.getCommitSha()
-    return [repoName, pr, containerTag, mergedPrNo]
+
+    step([
+      $class: 'GitHubCommitStatusSetter',
+      reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+      commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
+      errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
+      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
+    ])
   }
 }
