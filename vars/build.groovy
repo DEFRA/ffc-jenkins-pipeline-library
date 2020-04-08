@@ -7,10 +7,6 @@ def repoName = ''
 def commitSha = ''
 def workspace
 
-def test() {
-  sh 'echo "hello world"'
-}
-
 // private
 def getMergedPrNo() {
   def mergedPrNo = sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
@@ -47,7 +43,6 @@ def verifyCommitBuildable() {
 // public
 def getVariables(version) {
     branch = BRANCH_NAME
-    echo "branch set to ${branch}"
     // use the git API to get the open PR for a branch
     // Note: This will cause issues if one branch has two open PRs
     pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
