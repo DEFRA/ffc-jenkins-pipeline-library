@@ -99,7 +99,7 @@ A simple test harness may be run to unit test functions that are purely `groovy`
 ```
 
 ## Functions
-N.B. Many of these are now obsolete, and will be removed in v5 of the pipeline. Where there is a direct equivalent, this is listed next to the function name. The only exception to this is getVariables function, where the new version is listed directly beneath. A separate listing is done because the parameters have changed. If there is no direct equivalent, these functions are not used by repo pipelines, but are dependencies of 'public' pipeline functions.
+Many of these are now obsolete, and will be removed in v5 of the pipeline. Where there is a direct equivalent with no difference in parameters, this is listed next to the function name. Where there is an equivalence, but with different parameters (e.g. `defraUtils.getVariables` / `build.getVariables`), the equivalent function is listed directly following the obsolete function with details on the new parameters. If there is no equivalent, these functions are not used by repo pipelines, but are dependencies of 'public' pipeline functions.
 
 ### tagCommit
 
@@ -302,7 +302,7 @@ If the build is a branch with a Pull Request (PR), or the master branch a messag
 
 If the build is not for a PR or the master branch an error will be thrown with the message `Build aborted - not a PR or a master branch`
 
-### getVariables (see build.getVariables, beneath, for the new version of this function)
+### getVariables (Obsolete, see build.getVariables, below)
 
 Takes the repository name as a parameter, i.e. `ffc-demo-web`, as well as the relevant version parameter to call depending on the project type.
 
@@ -334,7 +334,7 @@ Example usage:
 ```
 (repoName, pr, containerTag, mergedPrNo) = build.getVariables(defraUtils.getPackageJsonVersion())
     or
-(pr, containerTag, mergedPrNo) = build.getVariables(defraUtils.getCSProjVersion())
+(repoName, pr, containerTag, mergedPrNo) = build.getVariables(defraUtils.getCSProjVersion())
 ```
 
 ### updateGithubCommitStatus
@@ -510,7 +510,7 @@ New usage:
 build.buildAndPushContainerImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', 'pr53')
 ```
 
-### deployChart / helm.deployChart
+### deployChart (Obsolete, see helm.deployChart below)
 
 Deploys the Helm chart stored in the repository to Kubernetes.
 By convention Helm charts are stored in the folder `helm` in a subfolder the same name as the image, service, and repository.
@@ -524,14 +524,35 @@ Takes five parameters:
 - container image tag to deploy
 - additional command line parameters to send to the Helm deployment
 
-New usage:
+Example usage:
 
 ```
 def extraCommands = "--values ./helm/ffc-demo-web/dev-values.yaml"
-helm.deployChart('kubeconfig01', 'myregistry.mydockerhub.com', 'ffc-demo-web', 'pr53', extraCommands)
+defraUtils.deployChart('kubeconfig01', 'myregistry.mydockerhub.com', 'ffc-demo-web', 'pr53', extraCommands)
 ```
 
-### undeployChart / helm.undeployChart
+### helm.deployChart
+
+Deploys the Helm chart stored in the repository to Kubernetes.
+By convention Helm charts are stored in the folder `helm` in a subfolder the same name as the image, service, and repository.
+
+Development Helm charts are deployed with the name and namespace set to a combination of the image name and tag, i.e. `ffc-demo-web-pr53`
+
+Takes four parameters:
+- environment to deploy to (this is used to determine which K8s credentials to use)
+- the registry where the chart's image is stored
+- the name of the chart (note this must also be the name of the image to deploy)
+- container image tag to deploy
+
+The 'extraCommands' parameter previously specified inline have now been moved to Jenkins secret values, `pr-values.yaml` and `dev-values.yaml`
+
+New usage:
+
+```
+helm.deployChart('dev', 'myregistry.mydockerhub.com', 'ffc-demo-web', 'pr53')
+```
+
+### undeployChart (Obsolete, see helm.undeployChart below)
 
 Removes a Helm chart previously deployed to a Kubernetes cluster.
 Both the chart and the namespace are removed when the chart is undeployed.
@@ -544,7 +565,23 @@ Takes three parameters:
 New usage:
 
 ```
-helm.undeployChart('kubeconfig01', 'ffc-demo-web', 'pr53')
+defraUtils.undeployChart('kubeconfig01', 'ffc-demo-web', 'pr53')
+```
+
+### helm.undeployChart
+
+Removes a Helm chart previously deployed to a Kubernetes cluster.
+Both the chart and the namespace are removed when the chart is undeployed.
+
+Takes three parameters:
+- environment to undeploy from
+- the name of the chart
+- container image tag that was deployed by this chart
+
+New usage:
+
+```
+helm.undeployChart('dev', 'ffc-demo-web', 'pr53')
 ```
 
 ### publishChart / helm.publishChart
@@ -562,7 +599,7 @@ New usage:
 helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
 ```
 
-### deployRemoteChart / helm.deployRemoteChart
+### deployRemoteChart (Obsolete, see helm.deployRemoteChart below)
 
 Deploys a Helm chart from a remote chart repository to Kubernetes.
 
@@ -576,7 +613,25 @@ New usage:
 
 ```
 def extraCommands = "--values ./helm/ffc-demo-web/aws-values.yaml"
-helm.deployRemoteChart('ffc-demo', 'ffc-demo-web', '1.1.7', extraCommands)
+defraUtils.deployRemoteChart('ffc-demo', 'ffc-demo-web', '1.1.7', extraCommands)
+```
+
+### helm.deployRemoteChart
+
+Deploys a Helm chart from a remote chart repository to Kubernetes.
+
+Takes four parameters:
+- the environment to deploy into
+- the Kubernetes namespace to deploy into
+- the chart name
+- the chart version
+
+The 'extraCommands' parameter previously specified inline have now been moved to Jenkins secret values, `pr-values.yaml` and `dev-values.yaml`
+
+New usage:
+
+```
+helm.deployRemoteChart('dev', 'ffc-demo', 'ffc-demo-web', '1.1.7')
 ```
 
 ### triggerDeploy / deploy.trigger

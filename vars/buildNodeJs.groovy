@@ -77,7 +77,7 @@ def call(Map config=[:], Closure body={}) {
       }
       if (mergedPrNo != '') {
         stage('Remove merged PR') {
-          helm.undeployChart(KUBE_CREDENTIALS_ID, repoName, mergedPrNo)
+          helm.undeployChart(config.environment, repoName, mergedPrNo)
         }
       }
       body()

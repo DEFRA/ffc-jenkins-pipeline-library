@@ -37,10 +37,10 @@ def writeUrlIfIngress(deploymentName) {
 }
 
 // public
-def undeployChart(credentialsId, chartName, tag) {
+def undeployChart(environment, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
-  withKubeConfig([credentialsId: credentialsId]) {
+  withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
     sh "helm uninstall $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
