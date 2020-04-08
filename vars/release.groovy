@@ -11,8 +11,7 @@ def releaseExists(containerTag, repoName, token){
 }
 
 // public
-def trigger(containerTag, releaseDescription, token){
-  def repoName = build.getRepoName()
+def trigger(containerTag, repoName, releaseDescription, token){
   if (releaseExists(containerTag, repoName, token)){
     echo "Release $containerTag already exists"
     return false

@@ -4,6 +4,7 @@ def call(Map config=[:], Closure body={}) {
   def lcovFile = './test-output/lcov.info'
   def sonarQubeEnv = 'SonarQube'
   def sonarScanner = 'SonarScanner'
+  def qualityGateTimeout = 10
   def repoName = ''
   def pr = ''
   def containerTag = ''
@@ -21,16 +22,14 @@ def call(Map config=[:], Closure body={}) {
       stage('Set PR, and containerTag variables') {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
-      echo "branch name: ${BRANCH_NAME}"
-      notifySlack.buildFailure("I can't do that Dave", "#generalbuildfailures")
-      /*stage('Helm lint') {
-        test.lintHelm()
+      stage('Helm lint') {
+        test.lintHelm(repoName)
       }
       stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, BUILD_NUMBER)
+        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER)
       }
       stage('Run tests') {
-        build.runTests(BUILD_NUMBER)
+        build.runTests(repoName, repoName, BUILD_NUMBER)
       }
       stage('Create JUnit report') {
         test.createReportJUnit()
@@ -39,13 +38,13 @@ def call(Map config=[:], Closure body={}) {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
       }
       stage('SonarQube analysis') {
-        test.analyseCode(sonarQubeEnv, sonarScanner)
+        test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName))
       }
       stage("Code quality gate") {
-        test.waitForQualityGateResult(10)
+        test.waitForQualityGateResult(qualityGateTimeout)
       }
       stage('Push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, containerTag)
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
       }
       if (pr != '') {
         stage('Verify version incremented') {
@@ -58,13 +57,13 @@ def call(Map config=[:], Closure body={}) {
       }
       if (pr == '') {
         stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, containerTag)
+          helm.publishChart(DOCKER_REGISTRY, repoName, containerTag)
         }
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            release.trigger(containerTag, containerTag, gitToken)
+            release.trigger(containerTag, repoName, containerTag, gitToken)
           }
         }
         stage('Trigger Deployment') {
@@ -78,12 +77,12 @@ def call(Map config=[:], Closure body={}) {
       }
       if (mergedPrNo != '') {
         stage('Remove merged PR') {
-          helm.undeployChart(KUBE_CREDENTIALS_ID, mergedPrNo)
+          helm.undeployChart(KUBE_CREDENTIALS_ID, repoName, mergedPrNo)
         }
       }
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
-      }*/
+      }
     } catch(e) {
       build.setGithubStatusFailure(e.message)
       notifySlack.buildFailure(e.message, "#generalbuildfailures")

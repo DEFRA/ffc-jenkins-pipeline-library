@@ -1,6 +1,5 @@
 // public
-def lintHelm() {
-  def chartName = build.getRepoName()
+def lintHelm(chartName) {
   sh "helm lint ./helm/$chartName"
 }
 
@@ -15,14 +14,16 @@ def deleteOutput(containerImage, containerWorkDir) {
   sh "[ -d \"$WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/$containerWorkDir/test-output $containerImage rm -rf test-output/*"
 }
 
-// public
-def analyseCode(sonarQubeEnv, sonarScanner) {
-  def scannerHome = tool sonarScanner
-  def params = [
-    'sonar.projectKey' : build.getRepoName(),
+def buildCodeAnalysisDefaultParams(projectName) {
+  return [
+    'sonar.projectKey' : projectName,
     'sonar.sources': '.'
-  ]
-  def projectKey = build.getRepoName()
+  ];
+}
+
+// public
+def analyseCode(sonarQubeEnv, sonarScanner, params) {
+  def scannerHome = tool sonarScanner
   withSonarQubeEnv(sonarQubeEnv) {
     def args = ''
     params.each { param ->

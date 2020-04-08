@@ -37,8 +37,7 @@ def writeUrlIfIngress(deploymentName) {
 }
 
 // public
-def undeployChart(credentialsId, tag) {
-  def chartName = build.getRepoName()
+def undeployChart(credentialsId, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: credentialsId]) {
@@ -48,8 +47,7 @@ def undeployChart(credentialsId, tag) {
 }
 
 // public
-def publishChart(registry, tag) {
-  def chartName = build.getRepoName()
+def publishChart(registry, chartName, tag) {
   withCredentials([
     string(credentialsId: 'helm-chart-repo', variable: 'helmRepo')
   ]) {

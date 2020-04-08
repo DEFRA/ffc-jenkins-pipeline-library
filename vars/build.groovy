@@ -94,28 +94,25 @@ def setGithubStatusFailure(message = '') {
 }
 
 // public
-def buildTestImage(credentialsId, registry, buildNumber) {
-  def projectName = getRepoName()
+def buildTestImage(credentialsId, registry, projectName, buildNumber) {
   docker.withRegistry("https://$registry", credentialsId) {
     sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache"
   }
 }
 
 // public
-def runTests(buildNumber) {
-  def projectName = getRepoName()
+def runTests(projectName, serviceName, buildNumber) {
   try {
     sh 'mkdir -p test-output'
     sh 'chmod 777 test-output'
-    sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $projectName"
+    sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName"
   } finally {
     sh "docker-compose -p $projectName-$containerTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v"
   }
 }
 
 // public
-def buildAndPushContainerImage(credentialsId, registry, tag) {
-  def imageName = getRepoName()
+def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   docker.withRegistry("https://$registry", credentialsId) {
     sh "docker-compose -f docker-compose.yaml build --no-cache"
     sh "docker tag $imageName $registry/$imageName:$tag"
