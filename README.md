@@ -10,6 +10,56 @@ The library is versioning following the [semantic versioning specification](http
 
 ## Usage
 
+### New build procedure
+A default node pipeline is now available and should be used in preference to the individual method calls in the `DefraUtils` class. This should very significantly reduce the amount of code required in your repository's Jenkinsfile:
+
+```
+@Library('defra-library@4') _
+
+buildNodeJs environment: 'dev'
+```
+
+Specifying an environment means that in future we'll be able to support pipelines for different clusters, such as staging and production environments, although these clusters aren't yet in existance. 
+If your pipeline has additional steps, pass a callback in the following manner:
+```
+buildNodeJs environment: 'dev'
+```
+
+Should you have a pipeline where you need to call the various methods individually, these have been moved to individual files:
+| DefraUtils | New Equivalent |
+|------------|:----------------:|
+| destroyPrSqsQueues | queues.destroyPrSqsQueues |
+| provisionPrSqsQueue | queues.provisionPrSqsQueue |
+| provisionPrDatabaseRoleAndSchema | database.provisionPrDbRoleAndSchema |
+| destroyPrDatabaseRoleAndSchema | database.destroyPrDbRoleAndSchema |
+| getCSProjVersion | version.getCSProjVersion |
+| getPackageJsonVersion | version.getPackageJsonVersion |
+| verifyCSProjVersionIncremented | version.verifyCSProjIncremented |
+| verifyPackageJsonVersionIncremented | version.verifyPackageJsonIncremented |
+| getVariables | build.getVariables |
+| setGithubStatusSuccess | build.setGithubStatusSuccess |
+| setGithubStatusPending | build.setGithubStatusPending |
+| setGithubStatusFailure | build.setGithubStatusFailure |
+| lintHelm | test.lintHelm |
+| buildTestImage | build.buildTestImage |
+| runTests | build.runTests |
+| createTestReportJUnit | test.createReportJUnit |
+| deleteTestOutput | test.deleteOutput |
+| analyseCode | test.analyseCode |
+| waitForQualityGateResult | test.waitForQualityGateResult |
+| buildAndPushContainerImage | build.buildAndPushContainerImage |
+| deployChart | helm.deployChart |
+| undeployChart | helm.undeployChart |
+| publishChart | helm.publishChart |
+| deployRemoteChart | helm.deployRemoteChart |
+| triggerDeploy | deploy.trigger |
+| triggerRelease | deploy.release |
+| notifySlackBuildFailure | notifySlack.buildFailure |
+| replaceInFile | utils.replaceInFile |
+| getCommitMessage | utils.getCommitMessage |
+The parameters taken by the function haven't changed, just the location.
+
+### Following build procedure is deprecated and will be removed in v5.0.0
 Register the library as a global pipeline library in the Jenkins Global Configuration.
 
 Import the library with the `@library` annotation, including an optional tag or branch.

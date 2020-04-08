@@ -80,6 +80,7 @@ def call(Map config=[:], Closure body={}) {
           helm.undeployChart(KUBE_CREDENTIALS_ID, repoName, mergedPrNo)
         }
       }
+      body()
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
       }
@@ -91,5 +92,4 @@ def call(Map config=[:], Closure body={}) {
       test.deleteOutput(repoName, containerSrcFolder)
     }
   }
-  body()
 }
