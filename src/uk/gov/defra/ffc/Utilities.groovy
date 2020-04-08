@@ -12,7 +12,7 @@ class Utilities implements Serializable {
   Utilities(context) {
     this.context = context
     this.branch = this.context.BRANCH_NAME
-    echo "BRANCH_NAME: ${this.branch}"
+    this.context.echo "BRANCH_NAME: ${this.branch}"
     this.verifyCommitBuildable();
 
     this.containerTag = this.getContainerTag()
