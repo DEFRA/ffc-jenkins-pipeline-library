@@ -27,7 +27,7 @@ buildNodeJs environment: 'dev'
 
 Should you have a pipeline where you need to call the various methods individually, these have been moved to individual files. For full details, see the individual function details in the next section.
 | DefraUtils | New Equivalent |
-|------------|:----------------:|
+|------------|----------------|
 | destroyPrSqsQueues | queues.destroyPrSqsQueues |
 | provisionPrSqsQueue | queues.provisionPrSqsQueue |
 | provisionPrDatabaseRoleAndSchema | database.provisionPrDbRoleAndSchema |
