@@ -20,8 +20,6 @@ def call(Map config=[:], Closure body={}) {
       }
       stage('Set PR, and containerTag variables') {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
-        pr = ''
-        //mergedPrNo = 'pr118'
       }
       stage('Helm lint') {
         test.lintHelm()
@@ -54,9 +52,6 @@ def call(Map config=[:], Closure body={}) {
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
           echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
-        }
-        stage('Deploy master') {
-          helm.deployRemoteChart(config.environment, 'ffc-demo', 'ffc-demo-web', containerTag)
         }
         notifySlack.buildFailure("I can't do that Dave", "#homicidalComputer")
       }
