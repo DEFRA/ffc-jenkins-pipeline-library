@@ -1,6 +1,6 @@
 // public
 def lintHelm(chartName) {
-  helm.addHelmRepo('ffc-public', $HELM_CHART_REPO_PUBLIC)
+  helm.addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
   sh "helm dependency update ./helm/$chartName"
   sh "helm lint ./helm/$chartName"
 }

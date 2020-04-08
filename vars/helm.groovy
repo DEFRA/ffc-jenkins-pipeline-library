@@ -80,7 +80,7 @@ def deployRemoteChart(credentialsId, environment, namespace, chartName, chartVer
       file(credentialsId: "$chartName-$environment-values", variable: 'values')
     ]) {
       def extraCommands = getExtraCommands(chartVersion)
-      addHelmRepo('ffc', $HELM_CHART_REPO)
+      addHelmRepo('ffc', HELM_CHART_REPO)
       sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
       sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
     }
