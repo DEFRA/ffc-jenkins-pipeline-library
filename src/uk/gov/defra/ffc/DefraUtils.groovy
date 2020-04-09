@@ -407,7 +407,7 @@ def publishChart(registry, chartName, tag) {
         sh "git commit -m 'update $chartName helm chart from build job'"
         sh 'git push'
       }
-    
+    }
   }
 }
 
