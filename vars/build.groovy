@@ -1,12 +1,3 @@
-def branch = ''
-def pr = ''
-def mergedPrNo = ''
-def containerTag = ''
-def repoUrl = ''
-def repoName = ''
-def commitSha = ''
-def workspace
-
 // private
 def getMergedPrNo() {
   def mergedPrNo = sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
