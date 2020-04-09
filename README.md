@@ -28,35 +28,35 @@ buildNodeJs environment: 'dev', { echo 'do the things' }
 Should you have a pipeline where you need to call the various methods individually, these have been moved to individual files. For full details, see the individual function details in the next section.
 | DefraUtils | New Equivalent |
 |------------|----------------|
+| buildAndPushContainerImage | build.buildAndPushContainerImage |
+| buildTestImage | build.buildTestImage |
+| getVariables | build.getVariables |
+| runTests | build.runTests |
+| setGithubStatusFailure | build.setGithubStatusFailure |
+| setGithubStatusPending | build.setGithubStatusPending |
+| setGithubStatusSuccess | build.setGithubStatusSuccess |
+| destroyPrDatabaseRoleAndSchema | database.destroyPrDbRoleAndSchema |
+| provisionPrDatabaseRoleAndSchema | database.provisionPrDbRoleAndSchema |
+| triggerRelease | deploy.release |
+| triggerDeploy | deploy.trigger |
+| deployChart | helm.deployChart |
+| deployRemoteChart | helm.deployRemoteChart |
+| publishChart | helm.publishChart |
+| undeployChart | helm.undeployChart |
+| notifySlackBuildFailure | notifySlack.buildFailure |
 | destroyPrSqsQueues | queues.destroyPrSqsQueues |
 | provisionPrSqsQueue | queues.provisionPrSqsQueue |
-| provisionPrDatabaseRoleAndSchema | database.provisionPrDbRoleAndSchema |
-| destroyPrDatabaseRoleAndSchema | database.destroyPrDbRoleAndSchema |
+| analyseCode | test.analyseCode |
+| createTestReportJUnit | test.createReportJUnit |
+| deleteTestOutput | test.deleteOutput |
+| lintHelm | test.lintHelm |
+| waitForQualityGateResult | test.waitForQualityGateResult |
+| getCommitMessage | utils.getCommitMessage |
+| replaceInFile | utils.replaceInFile |
 | getCSProjVersion | version.getCSProjVersion |
 | getPackageJsonVersion | version.getPackageJsonVersion |
 | verifyCSProjVersionIncremented | version.verifyCSProjIncremented |
 | verifyPackageJsonVersionIncremented | version.verifyPackageJsonIncremented |
-| getVariables | build.getVariables |
-| setGithubStatusSuccess | build.setGithubStatusSuccess |
-| setGithubStatusPending | build.setGithubStatusPtraending |
-| setGithubStatusFailure | build.setGithubStatusFailure |
-| lintHelm | test.lintHelm |
-| buildTestImage | build.buildTestImage |
-| runTests | build.runTests |
-| createTestReportJUnit | test.createReportJUnit |
-| deleteTestOutput | test.deleteOutput |
-| analyseCode | test.analyseCode |
-| waitForQualityGateResult | test.waitForQualityGateResult |
-| buildAndPushContainerImage | build.buildAndPushContainerImage |
-| deployChart | helm.deployChart |
-| undeployChart | helm.undeployChart |
-| publishChart | helm.publishChart |
-| deployRemoteChart | helm.deployRemoteChart |
-| triggerDeploy | deploy.trigger |
-| triggerRelease | deploy.release |
-| notifySlackBuildFailure | notifySlack.buildFailure |
-| replaceInFile | utils.replaceInFile |
-| getCommitMessage | utils.getCommitMessage |
 
 ### Following build procedure is deprecated and will be removed in v5.0.0
 Register the library as a global pipeline library in the Jenkins Global Configuration.
