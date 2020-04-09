@@ -1,5 +1,6 @@
 // public
 def buildFailure(exception, channel) {
+  def branch = BRANCH_NAME
   def msg = """BUILD FAILED
           ${JOB_NAME}/${BUILD_NUMBER}
           ${exception}

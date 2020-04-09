@@ -16,6 +16,13 @@ def deleteOutput(containerImage, containerWorkDir) {
   sh "[ -d \"$WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/$containerWorkDir/test-output $containerImage rm -rf test-output/*"
 }
 
+def buildCodeAnalysisDefaultParams(projectName) {
+  return [
+    'sonar.projectKey' : projectName,
+    'sonar.sources': '.'
+  ];
+}
+
 // public
 def analyseCode(sonarQubeEnv, sonarScanner, params) {
   def scannerHome = tool sonarScanner

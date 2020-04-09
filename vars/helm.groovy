@@ -15,8 +15,8 @@ def getPrCommands(registry, chartName, tag) {
 }
 
 // public
-def deployChart(credentialsId, environment, registry, chartName, tag) {
-  withKubeConfig([credentialsId: credentialsId]) {
+def deployChart(environment, registry, chartName, tag) {
+  withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
     withCredentials([
       file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
       file(credentialsId: "$chartName-pr-values", variable: 'prValues')
@@ -37,10 +37,10 @@ def writeUrlIfIngress(deploymentName) {
 }
 
 // public
-def undeployChart(credentialsId, chartName, tag) {
+def undeployChart(environment, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
-  withKubeConfig([credentialsId: credentialsId]) {
+  withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
     sh "helm uninstall $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
@@ -58,7 +58,7 @@ def publishChart(registry, chartName, tag) {
       dir('helm-charts') {
         sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
         sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
-        addHelmRepo('ffc-public', $HELM_CHART_REPO_PUBLIC)
+        addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
         sh "helm dependency update ../helm/$chartName"
         sh "helm package ../helm/$chartName"
         sh 'helm repo index .'
@@ -74,8 +74,8 @@ def publishChart(registry, chartName, tag) {
 }
 
 // public
-def deployRemoteChart(credentialsId, environment, namespace, chartName, chartVersion) {
-  withKubeConfig([credentialsId: credentialsId]) {
+def deployRemoteChart(environment, namespace, chartName, chartVersion) {
+  withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
     withCredentials([
       file(credentialsId: "$chartName-$environment-values", variable: 'values')
     ]) {
