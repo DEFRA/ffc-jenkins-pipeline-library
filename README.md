@@ -22,7 +22,7 @@ buildNodeJs environment: 'dev'
 Specifying an environment means that in future we'll be able to support pipelines for different clusters, such as staging and production environments, although these clusters aren't yet in existance. 
 If your pipeline has additional steps, pass a callback in the following manner:
 ```
-buildNodeJs environment: 'dev'
+buildNodeJs environment: 'dev', { echo 'do the things' }
 ```
 
 Should you have a pipeline where you need to call the various methods individually, these have been moved to individual files. For full details, see the individual function details in the next section.
