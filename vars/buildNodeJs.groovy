@@ -65,10 +65,9 @@ def call(Map config=[:], Closure body={}) {
         }
         stage('Trigger Deployment') {
           withCredentials([
-            string(credentialsId: 'web-deploy-job-name', variable: 'deployJobName'),
-            string(credentialsId: 'web-deploy-token', variable: 'jenkinsToken')
+            string(credentialsId: "${repoName}-deploy-token", variable: 'jenkinsToken')
           ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deployJobName, jenkinsToken, ['chartVersion': containerTag])
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': containerTag])
           }
         }
       }

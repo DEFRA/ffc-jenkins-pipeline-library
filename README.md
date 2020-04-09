@@ -633,7 +633,7 @@ New usage:
 helm.deployRemoteChart('dev', 'ffc-demo', 'ffc-demo-web', '1.1.7')
 ```
 
-### triggerDeploy / deploy.trigger
+### triggerDeploy (Obsolete, see deploy.trigger below)
 
 Triggers the Jenkins deployment job to deploy the built image.
 
@@ -651,6 +651,22 @@ New usage:
 deploy.trigger((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chartVersion':'1.0.0'])
 ```
 
+### deploy.trigger
+
+Triggers the Jenkins deployment job to deploy the built image.
+
+Takes four parameters:
+- the full url (without trailing /) of the jenkins service, including username and access token
+  e.g. `https://deploy:accesstoken@jenkins.ffc.aws-int.defra.cloud`
+- the repo name, which will be used to identify the deploy job name (assumes job name is in the format "$repoName-deploy")
+- the token that is set up when you configured the job in Jenkins. You must tick the "Trigger builds remotely" option when configuring the job. The Authentication token entered into the job is the one that should be passed here.
+- an object, that should contain all the parameters that need to be passed to the job (if required), for example `['version': '1.0.0']`
+
+New usage:
+
+```
+deploy.trigger((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chartVersion':'1.0.0'])
+```
 
 ### releaseExists
 

@@ -1,6 +1,6 @@
 // public
-def trigger(jenkinsUrl, jobName, token, params) {
-  def url = "$jenkinsUrl/job/$jobName/buildWithParameters?token=$token"
+def trigger(jenkinsUrl, repoName, token, params) {
+  def url = "$jenkinsUrl/job/$repoName-deploy/buildWithParameters?token=$token"
   params.each { param ->
     url = url + "\\&$param.key=$param.value"
   }
