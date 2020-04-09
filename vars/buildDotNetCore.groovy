@@ -90,8 +90,6 @@ def call(Map config=[:], Closure body={}) {
       build.setGithubStatusFailure(e.message)
       notifySlack.buildFailure(e.message, "#generalbuildfailures")
       throw e
-    } finally {
-      test.deleteOutput(repoName, containerSrcFolder)
     }
   }
 }
