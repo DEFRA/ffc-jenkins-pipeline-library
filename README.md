@@ -20,12 +20,12 @@ A default node pipeline is now available and should be used in preference to the
 buildNodeJs environment: 'dev'
 ```
 
-Specifying an environment means that in future we'll be able to support pipelines for different clusters, such as staging and production environments, although these clusters aren't yet in existance.
+Specifying an environment means that in future we'll be able to support pipelines for different clusters, such as staging and production environments, although these clusters aren't yet in existence.
 If your pipeline has additional steps, pass a callback in the following manner:
 ```
 buildNodeJs environment: 'dev', { echo 'do the things' }
 ```
-The pipeline relies on a number of conventions being observed within your repo and jenkins setup:
+The pipeline relies on a number of conventions being observed within your repo and Jenkins setup:
 1. The Helm chart must have the same name as the repository
 2. The service name in Docker Compose must have the same name as the repository
 3. The application must be deployed to /home/node/ in a container
@@ -74,7 +74,7 @@ Should you have a pipeline where you need to call the various methods individual
 Register the library as a global pipeline library in the Jenkins Global Configuration.
 
 Import the library with the `@library` annotation, including an optional tag or branch.
-Semver tags are created for each release, so you can target the `MAJOR`, `MINOR` or `PATCH` of a release.
+SemVer tags are created for each release, so you can target the `MAJOR`, `MINOR` or `PATCH` of a release.
 All the examples below are valid, assuming the global pipeline library has been imported as `defra-library`:
 
 ```
@@ -115,7 +115,7 @@ Many of these are now obsolete, and will be removed in v5 of the pipeline. Where
 
 ### tagCommit
 
-Attaches a tag to a specified commit on a repo in the DEFRA github account. If the provided tag alreay exists on origin, it is deleted and reattached to the given commit SHA. If the tag does not exist on origin, it is created and pushed to origin.
+Attaches a tag to a specified commit on a repo in the DEFRA github account. If the provided tag already exists on origin, it is deleted and reattached to the given commit SHA. If the tag does not exist on origin, it is created and pushed to origin.
 
 It takes three parameters:
   * a string containing the tag to attach to the commit
@@ -124,15 +124,15 @@ It takes three parameters:
 
 ### addSemverTags
 
-Attaches a `MAJOR` and `MINOR` version tag to the lastest commit to a repo in the DEFRA github account. It uses `tagCommit` to perform the commit tagging on origin.
+Attaches a `MAJOR` and `MINOR` version tag to the latest commit to a repo in the DEFRA github account. It uses `tagCommit` to perform the commit tagging on origin.
 
 Examples:
-  * provided with a `PATCH` increment to a verion (e.g. `2.3.5` to `2.3.6`), the `MAJOR` and `MINOR` tags (`2` and `2.3`) will be moved to the latest commit.
-  * provided with a `MINOR` increment to a verion (e.g. `2.3.5` to `2.4.0`), the `MAJOR` tag (`2`) will be moved and the `MINOR` tag (`2.4`) will be created and attached to the latest commit.
-  * provided with a `MAJOR` increment to a verion (e.g. `2.3.5` to `3.0.0`), the `MAJOR` and `MINOR` tags (`3` and `3.0`) will be created and attached to the latest commit.
+  * provided with a `PATCH` increment to a version (e.g. `2.3.5` to `2.3.6`), the `MAJOR` and `MINOR` tags (`2` and `2.3`) will be moved to the latest commit.
+  * provided with a `MINOR` increment to a version (e.g. `2.3.5` to `2.4.0`), the `MAJOR` tag (`2`) will be moved and the `MINOR` tag (`2.4`) will be created and attached to the latest commit.
+  * provided with a `MAJOR` increment to a version (e.g. `2.3.5` to `3.0.0`), the `MAJOR` and `MINOR` tags (`3` and `3.0`) will be created and attached to the latest commit.
 
 It takes two parameters:
-  * a string containing the current semver version for the release formatted as `MAJOR.MINOR.PATCH`
+  * a string containing the current SemVer version for the release formatted as `MAJOR.MINOR.PATCH`
   * a string containing the name of the repository (assumed to be in the DEFRA github account)
 
 
@@ -221,14 +221,14 @@ If the version has not incremented correctly, or is invalid, an error will be th
 
 ### getFileVersion
 
-Returns the contents of a given file. The assumption is that this file contains a single string that is a semver formatted version number: `MAJOR.MINOR.PATCH`.
+Returns the contents of a given file. The assumption is that this file contains a single string that is a SemVer formatted version number: `MAJOR.MINOR.PATCH`.
 
 It takes one parameter:
   * a string containing the file name of the file containing the version number
 
 ### getFileVersionMaster
 
-Returns the contents of a given file in the master branch. The assumption is that this file contains a single string that is a semver formatted version number: `MAJOR.MINOR.PATCH`.
+Returns the contents of a given file in the master branch. The assumption is that this file contains a single string that is a SemVer formatted version number: `MAJOR.MINOR.PATCH`.
 
 It takes one parameter:
   * a string containing the file name of the file containing the version number
@@ -253,7 +253,7 @@ Function used internally in the `verifyCSProjVersionIncremented`, `verifyPackage
 
 Takes two parameters of the versions to compare, typically master version and branch version.
 
-The function returns `true` if both versions are valid semvers, and the second version is higher than the first.
+The function returns `true` if both versions are valid SemVers, and the second version is higher than the first.
 
 The function returns `false` if either version is invalid, or the second version is not higher than the first.
 
@@ -322,7 +322,7 @@ Takes the repository name as a parameter, i.e. `ffc-demo-web`, as well as the re
 
 It returns information required by the build steps as an array
 - the PR number, i.e. `53`
-- the container tag, either the semver number (for master branch) or the PR number prefixed with pr, i.e. `pr53`
+- the container tag, either the SemVer number (for master branch) or the PR number prefixed with pr, i.e. `pr53`
 - the merged PR number
 
 Example usage:
@@ -340,7 +340,7 @@ Unlike the DefraUtils version, it no longer takes the repository name as a param
 It returns information required by the build steps as an array
 - the repo name, e.g. `ffc-demo-web`
 - the PR number, i.e. `53`
-- the container tag, either the semver number (for master branch) or the PR number prefixed with pr, i.e. `pr53`
+- the container tag, either the SemVer number (for master branch) or the PR number prefixed with pr, i.e. `pr53`
 - the merged PR number
 
 Example usage:
@@ -655,9 +655,9 @@ helm.deployRemoteChart('dev', 'ffc-demo', 'ffc-demo-web', '1.1.7')
 Triggers the Jenkins deployment job to deploy the built image.
 
 Takes four parameters:
-- the full url (without trailing /) of the jenkins service, including username and access token
+- the full url (without trailing /) of the Jenkins service, including username and access token
   e.g. `https://deploy:accesstoken@jenkins.ffc.aws-int.defra.cloud`
-- the jenkins job name for the deploy job, this is in the url when you edit or view the job in Jenkins
+- the Jenkins job name for the deploy job, this is in the url when you edit or view the job in Jenkins
 - the token that is set up when you configured the job in Jenkins. You must tick the "Trigger builds remotely" option when configuring the job. The Authentication token entered into the job is the one that should be passed here.
 - an object, that should contain all the parameters that need to be passed to the job (if required), for example `['version': '1.0.0']`
 
@@ -673,7 +673,7 @@ deploy.trigger((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chartVersion':'
 Triggers the Jenkins deployment job to deploy the built image.
 
 Takes four parameters:
-- the full url (without trailing /) of the jenkins service, including username and access token
+- the full url (without trailing /) of the Jenkins service, including username and access token
   e.g. `https://deploy:accesstoken@jenkins.ffc.aws-int.defra.cloud`
 - the repo name, which will be used to identify the deploy job name (assumes job name is in the format "$repoName-deploy")
 - the token that is set up when you configured the job in Jenkins. You must tick the "Trigger builds remotely" option when configuring the job. The Authentication token entered into the job is the one that should be passed here.
@@ -690,7 +690,7 @@ deploy.trigger((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chartVersion':'
 Checks GitHub to determine if a given Release Tag already exists for that repo.
 
 Takes three parameters:
-- the container tag in semver format to check for on GitHub e.g 1.0.0
+- the container tag in SemVer format to check for on GitHub e.g 1.0.0
 - the repository name to check
 - the GitHub connection token secret text
 
@@ -700,10 +700,10 @@ releaseExists(containerTag, repoName, token)
 
 ### triggerRelease / release.trigger
 
-Triggers a release to be created on GitHub for a given repo only where a release with the identical semver does not already exist
+Triggers a release to be created on GitHub for a given repo only where a release with the identical SemVer does not already exist
 
 Takes four parameters:
-- the container tag in semver format to check for on GitHub e.g 1.0.0
+- the container tag in SemVer format to check for on GitHub e.g 1.0.0
 - the repository name to check
 - the release description text
 - the GitHub connection token secret text
@@ -715,7 +715,7 @@ release.trigger(containerTag, repoName, releaseDescription, token)
 
 ### notifySlackBuildFailure / notifySlack.buildFailure
 
-Sends a message to the ffc-notifications Slack workspace when the jenkins build fails.
+Sends a message to the ffc-notifications Slack workspace when the Jenkins build fails.
 
 Takes two parameters:
 - the failure reason to display in the slack notification e.g. `e.message`
