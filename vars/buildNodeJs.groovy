@@ -13,9 +13,6 @@ def call(Map config=[:], Closure body={}) {
   node {
     checkout scm
     try {
-      stage('Start') {
-        echo "pipeline started"
-      }
       stage('Set GitHub status as pending') {
         build.setGithubStatusPending()
       }
