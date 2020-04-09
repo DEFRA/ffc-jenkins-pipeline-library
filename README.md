@@ -11,6 +11,7 @@ The library is versioning following the [semantic versioning specification](http
 ## Usage
 
 ### New build procedure
+
 A default node pipeline is now available and should be used in preference to the individual method calls in the `DefraUtils` class. This should very significantly reduce the amount of code required in your repository's Jenkinsfile:
 
 ```
@@ -19,7 +20,7 @@ A default node pipeline is now available and should be used in preference to the
 buildNodeJs environment: 'dev'
 ```
 
-Specifying an environment means that in future we'll be able to support pipelines for different clusters, such as staging and production environments, although these clusters aren't yet in existance. 
+Specifying an environment means that in future we'll be able to support pipelines for different clusters, such as staging and production environments, although these clusters aren't yet in existance.
 If your pipeline has additional steps, pass a callback in the following manner:
 ```
 buildNodeJs environment: 'dev', { echo 'do the things' }
@@ -34,6 +35,7 @@ The pipeline relies on a number of conventions being observed within your repo a
 7. The application's Docker Compose files must be structured to support running tests with the command `docker-compose -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName`
 
 #### Running pipeline methods individually
+
 Should you have a pipeline where you need to call the various methods individually, these have been moved to individual files. For full details, see the individual function details in the next section.
 | DefraUtils | New Equivalent |
 |------------|----------------|
@@ -68,6 +70,7 @@ Should you have a pipeline where you need to call the various methods individual
 | verifyPackageJsonVersionIncremented | version.verifyPackageJsonIncremented |
 
 ### Following build procedure is deprecated and will be removed in v5.0.0
+
 Register the library as a global pipeline library in the Jenkins Global Configuration.
 
 Import the library with the `@library` annotation, including an optional tag or branch.
@@ -107,6 +110,7 @@ A simple test harness may be run to unit test functions that are purely `groovy`
 ```
 
 ## Functions
+
 Many of these are now obsolete, and will be removed in v5 of the pipeline. Where there is a direct equivalent with no difference in parameters, this is listed next to the function name. Where there is an equivalence, but with different parameters (e.g. `defraUtils.getVariables` / `build.getVariables`), the equivalent function is listed directly following the obsolete function with details on the new parameters. If there is no equivalent, these functions are not used by repo pipelines, but are dependencies of 'public' pipeline functions.
 
 ### tagCommit
@@ -184,6 +188,7 @@ Returns the project version from the `[projectName].csproj` file. It requires th
 Returns the project version from the `[projectName].csproj` file in the master branch. It requires the project name to be passed as a parameter, but this means that in a solution of several projects, versions can be retrieved for each of them.
 
 ### verifyCSProjVersionIncremented / version.verifyCSProjVersionIncremented
+
 Compares the master version with the branch version from the provided project name.
 If the version has been incremented correctly a message will be `echoed` displaying the new and the old version, i.e.
 
@@ -204,6 +209,7 @@ Returns the package version from the `package.json` file.
 Returns the package version from the `package.json` file in the master branch.
 
 ### verifyPackageJsonVersionIncremented / version.verifyPackageJsonIncremented
+
 Compares the master version with the branch version of the `package.json`.
 If the version has been incremented correctly message will be `echoed` displaying the new and the old version, i.e.
 
@@ -403,6 +409,7 @@ build.setGithubStatusFailure(error.message)
 ```
 
 ### lintHelm / test.lintHelm
+
 Lints Helm chart within repository.
 
 By convention Helm charts are stored in the folder `helm` in a subfolder the same name as the image, service, and repository.
@@ -417,6 +424,7 @@ test.lintHelm('ffc-demo-web')
 ```
 
 ### buildTestImage / build.buildTestImage
+
 Builds the test image using the docker-compose files in the repository. By convention the services are named the same as the image.
 
 Takes four parameters:
