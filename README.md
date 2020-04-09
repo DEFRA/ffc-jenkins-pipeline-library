@@ -552,7 +552,7 @@ Takes four parameters:
 - the name of the chart (note this must also be the name of the image to deploy)
 - container image tag to deploy
 
-The 'extraCommands' parameter previously specified inline have now been moved to Jenkins secret values, `pr-values.yaml` and `dev-values.yaml`
+'extraCommands' is no longer necessary. Previously it included the location of the specific environment's 'values' file to use for deployment. Now 'values' files are stored in Jenkins as a credential (as they contain secrets) and are determined automatically by the value of the 'env' argument.
 
 New usage:
 
@@ -634,7 +634,7 @@ Takes four parameters:
 - the chart name
 - the chart version
 
-The 'extraCommands' parameter previously specified inline have now been moved to Jenkins secret values, `pr-values.yaml` and `dev-values.yaml`
+'extraCommands' is no longer necessary. Previously it included the location of the specific environment's 'values' file to use for deployment. Now 'values' files are stored in Jenkins as a credential (as they contain secrets) and are determined automatically by the value of the 'env' argument.
 
 New usage:
 
