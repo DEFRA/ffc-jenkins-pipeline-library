@@ -37,36 +37,36 @@ The pipeline relies on a number of conventions being observed within your repo a
 #### Running pipeline methods individually
 
 Should you have a pipeline where you need to call the various methods individually, these have been moved to individual files. For full details, see the individual function details in the next section.
-| DefraUtils | New Equivalent |
-|------------|----------------|
-| buildAndPushContainerImage | build.buildAndPushContainerImage |
-| buildTestImage | build.buildTestImage |
-| getVariables | build.getVariables |
-| runTests | build.runTests |
-| setGithubStatusFailure | build.setGithubStatusFailure |
-| setGithubStatusPending | build.setGithubStatusPending |
-| setGithubStatusSuccess | build.setGithubStatusSuccess |
-| destroyPrDatabaseRoleAndSchema | database.destroyPrDbRoleAndSchema |
-| provisionPrDatabaseRoleAndSchema | database.provisionPrDbRoleAndSchema |
-| triggerRelease | deploy.release |
-| triggerDeploy | deploy.trigger |
-| deployChart | helm.deployChart |
-| deployRemoteChart | helm.deployRemoteChart |
-| publishChart | helm.publishChart |
-| undeployChart | helm.undeployChart |
-| notifySlackBuildFailure | notifySlack.buildFailure |
-| destroyPrSqsQueues | queues.destroyPrSqsQueues |
-| provisionPrSqsQueue | queues.provisionPrSqsQueue |
-| analyseCode | test.analyseCode |
-| createTestReportJUnit | test.createReportJUnit |
-| deleteTestOutput | test.deleteOutput |
-| lintHelm | test.lintHelm |
-| waitForQualityGateResult | test.waitForQualityGateResult |
-| getCommitMessage | utils.getCommitMessage |
-| replaceInFile | utils.replaceInFile |
-| getCSProjVersion | version.getCSProjVersion |
-| getPackageJsonVersion | version.getPackageJsonVersion |
-| verifyCSProjVersionIncremented | version.verifyCSProjIncremented |
+| DefraUtils                          | New Equivalent                       |
+| ------------                        | ----------------                     |
+| buildAndPushContainerImage          | build.buildAndPushContainerImage     |
+| buildTestImage                      | build.buildTestImage                 |
+| getVariables                        | build.getVariables                   |
+| runTests                            | build.runTests                       |
+| setGithubStatusFailure              | build.setGithubStatusFailure         |
+| setGithubStatusPending              | build.setGithubStatusPending         |
+| setGithubStatusSuccess              | build.setGithubStatusSuccess         |
+| destroyPrDatabaseRoleAndSchema      | database.destroyPrDbRoleAndSchema    |
+| provisionPrDatabaseRoleAndSchema    | database.provisionPrDbRoleAndSchema  |
+| triggerRelease                      | deploy.release                       |
+| triggerDeploy                       | deploy.trigger                       |
+| deployChart                         | helm.deployChart                     |
+| deployRemoteChart                   | helm.deployRemoteChart               |
+| publishChart                        | helm.publishChart                    |
+| undeployChart                       | helm.undeployChart                   |
+| notifySlackBuildFailure             | notifySlack.buildFailure             |
+| destroyPrSqsQueues                  | queues.destroyPrSqsQueues            |
+| provisionPrSqsQueue                 | queues.provisionPrSqsQueue           |
+| analyseCode                         | test.analyseCode                     |
+| createTestReportJUnit               | test.createReportJUnit               |
+| deleteTestOutput                    | test.deleteOutput                    |
+| lintHelm                            | test.lintHelm                        |
+| waitForQualityGateResult            | test.waitForQualityGateResult        |
+| getCommitMessage                    | utils.getCommitMessage               |
+| replaceInFile                       | utils.replaceInFile                  |
+| getCSProjVersion                    | version.getCSProjVersion             |
+| getPackageJsonVersion               | version.getPackageJsonVersion        |
+| verifyCSProjVersionIncremented      | version.verifyCSProjIncremented      |
 | verifyPackageJsonVersionIncremented | version.verifyPackageJsonIncremented |
 
 ### Following build procedure is deprecated and will be removed in v5.0.0
