@@ -50,7 +50,7 @@ def call(Map config=[:], Closure body={}) {
 
       if (pr != '') {
         stage('Verify version incremented') {
-          version.verifyCSProjIncremented()
+          version.verifyCSProjIncremented(config.csProjectName)
         }
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
