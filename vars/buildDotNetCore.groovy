@@ -28,22 +28,6 @@ def call(Map config=[:], Closure body={}) {
       stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER)
       }
-      // This stage isn't in the .Net core file
-      // stage('Create JUnit report') {
-      //   test.createReportJUnit()
-      // }
-      // This stage isn't in the .Net core file
-      // stage('Fix lcov report') {
-      //   utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      // }
-      // This stage isn't in the .Net core file
-      // stage('SonarQube analysis') {
-      //   test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName))
-      // }
-      // This stage isn't in the .Net core file
-      // stage("Code quality gate") {
-      //   test.waitForQualityGateResult(qualityGateTimeout)
-      // }
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
       }
@@ -57,6 +41,7 @@ def call(Map config=[:], Closure body={}) {
           echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
         }
       }
+
       if (pr == '') {
         stage('Publish chart') {
           helm.publishChart(DOCKER_REGISTRY, repoName, containerTag)
@@ -70,18 +55,19 @@ def call(Map config=[:], Closure body={}) {
         }
         stage('Trigger Deployment') {
           withCredentials([
-            string(credentialsId: 'web-deploy-job-name', variable: 'deployJobName'),
-            string(credentialsId: 'web-deploy-token', variable: 'jenkinsToken')
+            string(credentialsId: "${repoName}-deploy-token", variable: 'jenkinsToken')
           ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deployJobName, jenkinsToken, ['chartVersion': containerTag])
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': containerTag])
           }
         }
       }
+
       if (mergedPrNo != '') {
         stage('Remove merged PR') {
           helm.undeployChart(config.environment, repoName, mergedPrNo)
         }
       }
+
       body()
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
