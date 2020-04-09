@@ -1,10 +1,4 @@
 def call(Map config=[:], Closure body={}) {
-  def containerSrcFolder = '\\/usr\\/src\\/app'
-  def localSrcFolder = '.'
-  def lcovFile = './test-output/lcov.info'
-  def sonarQubeEnv = 'SonarQube'
-  def sonarScanner = 'SonarScanner'
-  def qualityGateTimeout = 10
   def repoName = ''
   def pr = ''
   def containerTag = ''
