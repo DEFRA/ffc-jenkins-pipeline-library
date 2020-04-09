@@ -1,8 +1,8 @@
 def call(Map config=[:], Closure body={}) {
-  def repoName = ''
-  def pr = ''
   def containerTag = ''
   def mergedPrNo = ''
+  def pr = ''
+  def repoName = ''
 
   node {
     checkout scm
@@ -11,7 +11,7 @@ def call(Map config=[:], Closure body={}) {
         build.setGithubStatusPending()
       }
       stage('Set PR, and containerTag variables') {
-        (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getCSProjVersion(config.csProjectName))
+        (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getCSProjVersion(config.project))
       }
       stage('Helm lint') {
         test.lintHelm(repoName)
@@ -28,7 +28,7 @@ def call(Map config=[:], Closure body={}) {
 
       if (pr != '') {
         stage('Verify version incremented') {
-          version.verifyCSProjIncremented(config.csProjectName)
+          version.verifyCSProjIncremented(config.project)
         }
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)

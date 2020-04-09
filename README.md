@@ -12,15 +12,26 @@ The library is versioning following the [semantic versioning specification](http
 
 ### New build procedure
 
-A default node pipeline is now available and should be used in preference to the individual method calls in the `DefraUtils` class. This should very significantly reduce the amount of code required in your repository's Jenkinsfile:
+A default build pipeline is now available for both Node.js and .NET Core projects. These should be used in preference to the individual method calls in the `DefraUtils` class. This will very significantly reduce the amount of code required in your repository's Jenkinsfile:
 
+Example Node.js Jenkinsfile:
 ```
 @Library('defra-library@4') _
 
 buildNodeJs environment: 'dev'
 ```
 
-Specifying an environment means that in future we'll be able to support pipelines for different clusters, such as staging and production environments, although these clusters aren't yet in existence.
+Example .NET Core Jenkinsfile:
+```
+@Library('defra-library@4') _
+
+buildDotNetCore environment: 'dev', project: 'FFCDemoPaymentService'
+```
+
+Both Node.js and .NET Core pipelines require an environment to be specified. Specifying an environment means that in future we'll be able to support pipelines for different clusters, such as staging and production environments, although these clusters aren't yet in existence.
+
+The .Net Core pipeline additionally requires the name of the project to be specified. The name of the project is the name of the csproj file that represents the main project. Due to the nature of .NET Core projects the file containing the version isn't able to be conventionally named and unlike a Node.js project where `package.json` can be used the file name needs to be specified.
+
 If your pipeline has additional steps, pass a callback in the following manner:
 ```
 buildNodeJs environment: 'dev', { echo 'do the things' }
