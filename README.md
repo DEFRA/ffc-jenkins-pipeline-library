@@ -24,7 +24,16 @@ If your pipeline has additional steps, pass a callback in the following manner:
 ```
 buildNodeJs environment: 'dev', { echo 'do the things' }
 ```
+The pipeline relies on a number of conventions being observed within your repo and jenkins setup:
+1. The Helm chart must have the same name as the repository
+2. The service name in Docker Compose must have the same name as the repository
+3. The application must be deployed to /home/node/ in a container
+4. The repository must be hosted on GitHub
+5. Your app should be hosted in an FFC cluster (only dev exists at present)
+6. Your app must have separate deployment pipeline to trigger, with the name matching the pattern "$repoName-deploy" and a deploy token setup in Jenkins as a secret, again named "${repoName}-deploy-token"
+7. The application's Docker Compose files must be structured to support running tests with the command `docker-compose -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName`
 
+#### Running pipeline methods individually
 Should you have a pipeline where you need to call the various methods individually, these have been moved to individual files. For full details, see the individual function details in the next section.
 | DefraUtils | New Equivalent |
 |------------|----------------|
