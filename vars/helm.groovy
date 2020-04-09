@@ -31,8 +31,8 @@ def deployChart(environment, registry, chartName, tag) {
 }
 
 // private
-def writeUrlIfIngress(deploymentName) {  
-  sh "if kubectl get ingress $deploymentName --ignore-not-found --namespace $deploymentName; then echo 'Build available for review at https://$deploymentName.$INGRESS_SERVER'; fi"
+def writeUrlIfIngress(deploymentName) {
+  sh "kubectl get ingress -n $deploymentName -o jsonpath='{.items[0].spec.rules[0].host}' --ignore-not-found | sed -e 's/^/Build available for review at https:\/\//;'"  
 }
 
 // public
