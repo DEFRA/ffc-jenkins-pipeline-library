@@ -7,7 +7,6 @@ def getPrCommands(registry, chartName, tag) {
     /image=$registry\/$chartName:$tag/,
     /namespace=$chartName-$tag/,
     /pr=$tag/,
-    /name=$chartName-$tag/,
     /container.redeployOnChange=$tag-$BUILD_NUMBER/    
     ].join(',')
 

@@ -49,7 +49,6 @@ def call(Map config=[:], Closure body={}) {
         }
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
-          echo "Build available for review at https://ffc-demo-$containerTag.$INGRESS_SERVER"
         }
       }
       if (pr == '') {
