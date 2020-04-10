@@ -11,5 +11,5 @@ def trigger(jenkinsUrl, repoName, token, params) {
 
 def getFolder(repoName) {
   def folderArray = repoName.split('-')
-  return "$folderArray[0]-$folderArray[1]"
+  return "${folderArray[0]}-${folderArray[1]}"
 }
