@@ -9,7 +9,7 @@ def trigger(jenkinsUrl, repoName, token, params) {
   sh(script: "curl -k $url")
 }
 
-def folder(repoName) {
+def getFolder(repoName) {
   def folderArray = repoName.split('-')
   return "${folderArray[0]}-${folderArray[1]}"
 }
