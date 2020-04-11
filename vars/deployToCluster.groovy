@@ -9,5 +9,6 @@ def call(Map config=[:], Closure body={}) {
     } catch(e) {
       notifySlack.buildFailure(e.message, "#generalbuildfailures")
       throw e
+    }
   }
 }
