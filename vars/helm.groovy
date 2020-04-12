@@ -32,7 +32,7 @@ def deployChart(environment, registry, chartName, tag) {
 
 // private
 def writeUrlIfIngress(deploymentName) {
-  sh "kubectl get ingress -n $deploymentName -o jsonpath='{.items[0].spec.rules[0].host}' --ignore-not-found | sed -e 's/^/Build available for review at https:\\/\\//;'"
+  sh "kubectl get ingress -n $deploymentName -o json --ignore-not-found | jq '.items[0].spec.rules[0].host // empty' | xargs --no-run-if-empty printf 'Build available for review at https://%s\n'"
 }
 
 // public
