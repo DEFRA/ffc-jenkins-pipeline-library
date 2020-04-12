@@ -14,10 +14,10 @@ node {
 
   try {
     stage('Load library functions') {
-      build = load 'vars/build.groovy'
-      version = load 'vars/version.groovy'
-      release = load 'vars/release.groovy'
-      notifySlack = load 'vars/notifySlack.groovy'
+      build = load 'build.groovy'
+      version = load 'version.groovy'
+      release = load 'release.groovy'
+      notifySlack = load 'notifySlack.groovy'
     }
     stage('Set GitHub status as pending'){
       build.setGithubStatusPending()
