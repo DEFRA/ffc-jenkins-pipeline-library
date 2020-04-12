@@ -4,10 +4,21 @@ def currentVersion = ''
 def repoName = ''
 def versionFileName = "VERSION"
 
+def build
+def version
+def release
+def notifySlack
+
 node {
   checkout scm
 
   try {
+    stage('Load library functions') {
+      build = load 'build.groovy'
+      version = load 'version.groovy'
+      release = load 'release.groovy'
+      notifySlack = load 'notifySlack.groovy'
+    }
     stage('Set GitHub status as pending'){
       build.setGithubStatusPending()
     }
