@@ -13,6 +13,11 @@ def call(Map config=[:], Closure body={}) {
       stage('Set PR, and containerTag variables') {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getCSProjVersion(config.project))
       }
+      if (pr != '') {
+        stage('Verify version incremented') {
+          version.verifyCSProjIncremented(config.project)
+        }
+      }
       stage('Helm lint') {
         test.lintHelm(repoName)
       }
@@ -25,17 +30,12 @@ def call(Map config=[:], Closure body={}) {
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
       }
-
       if (pr != '') {
-        stage('Verify version incremented') {
-          version.verifyCSProjIncremented(config.project)
-        }
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
         }
       }
-
-      if (pr == '') {
+      else {
         stage('Publish chart') {
           helm.publishChart(DOCKER_REGISTRY, repoName, containerTag)
         }
