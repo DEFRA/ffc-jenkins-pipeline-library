@@ -1,14 +1,8 @@
 def call(Map config=[:], Closure body={}) {
-  def containerSrcFolder = '\\/home\\/node'
-  def localSrcFolder = '.'
-  def lcovFile = './test-output/lcov.info'
-  def sonarQubeEnv = 'SonarQube'
-  def sonarScanner = 'SonarScanner'
-  def qualityGateTimeout = 10
-  def repoName = ''
-  def pr = ''
   def containerTag = ''
   def mergedPrNo = ''
+  def pr = ''
+  def repoName = ''
 
   node {
     checkout scm
@@ -17,11 +11,11 @@ def call(Map config=[:], Closure body={}) {
         build.setGithubStatusPending()
       }
       stage('Set PR, and containerTag variables') {
-        (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
+        (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getCSProjVersion(config.project))
       }
       if (pr != '') {
         stage('Verify version incremented') {
-          version.verifyPackageJsonIncremented()
+          version.verifyCSProjIncremented(config.project)
         }
       }
       stage('Helm lint') {
@@ -32,18 +26,6 @@ def call(Map config=[:], Closure body={}) {
       }
       stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER)
-      }
-      stage('Create JUnit report') {
-        test.createReportJUnit()
-      }
-      stage('Fix lcov report') {
-        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      }
-      stage('SonarQube analysis') {
-        test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName))
-      }
-      stage("Code quality gate") {
-        test.waitForQualityGateResult(qualityGateTimeout)
       }
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
@@ -68,15 +50,17 @@ def call(Map config=[:], Closure body={}) {
           withCredentials([
             string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
           ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': containerTag, 'environment': config.environment])
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': containerTag])
           }
         }
       }
+
       if (mergedPrNo != '') {
         stage('Remove merged PR') {
           helm.undeployChart(config.environment, repoName, mergedPrNo)
         }
       }
+
       body()
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
@@ -85,8 +69,6 @@ def call(Map config=[:], Closure body={}) {
       build.setGithubStatusFailure(e.message)
       notifySlack.buildFailure(e.message, "#generalbuildfailures")
       throw e
-    } finally {
-      test.deleteOutput(repoName, containerSrcFolder)
     }
   }
 }

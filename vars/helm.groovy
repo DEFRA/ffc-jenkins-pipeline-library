@@ -7,7 +7,7 @@ def getPrCommands(registry, chartName, tag) {
     /image=$registry\/$chartName:$tag/,
     /namespace=$chartName-$tag/,
     /pr=$tag/,
-    /container.redeployOnChange=$tag-$BUILD_NUMBER/    
+    /deployment.redeployOnChange=$tag-$BUILD_NUMBER/
     ].join(',')
 
     return "--set $helmValues"
@@ -31,8 +31,8 @@ def deployChart(environment, registry, chartName, tag) {
 }
 
 // private
-def writeUrlIfIngress(deploymentName) {  
-  sh "if kubectl get ingress $deploymentName --ignore-not-found --namespace $deploymentName; then echo 'Build available for review at https://$deploymentName.$INGRESS_SERVER'; fi"
+def writeUrlIfIngress(deploymentName) {
+  sh "kubectl get ingress -n $deploymentName -o json --ignore-not-found | jq '.items[0].spec.rules[0].host // empty' | xargs --no-run-if-empty printf 'Build available for review at https://%s\n'"
 }
 
 // public
