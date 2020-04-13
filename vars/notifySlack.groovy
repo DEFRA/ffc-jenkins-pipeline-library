@@ -15,3 +15,16 @@ def buildFailure(exception, channel) {
             color: "#ff0000",
             message: msg.replace("  ", "")
 }
+
+def deploymentFailure(exception) {
+  def msg = """@here DEPLOYMENT FAILED
+          ${JOB_NAME}/${BUILD_NUMBER}
+          ${exception}
+          (<${BUILD_URL}|Open>)"""
+  
+  channel = "#masterbuildfailures"
+
+  slackSend channel: channel,
+            color: "#ff0000",
+            message: msg.replace("  ", "")
+}

@@ -114,6 +114,15 @@ Functions can be called on the instantiated library:
 defraUtils.updateGithubCommitStatus('Build started', 'PENDING')
 ```
 
+### Deployment pipeline
+A deployment pipeline, `deployToCluster.groovy` is provided to support deployment of specified Helm charts to specified clusters.
+
+Example usage from Jenkins pipeline configuration.
+
+```
+deployToCluster environment: 'dev, namespace: 'ffc-demo', chartName: 'ffc-demo-web', chartVersion: '1.0.0'
+```
+
 ## Testing
 
 A simple test harness may be run to unit test functions that are purely `groovy` code. This uses a groovy docker image and may be run via
