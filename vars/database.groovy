@@ -32,7 +32,7 @@ def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, pr
       echo "Role $prUser already exists, skipping"
     }
     else {
-      def createRoleSqlCmd = "CREATE ROLE $prUser PASSWORD '$prUserPassword' NOSUPERUSER NOCREATEDB CREATEROLE INHERIT LOGIN"
+      def createRoleSqlCmd = "CREATE ROLE $prUser PASSWORD '$prUserPassword' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN"
       runPsqlCommand(dbHost, dbUser, dbName, createRoleSqlCmd)
     }
 
@@ -42,6 +42,9 @@ def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, pr
 
     def grantPrivilegesSqlCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
     runPsqlCommand(dbHost, dbUser, dbName, grantPrivilegesSqlCmd)
+
+    def setSearchPathCmd = "ALTER ROLE $prUser SET search_path TO $prSchema"
+    runPsqlCommand(dbHost, dbUser, dbName, setSearchPathCmd)
   }
 
   return generatePrNames(dbName, prCode)
