@@ -40,7 +40,7 @@ buildNodeJs environment: 'dev', { echo 'do the things' }
 Both pipelines rely on a number of conventions being observed within your repo and Jenkins setup:
 1. The Helm chart must have the same name as the repository
 2. The service name in Docker Compose must have the same name as the repository
-3. The application must be deployed to `/home/node/` in a container (for the Node.js pipeline)
+3. The application must be deployed to a standard location (/home/node for node builds, /home/dotnet for .net Core)
 4. The repository must be hosted on GitHub
 5. Your app should be hosted in an FFC cluster (only dev exists at present)
 6. Your app must have separate deployment pipeline to trigger, with the name matching the pattern "$repoName-deploy" and a deploy token setup in Jenkins as a secret, again named "$repoName-deploy-token"
