@@ -6,7 +6,7 @@ def call(Map config=[:], Closure body={}) {
   def sonarScanner = 'SonarScanner'
   def qualityGateTimeout = 10
   def repoName = ''
-  def pr = ''
+  def pr = '70'
   def containerTag = ''
   def mergedPrNo = ''
 
@@ -38,12 +38,6 @@ def call(Map config=[:], Closure body={}) {
       }
       stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      }
-      stage('SonarQube analysis') {
-        test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName))
-      }
-      stage("Code quality gate") {
-        test.waitForQualityGateResult(qualityGateTimeout)
       }
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
