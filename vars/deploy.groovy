@@ -6,7 +6,7 @@ def trigger(jenkinsUrl, repoName, token, params) {
     url = url + "\\&$param.key=$param.value"
   }
   echo "Triggering deployment for $url"
-  sh(script: "curl -k $url")
+  sh(script: "curl -fk $url")
 }
 
 def getFolder(repoName) {
