@@ -2,11 +2,9 @@ def call(Map config=[:], Closure body={}) {
   def containerSrcFolder = '\\/home\\/node'
   def localSrcFolder = '.'
   def lcovFile = './test-output/lcov.info'
-  def sonarQubeEnv = 'SonarQube'
-  def sonarScanner = 'SonarScanner'
   def qualityGateTimeout = 10
   def repoName = ''
-  def pr = '70'
+  def pr = ''
   def containerTag = ''
   def mergedPrNo = ''
 
