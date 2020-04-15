@@ -691,7 +691,8 @@ deploy.trigger((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chartVersion':'
 
 ### deploy.trigger
 
-Triggers the Jenkins deployment job to deploy the built image.
+Triggers (via a curl request) the Jenkins deployment job to deploy the built image.
+If the curl request encounters a server error the stage (and therefore the build) will report a failure.
 
 Takes four parameters:
 - the full URL (without trailing /) of the Jenkins service, including username and access token
