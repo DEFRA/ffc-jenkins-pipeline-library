@@ -16,38 +16,61 @@ def call(Map config=[:], Closure body={}) {
       stage('Set GitHub status as pending') {
         build.setGithubStatusPending()
       }
+
       stage('Set PR, and containerTag variables') {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
+
       if (pr != '') {
         stage('Verify version incremented') {
           version.verifyPackageJsonIncremented()
         }
       }
+
+      if (config.containsKey("validateClosure")) {
+        config["validateClosure"]()
+      }
+
       stage('Helm lint') {
         test.lintHelm(repoName)
       }
+
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER)
       }
+
+      if (config.containsKey("buildClosure")) {
+        config["buildClosure"]()
+      }
+
       stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER)
       }
+
       stage('Create JUnit report') {
         test.createReportJUnit()
       }
+
       stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
       }
+
       stage('SonarQube analysis') {
         test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName))
       }
+
       stage("Code quality gate") {
         test.waitForQualityGateResult(qualityGateTimeout)
       }
+
+      if (config.containsKey("testClosure")) {
+        config["testClosure"]()
+      }
+
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
       }
+
       if (pr != '') {
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
@@ -57,6 +80,7 @@ def call(Map config=[:], Closure body={}) {
         stage('Publish chart') {
           helm.publishChart(DOCKER_REGISTRY, repoName, containerTag)
         }
+
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
@@ -64,6 +88,7 @@ def call(Map config=[:], Closure body={}) {
             release.trigger(containerTag, repoName, containerTag, gitToken)
           }
         }
+
         stage('Trigger Deployment') {
           withCredentials([
             string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
@@ -72,21 +97,34 @@ def call(Map config=[:], Closure body={}) {
           }
         }
       }
+
       if (mergedPrNo != '') {
         stage('Remove merged PR') {
           helm.undeployChart(config.environment, repoName, mergedPrNo)
         }
       }
-      body()
+
+      if (config.containsKey("deployClosure")) {
+        config["deployClosure"]()
+      }
+
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
       }
     } catch(e) {
-      build.setGithubStatusFailure(e.message)
-      notifySlack.buildFailure(e.message, "#generalbuildfailures")
+      stage('Set GitHub status as fail') {
+        build.setGithubStatusFailure(e.message)
+      }
+
+      stage('Send build failure slack notification') {
+        notifySlack.buildFailure(e.message, "#generalbuildfailures")
+      }
+
       throw e
     } finally {
-      test.deleteOutput(repoName, containerSrcFolder)
+      stage('Delete output') {
+        test.deleteOutput(repoName, containerSrcFolder)
+      }
     }
   }
 }
