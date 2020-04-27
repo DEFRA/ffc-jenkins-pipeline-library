@@ -31,7 +31,7 @@ def call(Map config=[:], Closure body={}) {
         echo "Here 1"
         echo "$pr"
         echo "Here 2"
-        config["validateClosure"]()
+        config["validateClosure"].call()
       }
 
       stage('Helm lint') {
