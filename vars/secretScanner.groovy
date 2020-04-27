@@ -63,9 +63,10 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
         if (dateObj > commitCheckDate) {
           def message = "Reason: $result.reason\n" +
                         "Date: $result.date\n" +
+                        "Branch: $result.branch\n" +
                         "Hash: $result.commitHash\n" +
                         "Filepath: $result.path\n" +
-                        "Branch: $result.branch\n" +
+                        "StringsFound: $result.stringsFound\n" +
                         "Commit: $result.commit"
           print message
         }
