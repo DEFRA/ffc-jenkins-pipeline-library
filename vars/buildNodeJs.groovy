@@ -25,18 +25,6 @@ def call(Map config=[:], Closure body={}) {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
 
-      echo "BEFORE Body"
-      def me = this
-      echo "$me"
-
-      globals.runMe()
-
-      echo "TEST VAR:"
-      def qqq = globals.testVar
-      echo "$qqq"
-
-      body()
-
       if (pr != '') {
         stage('Verify version incremented') {
           version.verifyPackageJsonIncremented()
@@ -44,10 +32,7 @@ def call(Map config=[:], Closure body={}) {
       }
 
       if (config.containsKey("validateClosure")) {
-        echo "Here 1"
-        echo "$pr"
-        echo "Here 2"
-        config["validateClosure"].call()
+        config["validateClosure"]()
       }
 
       stage('Helm lint') {
