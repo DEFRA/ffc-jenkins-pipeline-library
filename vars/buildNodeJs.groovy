@@ -1,7 +1,3 @@
-import groovy.transform.Field
-
-@Field pr = ''
-
 def call(Map config=[:], Closure body={}) {
   def containerSrcFolder = '\\/home\\/node'
   def localSrcFolder = '.'
@@ -10,7 +6,7 @@ def call(Map config=[:], Closure body={}) {
   def sonarScanner = 'SonarScanner'
   def qualityGateTimeout = 10
   def repoName = ''
-  // def pr = ''
+  def pr = ''
   def containerTag = ''
   def mergedPrNo = ''
 
