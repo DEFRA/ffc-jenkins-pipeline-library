@@ -17,16 +17,17 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
     def matchingRepos = []
 
     (numPages as Integer).times {
-      def reposCmd = "$curlAuth $githubApiUrl\\&page=${it+1} | jq '.[] | .full_name' | grep $githubOrg\\/$repositoryPrefix "
+      def reposCmd = "$curlAuth $githubApiUrl\\&page=${it+1} | jq '.[] | .full_name' | grep $githubOrg\\/$repositoryPrefix"
       // FIXME: look into reading this into groovy JSON object instead of using jq
       def reposResult = sh(returnStdout: true, script: reposCmd)
+      echo "reposResult: $reposResult"
       def reposList = []
 
-      if (reposResult.length() > 0) {
-        reposList = reposResult.split('\n').collect {
-          return it[1..-2]
-        }
-      }
+      // if (reposResult.length() > 0) {
+      //   reposList = reposResult.split('\n').collect {
+      //     return it[1..-2]
+      //   }
+      // }
 
       matchingRepos += reposList
     }
