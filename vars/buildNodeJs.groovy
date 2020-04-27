@@ -5,8 +5,8 @@ def call(Map config=[:], Closure body={}) {
   def sonarQubeEnv = 'SonarQube'
   def sonarScanner = 'SonarScanner'
   def qualityGateTimeout = 10
-  def repoName = ''
-  def pr = ''
+  repoName = ''
+  pr = ''
   def containerTag = ''
   def mergedPrNo = ''
 
