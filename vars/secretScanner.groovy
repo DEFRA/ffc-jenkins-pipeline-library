@@ -47,32 +47,37 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
 
     sh "docker pull dxa4481/trufflehog"
 
-    matchingRepos.each {
-      def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git"
-      def truffleHogRes = sh(returnStdout: true, script: truffleHogCmd).trim()
+    try {
+      matchingRepos.each {
+        def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git"
+        def truffleHogRes = sh(returnStdout: true, script: truffleHogCmd).trim()
 
-      echo "HERE 1"
+        echo "HERE 1"
 
-      def reportRes = []
-      def jsonSlurper = new JsonSlurper()
+        def reportRes = []
+        def jsonSlurper = new JsonSlurper()
 
-      echo "HERE 2"
+        echo "HERE 2"
 
-      truffleHogRes.split('\n').each {
-        echo "HERE 3"
-        def result = jsonSlurper.parseText(it)
-        def dateObj = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
+        truffleHogRes.split('\n').each {
+          echo "HERE 3"
+          def result = jsonSlurper.parseText(it)
+          def dateObj = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
 
-        if (dateObj > commitCheckDate) {
-          def message = "Reason: $result.reason\n" +
-                        "Date: $result.date\n" +
-                        "Hash: $result.commitHash\n" +
-                        "Filepath: $result.path\n" +
-                        "Branch: $result.branch\n" +
-                        "Commit: $result.commit\n"
-          print message
+          if (dateObj > commitCheckDate) {
+            def message = "Reason: $result.reason\n" +
+                          "Date: $result.date\n" +
+                          "Hash: $result.commitHash\n" +
+                          "Filepath: $result.path\n" +
+                          "Branch: $result.branch\n" +
+                          "Commit: $result.commit\n"
+            print message
+          }
         }
       }
+    } catch (e) {
+      echo "Kaboom"
+      echo "$e"
     }
   }
 }
