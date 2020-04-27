@@ -73,7 +73,7 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
         //                   "Commit: $result.commit\n"
         //     print message
         //   }
-        }
+        //}
       }
     } catch (e) {
       echo "Kaboom"
