@@ -1,3 +1,6 @@
+def test1 = "hello test1"
+test2 = "hello test2"
+
 def call(Map config=[:], Closure body={}) {
   def containerSrcFolder = '\\/home\\/node'
   def localSrcFolder = '.'
@@ -9,6 +12,9 @@ def call(Map config=[:], Closure body={}) {
   pr = ''
   def containerTag = ''
   def mergedPrNo = ''
+  def test3 = "hello test3"
+  test4 = "hello test4"
+
 
   node {
     checkout scm
