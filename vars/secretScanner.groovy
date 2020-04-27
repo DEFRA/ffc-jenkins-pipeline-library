@@ -1,4 +1,11 @@
 @NonCPS
+def getCommitCheckDate(scanWindowHrs) {
+  use (groovy.time.TimeCategory) {
+    def commitCheckDate = new Date() - scanWindowHrs.hours
+    return commitCheckDate
+  }
+}
+
 def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
@@ -31,11 +38,7 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
 
     echo "Matching repos: $matchingRepos"
 
-    def commitCheckDate
-
-    use (groovy.time.TimeCategory) {
-      commitCheckDate = new Date() - scanWindowHrs.hours
-    }
+    def commitCheckDate = getCommitCheckDate(scanWindowHrs)
 
     echo "Commit check date: $commitCheckDate"
 
