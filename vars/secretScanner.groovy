@@ -1,4 +1,6 @@
-@NonCPS
+import groovy.json.JsonSlurper
+
+@NonCPS // Don't run this in the Jenkins sandbox to make groovy.time.TimeCategory work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
     def commitCheckDate = new Date() - scanWindowHrs.hours
@@ -44,6 +46,27 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
 
     sh "docker pull dxa4481/trufflehog"
 
+    matchingRepos.each {
+      def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git"
+      def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
 
+      def reportRes = []
+      def jsonSlurper = new JsonSlurper()
+
+      truffleHogRes.split('\n').each {
+        def result = jsonSlurper.parseText(it)
+        def dateObj = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
+
+        if (dateObj > commitCheckDate) {
+          def message = "Reason: $result.reason\n" +
+                        "Date: $result.date\n" +
+                        "Hash: $result.commitHash\n" +
+                        "Filepath: $result.path\n" +
+                        "Branch: $result.branch\n" +
+                        "Commit: $result.commit\n"
+          print message
+        }
+      }
+    }
   }
 }
