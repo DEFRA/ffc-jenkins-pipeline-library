@@ -108,6 +108,8 @@ def call(Map config=[:], Closure body={}) {
         config["deployClosure"]()
       }
 
+      body()
+
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
       }
@@ -120,10 +122,18 @@ def call(Map config=[:], Closure body={}) {
         notifySlack.buildFailure(e.message, "#generalbuildfailures")
       }
 
+      if (config.containsKey("failureClosure")) {
+        config["failureClosure"]()
+      }
+
       throw e
     } finally {
       stage('Delete output') {
         test.deleteOutput(repoName, containerSrcFolder)
+      }
+
+      if (config.containsKey("finallyClosure")) {
+        config["finallyClosure"]()
       }
     }
   }
