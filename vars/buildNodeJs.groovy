@@ -25,6 +25,9 @@ def call(Map config=[:], Closure body={}) {
       def me = this
       echo "$me"
 
+      def qqq = globals.testVar
+      echo "$qqq"
+
       body()
 
       if (pr != '') {
