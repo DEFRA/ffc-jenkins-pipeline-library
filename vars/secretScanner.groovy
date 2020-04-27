@@ -1,3 +1,4 @@
+@NonCPS
 def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
