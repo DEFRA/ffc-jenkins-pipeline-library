@@ -21,7 +21,7 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
       echo "$reposCmd"
 
       // FIXME: look into reading this into groovy JSON object instead of using jq
-      // def reposResult = sh(returnStdout: true, script: reposCmd)
+      def reposResult = sh(returnStdout: true, script: reposCmd)
       // echo "reposResult: $reposResult"
       // def reposList = []
 
@@ -31,7 +31,7 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
       //   }
       // }
 
-      matchingRepos += reposList
+      // matchingRepos += reposList
     }
 
     echo "Matching repos: $matchingRepos"
