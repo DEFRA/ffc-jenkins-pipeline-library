@@ -1,0 +1,1 @@
+testVar = "hello from globals"
