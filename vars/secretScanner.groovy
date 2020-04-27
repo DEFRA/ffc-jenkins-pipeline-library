@@ -48,6 +48,8 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
     sh "docker pull dxa4481/trufflehog"
 
     matchingRepos.each {
+      echo "Scanning $it"
+
       // The truffleHog docker run cause exit code 1 which fails the build so need the || true to ignore it
       def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git || true"
       def truffleHogRes = sh(returnStdout: true, script: truffleHogCmd).trim()
@@ -64,10 +66,12 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
                         "Hash: $result.commitHash\n" +
                         "Filepath: $result.path\n" +
                         "Branch: $result.branch\n" +
-                        "Commit: $result.commit\n"
+                        "Commit: $result.commit"
           print message
         }
       }
+
+      echo "Finished scanning $it"
     }
   }
 }
