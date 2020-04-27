@@ -28,6 +28,9 @@ def call(Map config=[:], Closure body={}) {
       }
 
       if (config.containsKey("validateClosure")) {
+        echo "Here 1"
+        echo "$pr"
+        echo "Here 2"
         config["validateClosure"]()
       }
 
