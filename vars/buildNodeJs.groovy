@@ -27,6 +27,10 @@ def call(Map config=[:], Closure body={}) {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
 
+      echo "BEFORE Body"
+      def me = this
+      echo "$me"
+
       body()
 
       if (pr != '') {
