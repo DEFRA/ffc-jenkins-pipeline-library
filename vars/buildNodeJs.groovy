@@ -21,6 +21,8 @@ def call(Map config=[:], Closure body={}) {
         (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
 
+      body()
+
       if (pr != '') {
         stage('Verify version incremented') {
           version.verifyPackageJsonIncremented()
