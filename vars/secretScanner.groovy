@@ -49,12 +49,17 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
 
     matchingRepos.each {
       def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git"
-      def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
+      def truffleHogRes = sh(returnStdout: true, script: truffleHogCmd).trim()
+
+      echo "HERE 1"
 
       def reportRes = []
       def jsonSlurper = new JsonSlurper()
 
+      echo "HERE 2"
+
       truffleHogRes.split('\n').each {
+        echo "HERE 3"
         def result = jsonSlurper.parseText(it)
         def dateObj = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
 
