@@ -49,7 +49,7 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
 
     try {
       matchingRepos.each {
-        def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git"
+        def truffleHogCmd = "set +x && docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git"
         def truffleHogRes = sh(returnStdout: true, script: truffleHogCmd).trim()
 
         echo "HERE 1"
