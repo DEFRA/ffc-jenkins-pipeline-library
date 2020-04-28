@@ -47,7 +47,7 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
       //   // if (it.contains(repositoryPrefix)) {
       //   //   matchingRepos.add(it)
       //   // }
-      }
+      //}
     }
 
     echo "Matching repos: $matchingRepos"
