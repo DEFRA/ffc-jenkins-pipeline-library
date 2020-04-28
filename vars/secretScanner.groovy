@@ -1,5 +1,3 @@
-import groovy.json.JsonSlurper
-
 // FIXME: set up exclude file with package-lock and build own docker container
 
 @NonCPS // Don't run this in the Jenkins sandbox to make groovy.time.TimeCategory work
@@ -31,8 +29,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
 
     (numPages as Integer).times {
       def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
-      def jsonSlurper = new JsonSlurper()
-      def result = jsonSlurper.parseText(reposResult)
+      def result = readJSON text: reposResult
 
       result.each {
         if (it.full_name.toLowerCase().startsWith(matchStr)) {
@@ -49,39 +46,39 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
 
     sh "docker pull dxa4481/trufflehog"
 
-    matchingRepos.each {
-      echo "Scanning $it"
+    // matchingRepos.each {
+    //   echo "Scanning $it"
 
-      def githubBranchUrl = "https://api.github.com/repos/$it/branches"
-      def branchResult = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
-      def jsonSlurper = new JsonSlurper()
-      def branches = jsonSlurper.parseText(branchResult)
-      def repo = it
+    //   def githubBranchUrl = "https://api.github.com/repos/$it/branches"
+    //   def branchResult = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
+    //   def jsonSlurper = new JsonSlurper()
+    //   def branches = jsonSlurper.parseText(branchResult)
+    //   def repo = it
 
-      branches.each {
-        try {
-          def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${it.name}"
-          def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl"
-        } catch (e) {
-          echo "EXCEPTION"
-          echo "${e.message}"
-        }
+    //   branches.each {
+    //     try {
+    //       def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${it.name}"
+    //       def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl"
+    //     } catch (e) {
+    //       echo "EXCEPTION"
+    //       echo "${e.message}"
+    //     }
 
-        // // jsonSlurper = new JsonSlurper()
-        // def commits = jsonSlurper.parseText(commitResult)
+    //     // // jsonSlurper = new JsonSlurper()
+    //     // def commits = jsonSlurper.parseText(commitResult)
 
-        // echo "CMD: $githubApiCommitUrl"
-        // echo "REPO: $repo"
-        // echo "BRANCH: ${it.name}"
-        // echo "$commitResult"
+    //     // echo "CMD: $githubApiCommitUrl"
+    //     // echo "REPO: $repo"
+    //     // echo "BRANCH: ${it.name}"
+    //     // echo "$commitResult"
 
-        // if (commits.size() > 0) {
-        //   echo "COMMITS: $commits"
-        // }
-        // else {
-        //   echo "NO COMMITS"
-        // }
-      }
+    //     // if (commits.size() > 0) {
+    //     //   echo "COMMITS: $commits"
+    //     // }
+    //     // else {
+    //     //   echo "NO COMMITS"
+    //     // }
+    //   }
 
 
 
@@ -128,7 +125,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       //   }
       // } catch (e) { }
 
-      echo "Finished scanning $it"
-    }
+    //   echo "Finished scanning $it"
+    // }
   }
 }
