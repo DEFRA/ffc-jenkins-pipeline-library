@@ -46,39 +46,32 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
 
     sh "docker pull dxa4481/trufflehog"
 
-    // matchingRepos.each {
-    //   echo "Scanning $it"
+    matchingRepos.each {
+      echo "Scanning $it"
 
-    //   def githubBranchUrl = "https://api.github.com/repos/$it/branches"
-    //   def branchResult = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
-    //   def jsonSlurper = new JsonSlurper()
-    //   def branches = jsonSlurper.parseText(branchResult)
-    //   def repo = it
+      def githubBranchUrl = "https://api.github.com/repos/$it/branches"
+      def branchResult = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
+      def branches = readJSON text: branchResult
+      def repo = it
 
-    //   branches.each {
-    //     try {
-    //       def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${it.name}"
-    //       def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl"
-    //     } catch (e) {
-    //       echo "EXCEPTION"
-    //       echo "${e.message}"
-    //     }
+      branches.each {
+        def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${it.name}"
+        def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl"
+        def commits = readJSON text: commitResult
 
-    //     // // jsonSlurper = new JsonSlurper()
-    //     // def commits = jsonSlurper.parseText(commitResult)
+        echo "CMD: $githubApiCommitUrl"
+        echo "REPO: $repo"
+        echo "BRANCH: ${it.name}"
+        echo "$commitResult"
+        echo "$commits"
 
-    //     // echo "CMD: $githubApiCommitUrl"
-    //     // echo "REPO: $repo"
-    //     // echo "BRANCH: ${it.name}"
-    //     // echo "$commitResult"
-
-    //     // if (commits.size() > 0) {
-    //     //   echo "COMMITS: $commits"
-    //     // }
-    //     // else {
-    //     //   echo "NO COMMITS"
-    //     // }
-    //   }
+        if (commits.size() > 0) {
+          echo "COMMITS: $commits"
+        }
+        else {
+          echo "NO COMMITS"
+        }
+      }
 
 
 
@@ -125,7 +118,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       //   }
       // } catch (e) { }
 
-    //   echo "Finished scanning $it"
-    // }
+      echo "Finished scanning $it"
+    }
   }
 }
