@@ -27,12 +27,11 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
     echo "Number of pages of repos: $numPages"
 
     def matchingRepos = []
-    // def jsonSlurper = new JsonSlurper()
+    def jsonSlurper = new JsonSlurper()
     def matchStr = "$githubUser/$repositoryPrefix".toLowerCase()
 
     (numPages as Integer).times {
       def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}".trim()
-      def jsonSlurper = new JsonSlurper()
       def result = jsonSlurper.parseText(reposResult)
 
       result.each {
