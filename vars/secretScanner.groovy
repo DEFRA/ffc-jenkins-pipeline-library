@@ -5,7 +5,7 @@ import groovy.json.JsonSlurper
 @NonCPS // Don't run this in the Jenkins sandbox to make groovy.time.TimeCategory work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
-    def commitCheckDate = new Date() - scanWindowHrs.hours
+    def commitCheckDate = (new Date() - scanWindowHrs.hours).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
     return commitCheckDate
   }
 }
