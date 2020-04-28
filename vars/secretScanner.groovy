@@ -35,8 +35,8 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       def result = jsonSlurper.parseText(reposResult)
 
       result.each {
-        def matchStr = "$githubUser/$repositoryPrefix"
-        if (it.full_name.startsWith(matchStr)) {
+        // def matchStr =
+        if (it.full_name.startsWith("$githubUser/$repositoryPrefix")) {
           matchingRepos.add(it.full_name)
         }
       }
