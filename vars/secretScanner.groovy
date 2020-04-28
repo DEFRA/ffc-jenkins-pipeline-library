@@ -35,10 +35,10 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
       def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
 
       reposResult.trim().split('\n').each {
-        print "$it"
+        echo "$it"
         def result = jsonSlurper.parseText(it)
 
-        print "$result.full_name"
+        echo "$result.full_name"
         // FIXME: should use startsWith after '/'
         // if (it.contains(repositoryPrefix)) {
         //   matchingRepos.add(it)
