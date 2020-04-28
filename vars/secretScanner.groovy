@@ -59,7 +59,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git || true"
       def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
       def reportRes = []
-
+      def jsonSlurper = new JsonSlurper()
       def secretsFound = false
 
       truffleHogRes.trim().split('\n').each {
