@@ -30,7 +30,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
     def matchStr = "$githubUser/$repositoryPrefix".toLowerCase()
 
     (numPages as Integer).times {
-      def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}".trim()
+      def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
       def jsonSlurper = new JsonSlurper()
       def result = jsonSlurper.parseText(reposResult)
 
@@ -53,20 +53,21 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       echo "Scanning $it"
 
       def githubBranchUrl = "https://api.github.com/repos/$it/branches"
-      def branchResult = sh returnStdout: true, script: "$curlAuth $githubBranchUrl".trim()
+      def branchResult = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
       def jsonSlurper = new JsonSlurper()
       def branches = jsonSlurper.parseText(branchResult)
       def repo = it
 
       branches.each {
         def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${it.name}"
-        // def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl".trim()
+        def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl"
         // // jsonSlurper = new JsonSlurper()
         // def commits = jsonSlurper.parseText(commitResult)
 
         echo "CMD: $githubApiCommitUrl"
         echo "REPO: $repo"
         echo "BRANCH: ${it.name}"
+        echo "$commitResult"
 
         // if (commits.size() > 0) {
         //   echo "COMMITS: $commits"
