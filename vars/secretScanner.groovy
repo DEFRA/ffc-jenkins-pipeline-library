@@ -61,7 +61,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
 
         if (commits.size() > 0) {
           echo "COMMITS in ${branch.name}"
-
+          echo "$commits"
           commits.each { commit ->
             echo "${commit.sha}"
           }
