@@ -1,5 +1,7 @@
 import groovy.json.JsonSlurper
 
+// FIXME: set up exclude file with package-lock and build own docker container
+
 @NonCPS // Don't run this in the Jenkins sandbox to make groovy.time.TimeCategory work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
@@ -29,10 +31,11 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
 
     (numPages as Integer).times {
       def reposCmd = "$curlAuth $githubApiUrl\\&page=${it+1} | jq '.[] | .full_name'"
-      // FIXME: look into reading this into groovy JSON object instead of using jq
+      // FIXME: look into reading this into JSON slurper object instead of using jq
       def reposResult = sh(returnStdout: true, script: reposCmd).trim().replaceAll (/"/, '')
 
       reposResult.split('\n').each {
+        // FIXME: should use startsWith after '/'
         if (it.contains(repositoryPrefix)) {
           matchingRepos.add(it)
         }
@@ -50,16 +53,22 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
     matchingRepos.each {
       echo "Scanning $it"
 
+      // FIXME: use github API to check for only repos with a recent commit and only run truffleHog on these
+      // Keep a record of the commit SHAs
+
       // The truffleHog docker run cause exit code 1 which fails the build so need the || true to ignore it
       def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git || true"
       def truffleHogRes = sh(returnStdout: true, script: truffleHogCmd).trim()
       def reportRes = []
       def jsonSlurper = new JsonSlurper()
 
+      def secretsFound = false
+
       truffleHogRes.split('\n').each {
         def result = jsonSlurper.parseText(it)
         def dateObj = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
 
+        // FIXME: match by commit SHA instead of date when we use the github API to get only recent commits
         if (dateObj > commitCheckDate) {
           def message = "Reason: $result.reason\n" +
                         "Date: $result.date\n" +
@@ -69,7 +78,17 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
                         "StringsFound: $result.stringsFound\n" +
                         "Commit: $result.commit"
           print message
+          secretsFound = true
         }
+      }
+
+      if (secretsFound) {
+        def msg = "Potential secrets detected, check Jenkins job"
+        def channel = "#secretdetection"
+
+        slackSend channel: channel,
+                  color: "#ff0000",
+                  message: msg
       }
 
       echo "Finished scanning $it"
