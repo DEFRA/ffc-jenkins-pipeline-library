@@ -59,7 +59,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       def repo = it
 
       branches.each {
-        // def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${it.name}"
+        def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${it.name}"
         // def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl".trim()
         // // jsonSlurper = new JsonSlurper()
         // def commits = jsonSlurper.parseText(commitResult)
