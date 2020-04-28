@@ -57,7 +57,13 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       def jsonSlurper = new JsonSlurper()
       def commits = jsonSlurper.parseText(commitResult)
 
-      echo "COMMITS: $commits"
+      if (commits.size() > 0) {
+        echo "COMMITS: $commits"
+      }
+      else {
+        echo "NO COMMITS"
+      }
+
 
 
       // FIXME: use github API to check for only repos with a recent commit and only run truffleHog on these
