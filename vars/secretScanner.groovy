@@ -53,7 +53,7 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
 
     echo "Commit check date: $commitCheckDate"
 
-    sh "docker pull dxa4481/trufflehog"
+    // sh "docker pull dxa4481/trufflehog"
 
     // matchingRepos.each {
     //   echo "Scanning $it"
