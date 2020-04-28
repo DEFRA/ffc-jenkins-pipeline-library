@@ -36,13 +36,13 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
 
       reposResult.trim().split('\n').each {
         echo "$it"
-        def result = jsonSlurper.parseText(it)
+      //   def result = jsonSlurper.parseText(it)
 
-        echo "$result.full_name"
-        // FIXME: should use startsWith after '/'
-        // if (it.contains(repositoryPrefix)) {
-        //   matchingRepos.add(it)
-        // }
+      //   echo "$result.full_name"
+      //   // FIXME: should use startsWith after '/'
+      //   // if (it.contains(repositoryPrefix)) {
+      //   //   matchingRepos.add(it)
+      //   // }
       }
     }
 
