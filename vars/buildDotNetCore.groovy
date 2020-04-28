@@ -97,10 +97,7 @@ def call(Map config=[:], Closure body={}) {
       }
       throw e
     } finally {
-      stage('Clean up test output') {
-        test.deleteOutput(repoName, containerSrcFolder)
-      }
-
+     
       if (config.containsKey("finallyClosure")) {
         config["finallyClosure"]()
       }
