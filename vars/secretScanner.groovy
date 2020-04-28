@@ -13,7 +13,6 @@ def getCommitCheckDate(scanWindowHrs) {
 def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
-    // def githubApiUrl = "https://api.github.com/orgs/$githubOrg/repos?per_page=100"
     def githubApiUrl = "https://api.github.com/users/$githubOrg/repos?per_page=100"
 
     def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubApiUrl"
@@ -28,17 +27,21 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
     echo "Number of pages of repos: $numPages"
 
     def matchingRepos = []
+    def jsonSlurper = new JsonSlurper()
 
     (numPages as Integer).times {
-      def reposCmd = "$curlAuth $githubApiUrl\\&page=${it+1} | jq '.[] | .full_name'"
+      // def reposCmd = "$curlAuth $githubApiUrl\\&page=${it+1} | jq '.[] | .full_name'"
       // FIXME: look into reading this into JSON slurper object instead of using jq
-      def reposResult = sh(returnStdout: true, script: reposCmd).trim().replaceAll (/"/, '')
+      def reposResult = returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
 
-      reposResult.split('\n').each {
+      reposResult.trim().split('\n').each {
+        def result = jsonSlurper.parseText(it)
+
+        print "$result.full_name"
         // FIXME: should use startsWith after '/'
-        if (it.contains(repositoryPrefix)) {
-          matchingRepos.add(it)
-        }
+        // if (it.contains(repositoryPrefix)) {
+        //   matchingRepos.add(it)
+        // }
       }
     }
 
@@ -60,7 +63,6 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
       def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git || true"
       def truffleHogRes = sh(returnStdout: true, script: truffleHogCmd).trim()
       def reportRes = []
-      def jsonSlurper = new JsonSlurper()
 
       def secretsFound = false
 
