@@ -82,14 +82,16 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
         }
       }
 
-      if (secretsFound) {
-        def msg = "Potential secrets detected, check Jenkins job"
-        def channel = "#secretdetection"
+      try {
+        if (secretsFound) {
+          def msg = "Potential secrets detected, check Jenkins job ${JOB_NAME}/${BUILD_NUMBER}"
+          def channel = "#secretdetection"
 
-        slackSend channel: channel,
-                  color: "#ff0000",
-                  message: msg
-      }
+          slackSend channel: channel,
+                    color: "#ff0000",
+                    message: msg
+        }
+      } catch (e) { }
 
       echo "Finished scanning $it"
     }
