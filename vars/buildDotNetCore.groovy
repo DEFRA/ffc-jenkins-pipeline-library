@@ -1,4 +1,4 @@
-def call(Map config=[:], Closure body={}) {
+def call(Map config=[:]) {
   def containerTag = ''
   def mergedPrNo = ''
   def pr = ''
@@ -18,15 +18,30 @@ def call(Map config=[:], Closure body={}) {
           version.verifyCSProjIncremented(config.project)
         }
       }
+
+      if (config.containsKey("validateClosure")) {
+        config["validateClosure"]()
+      }
+
       stage('Helm lint') {
         test.lintHelm(repoName)
       }
+
+      if (config.containsKey("buildClosure")) {
+        config["buildClosure"]()
+      }
+
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER)
       }
       stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER)
       }
+
+      if (config.containsKey("testClosure")) {
+        config["testClosure"]()
+      }
+
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
       }
@@ -61,14 +76,31 @@ def call(Map config=[:], Closure body={}) {
         }
       }
 
-      body()
+      if (config.containsKey("deployClosure")) {
+        config["deployClosure"]()
+      }
+
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
       }
     } catch(e) {
-      build.setGithubStatusFailure(e.message)
-      notifySlack.buildFailure(e.message, "#generalbuildfailures")
+      stage('Set GitHub status as fail') {
+        build.setGithubStatusFailure(e.message)
+      }
+
+      stage('Send build failure slack notification') {
+        notifySlack.buildFailure(e.message, "#generalbuildfailures")
+      }
+
+      if (config.containsKey("failureClosure")) {
+        config["failureClosure"]()
+      }
+
       throw e
+    } finally {
+      if (config.containsKey("finallyClosure")) {
+        config["finallyClosure"]()
+      }
     }
   }
 }
