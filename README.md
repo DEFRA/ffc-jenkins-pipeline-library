@@ -32,9 +32,33 @@ Both Node.js and .NET Core pipelines require an environment to be specified. Spe
 
 The .Net Core pipeline additionally requires the name of the project to be specified. The name of the project is the name of the csproj file that represents the main project. Due to the nature of .NET Core projects the file containing the version isn't able to be conventionally named and unlike a Node.js project where `package.json` can be used the file name needs to be specified.
 
-If your pipeline has additional steps, pass a callback in the following manner:
+If your pipeline has additional steps, you can add closures to the config Map passed to the pipeline that will be run as callbacks at various pre-defined locations. The place where the callback is run is determined by the key associated with the closure in the the config Map. These are:
+
+| Key               | Location                                                                |
+| ---               | --------                                                                |
+| `validateClosure` | After the stages to validate the pipeline should be run                 |
+| `buildClosure`    | After the stages to lint the Helm chart and build the test image        |
+| `testClosure`     | After the stages that run the tests                                     |
+| `deployClosure`   | After the stages that build and publish the Helm and trigger the deploy |
+| `failureClosure`  | At the end of the `catch` block when a pipeline build fails             |
+| `finallyClosure`  | At the end of the `finally` block to clean up the build                 |
+
+An example of passing closures to run in the finally and test block would look like:
+
 ```
-buildNodeJs environment: 'dev', { echo 'do the things' }
+def extraTestThings = {
+  stage('Extra test things') {
+    // Do the test things
+  }
+}
+
+def extraFinallyThings = {
+  stage('Extra finally things') {
+    // Do the finally things
+  }
+}
+
+buildNodeJs environment: 'dev', finallyClosure: extraFinallyThings, testClosure: extraTestThings
 ```
 
 Both pipelines rely on a number of conventions being observed within your repo and Jenkins setup:
