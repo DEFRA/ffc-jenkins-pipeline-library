@@ -60,27 +60,21 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
         def commits = readJSON text: commitResult
 
         if (commits.size() > 0) {
-          echo "COMMITS in ${branch.name}"
-          echo "${commits.size()}"
-          commits.each { commit ->
-            echo "${commit.sha}"
-          }
+          commitShas.add(commit.sha)
         }
-        else {
-          echo "NO COMMITS in ${branch.name}"
-        }
+      }
+
+      if (commitShas.size() > 0) {
+        // The truffleHog docker run causes exit code 1 which fails the build so need the || true to ignore it
+        def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git || true"
+        def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
+        def secretsFound = false
+        def results = readJSON text: truffleHogRes
+        echo "$results"
       }
 
 
 
-
-
-      // FIXME: use github API to check for only repos with a recent commit and only run truffleHog on these
-      // Keep a record of the commit SHAs
-
-      // The truffleHog docker run cause exit code 1 which fails the build so need the || true to ignore it
-      // def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git || true"
-      // def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
       // def reportRes = []
       // def jsonSlurper = new JsonSlurper()
       // def secretsFound = false
