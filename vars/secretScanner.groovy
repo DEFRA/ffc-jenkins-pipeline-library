@@ -35,6 +35,7 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
       def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
 
       reposResult.trim().split('\n').each {
+        print "$it"
         def result = jsonSlurper.parseText(it)
 
         print "$result.full_name"
@@ -61,12 +62,12 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
 
       // The truffleHog docker run cause exit code 1 which fails the build so need the || true to ignore it
       def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git || true"
-      def truffleHogRes = sh(returnStdout: true, script: truffleHogCmd).trim()
+      def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
       def reportRes = []
 
       def secretsFound = false
 
-      truffleHogRes.split('\n').each {
+      truffleHogRes.trim().split('\n').each {
         def result = jsonSlurper.parseText(it)
         def dateObj = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
 
