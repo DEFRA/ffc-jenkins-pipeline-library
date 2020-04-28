@@ -46,24 +46,28 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
 
     sh "docker pull dxa4481/trufflehog"
 
-    matchingRepos.each {
-      echo "Scanning $it"
+    matchingRepos.each { repo ->
+      echo "Scanning $repo"
 
-      def githubBranchUrl = "https://api.github.com/repos/$it/branches"
+      def githubBranchUrl = "https://api.github.com/repos/$repo/branches"
       def branchResult = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
       def branches = readJSON text: branchResult
-      def repo = it
+      def commitShas = []
 
-      branches.each {
-        def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${it.name}"
+      branches.each { branch ->
+        def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${branch.name}"
         def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl"
         def commits = readJSON text: commitResult
 
         if (commits.size() > 0) {
-          echo "COMMITS in $it"
+          echo "COMMITS in ${branch.name}"
+
+          commits.each { commit ->
+            echo "${commit.sha}"
+          }
         }
         else {
-          echo "NO COMMITS in $it"
+          echo "NO COMMITS in ${branch.name}"
         }
       }
 
@@ -112,7 +116,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       //   }
       // } catch (e) { }
 
-      echo "Finished scanning $it"
+      echo "Finished scanning $repo"
     }
   }
 }
