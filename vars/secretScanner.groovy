@@ -52,17 +52,24 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
     matchingRepos.each {
       echo "Scanning $it"
 
-      def githubApiCommitUrl = "https://api.github.com/repos/$it/commits?since=$commitCheckDate"
-      def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl".trim()
+      def githubBranchUrl = "https://api.github.com/repos/$it/branches"
+      def branchResult = sh returnStdout: true, script: "$curlAuth $githubBranchUrl".trim()
       def jsonSlurper = new JsonSlurper()
-      def commits = jsonSlurper.parseText(commitResult)
+      def branches = jsonSlurper.parseText(branchResult)
 
-      if (commits.size() > 0) {
-        echo "COMMITS: $commits"
-      }
-      else {
-        echo "NO COMMITS"
-      }
+      echo "BRANCHES: $branches"
+
+      // def githubApiCommitUrl = "https://api.github.com/repos/$it/commits?since=$commitCheckDate"
+      // def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl".trim()
+      // def jsonSlurper = new JsonSlurper()
+      // def commits = jsonSlurper.parseText(commitResult)
+
+      // if (commits.size() > 0) {
+      //   echo "COMMITS: $commits"
+      // }
+      // else {
+      //   echo "NO COMMITS"
+      // }
 
 
 
