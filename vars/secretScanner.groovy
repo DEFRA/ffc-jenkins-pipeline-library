@@ -89,9 +89,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
         }
 
         if (secretsFound) {
-          def msg = """POTENTIAL SECRETS DETECTED
-          ${JOB_NAME}/${BUILD_NUMBER}
-          (<${BUILD_URL}|Open>)"""
+          def msg = "POTENTIAL SECRETS DETECTED\n${JOB_NAME}/${BUILD_NUMBER}\n(<${BUILD_URL}|Open>)"
           def channel = "#secretdetection"
 
           slackSend channel: channel,
