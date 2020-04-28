@@ -58,7 +58,9 @@ def extraFinallyThings = {
   }
 }
 
-buildNodeJs environment: 'dev', finallyClosure: extraFinallyThings, testClosure: extraTestThings
+buildNodeJs environment: 'dev',
+            finallyClosure: extraFinallyThings,
+            testClosure: extraTestThings
 ```
 
 Both pipelines rely on a number of conventions being observed within your repo and Jenkins setup:
