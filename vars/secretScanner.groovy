@@ -87,7 +87,7 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
           }
         }
 
-        if (secretsMessage.size() > 0) {
+        if (secretMessages.size() > 0) {
           def msg = "POTENTIAL SECRETS DETECTED\n${JOB_NAME}/${BUILD_NUMBER}\n(<${BUILD_URL}|Open>)"
           def channel = "#secretdetection"
 
