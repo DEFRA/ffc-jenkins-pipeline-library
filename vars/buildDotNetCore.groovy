@@ -83,7 +83,8 @@ def call(Map config=[:]) {
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
       }
-    } catch(e) {stage('Set GitHub status as fail') {
+    } catch(e) {
+      stage('Set GitHub status as fail') {
         build.setGithubStatusFailure(e.message)
       }
 
@@ -94,6 +95,7 @@ def call(Map config=[:]) {
       if (config.containsKey("failureClosure")) {
         config["failureClosure"]()
       }
+
       throw e
     } finally {
       if (config.containsKey("finallyClosure")) {
