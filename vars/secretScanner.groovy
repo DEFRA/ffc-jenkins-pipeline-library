@@ -33,18 +33,18 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
       echo "$it"
       // def reposCmd = "$curlAuth $githubApiUrl\\&page=${it+1} | jq '.[] | .full_name'"
       // FIXME: look into reading this into JSON slurper object instead of using jq
-      // def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
-      // echo "$reposResult"
-      // reposResult.trim().split('\n').each {
-      //   echo "$it"
-      // //   def result = jsonSlurper.parseText(it)
+      def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
+      echo "$reposResult"
+      reposResult.trim().split('\n').each {
+        echo "$it"
+      //   def result = jsonSlurper.parseText(it)
 
-      // //   echo "$result.full_name"
-      // //   // FIXME: should use startsWith after '/'
-      // //   // if (it.contains(repositoryPrefix)) {
-      // //   //   matchingRepos.add(it)
-      // //   // }
-      // }
+      //   echo "$result.full_name"
+      //   // FIXME: should use startsWith after '/'
+      //   // if (it.contains(repositoryPrefix)) {
+      //   //   matchingRepos.add(it)
+      //   // }
+      }
     }
 
     echo "Matching repos: $matchingRepos"
