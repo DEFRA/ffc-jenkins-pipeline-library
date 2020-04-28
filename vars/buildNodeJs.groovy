@@ -108,8 +108,6 @@ def call(Map config=[:], Closure body={}) {
         config["deployClosure"]()
       }
 
-      body()
-
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
       }
