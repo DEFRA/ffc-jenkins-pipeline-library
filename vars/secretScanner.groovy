@@ -59,17 +59,11 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
         def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl"
         def commits = readJSON text: commitResult
 
-        echo "CMD: $githubApiCommitUrl"
-        echo "REPO: $repo"
-        echo "BRANCH: ${it.name}"
-        echo "$commitResult"
-        echo "$commits"
-
         if (commits.size() > 0) {
-          echo "COMMITS: $commits"
+          echo "COMMITS in $it"
         }
         else {
-          echo "NO COMMITS"
+          echo "NO COMMITS in $it"
         }
       }
 
