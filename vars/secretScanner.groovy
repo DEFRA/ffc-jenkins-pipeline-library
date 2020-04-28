@@ -75,9 +75,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
         truffleHogRes.trim().split('\n').each {
           def result = readJSON text: it
 
-
-
-
+          if (commitShas.contains(result.commitHash)) {
             def message = "Reason: $result.reason\n" +
                           "Date: $result.date\n" +
                           "Branch: $result.branch\n" +
@@ -87,20 +85,9 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
                           "Commit: $result.commit"
             print message
             secretsFound = true
-
+          }
         }
-
-      }
-
-
-
-      // def reportRes = []
-      // def jsonSlurper = new JsonSlurper()
-      // def secretsFound = false
-
-
-
-      // try {
+              // try {
       //   if (secretsFound) {
       //     def msg = """POTENTIAL SECRETS DETECTED
       //     ${JOB_NAME}/${BUILD_NUMBER}
@@ -112,6 +99,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       //               message: msg.replace("  ", "")
       //   }
       // } catch (e) { }
+      }
 
       echo "Finished scanning $repo"
     }
