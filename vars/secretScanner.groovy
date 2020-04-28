@@ -60,13 +60,15 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
         def commits = readJSON text: commitResult
 
         if (commits.size() > 0) {
-          commitShas.add(commit.sha)
+          commits.each {
+            commitShas.add(it.sha)
+          }
         }
       }
 
       if (commitShas.size() > 0) {
         // The truffleHog docker run causes exit code 1 which fails the build so need the || true to ignore it
-        def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${it}.git || true"
+        def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${repo}.git || true"
         def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
         def secretsFound = false
         def results = readJSON text: truffleHogRes
