@@ -86,17 +86,17 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
             echo "$message"
             secretsFound = true
           }
+        }
 
-          if (secretsFound) {
-            def msg = """POTENTIAL SECRETS DETECTED
-            ${JOB_NAME}/${BUILD_NUMBER}
-            (<${BUILD_URL}|Open>)"""
-            def channel = "#secretdetection"
+        if (secretsFound) {
+          def msg = """POTENTIAL SECRETS DETECTED
+          ${JOB_NAME}/${BUILD_NUMBER}
+          (<${BUILD_URL}|Open>)"""
+          def channel = "#secretdetection"
 
-            slackSend channel: channel,
-                      color: "#ff0000",
-                      message: msg.replace("  ", "")
-          }
+          slackSend channel: channel,
+                    color: "#ff0000",
+                    message: msg
         }
       }
 
