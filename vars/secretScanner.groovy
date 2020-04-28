@@ -10,10 +10,10 @@ def getCommitCheckDate(scanWindowHrs) {
   }
 }
 
-def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
+def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
-    def githubApiUrl = "https://api.github.com/users/$githubOrg/repos?per_page=100"
+    def githubApiUrl = "https://api.github.com/users/$githubUser/repos?per_page=100"
 
     def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubApiUrl"
     def numPages = "1"
@@ -30,22 +30,14 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
     // def jsonSlurper = new JsonSlurper()
 
     (numPages as Integer).times {
-      echo "$it"
-      // def reposCmd = "$curlAuth $githubApiUrl\\&page=${it+1} | jq '.[] | .full_name'"
-      // FIXME: look into reading this into JSON slurper object instead of using jq
       def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}".trim()
       def jsonSlurper = new JsonSlurper()
       def result = jsonSlurper.parseText(reposResult)
 
       result.each {
-        echo "$it.full_name"
-        // def result = jsonSlurper.parseText(it)
-
-        // echo "$result.full_name"
-        // FIXME: should use startsWith after '/'
-        // if (it.contains(repositoryPrefix)) {
-        //   matchingRepos.add(it)
-        // }
+        if (it.startsWith("$githubUser/$repositoryPrefix")) {
+          matchingRepos.add(it)
+        }
       }
     }
 
