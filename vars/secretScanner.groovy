@@ -36,9 +36,11 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
 
       result.each {
         echo "$it.full_name"
-        // if (it.full_name.startsWith("$githubUser/$repositoryPrefix")) {
-        //   matchingRepos.add(it)
-        // }
+        def matchStr = "$githubUser/$repositoryPrefix"
+        echo "$matchStr"
+        if (it.full_name.startsWith(matchStr)) {
+          matchingRepos.add(it.full_name)
+        }
       }
     }
 
