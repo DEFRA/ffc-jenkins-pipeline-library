@@ -28,6 +28,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
 
     def matchingRepos = []
     // def jsonSlurper = new JsonSlurper()
+    def matchStr = "$githubUser/$repositoryPrefix".toLowerCase()
 
     (numPages as Integer).times {
       def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}".trim()
@@ -35,8 +36,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       def result = jsonSlurper.parseText(reposResult)
 
       result.each {
-        // def matchStr =
-        if (it.full_name.startsWith("$githubUser/$repositoryPrefix")) {
+        if (it.full_name.toLowerCase().startsWith(matchStr)) {
           matchingRepos.add(it.full_name)
         }
       }
