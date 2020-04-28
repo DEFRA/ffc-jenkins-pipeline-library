@@ -80,7 +80,6 @@ def call(Map config=[:]) {
         config["deployClosure"]()
       }
 
-
       stage('Set GitHub status as success'){
         build.setGithubStatusSuccess()
       }
@@ -97,7 +96,6 @@ def call(Map config=[:]) {
       }
       throw e
     } finally {
-     
       if (config.containsKey("finallyClosure")) {
         config["finallyClosure"]()
       }
