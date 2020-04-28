@@ -65,7 +65,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
         // def commits = jsonSlurper.parseText(commitResult)
 
         echo "REPO: $repo"
-        echo "BRANCH: $it"
+        echo "BRANCH: ${it.name}"
 
         // if (commits.size() > 0) {
         //   echo "COMMITS: $commits"
