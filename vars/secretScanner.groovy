@@ -83,22 +83,21 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
                           "Filepath: $result.path\n" +
                           "StringsFound: $result.stringsFound\n" +
                           "Commit: $result.commit"
-            print message
+            echo "$message"
             secretsFound = true
           }
-        }
-              // try {
-      //   if (secretsFound) {
-      //     def msg = """POTENTIAL SECRETS DETECTED
-      //     ${JOB_NAME}/${BUILD_NUMBER}
-      //     (<${BUILD_URL}|Open>)"""
-      //     def channel = "#secretdetection"
 
-      //     slackSend channel: channel,
-      //               color: "#ff0000",
-      //               message: msg.replace("  ", "")
-      //   }
-      // } catch (e) { }
+          if (secretsFound) {
+            def msg = """POTENTIAL SECRETS DETECTED
+            ${JOB_NAME}/${BUILD_NUMBER}
+            (<${BUILD_URL}|Open>)"""
+            def channel = "#secretdetection"
+
+            slackSend channel: channel,
+                      color: "#ff0000",
+                      message: msg.replace("  ", "")
+          }
+        }
       }
 
       echo "Finished scanning $repo"
