@@ -71,8 +71,25 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
         def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${repo}.git || true"
         def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
         def secretsFound = false
-        def results = readJSON text: truffleHogRes
-        echo "$results"
+
+        truffleHogRes.trim().split('\n').each {
+          def result = readJSON text: it
+
+
+
+
+            def message = "Reason: $result.reason\n" +
+                          "Date: $result.date\n" +
+                          "Branch: $result.branch\n" +
+                          "Hash: $result.commitHash\n" +
+                          "Filepath: $result.path\n" +
+                          "StringsFound: $result.stringsFound\n" +
+                          "Commit: $result.commit"
+            print message
+            secretsFound = true
+
+        }
+
       }
 
 
@@ -81,23 +98,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
       // def jsonSlurper = new JsonSlurper()
       // def secretsFound = false
 
-      // truffleHogRes.trim().split('\n').each {
-      //   def result = jsonSlurper.parseText(it)
-      //   def dateObj = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
 
-      //   // FIXME: match by commit SHA instead of date when we use the github API to get only recent commits
-      //   if (dateObj > commitCheckDate) {
-      //     def message = "Reason: $result.reason\n" +
-      //                   "Date: $result.date\n" +
-      //                   "Branch: $result.branch\n" +
-      //                   "Hash: $result.commitHash\n" +
-      //                   "Filepath: $result.path\n" +
-      //                   "StringsFound: $result.stringsFound\n" +
-      //                   "Commit: $result.commit"
-      //     print message
-      //     secretsFound = true
-      //   }
-      // }
 
       // try {
       //   if (secretsFound) {
