@@ -49,13 +49,12 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
 
     sh "docker pull dxa4481/trufflehog"
 
-    def jsonSlurper = new JsonSlurper()
-
     matchingRepos.each {
       echo "Scanning $it"
 
       def githubApiCommitUrl = "https://api.github.com/repos/$it/commits?since=$commitCheckDate"
       def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl".trim()
+      def jsonSlurper = new JsonSlurper()
       def commits = jsonSlurper.parseText(commitResult)
 
       echo "COMMITS: $commits"
