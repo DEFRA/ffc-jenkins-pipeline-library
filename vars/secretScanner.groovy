@@ -32,7 +32,7 @@ def scanWithinWindow(githubOrg, repositoryPrefix, scanWindowHrs) {
     (numPages as Integer).times {
       // def reposCmd = "$curlAuth $githubApiUrl\\&page=${it+1} | jq '.[] | .full_name'"
       // FIXME: look into reading this into JSON slurper object instead of using jq
-      def reposResult = returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
+      def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
 
       reposResult.trim().split('\n').each {
         def result = jsonSlurper.parseText(it)
