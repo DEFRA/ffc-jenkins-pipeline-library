@@ -8,10 +8,10 @@ def getCommitCheckDate(scanWindowHrs) {
   }
 }
 
-def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
+def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
-    def githubApiUrl = "https://api.github.com/users/$githubUser/repos?per_page=100"
+    def githubApiUrl = "https://api.github.com/users/$githubOwner/repos?per_page=100"
 
     def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubApiUrl"
     def numPages = "1"
@@ -25,7 +25,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
     echo "Number of pages of repos: $numPages"
 
     def matchingRepos = []
-    def matchStr = "$githubUser/$repositoryPrefix".toLowerCase()
+    def matchStr = "$githubOwner/$repositoryPrefix".toLowerCase()
 
     (numPages as Integer).times {
       def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
@@ -70,7 +70,7 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
         // The truffleHog docker run causes exit code 1 which fails the build so need the || true to ignore it
         def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${repo}.git || true"
         def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
-        def secretsFound = false
+        def secretMessages = []
 
         truffleHogRes.trim().split('\n').each {
           def result = readJSON text: it
@@ -83,18 +83,21 @@ def scanWithinWindow(githubUser, repositoryPrefix, scanWindowHrs) {
                           "Filepath: $result.path\n" +
                           "StringsFound: $result.stringsFound\n" +
                           "Commit: $result.commit"
-            echo "$message"
-            secretsFound = true
+            secretMessages.add(message)
           }
         }
 
-        if (secretsFound) {
+        if (secretsMessage.size() > 0) {
           def msg = "POTENTIAL SECRETS DETECTED\n${JOB_NAME}/${BUILD_NUMBER}\n(<${BUILD_URL}|Open>)"
           def channel = "#secretdetection"
 
           slackSend channel: channel,
                     color: "#ff0000",
                     message: msg
+
+          secretMessages.each {
+            echo "$it"
+          }
         }
       }
 
