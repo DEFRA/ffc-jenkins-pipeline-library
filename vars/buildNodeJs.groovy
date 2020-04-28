@@ -1,4 +1,4 @@
-def call(Map config=[:], Closure body={}) {
+def call(Map config=[:]) {
   def containerSrcFolder = '\\/home\\/node'
   def localSrcFolder = '.'
   def lcovFile = './test-output/lcov.info'

@@ -1,4 +1,4 @@
-def call(Map config=[:], Closure body={}) {
+def call(Map config=[:]) {
   def containerTag = ''
   def mergedPrNo = ''
   def pr = ''
