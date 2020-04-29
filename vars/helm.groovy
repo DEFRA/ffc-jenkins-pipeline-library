@@ -46,6 +46,23 @@ def undeployChart(environment, chartName, tag) {
 }
 
 // public
+def publishHelmChart(registry, chartName, tag) {
+  withCredentials([
+    string(credentialsId: 'helm-chart-repo', variable: 'helmRepo')
+    usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password'),
+  ]) {
+    // jenkins doesn't tidy up folder, remove old charts before running
+    sh "rm -rf helm-charts"
+    dir('helm-charts') {
+      sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
+      addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
+      sh "helm package ../helm/$chartName --version $tag --dependency-update"
+      sh "curl -u $username:$password -X PUT $ARTIFACTORY_HELM_REPO_URL/$chartName-$tag.tgz -T $chartName-$tag.tgz"
+    }
+  }
+}
+
+// public
 def publishChart(registry, chartName, tag) {
   withCredentials([
     string(credentialsId: 'helm-chart-repo', variable: 'helmRepo')
