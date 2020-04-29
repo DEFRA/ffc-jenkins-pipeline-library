@@ -48,8 +48,8 @@ def undeployChart(environment, chartName, tag) {
 // public
 def publishHelmChart(registry, chartName, tag) {
   withCredentials([
-    string(credentialsId: 'helm-chart-repo', variable: 'helmRepo')
-    usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password'),
+    string(credentialsId: 'helm-chart-repo', variable: 'helmRepo'),
+    usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password')
   ]) {
     // jenkins doesn't tidy up folder, remove old charts before running
     sh "rm -rf helm-charts"
