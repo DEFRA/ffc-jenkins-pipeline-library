@@ -89,7 +89,7 @@ Should you have a pipeline where you need to call the various methods individual
 | triggerRelease                      | deploy.release                       |
 | triggerDeploy                       | deploy.trigger                       |
 | deployChart                         | helm.deployChart                     |
-| deployRemoteChart                   | helm.deployRemoteChart               |
+| deployChart                         | helm.deployChart                     |
 | publishChart                        | helm.publishChart                    |
 | undeployChart                       | helm.undeployChart                   |
 | notifySlackBuildFailure             | notifySlack.buildFailure             |
@@ -662,7 +662,7 @@ New usage:
 helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
 ```
 
-### deployRemoteChart (Obsolete, see helm.deployRemoteChart below)
+### deployChart (Obsolete, see helm.deployChart below)
 
 Deploys a Helm chart from a remote chart repository to Kubernetes.
 
@@ -676,10 +676,10 @@ New usage:
 
 ```
 def extraCommands = "--values ./helm/ffc-demo-web/aws-values.yaml"
-defraUtils.deployRemoteChart('ffc-demo', 'ffc-demo-web', '1.1.7', extraCommands)
+defraUtils.deployChart('ffc-demo', 'ffc-demo-web', '1.1.7', extraCommands)
 ```
 
-### helm.deployRemoteChart
+### helm.deployChart
 
 Deploys a Helm chart from a remote chart repository to Kubernetes.
 
@@ -694,7 +694,7 @@ Takes four parameters:
 New usage:
 
 ```
-helm.deployRemoteChart('dev', 'ffc-demo', 'ffc-demo-web', '1.1.7')
+helm.deployChart('dev', 'ffc-demo', 'ffc-demo-web', '1.1.7')
 ```
 
 ### triggerDeploy (Obsolete, see deploy.trigger below)
