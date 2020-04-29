@@ -662,6 +662,21 @@ New usage:
 helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
 ```
 
+### helm.publishHelmChart
+
+Publishes the local Helm chart to a Helm chart repository
+
+Takes three parameters:
+- docker registry without the protocol
+- chart name
+- container image tag
+
+New usage:
+
+```
+publishHelmChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
+```
+
 ### deployChart (Obsolete, see helm.deployChart below)
 
 Deploys a Helm chart from a remote chart repository to Kubernetes.
