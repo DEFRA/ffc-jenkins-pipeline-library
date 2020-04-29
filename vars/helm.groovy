@@ -55,7 +55,7 @@ def publishChart(registry, chartName, tag) {
     sshagent(credentials: ['helm-chart-creds']) {
       sh "git clone $helmRepo"
       dir('helm-charts') {
-        sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"        
+        sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
         addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
         sh "helm package ../helm/$chartName --version $tag --dependency-update"
         sh 'helm repo index .'
