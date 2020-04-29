@@ -73,7 +73,7 @@ def call(Map config=[:]) {
 
       if (pr != '') {
         stage('Helm install') {
-          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
+          helm.deployHelmChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
         }
       }
       else {
