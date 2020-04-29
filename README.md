@@ -656,6 +656,9 @@ Takes three parameters:
 - chart name
 - container image tag
 
+Uses an environment variable `HELM_CHART_REPO_PUBLIC`, available within Jenkins
+to provide the location to the packaged library chart.
+
 New usage:
 
 ```
@@ -670,6 +673,9 @@ Takes three parameters:
 - docker registry without the protocol
 - chart name
 - container image tag
+
+Uses an environment variable `HELM_CHART_REPO_PUBLIC`, available within Jenkins
+to provide the location to the packaged library chart.
 
 New usage:
 
