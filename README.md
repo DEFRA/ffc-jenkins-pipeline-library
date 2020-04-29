@@ -667,15 +667,15 @@ helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
 
 ### helm.publishHelmChart
 
-Publishes the local Helm chart to a Helm chart repository
+Publishes the local Helm chart to an Artifactory helm chart repo.
 
 Takes three parameters:
 - docker registry without the protocol
 - chart name
 - container image tag
 
-Uses an environment variable `HELM_CHART_REPO_PUBLIC`, available within Jenkins
-to provide the location to the packaged library chart.
+Uses the environment variable `HELM_CHART_REPO_PUBLIC` (set within Jenkins)
+to provide the location of a packaged library chart.
 
 New usage:
 
