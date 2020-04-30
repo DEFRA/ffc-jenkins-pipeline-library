@@ -57,7 +57,7 @@ def publishHelmChart(registry, chartName, tag) {
       sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
       addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
       sh "helm package ../helm/$chartName --version $tag --dependency-update"
-      sh "curl -u $username:$password -X PUT ${ARTIFACTORY_HELM_REPO_URL}ffc-helm-local/$chartName-$tag.tgz -T $chartName-$tag.tgz"
+      sh "curl -u $username:$password -X PUT ${ARTIFACTORY_REPO_URL}ffc-helm-local/$chartName-$tag.tgz -T $chartName-$tag.tgz"
     }
   }
 }
@@ -94,7 +94,7 @@ def deployRemoteChart(environment, namespace, chartName, chartVersion) {
       file(credentialsId: "$chartName-$environment-values", variable: 'values')
     ]) {
       def extraCommands = getExtraCommands(chartVersion)
-      addHelmRepo('ffc', "${ARTIFACTORY_HELM_REPO_URL}ffc-helm-virtual")
+      addHelmRepo('ffc', "${ARTIFACTORY_REPO_URL}ffc-helm-virtual")
       sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
       sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
     }

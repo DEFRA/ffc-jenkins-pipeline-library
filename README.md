@@ -712,7 +712,7 @@ Takes four parameters:
 
 'extraCommands' is no longer necessary. Previously it included the location of the specific environment's 'values' file to use for deployment. Now 'values' files are stored in Jenkins as a credential (as they contain secrets) and are determined automatically by the value of the 'env' argument.
 
-The Artifactory repository is specified by an env var (set in Jenkins) - `ARTIFACTORY_HELM_REPO_URL`.
+The Artifactory repository is specified by an env var (set in Jenkins) - `ARTIFACTORY_REPO_URL`.
 
 New usage:
 
