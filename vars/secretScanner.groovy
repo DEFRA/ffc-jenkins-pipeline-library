@@ -48,6 +48,8 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
 
     sh "docker pull dxa4481/trufflehog"
 
+    def secretsFound = false
+
     matchingRepos.each { repo ->
       echo "Scanning $repo"
 
@@ -85,7 +87,9 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
                           "Filepath: $result.path\n" +
                           "StringsFound: $result.stringsFound\n" +
                           "Commit: $result.commit"
+
             secretMessages.add(message)
+            secretsFound = true
           }
         }
 
@@ -100,12 +104,12 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
           secretMessages.each {
             echo "$it"
           }
-
-          throw new Exception("Potential secrets found")
         }
       }
 
       echo "Finished scanning $repo"
     }
+
+    return secretsFound
   }
 }
