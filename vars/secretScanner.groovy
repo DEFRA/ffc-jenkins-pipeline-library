@@ -75,17 +75,8 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
         def truffleHogResults = sh returnStdout: true, script: truffleHogCmd
         def secretMessages = []
 
-        def debug = truffleHogResults.trim().split('\n')
-        echo "==DEBUGGING=="
-        echo "$truffleHogResults"
-        echo "$debug"
-        echo "${debug.size()}"
-        echo "${debug[0].getClass()}"
-        echo "${debug[0].length()}"
-        echo "==END DEBUGGING=="
-
         truffleHogResults.trim().split('\n').each {
-          if (it.length() == 0) return
+          if (it.length() == 0) return  // readJSON won't accept an empty string
           def result = readJSON text: it
 
           if (commitShas.contains(result.commitHash)) {
