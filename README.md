@@ -169,6 +169,8 @@ It takes four parameters:
   * repositoryPrefix: string containing prefix of repo names to scan e.g. 'ffc'
   * scanWindowHrs: integer determining size of scanning window in hours
 
+The function returns `true` if potential secrets are detected, otherwise `false`
+
 ### tagCommit
 
 Attaches a tag to a specified commit on a repo in the DEFRA github account. If the provided tag already exists on origin, it is deleted and reattached to the given commit SHA. If the tag does not exist on origin, it is created and pushed to origin.

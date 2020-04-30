@@ -1,7 +1,5 @@
-// FIXME: set up exclude file with package-lock and build own docker container
-
 // private
-@NonCPS // Don't run this in the Jenkins sandbox to make groovy.time.TimeCategory work
+@NonCPS // Don't run this in the Jenkins sandbox so that use (groovy.time.TimeCategory) will work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
     def commitCheckDate = (new Date() - scanWindowHrs.hours).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
@@ -13,14 +11,14 @@ def getCommitCheckDate(scanWindowHrs) {
 def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
-    def githubApiUrl = "https://api.github.com/users/$githubOwner/repos?per_page=100"
+    def githubReposUrl = "https://api.github.com/users/$githubOwner/repos?per_page=100"
 
-    def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubApiUrl"
+    def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubReposUrl"
     def numPages = "1"
 
-    curlHeaders.split('\n').each {
-      if (it.startsWith('Link:')) {
-        numPages = it[(it.lastIndexOf('&page=')+6)..(it.lastIndexOf('>')-1)]
+    curlHeaders.split('\n').each { header ->
+      if (header.startsWith('Link:')) {
+        numPages = header[(header.lastIndexOf('&page=')+6)..(header.lastIndexOf('>')-1)]
       }
     }
 
@@ -29,13 +27,13 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
     def matchingRepos = []
     def matchStr = "$githubOwner/$repositoryPrefix".toLowerCase()
 
-    (numPages as Integer).times {
-      def reposResult = sh returnStdout: true, script: "$curlAuth $githubApiUrl\\&page=${it+1}"
-      def result = readJSON text: reposResult
+    (numPages as Integer).times { page ->
+      def reposResults = sh returnStdout: true, script: "$curlAuth $githubReposUrl\\&page=${page+1}"
+      def allRepos = readJSON text: reposResults
 
-      result.each {
-        if (it.full_name.toLowerCase().startsWith(matchStr)) {
-          matchingRepos.add(it.full_name)
+      allRepos.each { repo ->
+        if (repo.full_name.toLowerCase().startsWith(matchStr)) {
+          matchingRepos.add(repo.full_name)
         }
       }
     }
@@ -54,14 +52,14 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
       echo "Scanning $repo"
 
       def githubBranchUrl = "https://api.github.com/repos/$repo/branches"
-      def branchResult = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
-      def branches = readJSON text: branchResult
+      def branchResults = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
+      def branches = readJSON text: branchResults
       def commitShas = []
 
       branches.each { branch ->
-        def githubApiCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${branch.name}"
-        def commitResult = sh returnStdout: true, script: "$curlAuth $githubApiCommitUrl"
-        def commits = readJSON text: commitResult
+        def githubCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${branch.name}"
+        def commitResults = sh returnStdout: true, script: "$curlAuth $githubCommitUrl"
+        def commits = readJSON text: commitResults
 
         if (commits.size() > 0) {
           commits.each {
@@ -71,12 +69,13 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
       }
 
       if (commitShas.size() > 0) {
-        // The truffleHog docker run causes exit code 1 which fails the build so need the || true to ignore it
+        // truffleHog seems to alway exit with code 1 even though it appears to run fine
+        // which fails the build so we need the || true to ignore the exit code and carry on
         def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${repo}.git || true"
-        def truffleHogRes = sh returnStdout: true, script: truffleHogCmd
+        def truffleHogResults = sh returnStdout: true, script: truffleHogCmd
         def secretMessages = []
 
-        truffleHogRes.trim().split('\n').each {
+        truffleHogResults.trim().split('\n').each {
           def result = readJSON text: it
 
           if (commitShas.contains(result.commitHash)) {
