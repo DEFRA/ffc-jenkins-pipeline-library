@@ -702,7 +702,7 @@ defraUtils.deployRemoteChart('ffc-demo', 'ffc-demo-web', '1.1.7', extraCommands)
 
 ### helm.deployRemoteChart
 
-Deploys a Helm chart from a remote chart repository to Kubernetes.
+Deploys a Helm chart from a remote (Artifactory) chart repository to Kubernetes.
 
 Takes four parameters:
 - the environment to deploy into
@@ -711,6 +711,8 @@ Takes four parameters:
 - the chart version
 
 'extraCommands' is no longer necessary. Previously it included the location of the specific environment's 'values' file to use for deployment. Now 'values' files are stored in Jenkins as a credential (as they contain secrets) and are determined automatically by the value of the 'env' argument.
+
+The Artifactory repository is specified by an env var (set in Jenkins) - `ARTIFACTORY_HELM_REPO_URL`.
 
 New usage:
 
