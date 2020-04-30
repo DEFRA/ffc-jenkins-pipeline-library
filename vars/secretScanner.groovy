@@ -100,6 +100,8 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
           secretMessages.each {
             echo "$it"
           }
+
+          throw new Exception("Potential secrets found")
         }
       }
 
