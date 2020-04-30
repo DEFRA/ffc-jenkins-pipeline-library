@@ -80,6 +80,7 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
         echo "$truffleHogResults"
         echo "$debug"
         echo "${debug.size()}"
+        echo "${debug[0].getClass()}"
         echo "==END DEBUGGING=="
 
         truffleHogResults.trim().split('\n').each {
