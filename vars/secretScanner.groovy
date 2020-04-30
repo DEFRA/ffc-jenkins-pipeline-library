@@ -81,9 +81,11 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
         echo "$debug"
         echo "${debug.size()}"
         echo "${debug[0].getClass()}"
+        echo "${debug[0].length()}"
         echo "==END DEBUGGING=="
 
         truffleHogResults.trim().split('\n').each {
+          if (it.length() == 0) return
           def result = readJSON text: it
 
           if (commitShas.contains(result.commitHash)) {
