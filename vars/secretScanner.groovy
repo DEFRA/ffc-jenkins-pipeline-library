@@ -1,5 +1,6 @@
 // FIXME: set up exclude file with package-lock and build own docker container
 
+// private
 @NonCPS // Don't run this in the Jenkins sandbox to make groovy.time.TimeCategory work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
@@ -8,6 +9,7 @@ def getCommitCheckDate(scanWindowHrs) {
   }
 }
 
+// public
 def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"

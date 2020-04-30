@@ -160,6 +160,15 @@ A simple test harness may be run to unit test functions that are purely `groovy`
 
 Many of these are now obsolete, and will be removed in v5 of the pipeline. Where there is a direct equivalent with no difference in parameters, this is listed next to the function name. Where there is an equivalence, but with different parameters (e.g. `defraUtils.getVariables` / `build.getVariables`), the equivalent function is listed directly following the obsolete function with details on the new parameters. If there is no equivalent, these functions are not used by repo pipelines, but are dependencies of 'public' pipeline functions.
 
+### secretScanner.scanWithinWindow
+
+Scans Github repos for potential secrets committed within a given time window. It uses the [truffleHog](https://github.com/dxa4481/truffleHog) tool to scan the commit history and branches of repos, running entropy and regex checks on git diffs. Given a Github username/organisation and a repo name prefix, this function queries the Github API to identify matching repos and establish which of these repos has had a commit within a given time window. `truffleHog` is then run to identify potential secrets within these commits, and reports these to a Slack channel.
+
+It takes four parameters:
+  * githubOwner: string containing owner of Github repos to be scanned e.g. 'DEFRA'. Used in calls to the Github API e.g. https://api.github.com/users/:username/repos
+  * repositoryPrefix: string containing prefix of repo names to scan e.g. 'ffc'
+  * scanWindowHrs: integer determining size of scanning window in hours
+
 ### tagCommit
 
 Attaches a tag to a specified commit on a repo in the DEFRA github account. If the provided tag already exists on origin, it is deleted and reattached to the given commit SHA. If the tag does not exist on origin, it is created and pushed to origin.
