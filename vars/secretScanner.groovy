@@ -75,6 +75,13 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
         def truffleHogResults = sh returnStdout: true, script: truffleHogCmd
         def secretMessages = []
 
+        def debug = truffleHogResults.trim().split('\n')
+        echo "==DEBUGGING=="
+        echo "$truffleHogResults"
+        echo "$debug"
+        echo "${debug.size()}"
+        echo "==END DEBUGGING=="
+
         truffleHogResults.trim().split('\n').each {
           def result = readJSON text: it
 
