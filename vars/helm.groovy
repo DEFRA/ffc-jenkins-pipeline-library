@@ -57,7 +57,7 @@ def publishHelmChart(registry, chartName, tag) {
       sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
       addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
       sh "helm package ../helm/$chartName --version $tag --dependency-update"
-      sh "curl -u $username:$password -X PUT ${ARTIFACTORY_REPO_URL}ffc-helm-local/$chartName-$tag.tgz -T $chartName-$tag.tgz"
+      sh "curl -u $username:$password -X PUT ${ARTIFACTORY_REPO_URL}ffc-helm-local/$chartName-${tag}.tgz -T $chartName-${tag}.tgz"
     }
   }
 }
