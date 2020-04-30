@@ -88,20 +88,6 @@ def publishChart(registry, chartName, tag) {
 }
 
 // public
-def deployHelmChart(environment, namespace, chartName, chartVersion) {
-  withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
-    withCredentials([
-      file(credentialsId: "$chartName-$environment-values", variable: 'values')
-    ]) {
-      def extraCommands = getExtraCommands(chartVersion)
-      addHelmRepo('ffc', "${ARTIFACTORY_HELM_REPO_URL}ffc-helm-virtual/")
-      sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
-      sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
-    }
-  }
-}
-
-// public
 def deployRemoteChart(environment, namespace, chartName, chartVersion) {
   withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
     withCredentials([
