@@ -667,7 +667,7 @@ helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
 
 ### helm.publishHelmChart
 
-Publishes the local Helm chart to an Artifactory helm chart repo.
+Publishes the local Helm chart to an Artifactory helm chart repository.
 
 Takes three parameters:
 - docker registry without the protocol
@@ -680,7 +680,7 @@ to provide the location of a packaged library chart.
 New usage:
 
 ```
-publishHelmChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
+helm.publishHelmChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
 ```
 
 ### deployRemoteChart (Obsolete, see helm.deployRemoteChart below)
