@@ -1,5 +1,5 @@
 def getExtraCommands(tag) {
-  return "--set labels.version=$tag --install --atomic"
+  return "--set labels.version=$tag --install --atomic --version=$tag"
 }
 
 def getPrCommands(registry, chartName, tag) {
