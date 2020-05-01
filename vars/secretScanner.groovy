@@ -2,7 +2,7 @@
 @NonCPS // Don't run this in the Jenkins sandbox so that use (groovy.time.TimeCategory) will work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
-    return new Date() - scanWindowHrs.hours
+    return (new Date() - scanWindowHrs.hours).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
   }
 }
 
@@ -62,8 +62,6 @@ def getMatchingRepos(curlAuth, githubOwner, repositoryPrefix) {
 
   echo "Number of pages of repos: $numPages"
 
-  throw new Exception("TESTING")
-
   def matchingRepos = []
   def matchStr = "$githubOwner/$repositoryPrefix".toLowerCase()
 
@@ -98,9 +96,8 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
 
     def matchingRepos = getMatchingRepos(curlAuth, githubOwner, repositoryPrefix)
     def commitCheckDate = getCommitCheckDate(scanWindowHrs)
-    def commitCheckDateStr = commitCheckDate.format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
 
-    echo "Commit check date: $commitCheckDateStr"
+    echo "Commit check date: $commitCheckDate"
 
     def secretsFound = false
 
@@ -111,18 +108,25 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
       def githubBranchUrl = "https://api.github.com/repos/$repo/branches?per_page=100"
       def branchResults = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
       def branches = readJSON text: branchResults
-      def commitExists = false
+      def commitShas = []
 
-      for (branch in branches) {
+      branches.each { branch ->
         def githubCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDateStr\\&sha=${branch.name}"
-        def commitResults = sh returnStdout: true, script: "$curlAuth $githubCommitUrl"
-        def commits = readJSON text: commitResults
+        def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubCommitUrl"
+        def numPages = getNumPages(curlHeaders)
 
-        if (commits.size() > 0) {
-          commitExists = true
-          break
-        }
+        echo "NUMBER OF PAGES for ${branch.name}: $numPages"
+
+        // def commitResults = sh returnStdout: true, script: "$curlAuth $githubCommitUrl"
+        // def commits = readJSON text: commitResults
+
+        // if (commits.size() > 0) {
+        //   commitExists = true
+        //   break
+        // }
       }
+
+      def commitExists = false
 
       if (commitExists) {
         def secretMessages = runTruffleHog(dockerImgName, repo, commitCheckDate)
