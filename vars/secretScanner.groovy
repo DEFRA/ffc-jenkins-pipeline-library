@@ -39,20 +39,30 @@ def runTruffleHog(dockerImgName, repoName, commitCheckDate=new Date(0)) {
   return secretMessages
 }
 
+def getNumPages(curlHeaders) {
+  def linkHeader = curlHeaders.split('\n').find { header -> header.toLowerCase().startsWith('link:') }
+
+  if (linkHeader) {
+    def lastLink = linkHeader.split(',').find { link -> link.contains('rel="last"') }
+
+    if (lastLink) {
+      return lastLink[(lastLink.lastIndexOf('&page=')+6)..(lastLink.lastIndexOf('>')-1)]
+    }
+  }
+
+  return "1"
+}
+
 // private
 def getMatchingRepos(curlAuth, githubOwner, repositoryPrefix) {
   def githubReposUrl = "https://api.github.com/users/$githubOwner/repos?per_page=100"
 
   def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubReposUrl"
-  def numPages = "1"
-
-  curlHeaders.split('\n').each { header ->
-    if (header.startsWith('Link:')) {
-      numPages = header[(header.lastIndexOf('&page=')+6)..(header.lastIndexOf('>')-1)]
-    }
-  }
+  def numPages = getNumPages(curlHeaders)
 
   echo "Number of pages of repos: $numPages"
+
+  throw new Exception("TESTING")
 
   def matchingRepos = []
   def matchStr = "$githubOwner/$repositoryPrefix".toLowerCase()
