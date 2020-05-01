@@ -41,12 +41,9 @@ def scanWithinWindow(dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs
     echo "Matching repos: $matchingRepos"
 
     def commitCheckDate = getCommitCheckDate(scanWindowHrs)
+    def secretsFound = false
 
     echo "Commit check date: $commitCheckDate"
-
-    sh "docker pull dxa4481/trufflehog"
-
-    def secretsFound = false
 
     matchingRepos.each { repo ->
       echo "Scanning $repo"
