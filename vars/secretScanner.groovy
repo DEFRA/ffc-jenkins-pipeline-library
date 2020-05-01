@@ -111,7 +111,7 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
       def commitShas = []
 
       branches.each { branch ->
-        def githubCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDateStr\\&sha=${branch.name}"
+        def githubCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${branch.name}\\&per_page=100"
         def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubCommitUrl"
         def numPages = getNumPages(curlHeaders)
 
