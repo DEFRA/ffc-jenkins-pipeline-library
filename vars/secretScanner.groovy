@@ -18,7 +18,7 @@ def runTruffleHog(dockerImgName, repoName, commitShas=null) {
     if (it.length() == 0) return  // readJSON won't accept an empty string
     def result = readJSON text: it
 
-    if (commitShas.contains(result.commitHash) || !commitShas) {
+    if (!commitShas || commitShas.contains(result.commitHash)) {
       def message = "Reason: $result.reason\n" +
                     "Date: $result.date\n" +
                     "Repo: $repoName\n" +
