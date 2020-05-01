@@ -2,7 +2,7 @@
 @NonCPS // Don't run this in the Jenkins sandbox so that use (groovy.time.TimeCategory) will work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
-    return new (Date() - scanWindowHrs.hours).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
+    return (new Date() - scanWindowHrs.hours).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
   }
 }
 
