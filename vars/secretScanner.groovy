@@ -144,10 +144,7 @@ def scanFullHistory(dockerImgName, githubOwner, repositoryPrefix) {
 
     echo "Matching repos: $matchingRepos"
 
-    def commitCheckDate = getCommitCheckDate(scanWindowHrs)
     def secretsFound = false
-
-    echo "Commit check date: $commitCheckDate"
 
     matchingRepos.each { repo ->
       echo "Scanning $repo"
