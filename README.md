@@ -647,25 +647,7 @@ New usage:
 helm.undeployChart('dev', 'ffc-demo-web', 'pr53')
 ```
 
-### publishChart / helm.publishChart
-
-Publishes the local Helm chart to a Helm chart repository implemented in git.
-
-Takes three parameters:
-- docker registry without the protocol
-- chart name
-- container image tag
-
-Uses an environment variable `HELM_CHART_REPO_PUBLIC`, available within Jenkins
-to provide the location to the packaged library chart.
-
-New usage:
-
-```
-helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
-```
-
-### helm.publishHelmChart
+### helm.publishChart
 
 Publishes the local Helm chart to an Artifactory helm chart repository.
 
@@ -680,7 +662,7 @@ to provide the location of a packaged library chart.
 New usage:
 
 ```
-helm.publishHelmChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
+helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
 ```
 
 ### deployRemoteChart (Obsolete, see helm.deployRemoteChart below)
