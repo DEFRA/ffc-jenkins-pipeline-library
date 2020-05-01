@@ -24,8 +24,8 @@ def runTruffleHog(dockerImgName, repoName, commitShas=null) {
                     "Repo: $repoName\n" +
                     "Branch: $result.branch\n" +
                     "Hash: $result.commitHash\n" +
-                    "Filepath: $result.path\n" +
-                    "StringsFound: $result.stringsFound\n" +
+                    "File path: $result.path\n" +
+                    "Strings found: $result.stringsFound\n" +
                     "Commit: $result.commit"
 
       secretMessages.add(message)
