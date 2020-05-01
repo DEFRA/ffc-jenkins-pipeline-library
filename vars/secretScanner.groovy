@@ -7,7 +7,7 @@ def getCommitCheckDate(scanWindowHrs) {
 }
 
 // private
-def runTruffleHog(dockerImgName, repoName, commitCheckDate=new Date(0)) {
+def runTruffleHog(dockerImgName, repoName, commitShas=null) {
   // truffleHog seems to alway exit with code 1 even though it appears to run fine
   // which fails the build so we need the || true to ignore the exit code and carry on
   def truffleHogCmd = "docker run $dockerImgName --json --regex https://github.com/${repoName}.git || true"
@@ -17,12 +17,8 @@ def runTruffleHog(dockerImgName, repoName, commitCheckDate=new Date(0)) {
   truffleHogResults.trim().split('\n').each {
     if (it.length() == 0) return  // readJSON won't accept an empty string
     def result = readJSON text: it
-    def commitDate = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
 
-    echo "commitDate: $commitDate"
-    echo "commitCheck: $commitCheckDate"
-
-    if (commitDate > commitCheckDate) {
+    if (commitShas.contains(result.commitHash)) {
       def message = "Reason: $result.reason\n" +
                     "Date: $result.date\n" +
                     "Repo: $repoName\n" +
@@ -125,7 +121,7 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
       }
 
       if (commitShas.size() > 0) {
-        def secretMessages = runTruffleHog(dockerImgName, repo, commitCheckDate)
+        def secretMessages = runTruffleHog(dockerImgName, repo, commitShas)
         secretsFound = !secretMessages.isEmpty()
         reportSecrets(secretMessages, repo, slackChannel)
       }
@@ -148,7 +144,7 @@ def scanFullHistory(githubCredentialId, dockerImgName, githubOwner, repositoryPr
     matchingRepos.each { repo ->
       echo "Scanning $repo"
 
-      def secretMessages = runTruffleHog(dockerImgName, repo, commitCheckDate)
+      def secretMessages = runTruffleHog(dockerImgName, repo)
       secretsFound = !secretMessages.isEmpty()
       reportSecrets(secretMessages, repo, slackChannel)
 
