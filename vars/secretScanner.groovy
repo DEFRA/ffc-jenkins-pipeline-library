@@ -10,8 +10,6 @@ def getCommitCheckDate(scanWindowHrs) {
 // public
 def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
-    def debug = readJSON text: ""
-
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
     def githubReposUrl = "https://api.github.com/users/$githubOwner/repos?per_page=100"
 
@@ -108,6 +106,8 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
           }
         }
       }
+
+      def debug = readJSON text: ""
 
       echo "Finished scanning $repo"
     }
