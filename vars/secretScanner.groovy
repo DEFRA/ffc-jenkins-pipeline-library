@@ -8,7 +8,7 @@ def getCommitCheckDate(scanWindowHrs) {
 }
 
 // public
-def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
+def scanWithinWindow(dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
     def githubReposUrl = "https://api.github.com/users/$githubOwner/repos?per_page=100"
@@ -71,7 +71,7 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
       if (commitShas.size() > 0) {
         // truffleHog seems to alway exit with code 1 even though it appears to run fine
         // which fails the build so we need the || true to ignore the exit code and carry on
-        def truffleHogCmd = "docker run dxa4481/trufflehog --json --regex https://github.com/${repo}.git || true"
+        def truffleHogCmd = "docker run $dockerImgName --json --regex https://github.com/${repo}.git || true"
         def truffleHogResults = sh returnStdout: true, script: truffleHogCmd
         def secretMessages = []
 
