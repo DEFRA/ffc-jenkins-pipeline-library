@@ -112,7 +112,7 @@ def scanWithinWindow(dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs
 }
 
 // public
-def scanFull(dockerImgName, githubOwner, repositoryPrefix) {
+def scanFullHistory(dockerImgName, githubOwner, repositoryPrefix) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
     def githubReposUrl = "https://api.github.com/users/$githubOwner/repos?per_page=100"
