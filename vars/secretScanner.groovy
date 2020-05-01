@@ -19,6 +19,9 @@ def runTruffleHog(dockerImgName, repoName, commitCheckDate=new Date(0)) {
     def result = readJSON text: it
     def commitDate = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
 
+    echo "commitDate: $commitDate"
+    echo "commitCheck: $commitCheckDate"
+
     if (commitDate > commitCheckDate) {
       def message = "Reason: $result.reason\n" +
                     "Date: $result.date\n" +
