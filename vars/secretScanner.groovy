@@ -79,6 +79,7 @@ def scanWithinWindow(dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs
           if (commitShas.contains(result.commitHash)) {
             def message = "Reason: $result.reason\n" +
                           "Date: $result.date\n" +
+                          "Repo: $repo\n" +
                           "Branch: $result.branch\n" +
                           "Hash: $result.commitHash\n" +
                           "Filepath: $result.path\n" +
@@ -161,6 +162,7 @@ def scanFullHistory(dockerImgName, githubOwner, repositoryPrefix) {
 
         def message = "Reason: $result.reason\n" +
                       "Date: $result.date\n" +
+                      "Repo: $repo\n" +
                       "Branch: $result.branch\n" +
                       "Hash: $result.commitHash\n" +
                       "Filepath: $result.path\n" +
