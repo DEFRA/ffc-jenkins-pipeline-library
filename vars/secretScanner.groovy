@@ -115,16 +115,14 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
         def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubCommitUrl"
         def numPages = getNumPages(curlHeaders)
 
-        echo "NUMBER OF PAGES for ${branch.name}: $numPages"
-
-        // def commitResults = sh returnStdout: true, script: "$curlAuth $githubCommitUrl"
-        // def commits = readJSON text: commitResults
-
-        // if (commits.size() > 0) {
-        //   commitExists = true
-        //   break
-        // }
+        (numPages as Integer).times { page ->
+          def commitResults = sh returnStdout: true, script: "$curlAuth $githubCommitUrl\\&page=${page+1}"
+          def commits = readJSON text: commitResults
+          commits.each { commit -> commitShas.add(commit.sha) }
+        }
       }
+
+      echo "$repo: $commitShas"
 
       def commitExists = false
 
