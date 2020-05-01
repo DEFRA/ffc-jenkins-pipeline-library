@@ -7,10 +7,10 @@ def getCommitCheckDate(scanWindowHrs) {
 }
 
 // private
-def runTruffleHog(dockerImgName, repoName, commitShas=null) {
+def runTruffleHogShas(dockerImgName, repoName, commitShas) {
   // truffleHog seems to alway exit with code 1 even though it appears to run fine
   // which fails the build so we need the || true to ignore the exit code and carry on
-  def truffleHogCmd = "docker run $dockerImgName --json --regex https://github.com/${repoName}.git || true"
+  def truffleHogCmd = "docker run $dockerImgName --json https://github.com/${repoName}.git || true"
   def truffleHogResults = sh returnStdout: true, script: truffleHogCmd
   def secretMessages = []
 
@@ -18,7 +18,7 @@ def runTruffleHog(dockerImgName, repoName, commitShas=null) {
     if (it.length() == 0) return  // readJSON won't accept an empty string
     def result = readJSON text: it
 
-    if (!commitShas || commitShas.contains(result.commitHash)) {
+    if (commitShas.contains(result.commitHash)) {
       def message = "Reason: $result.reason\n" +
                     "Date: $result.date\n" +
                     "Repo: $repoName\n" +
@@ -121,7 +121,7 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
       }
 
       if (commitShas.size() > 0) {
-        def secretMessages = runTruffleHog(dockerImgName, repo, commitShas)
+        def secretMessages = runTruffleHogShas(dockerImgName, repo, commitShas)
 
         if (!secretMessages.isEmpty()) {
           secretsFound = true
@@ -147,12 +147,11 @@ def scanFullHistory(githubCredentialId, dockerImgName, githubOwner, repositoryPr
     matchingRepos.each { repo ->
       echo "Scanning $repo"
 
-      def secretMessages = runTruffleHog(dockerImgName, repo)
-
-      if (!secretMessages.isEmpty()) {
-        secretsFound = true
-        reportSecrets(secretMessages, repo, slackChannel)
-      }
+      // truffleHog seems to alway exit with code 1 even though it appears to run fine
+      // which fails the build so we need the || true to ignore the exit code and carry on
+      def truffleHogCmd = "docker run $dockerImgName https://github.com/${repoName}.git || true"
+      def truffleHogResults = sh returnStdout: true, script: truffleHogCmd
+      echo "$truffleHogResults"
 
       echo "Finished scanning $repo"
     }
