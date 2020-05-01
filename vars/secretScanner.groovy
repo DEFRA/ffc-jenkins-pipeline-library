@@ -122,8 +122,11 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
 
       if (commitShas.size() > 0) {
         def secretMessages = runTruffleHog(dockerImgName, repo, commitShas)
-        secretsFound = !secretMessages.isEmpty()
-        reportSecrets(secretMessages, repo, slackChannel)
+
+        if (!secretMessages.isEmpty()) {
+          secretsFound = true
+          reportSecrets(secretMessages, repo, slackChannel)
+        }
       }
 
       echo "Finished scanning $repo"
@@ -145,8 +148,11 @@ def scanFullHistory(githubCredentialId, dockerImgName, githubOwner, repositoryPr
       echo "Scanning $repo"
 
       def secretMessages = runTruffleHog(dockerImgName, repo)
-      secretsFound = !secretMessages.isEmpty()
-      reportSecrets(secretMessages, repo, slackChannel)
+
+      if (!secretMessages.isEmpty()) {
+        secretsFound = true
+        reportSecrets(secretMessages, repo, slackChannel)
+      }
 
       echo "Finished scanning $repo"
     }
