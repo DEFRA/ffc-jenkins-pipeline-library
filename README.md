@@ -164,11 +164,25 @@ Many of these are now obsolete, and will be removed in v5 of the pipeline. Where
 
 Scans Github repos for potential secrets committed within a given time window. It uses the [truffleHog](https://github.com/dxa4481/truffleHog) tool to scan the commit history and branches of repos, running entropy and regex checks on git diffs. Given a Github username/organisation and a repo name prefix, this function queries the Github API to identify matching repos and establish which of these repos has had a commit within a given time window. `truffleHog` is then run to identify potential secrets within these commits, and reports these to a Slack channel.
 
-It takes four parameters:
-  * dockerImgName: name of the docker image to run the tests with. It is assumed this image has been built and is accessible locally.
+It takes five parameters:
+  * githubCredentialId: string containing Jenkins credentialsId containing token for Github API access.
+  * dockerImgName: string containing name of the docker image to run the tests with. It is assumed this image has been built and is accessible locally.
   * githubOwner: string containing owner of Github repos to be scanned e.g. 'DEFRA'. Used in calls to the Github API e.g. https://api.github.com/users/:username/repos.
   * repositoryPrefix: string containing prefix of repo names to scan e.g. 'ffc'.
   * scanWindowHrs: integer determining size of scanning window in hours.
+
+The function returns `true` if potential secrets are detected, otherwise `false`.
+
+### secretScanner.scanFullHistory
+
+Scans full history Github repos for potential secrets committed. It uses the [truffleHog](https://github.com/dxa4481/truffleHog) tool to scan the commit history and branches of repos, running entropy and regex checks on git diffs. Given a Github username/organisation and a repo name prefix, this function queries the Github API to identify matching repos and runs `truffleHog` on each repo to identify potential secrets. This function is designed for ad-hoc scanning rather than as a scheuled job, so reporting to the Slack is configurable.
+
+It takes five parameters:
+  * githubCredentialId: string containing Jenkins credentialsId containing token for Github API access.
+  * dockerImgName: string containing name of the docker image to run the tests with. It is assumed this image has been built and is accessible locally.
+  * githubOwner: string containing owner of Github repos to be scanned e.g. 'DEFRA'. Used in calls to the Github API e.g. https://api.github.com/users/:username/repos.
+  * repositoryPrefix: string containing prefix of repo names to scan e.g. 'ffc'.
+  * reportToSlack: boolean controlling whether slack message reporting is enabled.
 
 The function returns `true` if potential secrets are detected, otherwise `false`.
 
