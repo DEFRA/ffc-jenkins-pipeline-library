@@ -94,7 +94,7 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
         }
 
         if (secretMessages.size() > 0) {
-          def msg = "POTENTIAL SECRETS DETECTED\n${JOB_NAME}/${BUILD_NUMBER}\n(<${BUILD_URL}|Open>)"
+          def msg = "POTENTIAL SECRETS DETECTED IN $repo:$branch\n${JOB_NAME}/${BUILD_NUMBER}\n(<${BUILD_URL}|Open>)"
           def channel = "#secretdetection"
 
           slackSend channel: channel,
@@ -106,8 +106,6 @@ def scanWithinWindow(githubOwner, repositoryPrefix, scanWindowHrs) {
           }
         }
       }
-
-      def debug = readJSON text: ""
 
       echo "Finished scanning $repo"
     }
