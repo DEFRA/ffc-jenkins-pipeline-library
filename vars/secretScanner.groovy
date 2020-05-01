@@ -2,7 +2,7 @@
 @NonCPS // Don't run this in the Jenkins sandbox so that use (groovy.time.TimeCategory) will work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
-    return (new Date() - scanWindowHrs.hours).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
+    return new Date() - scanWindowHrs.hours
   }
 }
 
@@ -85,8 +85,9 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
 
     def matchingRepos = getMatchingRepos(curlAuth, githubOwner, repositoryPrefix)
     def commitCheckDate = getCommitCheckDate(scanWindowHrs)
+    def commitCheckDateStr = commitCheckDate.format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
 
-    echo "Commit check date: $commitCheckDate"
+    echo "Commit check date: $commitCheckDateStr"
 
     def secretsFound = false
 
@@ -100,7 +101,7 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
       def commitExists = false
 
       for (branch in branches) {
-        def githubCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${branch.name}"
+        def githubCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDateStr\\&sha=${branch.name}"
         def commitResults = sh returnStdout: true, script: "$curlAuth $githubCommitUrl"
         def commits = readJSON text: commitResults
 
