@@ -113,7 +113,7 @@ def scanWithinWindow(dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs
 }
 
 // public
-def scanFullHistory(dockerImgName, githubOwner, repositoryPrefix) {
+def scanFullHistory(dockerImgName, githubOwner, repositoryPrefix, reportToSlack) {
   withCredentials([string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
     def githubReposUrl = "https://api.github.com/users/$githubOwner/repos?per_page=100"
@@ -173,7 +173,7 @@ def scanFullHistory(dockerImgName, githubOwner, repositoryPrefix) {
         secretsFound = true
       }
 
-      if (secretMessages.size() > 0) {
+      if ((secretMessages.size() > 0) && reportToSlack) {
         def msg = "POTENTIAL SECRETS DETECTED IN $repo\n${JOB_NAME}/${BUILD_NUMBER}\n(<${BUILD_URL}|Open>)"
         def channel = "#secretdetection"
 
