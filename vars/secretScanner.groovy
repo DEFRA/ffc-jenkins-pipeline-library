@@ -2,13 +2,12 @@
 @NonCPS // Don't run this in the Jenkins sandbox so that use (groovy.time.TimeCategory) will work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
-    def commitCheckDate = (new Date() - scanWindowHrs.hours).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
-    return commitCheckDate
+    return new Date() - scanWindowHrs.hours
   }
 }
 
 // private
-def runTruffleHog(dockerImgName, repoName) {
+def runTruffleHog(dockerImgName, repoName, commitCheckDate=new Date(0)) {
   // truffleHog seems to alway exit with code 1 even though it appears to run fine
   // which fails the build so we need the || true to ignore the exit code and carry on
   def truffleHogCmd = "docker run $dockerImgName --json --regex https://github.com/${repoName}.git || true"
@@ -18,8 +17,9 @@ def runTruffleHog(dockerImgName, repoName) {
   truffleHogResults.trim().split('\n').each {
     if (it.length() == 0) return  // readJSON won't accept an empty string
     def result = readJSON text: it
+    def commitDate = new Date().parse("yyyy-MM-dd HH:mm:ss", result.date)
 
-    if (commitShas.contains(result.commitHash)) {
+    if (commitDate > commitCheckDate) {
       def message = "Reason: $result.reason\n" +
                     "Date: $result.date\n" +
                     "Repo: $repoName\n" +
@@ -93,27 +93,25 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
     matchingRepos.each { repo ->
       echo "Scanning $repo"
 
-      def githubBranchUrl = "https://api.github.com/repos/$repo/branches"
+      // We don't handle more than 100 branches on a repo. You shouldn't have more than 100 branches open.
+      def githubBranchUrl = "https://api.github.com/repos/$repo/branches?per_page=100"
       def branchResults = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
       def branches = readJSON text: branchResults
-      def commitShas = []
+      def commitExists = false
 
-      branches.each { branch ->
-        // FIXME: as soon as we find a branch with commits we can stop looking
-
+      for (branch in branches) {
         def githubCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${branch.name}"
         def commitResults = sh returnStdout: true, script: "$curlAuth $githubCommitUrl"
         def commits = readJSON text: commitResults
 
         if (commits.size() > 0) {
-          commits.each {
-            commitShas.add(it.sha)
-          }
+          commitExists = true
+          break
         }
       }
 
-      if (commitShas.size() > 0) {
-        def secretMessages = runTruffleHog(dockerImgName, repo)
+      if (commitExists) {
+        def secretMessages = runTruffleHog(dockerImgName, repo, commitCheckDate)
         secretsFound = !secretMessages.isEmpty()
 
         if (secretMessages.size() > 0) {
