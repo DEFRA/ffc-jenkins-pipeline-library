@@ -35,6 +35,7 @@ def runTruffleHogShas(dockerImgName, repoName, commitShas) {
   return secretMessages
 }
 
+// private
 def getNumPages(curlHeaders) {
   def linkHeader = curlHeaders.split('\n').find { header -> header.toLowerCase().startsWith('link:') }
 
@@ -77,6 +78,7 @@ def getMatchingRepos(curlAuth, githubOwner, repositoryPrefix) {
   return matchingRepos
 }
 
+// private
 def reportSecrets(secretMessages, repo, channel) {
   secretMessages.each { echo "$it" }
 
