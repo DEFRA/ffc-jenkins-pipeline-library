@@ -7,7 +7,7 @@ def getCommitCheckDate(scanWindowHrs) {
 }
 
 // private
-def runTruffleHogShas(dockerImgName, repoName, commitShas) {
+def runTruffleHog(dockerImgName, repoName, commitShas=null) {
   // truffleHog seems to alway exit with code 1 even though it appears to run fine
   // which fails the build so we need the || true to ignore the exit code and carry on
   def truffleHogCmd = "docker run $dockerImgName --json https://github.com/${repoName}.git || true"
@@ -18,7 +18,7 @@ def runTruffleHogShas(dockerImgName, repoName, commitShas) {
     if (it.length() == 0) return  // readJSON won't accept an empty string
     def result = readJSON text: it
 
-    if (commitShas.contains(result.commitHash)) {
+    if (!commitShas || commitShas.contains(result.commitHash)) {
       def message = "Reason: $result.reason\n" +
                     "Date: $result.date\n" +
                     "Repo: $repoName\n" +
@@ -123,7 +123,7 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
       }
 
       if (commitShas.size() > 0) {
-        def secretMessages = runTruffleHogShas(dockerImgName, repo, commitShas)
+        def secretMessages = runTruffleHog(dockerImgName, repo, commitShas)
 
         if (!secretMessages.isEmpty()) {
           secretsFound = true
@@ -149,11 +149,12 @@ def scanFullHistory(githubCredentialId, dockerImgName, githubOwner, repositoryPr
     matchingRepos.each { repo ->
       echo "Scanning $repo"
 
-      // truffleHog seems to alway exit with code 1 even though it appears to run fine
-      // which fails the build so we need the || true to ignore the exit code and carry on
-      def truffleHogCmd = "docker run $dockerImgName https://github.com/${repo}.git || true"
-      def truffleHogResults = sh returnStdout: true, script: truffleHogCmd
-      echo "$truffleHogResults"
+      def secretMessages = runTruffleHog(dockerImgName, repo)
+
+      if (!secretMessages.isEmpty()) {
+        secretsFound = true
+        reportSecrets(secretMessages, repo, slackChannel)
+      }
 
       echo "Finished scanning $repo"
     }
