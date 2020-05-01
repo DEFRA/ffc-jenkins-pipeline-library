@@ -149,7 +149,7 @@ def scanFullHistory(githubCredentialId, dockerImgName, githubOwner, repositoryPr
 
       // truffleHog seems to alway exit with code 1 even though it appears to run fine
       // which fails the build so we need the || true to ignore the exit code and carry on
-      def truffleHogCmd = "docker run $dockerImgName https://github.com/${repoName}.git || true"
+      def truffleHogCmd = "docker run $dockerImgName https://github.com/${repo}.git || true"
       def truffleHogResults = sh returnStdout: true, script: truffleHogCmd
       echo "$truffleHogResults"
 
