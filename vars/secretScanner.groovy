@@ -81,7 +81,9 @@ def getMatchingRepos(curlAuth, githubOwner, repositoryPrefix) {
   return matchingRepos
 }
 
-def sendSlackMessage(channel, repo) {
+def reportSecrets(secretMessages, repo, channel) {
+  secretMessages.each { echo "$it" }
+
   if (channel.length() == 0) return
 
   slackSend channel: channel,
@@ -122,21 +124,10 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
         }
       }
 
-      echo "$repo: $commitShas"
-
-      def commitExists = false
-
-      if (commitExists) {
+      if (commitShas.size() > 0) {
         def secretMessages = runTruffleHog(dockerImgName, repo, commitCheckDate)
         secretsFound = !secretMessages.isEmpty()
-
-        if (secretMessages.size() > 0) {
-          sendSlackMessage(slackChannel, repo)
-
-          secretMessages.each {
-            echo "$it"
-          }
-        }
+        reportSecrets(secretMessages, repo, slackChannel)
       }
 
       echo "Finished scanning $repo"
@@ -157,16 +148,9 @@ def scanFullHistory(githubCredentialId, dockerImgName, githubOwner, repositoryPr
     matchingRepos.each { repo ->
       echo "Scanning $repo"
 
-      def secretMessages = runTruffleHog(dockerImgName, repo)
+      def secretMessages = runTruffleHog(dockerImgName, repo, commitCheckDate)
       secretsFound = !secretMessages.isEmpty()
-
-      if (secretMessages.size() > 0) {
-        sendSlackMessage(slackChannel, repo)
-      }
-
-      secretMessages.each {
-        echo "$it"
-      }
+      reportSecrets(secretMessages, repo, slackChannel)
 
       echo "Finished scanning $repo"
     }
