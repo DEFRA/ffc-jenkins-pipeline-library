@@ -180,10 +180,10 @@ def scanFullHistory(dockerImgName, githubOwner, repositoryPrefix, reportToSlack)
         slackSend channel: channel,
                   color: "#ff0000",
                   message: msg
+      }
 
-        secretMessages.each {
-          echo "$it"
-        }
+      secretMessages.each {
+        echo "$it"
       }
 
       echo "Finished scanning $repo"
