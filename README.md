@@ -165,11 +165,12 @@ Many of these are now obsolete, and will be removed in v5 of the pipeline. Where
 Scans Github repos for potential secrets committed within a given time window. It uses the [truffleHog](https://github.com/dxa4481/truffleHog) tool to scan the commit history and branches of repos, running entropy and regex checks on git diffs. Given a Github username/organisation and a repo name prefix, this function queries the Github API to identify matching repos and establish which of these repos has had a commit within a given time window. `truffleHog` is then run to identify potential secrets within these commits, and reports these to a Slack channel.
 
 It takes four parameters:
-  * githubOwner: string containing owner of Github repos to be scanned e.g. 'DEFRA'. Used in calls to the Github API e.g. https://api.github.com/users/:username/repos
-  * repositoryPrefix: string containing prefix of repo names to scan e.g. 'ffc'
-  * scanWindowHrs: integer determining size of scanning window in hours
+  * dockerImgName: name of the docker image to run the tests with. It is assumed this image has been built and is accessible locally.
+  * githubOwner: string containing owner of Github repos to be scanned e.g. 'DEFRA'. Used in calls to the Github API e.g. https://api.github.com/users/:username/repos.
+  * repositoryPrefix: string containing prefix of repo names to scan e.g. 'ffc'.
+  * scanWindowHrs: integer determining size of scanning window in hours.
 
-The function returns `true` if potential secrets are detected, otherwise `false`
+The function returns `true` if potential secrets are detected, otherwise `false`.
 
 ### tagCommit
 
