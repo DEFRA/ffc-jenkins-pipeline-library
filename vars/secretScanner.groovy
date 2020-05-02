@@ -7,7 +7,7 @@ def getCommitCheckDate(scanWindowHrs) {
 }
 
 // private
-def runTruffleHog(dockerImgName, repoName, commitShas=null) {
+def runTruffleHog(dockerImgName, repoName, excludeStrings, commitShas=null) {
   // truffleHog seems to alway exit with code 1 even though it appears to run fine
   // which fails the build so we need the || true to ignore the exit code and carry on
   def truffleHogCmd = "docker run $dockerImgName --json https://github.com/${repoName}.git || true"
@@ -19,15 +19,17 @@ def runTruffleHog(dockerImgName, repoName, commitShas=null) {
     def result = readJSON text: it
 
     if (!commitShas || commitShas.contains(result.commitHash)) {
-      def message = "Reason: $result.reason\n" +
-                    "Date: $result.date\n" +
-                    "Repo: $repoName\n" +
-                    "Branch: $result.branch\n" +
-                    "Hash: $result.commitHash\n" +
-                    "File path: $result.path\n" +
-                    "Strings found: $result.stringsFound\n"
+      if (!result.stringsFound.every { it in excludeStrings }) {
+        def message = "Reason: $result.reason\n" +
+                      "Date: $result.date\n" +
+                      "Repo: $repoName\n" +
+                      "Branch: $result.branch\n" +
+                      "Hash: $result.commitHash\n" +
+                      "File path: $result.path\n" +
+                      "Strings found: $result.stringsFound\n"
 
-      secretMessages.add(message)
+        secretMessages.add(message)
+      }
     }
   }
 
@@ -89,7 +91,7 @@ def reportSecrets(secretMessages, repo, channel) {
 }
 
 // public
-def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs, slackChannel="") {
+def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs, excludeStrings, slackChannel="") {
   withCredentials([string(credentialsId: credentialId, variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
 
@@ -122,7 +124,7 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
       }
 
       if (commitShas.size() > 0) {
-        def secretMessages = runTruffleHog(dockerImgName, repo, commitShas)
+        def secretMessages = runTruffleHog(dockerImgName, repo, excludeStrings, commitShas)
 
         if (!secretMessages.isEmpty()) {
           secretsFound = true
@@ -138,7 +140,7 @@ def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix,
 }
 
 // public
-def scanFullHistory(githubCredentialId, dockerImgName, githubOwner, repositoryPrefix, slackChannel="") {
+def scanFullHistory(githubCredentialId, dockerImgName, githubOwner, repositoryPrefix, excludeStrings, slackChannel="") {
   withCredentials([string(credentialsId: githubCredentialId, variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
     def matchingRepos = getMatchingRepos(curlAuth, githubOwner, repositoryPrefix)
@@ -148,7 +150,7 @@ def scanFullHistory(githubCredentialId, dockerImgName, githubOwner, repositoryPr
     matchingRepos.each { repo ->
       echo "Scanning $repo"
 
-      def secretMessages = runTruffleHog(dockerImgName, repo)
+      def secretMessages = runTruffleHog(dockerImgName, repo, excludeStrings)
 
       if (!secretMessages.isEmpty()) {
         secretsFound = true
