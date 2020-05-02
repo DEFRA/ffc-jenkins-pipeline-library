@@ -2,7 +2,7 @@
 @NonCPS // Don't run this in the Jenkins sandbox so that use (groovy.time.TimeCategory) will work
 def getCommitCheckDate(scanWindowHrs) {
   use (groovy.time.TimeCategory) {
-    return (new Date() - scanWindowHrs.hours).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
+    return (new Date() - scanWindowHrs.hours - 10.minutes).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
   }
 }
 
@@ -25,8 +25,7 @@ def runTruffleHog(dockerImgName, repoName, commitShas=null) {
                     "Branch: $result.branch\n" +
                     "Hash: $result.commitHash\n" +
                     "File path: $result.path\n" +
-                    "Strings found: $result.stringsFound\n" +
-                    "Commit: $result.commit"
+                    "Strings found: $result.stringsFound\n"
 
       secretMessages.add(message)
     }
