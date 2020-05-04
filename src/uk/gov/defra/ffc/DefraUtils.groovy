@@ -384,20 +384,20 @@ def undeployChart(credentialsId, chartName, tag) {
   }
 }
 
-// def publishChart(registry, chartName, tag) {
-//   withCredentials([
-//     usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password')
-//   ]) {
-//     // jenkins doesn't tidy up folder, remove old charts before running
-//     sh "rm -rf helm-charts"
-//     dir('helm-charts') {
-//       sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
-//       addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
-//       sh "helm package ../helm/$chartName --version $tag --dependency-update"
-//       sh "curl -u $username:$password -X PUT ${ARTIFACTORY_REPO_URL}ffc-helm-local/$chartName-${tag}.tgz -T $chartName-${tag}.tgz"
-//     }
-//   }
-// }
+def publishChart(registry, chartName, tag) {
+  withCredentials([
+    usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password')
+  ]) {
+    // jenkins doesn't tidy up folder, remove old charts before running
+    sh "rm -rf helm-charts"
+    dir('helm-charts') {
+      sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
+      addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
+      sh "helm package ../helm/$chartName --version $tag --dependency-update"
+      sh "curl -u $username:$password -X PUT ${ARTIFACTORY_REPO_URL}ffc-helm-local/$chartName-${tag}.tgz -T $chartName-${tag}.tgz"
+    }
+  }
+}
 
 // def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
 //   withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
