@@ -386,27 +386,15 @@ def undeployChart(credentialsId, chartName, tag) {
 
 def publishChart(registry, chartName, tag) {
   withCredentials([
-    string(credentialsId: 'helm-chart-repo', variable: 'helmRepo')
+    usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password')
   ]) {
     // jenkins doesn't tidy up folder, remove old charts before running
     sh "rm -rf helm-charts"
-    sshagent(credentials: ['helm-chart-creds']) {
-      sh "git clone $helmRepo"
-      dir('helm-charts') {
-        sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
-        sh "sed -i -e 's/version:.*/version: $tag/' ../helm/$chartName/Chart.yaml"
-        sh "helm repo add ffc-public $HELM_CHART_REPO_PUBLIC"
-        sh "helm repo update"
-        sh "helm dependency update ../helm/$chartName"
-        sh "helm package ../helm/$chartName"
-        sh 'helm repo index .'
-        sh 'git config --global user.email "buildserver@defra.gov.uk"'
-        sh 'git config --global user.name "buildserver"'
-        sh 'git checkout master'
-        sh 'git add -A'
-        sh "git commit -m 'update $chartName helm chart from build job'"
-        sh 'git push'
-      }
+    dir('helm-charts') {
+      sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
+      addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
+      sh "helm package ../helm/$chartName --version $tag --dependency-update"
+      sh "curl -u $username:$password -X PUT ${ARTIFACTORY_REPO_URL}ffc-helm-local/$chartName-${tag}.tgz -T $chartName-${tag}.tgz"
     }
   }
 }
