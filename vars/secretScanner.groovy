@@ -87,12 +87,12 @@ def reportSecrets(secretMessages, repo, channel) {
 
   slackSend channel: channel,
             color: "#ff0000",
-            message: "POTENTIAL SECRETS DETECTED IN $repo\n$JOB_NAME/$BUILD_NUMBER\n(<$BUILD_URL|Open>)"
+            message: "@here POTENTIAL SECRETS DETECTED IN $repo\n$JOB_NAME/$BUILD_NUMBER\n(<$BUILD_URL|Open>)"
 }
 
 // public
-def scanWithinWindow(credentialId, dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs, excludeStrings, slackChannel="") {
-  withCredentials([string(credentialsId: credentialId, variable: 'githubToken')]) {
+def scanWithinWindow(githubCredentialId, dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs, excludeStrings, slackChannel="") {
+  withCredentials([string(credentialsId: githubCredentialId, variable: 'githubToken')]) {
     def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
 
     def matchingRepos = getMatchingRepos(curlAuth, githubOwner, repositoryPrefix)
