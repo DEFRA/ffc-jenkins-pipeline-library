@@ -11,9 +11,7 @@ node {
 
   try {
     stage('Load defraUtils functions') {
-      echo "DEBUG 1"
       defraUtils = load 'src/uk/gov/defra/ffc/DefraUtils.groovy'
-      echo "DEBUG 2"
     }
     stage('Set GitHub status as pending'){
       defraUtils.setGithubStatusPending()
