@@ -404,7 +404,6 @@ def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
     withCredentials([
       file(credentialsId: "$chartName-$environment-values", variable: 'values')
     ]) {
-      // def extraCommands = getExtraCommands(chartVersion)
       addHelmRepo('ffc', "${ARTIFACTORY_REPO_URL}ffc-helm-virtual")
       sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
       sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
