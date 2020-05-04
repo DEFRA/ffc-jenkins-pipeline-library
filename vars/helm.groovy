@@ -1,5 +1,5 @@
 def getExtraCommands(tag) {
-  return "--set labels.version=$tag --install --atomic"
+  return "--set labels.version=$tag --install --atomic --version=$tag"
 }
 
 def getPrCommands(registry, chartName, tag) {
@@ -48,24 +48,15 @@ def undeployChart(environment, chartName, tag) {
 // public
 def publishChart(registry, chartName, tag) {
   withCredentials([
-    string(credentialsId: 'helm-chart-repo', variable: 'helmRepo')
+    usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password')
   ]) {
     // jenkins doesn't tidy up folder, remove old charts before running
     sh "rm -rf helm-charts"
-    sshagent(credentials: ['helm-chart-creds']) {
-      sh "git clone $helmRepo"
-      dir('helm-charts') {
-        sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"        
-        addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
-        sh "helm package ../helm/$chartName --version $tag --dependency-update"
-        sh 'helm repo index .'
-        sh 'git config --global user.email "buildserver@defra.gov.uk"'
-        sh 'git config --global user.name "buildserver"'
-        sh 'git checkout master'
-        sh 'git add -A'
-        sh "git commit -m 'update $chartName helm chart from build job'"
-        sh 'git push'
-      }
+    dir('helm-charts') {
+      sh "sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml"
+      addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
+      sh "helm package ../helm/$chartName --version $tag --dependency-update"
+      sh "curl -u $username:$password -X PUT ${ARTIFACTORY_REPO_URL}ffc-helm-local/$chartName-${tag}.tgz -T $chartName-${tag}.tgz"
     }
   }
 }
@@ -77,7 +68,7 @@ def deployRemoteChart(environment, namespace, chartName, chartVersion) {
       file(credentialsId: "$chartName-$environment-values", variable: 'values')
     ]) {
       def extraCommands = getExtraCommands(chartVersion)
-      addHelmRepo('ffc', HELM_CHART_REPO)
+      addHelmRepo('ffc', "${ARTIFACTORY_REPO_URL}ffc-helm-virtual")
       sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
       sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
     }
