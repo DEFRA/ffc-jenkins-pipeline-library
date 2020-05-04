@@ -399,18 +399,18 @@ def publishChart(registry, chartName, tag) {
   }
 }
 
-// def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
-//   withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
-//     withCredentials([
-//       file(credentialsId: "$chartName-$environment-values", variable: 'values')
-//     ]) {
-//       def extraCommands = getExtraCommands(chartVersion)
-//       addHelmRepo('ffc', "${ARTIFACTORY_REPO_URL}ffc-helm-virtual")
-//       sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
-//       sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
-//     }
-//   }
-// }
+def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
+  withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+    withCredentials([
+      file(credentialsId: "$chartName-$environment-values", variable: 'values')
+    ]) {
+      // def extraCommands = getExtraCommands(chartVersion)
+      addHelmRepo('ffc', "${ARTIFACTORY_REPO_URL}ffc-helm-virtual")
+      sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
+      sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
+    }
+  }
+}
 
 def triggerDeploy(jenkinsUrl, jobName, token, params) {
   def url = "$jenkinsUrl/job/$jobName/buildWithParameters?token=$token"
