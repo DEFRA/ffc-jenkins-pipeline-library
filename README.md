@@ -803,3 +803,13 @@ Example usage:
 ```
 notifySlack.buildFailure(e.message, "#generalbuildfailures")
 ```
+
+### notifySlack.sendMessage
+
+Sends a given message to a given channel in th the ffc-notifications Slack workspace. It can be parameterised to add the `@here` annotation.
+
+It takes three parameters:
+
+* channel: a string containing the channel name e.g. #generalbuildfailures"
+* message: a string containing the message to send
+* useHere: a boolean determining whether to prefix the message with the `@here` annotation or not

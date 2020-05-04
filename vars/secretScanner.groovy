@@ -85,9 +85,9 @@ def reportSecrets(secretMessages, repo, channel) {
 
   if (channel.length() == 0) return
 
-  slackSend channel: channel,
-            color: "#ff0000",
-            message: "@here POTENTIAL SECRETS DETECTED IN $repo\n$JOB_NAME/$BUILD_NUMBER\n(<$BUILD_URL|Open>)"
+  def message = "POTENTIAL SECRETS DETECTED IN $repo\n$JOB_NAME/$BUILD_NUMBER\n(<$BUILD_URL|Open>)"
+
+  notifySlack.sendMessage(channel, message, true)
 }
 
 // public
