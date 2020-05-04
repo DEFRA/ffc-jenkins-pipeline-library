@@ -28,3 +28,9 @@ def deploymentFailure(exception) {
             color: "#ff0000",
             message: msg.replace("  ", "")
 }
+
+def sendMessage(channel, message, useHere) {
+  slackSend channel: channel,
+            color: "#ff0000",
+            message: "${useHere ? '@here ' : ''}$message"
+}
