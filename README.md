@@ -647,14 +647,17 @@ New usage:
 helm.undeployChart('dev', 'ffc-demo-web', 'pr53')
 ```
 
-### publishChart / helm.publishChart
+### helm.publishChart
 
-Publishes the local Helm chart to a Helm chart repository implemented in git.
+Publishes the local Helm chart to an Artifactory Helm chart repository.
 
 Takes three parameters:
 - docker registry without the protocol
 - chart name
 - container image tag
+
+Uses the environment variable `HELM_CHART_REPO_PUBLIC` (set within Jenkins)
+to provide the location of a packaged library chart.
 
 New usage:
 
@@ -681,7 +684,7 @@ defraUtils.deployRemoteChart('ffc-demo', 'ffc-demo-web', '1.1.7', extraCommands)
 
 ### helm.deployRemoteChart
 
-Deploys a Helm chart from a remote chart repository to Kubernetes.
+Deploys a Helm chart from a remote (Artifactory) chart repository to Kubernetes.
 
 Takes four parameters:
 - the environment to deploy into
@@ -690,6 +693,8 @@ Takes four parameters:
 - the chart version
 
 'extraCommands' is no longer necessary. Previously it included the location of the specific environment's 'values' file to use for deployment. Now 'values' files are stored in Jenkins as a credential (as they contain secrets) and are determined automatically by the value of the 'env' argument.
+
+The Artifactory repository is specified by an env var (set in Jenkins) - `ARTIFACTORY_REPO_URL`.
 
 New usage:
 

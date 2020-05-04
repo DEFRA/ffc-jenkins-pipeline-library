@@ -3,7 +3,7 @@ def call(Map config=[:], Closure body={}) {
     try {
       stage('Deploy Helm chart') {
         helm.deployRemoteChart(config.environment, config.namespace, config.chartName, config.chartVersion)
-      }      
+      }
       body()
     } catch(e) {
       notifySlack.deploymentFailure(e.message)

@@ -21,7 +21,7 @@ def deploymentFailure(exception) {
           ${JOB_NAME}/${BUILD_NUMBER}
           ${exception}
           (<${BUILD_URL}|Open>)"""
-  
+
   channel = "#masterbuildfailures"
 
   slackSend channel: channel,
