@@ -400,15 +400,14 @@ def publishChart(registry, chartName, tag) {
 }
 
 def deployRemoteChart(namespace, chartName, chartVersion, extraCommands) {
-  withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
-    sh "rm -rf tmp && mkdir tmp"
-    dir("tmp") {
-      sh "helm repo add ffc $HELM_CHART_REPO"
-      sh "helm repo update"
+  withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+    withCredentials([
+      file(credentialsId: "$chartName-$environment-values", variable: 'values')
+    ]) {
+      def extraCommands = getExtraCommands(chartVersion)
+      addHelmRepo('ffc', "${ARTIFACTORY_REPO_URL}ffc-helm-virtual")
       sh "kubectl get namespaces $namespace || kubectl create namespace $namespace"
-      sh "helm fetch --untar ffc/$chartName --version $chartVersion"
-      sh "helm upgrade --namespace=$namespace --install --atomic $chartName --set namespace=$namespace ./$chartName $extraCommands"
-      deleteDir()
+      sh "helm upgrade --namespace=$namespace $chartName -f $values --set namespace=$namespace ffc/$chartName $extraCommands"
     }
   }
 }
