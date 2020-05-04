@@ -649,7 +649,7 @@ helm.undeployChart('dev', 'ffc-demo-web', 'pr53')
 
 ### helm.publishChart
 
-Publishes the local Helm chart to an Artifactory helm chart repository.
+Publishes the local Helm chart to an Artifactory Helm chart repository.
 
 Takes three parameters:
 - docker registry without the protocol
