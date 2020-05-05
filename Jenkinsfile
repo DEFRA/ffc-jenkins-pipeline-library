@@ -1,4 +1,4 @@
-@Library('defra-library@psd-732-use-global-vars') _
+@Library('defra-library@4') _
 
 def libraryVersion = ''
 def mergedPrNo = ''
