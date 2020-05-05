@@ -1,8 +1,8 @@
 @Library('defra-library@psd-732-use-global-vars') _
 
+def libraryVersion = ''
 def mergedPrNo = ''
 def pr = ''
-def version = ''
 def repoName = ''
 def versionFileName = "VERSION"
 
@@ -14,8 +14,8 @@ node {
       build.setGithubStatusPending()
     }
     stage('Set PR and version variables') {
-      version = version.getFileVersion(versionFileName)
-      (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version)
+      libraryVersion = version.getFileVersion(versionFileName)
+      (repoName, pr, containerTag, mergedPrNo) = build.getVariables(libraryVersion)
     }
     if (pr != '') {
       stage('Verify version incremented') {
@@ -27,10 +27,10 @@ node {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
         ]) {
-          def releaseSuccess = release.trigger(version, repoName, version, gitToken)
+          def releaseSuccess = release.trigger(libraryVersion, repoName, libraryVersion, gitToken)
 
           if (releaseSuccess) {
-            release.addSemverTags(version, repoName)
+            release.addSemverTags(libraryVersion, repoName)
           }
         }
       }
