@@ -1,4 +1,4 @@
-@Library('defra-library@4') _
+@Library('defra-library@psd-645-remove-defra-utils') _
 
 def pr = ''
 def repoName = ''
