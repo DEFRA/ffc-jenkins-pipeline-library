@@ -1,3 +1,5 @@
+@Library('defra-library@psd-732-use-global-vars') _
+
 def mergedPrNo = ''
 def pr = ''
 def version = ''
