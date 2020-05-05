@@ -1,28 +1,23 @@
-def defraUtils
-
 def mergedPrNo = ''
 def pr = ''
 def version = ''
-def serviceName = 'ffc-jenkins-pipeline-library'
+def repoName = ''
 def versionFileName = "VERSION"
 
 node {
   checkout scm
 
   try {
-    stage('Load defraUtils functions') {
-      defraUtils = load 'src/uk/gov/defra/ffc/DefraUtils.groovy'
-    }
     stage('Set GitHub status as pending'){
-      defraUtils.setGithubStatusPending()
+      build.setGithubStatusPending()
     }
     stage('Set PR and version variables') {
-      (pr, containerTag, mergedPrNo) = defraUtils.getVariables(serviceName, defraUtils.getFileVersion(versionFileName))
-      version = defraUtils.getFileVersion(versionFileName)
+      version = version.getFileVersion(versionFileName)
+      (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version)
     }
     if (pr != '') {
       stage('Verify version incremented') {
-        defraUtils.verifyFileVersionIncremented(versionFileName)
+        version.verifyFileIncremented(versionFileName)
       }
     }
     else {
@@ -30,20 +25,20 @@ node {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
         ]) {
-          def releaseSuccess = defraUtils.triggerRelease(version, serviceName, version, gitToken)
+          def releaseSuccess = release.trigger(version, repoName, version, gitToken)
 
           if (releaseSuccess) {
-            defraUtils.addSemverTags(version, serviceName)
+            release.addSemverTags(version, repoName)
           }
         }
       }
     }
     stage('Set GitHub status as success'){
-      defraUtils.setGithubStatusSuccess()
+      build.setGithubStatusSuccess()
     }
   } catch(e) {
-    defraUtils.setGithubStatusFailure(e.message)
-    defraUtils.notifySlackBuildFailure(e.message, "#generalbuildfailures")
+    build.setGithubStatusFailure(e.message)
+    notifySlack.buildFailure(e.message, "#generalbuildfailures")
     throw e
   }
 }
