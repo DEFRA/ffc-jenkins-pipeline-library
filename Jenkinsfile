@@ -1,7 +1,5 @@
 @Library('defra-library@4') _
 
-def libraryVersion = ''
-def mergedPrNo = ''
 def pr = ''
 def repoName = ''
 def versionFileName = "VERSION"
@@ -14,8 +12,7 @@ node {
       build.setGithubStatusPending()
     }
     stage('Set PR and version variables') {
-      libraryVersion = version.getFileVersion(versionFileName)
-      (repoName, pr, containerTag, mergedPrNo) = build.getVariables(libraryVersion)
+      (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName))
     }
     if (pr != '') {
       stage('Verify version incremented') {
@@ -27,10 +24,10 @@ node {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
         ]) {
-          def releaseSuccess = release.trigger(libraryVersion, repoName, libraryVersion, gitToken)
+          def releaseSuccess = release.trigger(versionTag, repoName, versionTag, gitToken)
 
           if (releaseSuccess) {
-            release.addSemverTags(libraryVersion, repoName)
+            release.addSemverTags(versionTag, repoName)
           }
         }
       }
