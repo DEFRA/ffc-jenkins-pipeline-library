@@ -27,11 +27,8 @@ def runTruffleHog(dockerImgName, repoName, excludeStrings, commitShas=null) {
                       "Hash: $result.commitHash\n" +
                       "File path: $result.path\n" +
                       "Strings found: $result.stringsFound\n" +
-                      "Link: https://github.com/$repoName/blob/$result.commitHash/$result.path\n"
-
-        result.each { k, v ->
-          echo "$k :----> $v"
-        }
+                      "Commit link: https://github.com/$repoName/commit/$result.commitHash\n" +
+                      "File link: https://github.com/$repoName/blob/$result.commitHash/$result.path\n"
 
         secretMessages.add(message)
       }
