@@ -1,7 +1,7 @@
 # Global variables scripts
 
 This is a simple list linking to the individual documentation files for each
-global variable scripts. Its primary purpose is to ease navigation of the
+global variables script. Its primary purpose is to ease navigation of the
 scripts within the directory when viewed in a markdown friendly environment
 e.g. GitHub.
 

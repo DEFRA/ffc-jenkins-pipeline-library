@@ -1,7 +1,9 @@
 # deploy
 
-> Below are the methods available on the script. They can be executed by
-  calling `<script>.<method>` e.g. `deploy.trigger()`
+> Methods related to the deployment of the local (just built) image
+
+Below are the methods available on the script. They can be executed by calling
+`<script>.<method>` e.g. `deploy.trigger()`
 
 ## trigger
 

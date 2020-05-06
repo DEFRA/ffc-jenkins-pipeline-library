@@ -1,8 +1,9 @@
 # deployToCluster
 
-> `deployToCluster` represents a default build configuration for deploying a
-  Helm chart to a Kubernetes cluster.
-  Below is an example of how this can be achieved.
+> The default deploy to cluster build configuration
+
+`deployToCluster` represents a default build configuration for deploying a Helm
+chart to a Kubernetes cluster. Below is an example of how this can be achieved.
 
 ```
 @Library('defra-library@5') _

@@ -1,7 +1,9 @@
 # release
 
-> Below are the methods available on the script. They can be executed by
-  calling `<script>.<method>` e.g. `release.tagCommit()`
+> Release related methods
+
+Below are the methods available on the script. They can be executed by calling
+`<script>.<method>` e.g. `release.tagCommit()`
 
 ## tagCommit
 

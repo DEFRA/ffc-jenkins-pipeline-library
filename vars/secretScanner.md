@@ -1,7 +1,9 @@
 # secretScanner
 
-> Below are the methods available on the script. They can be executed by
-  calling `<script>.<method>` e.g. `secretScanner.scanFullHistory()`
+> Repository secret scanning related methods
+
+Below are the methods available on the script. They can be executed by calling
+`<script>.<method>` e.g. `secretScanner.scanFullHistory()`
 
 ## secretScanner.scanWithinWindow
 

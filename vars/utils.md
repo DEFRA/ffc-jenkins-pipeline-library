@@ -1,7 +1,9 @@
 # utils
 
-> Below are the methods available on the script. They can be executed by
-  calling `<script>.<method>` e.g. `utils.replaceInFile()`
+> General utility type methods that do not fit within other scripts
+
+Below are the methods available on the script. They can be executed by calling
+`<script>.<method>` e.g. `utils.replaceInFile()`
 
 ## getCommitMessage
 

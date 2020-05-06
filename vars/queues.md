@@ -1,7 +1,9 @@
 # queues
 
-> Below are the methods available on the script. They can be executed by
-  calling `<script>.<method>` e.g. `queues.destroyPrSqsQueues()`
+> Methods related to message queues
+
+Below are the methods available on the script. They can be executed by calling
+`<script>.<method>` e.g. `queues.destroyPrSqsQueues()`
 
 ## destroyPrSqsQueues
 

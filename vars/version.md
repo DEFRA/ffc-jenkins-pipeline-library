@@ -1,7 +1,9 @@
 # version
 
-> Below are the methods available on the script. They can be executed by
-  calling `<script>.<method>` e.g. `version.getFileVersion()`
+> Methods related to versioning of the repository/image/artifact
+
+Below are the methods available on the script. They can be executed by calling
+`<script>.<method>` e.g. `version.getFileVersion()`
 
 ## versionHasIncremented
 
