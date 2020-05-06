@@ -1,1 +1,1 @@
-<a href="https://github.com/DEFRA/ffc-jenkins-pipeline-library/blob/master/vars/build.md">Build script documentation</a>
+Please see <a href="https://github.com/DEFRA/ffc-jenkins-pipeline-library/blob/master/vars/build.md">build script documentation</a> for additional details.

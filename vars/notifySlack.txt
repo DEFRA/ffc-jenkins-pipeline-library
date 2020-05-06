@@ -1,0 +1,1 @@
+Please see <a href="https://github.com/DEFRA/ffc-jenkins-pipeline-library/blob/master/vars/notifySlack.md">notifySlack script documentation</a> for additional details.
