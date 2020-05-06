@@ -145,13 +145,14 @@ of calling methods as required.
 
 ## Available methods for build configuration
 
-The groovy scripts within [vars](vars) are documented with a matching `.md`
-file. The corresponding `.txt` file contains a link to the markdown file within
-this repo in order to provide a link to the documentation from the Jenkins
-server where the shared library is being used.
+The groovy scripts within [vars](vars) are documented with a corresponding
+`.md` file. There is also a corresponding `.txt` file, this contains basic html
+which links back to the markdown file and will be rendered within the Jenkins
+UI as per the
+[documentation](https://www.jenkins.io/doc/book/pipeline/shared-libraries/#directory-structure).
+
 An additional file to ease navigation within the directory is also provided -
 [README](./vars/README.md)
-
 
 ### Deployment methods
 
