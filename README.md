@@ -149,13 +149,6 @@ Example usage from Jenkins pipeline configuration.
 deployToCluster environment: 'dev, namespace: 'ffc-demo', chartName: 'ffc-demo-web', chartVersion: '1.0.0'
 ```
 
-## Testing
-
-A simple test harness may be run to unit test methods that are purely `groovy` code. This uses a groovy docker image and may be run via
-```
-./scripts/test
-```
-
 ## Available methods
 
 The methods are documented within the `vars` directory as Markdown files with a
