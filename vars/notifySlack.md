@@ -1,4 +1,4 @@
-<h2>notifySlack.buildFailure</h2>
+### notifySlack.buildFailure
 
 Sends a message to the ffc-notifications Slack workspace when the Jenkins build fails.
 
