@@ -1,44 +1,44 @@
-### tagCommit
+# release
 
-Attaches a tag to a specified commit on a repo in the DEFRA github account. If the provided tag already exists on origin, it is deleted and reattached to the given commit SHA. If the tag does not exist on origin, it is created and pushed to origin.
+> Below are the methods available on the script. They can be executed by
+  calling `<script>.<method>` e.g. `release.tagCommit()`
+
+## tagCommit
+
+Attaches a tag to a specified commit on a repo in the DEFRA GitHub account. If
+the provided tag already exists on origin, it is deleted and reattached to the
+given commit SHA. If the tag does not exist on origin, it is created and pushed
+to origin.
 
 It takes three parameters:
-  * a string containing the tag to attach to the commit
-  * a string containing the commit SHA
-  * a string containing the name of the repository (assumed to be in the DEFRA github account)
+* a string containing the tag to attach to the commit
+* a string containing the commit SHA
+* a string containing the name of the repository (assumed to be in the DEFRA
+  GitHub account)
 
-### addSemverTags
+## addSemverTags
 
-Attaches a `MAJOR` and `MINOR` version tag to the latest commit to a repo in the DEFRA github account. It uses `tagCommit` to perform the commit tagging on origin.
+Attaches a `MAJOR` and `MINOR` version tag to the latest commit to a repo in
+the DEFRA GitHub account. It uses `tagCommit` to perform the commit tagging on
+origin.
 
 Examples:
-  * provided with a `PATCH` increment to a version (e.g. `2.3.5` to `2.3.6`), the `MAJOR` and `MINOR` tags (`2` and `2.3`) will be moved to the latest commit.
-  * provided with a `MINOR` increment to a version (e.g. `2.3.5` to `2.4.0`), the `MAJOR` tag (`2`) will be moved and the `MINOR` tag (`2.4`) will be created and attached to the latest commit.
-  * provided with a `MAJOR` increment to a version (e.g. `2.3.5` to `3.0.0`), the `MAJOR` and `MINOR` tags (`3` and `3.0`) will be created and attached to the latest commit.
+* provided with a `PATCH` increment to a version (e.g. `2.3.5` to `2.3.6`), the
+  `MAJOR` and `MINOR` tags (`2` and `2.3`) will be moved to the latest commit.
+* provided with a `MINOR` increment to a version (e.g. `2.3.5` to `2.4.0`), the
+  `MAJOR` tag (`2`) will be moved and the `MINOR` tag (`2.4`) will be created
+  and attached to the latest commit.
+* provided with a `MAJOR` increment to a version (e.g. `2.3.5` to `3.0.0`), the
+  `MAJOR` and `MINOR` tags (`3` and `3.0`) will be created and attached to the
+  latest commit.
 
 It takes two parameters:
-  * a string containing the current SemVer version for the release formatted as `MAJOR.MINOR.PATCH`
-  * a string containing the name of the repository (assumed to be in the DEFRA github account)
+* a string containing the current SemVer version for the release formatted as
+  `MAJOR.MINOR.PATCH`
+* a string containing the name of the repository (assumed to be in the DEFRA
+  GitHub account)
 
-### deploy.trigger
-
-Triggers (via a curl request) the Jenkins deployment job to deploy the built image.
-If the curl request encounters a server error the stage (and therefore the build) will report a failure.
-
-Takes four parameters:
-- the full URL (without trailing /) of the Jenkins service, including username and access token
-  e.g. `https://deploy:accesstoken@jenkins.ffc.aws-int.defra.cloud`
-- the repo name, which will be used to identify the deploy job name (assumes job name is in the format "$repoName-deploy")
-- the token that is set up when you configured the job in Jenkins. You must tick the "Trigger builds remotely" option when configuring the job. The Authentication token entered into the job is the one that should be passed here.
-- an object, that should contain all the parameters that need to be passed to the job (if required), for example `['version': '1.0.0']`
-
-New usage:
-
-```
-deploy.trigger((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chartVersion':'1.0.0'])
-```
-
-### releaseExists
+## releaseExists
 
 Checks GitHub to determine if a given Release Tag already exists for that repo.
 
@@ -48,10 +48,10 @@ Takes three parameters:
 - the GitHub connection token secret text
 
 ```
-releaseExists(containerTag, repoName, token)
+release.releaseExists(containerTag, repoName, token)
 ```
 
-### trigger
+## trigger
 
 Triggers a release to be created on GitHub for a given repo only where a release with the identical SemVer does not already exist
 
