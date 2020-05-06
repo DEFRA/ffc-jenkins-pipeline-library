@@ -139,20 +139,27 @@ could be called like this:
 ```
 build.masterBranch()
 ```
+For a more detailed example the [Jenkinsfile](Jenkinsfile) in this repo can be
+used. There is no default build configuration for the library so it is made up
+of calling methods as required.
 
-### Deployment pipeline
-A deployment pipeline, `deployToCluster.groovy` is provided to support deployment of specified Helm charts to specified clusters.
+## Available methods for build configuration
+
+The groovy scripts within [vars](vars) are documented with a matching `.md`
+file. The corresponding `.txt` file contains a link to the markdown file within
+this repo in order to provide a link to the documentation from the Jenkins
+server where the shared library is being used.
+An additional file to ease navigation within the directory is also provided -
+[README](./vars/README.md)
+
+
+### Deployment methods
+
+A deployment configuration, `deployToCluster.groovy` is provided to support
+deployment of specified Helm charts to specified clusters.
 
 Example usage from Jenkins pipeline configuration.
 
 ```
 deployToCluster environment: 'dev, namespace: 'ffc-demo', chartName: 'ffc-demo-web', chartVersion: '1.0.0'
 ```
-
-## Available methods
-
-The methods are documented within the `vars` directory as Markdown files with a
-`.txt` extension so the documentation is available on the Jenkins server. See
-the
-[official documentation](https://www.jenkins.io/doc/book/pipeline/shared-libraries/#directory-structure)
-for additional information.
