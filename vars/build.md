@@ -1,46 +1,57 @@
-### getMergedPrNo
+# Build
 
-Parses the local commit log to obtain the merged PR number from the message. This is reliant on the standard github merge message of the PR name followed by the PR number, i.e.
-```
-Update license details (#53)
-```
+> Below are the methods available on the script. They can be executed by
+  calling `<script>.<method>` e.g. `build.getRepoUrl()`
 
-The method returns the PR number for a merge of the appropriate format, i.e. `pr53` or an empty string if not.
+## getCommitSha
 
-### getRepoUrl
+Return the SHA hash of the latest commit for the current repository, i.e.
+`9fd0a77d3eaa3d4370d3f31158f37dd8abd19fae`
 
-Obtains the remote URL of the current repository, i.e. `https://github.com/DEFRA/ffc-demo-web.git`
+## getMergedPrNo
 
-### getCommitSha
+Parses the local commit log to obtain the merged PR number from the message.
+This is reliant on the standard GitHub merge message of the PR name followed by
+the PR number, i.e. `Update license details (#53)`
 
-Return the SHA hash of the latest commit for the current repository, i.e. `9fd0a77d3eaa3d4370d3f31158f37dd8abd19fae`
+The method returns the PR number for a merge of the appropriate format, i.e.
+`pr53` or an empty string if not.
 
-### verifyCommitBuildable
+## getRepoUrl
 
-If the build is a branch with a Pull Request (PR), or the master branch a message will be `echoed` describing the type of build.
+Obtains the remote URL of the current repository, i.e.
+`https://github.com/DEFRA/ffc-demo-web.git`
 
-If the build is not for a PR or the master branch an error will be thrown with the message `Build aborted - not a PR or a master branch`
+## verifyCommitBuildable
 
-### getVariables (Obsolete, see build.getVariables, below)
+If the build is a branch with a Pull Request (PR), or the master branch a
+message will be `echoed` describing the type of build.
 
-Takes the repository name as a parameter, i.e. `ffc-demo-web`, as well as the relevant version parameter to call depending on the project type.
+If the build is not for a PR or the master branch an error will be thrown with
+the message `Build aborted - not a PR or a master branch`
 
-It returns information required by the build steps as an array
+## getVariables
+
+Supplied with the version of the repo being built, an array containing the
+following will be returned:
+- the repo name, e.g. `ffc-demo-web`
 - the PR number, i.e. `53`
-- the container tag, either the SemVer number (for master branch) or the PR number prefixed with pr, i.e. `pr53`
+- the identity tag that will be used, either the SemVer number (for master
+  branch) or the PR number prefixed with pr, i.e. `pr53`
 - the merged PR number
 
 Example usage:
 
 ```
-(pr, containerTag, mergedPrNo) = defraUtils.getVariables('ffc-demo-payment-service', defraUtils.getPackageJsonVersion())
+(repoName, pr, identityTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
     or
-(pr, containerTag, mergedPrNo) = defraUtils.getVariables('ffc-demo-payment-service-core', defraUtils.getCSProjVersion())
+(repoName, pr, identityTag, mergedPrNo) = build.getVariables(version.getCSProjVersion())
 ```
 
-### updateGithubCommitStatus
+## updateGithubCommitStatus
 
-Updates the build status for the current commit in the github repository. The Jenkins server requires `repo:status` permissions for the repository.
+Updates the build status for the current commit in the GitHub repository. The
+Jenkins server requires `repo:status` permissions for the repository.
 
 The method takes two parameters:
 - a message
@@ -49,53 +60,62 @@ The method takes two parameters:
 Example usage:
 
 ```
-defraUtils.updateGithubCommitStatus('Build started', 'PENDING')
+build.updateGithubCommitStatus('Build started', 'PENDING')
 ```
 
-Note: the library initialises member variables `repoUrl` and `commitSha` when the `getVariables` method is run. These need to be set for the `updateGithubCommitStatus` method to work correctly.
+Note: the method requires member variables `repoUrl` and `commitSha` to be set
+prior to running `getVariables`. Without these variables being set
+`updateGithubCommitStatus` method will fail to work correctly.
 
-There are 3 shortcut methods in the library for setting pending, failure and success. You should use these instead of calling this method directly.
+There are 3 shortcut methods in the library for setting pending, failure and
+success. You should use these instead of calling this method directly.
 
-### setGithubStatusPending / build.setGithubStatusPending
+## setGithubStatusPending
 
-Updates the build status for the current commit to "Pending". See `updateGithubCommitStatus` for further information, as that method is called by this one.
+Updates the build status for the current commit to "Pending". See
+`updateGithubCommitStatus` for further information, as that method is called by
+this one.
 
 The method takes a single optional parameter
 - a message. This defaults to `Build started` if nothing is passed
 
-New usage:
+Example usage:
 
 ```
 build.setGithubStatusPending()
 ```
 
-### setGithubStatusSuccess / build.setGithubStatusSuccess
+## setGithubStatusSuccess
 
-Updates the build status for the current commit to "Success". See `updateGithubCommitStatus` for further information, as that method is called by this one.
+Updates the build status for the current commit to "Success". See
+`updateGithubCommitStatus` for further information, as that method is called by
+this one.
 
 The method takes a single optional parameter
 - a message. This defaults to `Build successful` if nothing is passed
 
-New usage:
+Example usage:
 
 ```
 build.setGithubStatusSuccess()
 ```
 
-### setGithubStatusFailure / build.setGithubStatusFailure
+## setGithubStatusFailure
 
-Updates the build status for the current commit to "Failed". See `updateGithubCommitStatus` for further information, as that method is called by this one.
+Updates the build status for the current commit to "Failed". See
+`updateGithubCommitStatus` for further information, as that method is called by
+this one.
 
 The method takes a single parameter
 - a message.
 
-New usage:
+Example usage:
 
 ```
 build.setGithubStatusFailure(error.message)
 ```
 
-### buildAndPushContainerImage / build.buildAndPushContainerImage
+## buildAndPushContainerImage
 
 Builds the image from the docker-compose file and pushes it to a repository.
 
@@ -105,31 +125,34 @@ Takes four parameters:
 - the name of the image
 - container image tag
 
-New usage:
+Example usage:
 
 ```
 build.buildAndPushContainerImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', 'pr53')
 ```
-### runTests / build.runTests
+
+## runTests
 
 Uses the image built by the previous command to run tests.
 By convention tests write results out to the folder `test-output`.
-Junit tests are published to Jenkins from the file `test-output/junit.xml`, and the contents of `test-output` are removed after tests are published.
+JUnit tests are published to Jenkins from the file `test-output/junit.xml`, and
+the contents of `test-output` are removed after tests are published.
 
 Takes three parameters:
 - project name, e.g. `ffc-demo-web`
-- service name to run from the project's docker-compose configuration, e.g. `app`
+- service name to run from the project's docker-compose configuration e.g. `app`
 - build number
 
-New usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
+Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
 build.runTests('ffc-demo-web', 'app', BUILD_NUMBER)
 ```
 
-### buildTestImage / build.buildTestImage
+## buildTestImage
 
-Builds the test image using the docker-compose files in the repository. By convention the services are named the same as the image.
+Builds the test image using the docker-compose files in the repository. By
+convention the services are named the same as the image.
 
 Takes four parameters:
 - the ID of the docker registry credentials previously set up in Jenkins
@@ -137,7 +160,7 @@ Takes four parameters:
 - project name, e.g. `ffc-demo-web`
 - build number
 
-New usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
+Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
 build.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', BUILD_NUMBER)
