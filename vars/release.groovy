@@ -51,7 +51,7 @@ def addSemverTags(version, repoName) {
 
   def majorTag = "${versionList[0]}"
   def minorTag = "${versionList[0]}.${versionList[1]}"
-  def commitSha = getCommitSha()
+  def commitSha = utils.getCommitSha()
 
   tagCommit(minorTag, commitSha, repoName)
   tagCommit(majorTag, commitSha, repoName)
