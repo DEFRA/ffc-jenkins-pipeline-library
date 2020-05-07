@@ -48,14 +48,8 @@ def getVariables(version) {
 }
 
 // private
-def getCommitSha() {
-  return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
-}
-
-// private
 def updateGithubCommitStatus(message, state) {
   def commitSha = utils.getCommitSha()
-  echo "COMMITSHA: $commitSha *********************************"
   step([
     $class: 'GitHubCommitStatusSetter',
     reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
