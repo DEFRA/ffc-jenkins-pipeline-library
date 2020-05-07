@@ -44,12 +44,12 @@ def getVariables(version) {
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
     def repoName = getRepoName()
-    commitSha = utils.getCommitSha()
     return [repoName, pr, identityTag, mergedPrNo]
 }
 
 // private
 def updateGithubCommitStatus(message, state) {
+  def commitSha = utils.getCommitSha()
   step([
     $class: 'GitHubCommitStatusSetter',
     reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
