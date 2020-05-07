@@ -1,0 +1,2 @@
+<p>Global variable added by <a href="https://github.com/DEFRA/ffc-jenkins-pipeline-library">ffc-jenkins-pipeline-library</a>.</p>
+<p>Please see <a href="https://github.com/DEFRA/ffc-jenkins-pipeline-library/blob/master/vars/database.md">database script documentation</a> for additional details.</p>

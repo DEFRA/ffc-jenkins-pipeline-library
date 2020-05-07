@@ -40,17 +40,17 @@ def getVariables(version) {
     verifyCommitBuildable()
 
     if (branch == "master") {
-      containerTag = version
+      identityTag = version
     } else {
       def rawTag = pr == '' ? branch : "pr$pr"
-      containerTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
+      identityTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
     def repoName = getRepoName()
     commitSha = getCommitSha()
-    return [repoName, pr, containerTag, mergedPrNo]
+    return [repoName, pr, identityTag, mergedPrNo]
 }
 
 // private
