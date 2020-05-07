@@ -44,6 +44,11 @@ def tagCommit(tag, commitSha, repoName) {
   }
 }
 
+// private
+def getCommitSha() {
+  return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+}
+
 // public
 def addSemverTags(version, repoName) {
   def versionList = version.tokenize('.')
