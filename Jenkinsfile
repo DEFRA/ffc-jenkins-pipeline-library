@@ -1,4 +1,4 @@
-@Library('defra-library@fix-missing-method') _
+@Library('defra-library@4') _
 
 def pr = ''
 def repoName = ''
