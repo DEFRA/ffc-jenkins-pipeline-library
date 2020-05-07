@@ -15,11 +15,6 @@ def getRepoName() {
 }
 
 // private
-def getCommitSha() {
-  return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
-}
-
-// private
 def verifyCommitBuildable() {
   if (pr) {
     echo "Building PR$pr"
@@ -49,7 +44,7 @@ def getVariables(version) {
     mergedPrNo = getMergedPrNo()
     repoUrl = getRepoUrl()
     def repoName = getRepoName()
-    commitSha = getCommitSha()
+    commitSha = utils.getCommitSha()
     return [repoName, pr, identityTag, mergedPrNo]
 }
 

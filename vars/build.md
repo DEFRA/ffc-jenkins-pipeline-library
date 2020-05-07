@@ -5,11 +5,6 @@
 Below are the methods available on the script. They can be executed by calling
 `<script>.<method>` e.g. `build.getRepoUrl()`
 
-## getCommitSha
-
-Return the SHA hash of the latest commit for the current repository, i.e.
-`9fd0a77d3eaa3d4370d3f31158f37dd8abd19fae`
-
 ## getMergedPrNo
 
 Parses the local commit log to obtain the merged PR number from the message.
