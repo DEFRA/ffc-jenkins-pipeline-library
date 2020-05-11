@@ -26,7 +26,7 @@ def getFileVersion(fileName) {
 // private
 def getPreviousFileVersion(fileName, currentVersion) {
   def majorVersion = currentVersion[0]
-  return sh(returnStdout: true, script: "git show \$(git rev-list -n 1 '$majorVersion'):${fileName}").trim()
+  return sh(returnStdout: true, script: "git show \$(git rev-list -n 1 --tags $majorVersion):${fileName}").trim()
 }
 
 // public
