@@ -510,4 +510,10 @@ def addSemverTags(version, repoName) {
   tagCommit(majorTag, commitSha, repoName)
 }
 
+// private
+def addHelmRepo(repoName, url) {
+  sh "helm repo add $repoName $url"
+  sh "helm repo update"
+}
+
 return this
