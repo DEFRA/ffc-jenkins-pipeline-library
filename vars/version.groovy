@@ -51,8 +51,8 @@ def verifyFileIncremented(fileName) {
 
 // private
 def errorOnNoVersionIncrement(masterVersion, version){
-  def cleanMasterVersion = removeVHyphen(masterVersion)
-  def cleanVersion = removeVHyphen(version)
+  def cleanMasterVersion = extractSemVerVersion(masterVersion)
+  def cleanVersion = extractSemVerVersion(version)
   if (hasIncremented(cleanMasterVersion, cleanVersion)) {
     echo "version increment valid '$cleanMasterVersion' -> '$cleanVersion'"
   } else {
@@ -61,7 +61,7 @@ def errorOnNoVersionIncrement(masterVersion, version){
 }
 
 // private
-def removeVHyphen(versionTag) {
+def extractSemVerVersion(versionTag) {
   def splitTag = versionTag.split(/^v-/)
   return splitTag.length > 1 ? splitTag[1] : versionTag
 }
