@@ -19,9 +19,10 @@ single numeric tag such as `6` is not precise enough to prevent other branches
 or SHAs from being matched and that version being used rather than the expected
 tagged version of the library. To prevent this from causing problems the
 SemVer version is prepended with a `v-`. Doing so means the tag will not be
-mistakenly resolved against a SHA (alphanumeric only). It might still be matched
-against a branch, however, this is much less likely and is under the control of
-the developers.  The unique tag doesn't need to be `v-` and is easily changed
+mistakenly resolved against a SHA (alphanumeric only) although it might still
+be matched against a branch. However, this is much less likely and is under the
+control of the developers.
+The unique tag doesn't need to be `v-` and is easily changed
 by updating the code in `version.extractSemVerVersion()`. The version is
 specified in [VERSION](VERSION) and would also need to be updated.
 
