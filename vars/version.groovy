@@ -51,11 +51,19 @@ def verifyFileIncremented(fileName) {
 
 // private
 def errorOnNoVersionIncrement(masterVersion, version){
-  if (hasIncremented(masterVersion, version)) {
-    echo "version increment valid '$masterVersion' -> '$version'"
+  def cleanMasterVersion = removeVHyphen(masterVersion)
+  def cleanVersion = removeVHyphen(version)
+  if (hasIncremented(cleanMasterVersion, cleanVersion)) {
+    echo "version increment valid '$cleanMasterVersion' -> '$cleanVersion'"
   } else {
-    error( "version increment invalid '$masterVersion' -> '$version'")
+    error( "version increment invalid '$cleanMasterVersion' -> '$cleanVersion'")
   }
+}
+
+// private
+def removeVHyphen(versionTag) {
+  def splitTag = versionTag.split(/^v-/)
+  return splitTag.length > 1 ? splitTag[1] : versionTag
 }
 
 // private
