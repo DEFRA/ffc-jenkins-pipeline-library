@@ -1,4 +1,4 @@
-@Library('defra-library@v-6') _
+@Library('defra-library@psd-737-tagging') _
 
 def pr = ''
 def repoName = ''
