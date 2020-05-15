@@ -54,9 +54,9 @@ def errorOnNoVersionIncrement(masterVersion, version){
   def cleanMasterVersion = extractSemVerVersion(masterVersion)
   def cleanVersion = extractSemVerVersion(version)
   if (hasIncremented(cleanMasterVersion, cleanVersion)) {
-    echo "version increment valid '$cleanMasterVersion' -> '$cleanVersion'"
+    echo "version increment valid '$masterVersion' -> '$version'"
   } else {
-    error( "version increment invalid '$cleanMasterVersion' -> '$cleanVersion'")
+    error( "version increment invalid '$masterVersion' -> '$version'")
   }
 }
 
