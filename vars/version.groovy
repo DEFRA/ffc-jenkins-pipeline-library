@@ -25,7 +25,7 @@ def getFileVersion(fileName) {
 
 // private
 def getPreviousFileVersion(fileName, currentVersion) {
-  def majorVersion = currentVersion[0]
+  def majorVersion = currentVersion.split('\\.')[0]
   return sh(returnStdout: true, script: "git show \$(git ls-remote origin -t $majorVersion | cut -f 1):${fileName}").trim()
 }
 
