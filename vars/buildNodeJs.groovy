@@ -127,7 +127,7 @@ def call(Map config=[:]) {
       throw e
     } finally {
       stage('Clean up test output') {
-        test.deleteOutput(repoName, containerSrcFolder)
+        test.deleteOutput('defradigital/node-development', containerSrcFolder)
       }
 
       if (config.containsKey("finallyClosure")) {
