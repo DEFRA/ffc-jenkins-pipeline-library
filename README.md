@@ -14,7 +14,7 @@ Upon merge to the master branch a new GitHub release will automatically be
 created, tagged with the `MAJOR`, `MINOR` and `PATCH` versions. For example
 version `2.4.6` will have the tags `2`, `2.4` and `2.4.6`.
 
-*Note:* Due to the way versions of Jenkins shared libraries are resolved, a
+**Note:** Due to the way versions of Jenkins shared libraries are resolved, a
 single numeric tag such as `6` is not precise enough to prevent other branches
 or SHAs from being matched and that version being used rather than the expected
 tagged version of the library. To prevent this from causing problems the
@@ -43,6 +43,14 @@ current branches `VERSION` file contains `v-9.8.7` the value of the `VERSION`
 file in tag `v-9` will be used to compare.
 If there is no pre-existing `MAJOR` version tag the check will succeed.
 There is no check to ensure a new `MAJOR` version is being added in sequence.
+
+**Note:** The change described above is the first step towards providing full
+multi-version support. Currently there is no consideration for which branch the
+change will be merged into and by default the changes will be merged into
+`master`. This is not ideal due to the likely differences between `MAJOR`
+versions. Therefore in order to fully support multiple versions new branches
+will be required in order for those versions to co-exist. Currently this can be
+achieved manually but will be automated at some point.
 
 ## Usage
 
