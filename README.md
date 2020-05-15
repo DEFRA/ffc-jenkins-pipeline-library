@@ -26,6 +26,24 @@ The unique tag doesn't need to be `v-` and is easily changed
 by updating the code in `version.extractSemVerVersion()`. The version is
 specified in [VERSION](VERSION) and would also need to be updated.
 
+### Multi-MAJOR version support
+
+A new feature added in `v-6.1.0` is the ability for multiple `MAJOR` versions
+to be changed. Until the feature was introduced once a new `MAJOR` version had
+been released it was not possible to make changes to any previous version as
+the version check in the build pipeline would fail the build.
+This is problematic as previous versions often require bug fixes and on
+occasion, new features need to be added for consumers that are either unable
+to, or choose not to upgrade to use the latest version.
+Checking the version has been incremented is critical in maintaining the
+integrity of the library thus removing the check is not an option. Therefore,
+the check has been updated to ensure the version of the SHA tagged with the
+`MAJOR` version of the current `VERSION` file has been incremented e.g. if the
+current branches `VERSION` file contains `v-9.8.7` the value of the `VERSION`
+file in tag `v-9` will be used to compare.
+If there is no pre-existing `MAJOR` version tag the check will succeed.
+There is no check to ensure a new `MAJOR` version is being added in sequence.
+
 ## Usage
 
 ### Default build configurations
