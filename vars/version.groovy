@@ -26,7 +26,11 @@ def getFileVersion(fileName) {
 // private
 def getPreviousFileVersion(fileName, currentVersion) {
   def majorVersion = currentVersion.split('\\.')[0]
-  return sh(returnStdout: true, script: "git show \$(git ls-remote origin -t $majorVersion | cut -f 1):${fileName}").trim()
+  // if there are no pre-existing versions of the MAJOR version no SHA will exist
+  def previousVersionSha = sh(returnStdout: true, script: "git ls-remote origin -t $majorVersion | cut -f 1").trim()
+  return previousVersionSha
+    ? sh(returnStdout: true, script: "git show $previousVersionSha:$fileName").trim()
+    : ''
 }
 
 // public
