@@ -1,4 +1,4 @@
-@Library('defra-library@psd-739-test-self') _
+@Library('defra-library@psd-739') _
 
 def pr = ''
 def repoName = ''
