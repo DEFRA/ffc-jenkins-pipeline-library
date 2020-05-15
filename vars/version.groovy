@@ -24,8 +24,9 @@ def getFileVersion(fileName) {
 }
 
 // private
-def getFileVersionMaster(fileName) {
-  return sh(returnStdout: true, script: "git show origin/master:${fileName}").trim()
+def getPreviousFileVersion(fileName, currentVersion) {
+  def majorVersion = currentVersion[0]
+  return sh(returnStdout: true, script: "git show \$(git ls-remote origin -t $majorVersion | cut -f 1):${fileName}").trim()
 }
 
 // public
@@ -44,19 +45,19 @@ def verifyPackageJsonIncremented() {
 
 // public
 def verifyFileIncremented(fileName) {
-  def masterVersion = getFileVersionMaster(fileName)
-  def version = getFileVersion(fileName)
-  errorOnNoVersionIncrement(masterVersion, version)
+  def currentVersion = getFileVersion(fileName)
+  def previousVersion = getPreviousFileVersion(fileName, currentVersion)
+  errorOnNoVersionIncrement(previousVersion, currentVersion)
 }
 
 // private
-def errorOnNoVersionIncrement(masterVersion, version){
-  def cleanMasterVersion = extractSemVerVersion(masterVersion)
-  def cleanVersion = extractSemVerVersion(version)
-  if (hasIncremented(cleanMasterVersion, cleanVersion)) {
-    echo "version increment valid '$masterVersion' -> '$version'"
+def errorOnNoVersionIncrement(previousVersion, currentVersion){
+  def cleanPreviousVersion = extractSemVerVersion(previousVersion)
+  def cleanCurrentVersion = extractSemVerVersion(currentVersion)
+  if (hasIncremented(cleanPreviousVersion, cleanCurrentVersion)) {
+    echo "version increment valid '$previousVersion' -> '$currentVersion'"
   } else {
-    error( "version increment invalid '$masterVersion' -> '$version'")
+    error( "version increment invalid '$previousVersion' -> '$currentVersion'")
   }
 }
 
