@@ -51,11 +51,19 @@ def verifyFileIncremented(fileName) {
 
 // private
 def errorOnNoVersionIncrement(masterVersion, version){
-  if (hasIncremented(masterVersion, version)) {
+  def cleanMasterVersion = extractSemVerVersion(masterVersion)
+  def cleanVersion = extractSemVerVersion(version)
+  if (hasIncremented(cleanMasterVersion, cleanVersion)) {
     echo "version increment valid '$masterVersion' -> '$version'"
   } else {
     error( "version increment invalid '$masterVersion' -> '$version'")
   }
+}
+
+// private
+def extractSemVerVersion(versionTag) {
+  def splitTag = versionTag.split(/^v-/)
+  return splitTag.length > 1 ? splitTag[1] : versionTag
 }
 
 // private

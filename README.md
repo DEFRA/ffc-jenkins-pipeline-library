@@ -6,12 +6,25 @@ Common scripts for use in Jenkins pipelines used in build and deployment.
 
 ## Versioning
 
-The library is versioned following the
+The library is versioned following the principle of the
 [semantic versioning specification](https://semver.org/). When updating the
-library you will need to increment the version number in the `VERSION` file.
+library you will need to increment the version number in the
+[VERSION](VERSION) file.
 Upon merge to the master branch a new GitHub release will automatically be
 created, tagged with the `MAJOR`, `MINOR` and `PATCH` versions. For example
 version `2.4.6` will have the tags `2`, `2.4` and `2.4.6`.
+
+*Note:* Due to the way versions of Jenkins shared libraries are resolved, a
+single numeric tag such as `6` is not precise enough to prevent other branches
+or SHAs from being matched and that version being used rather than the expected
+tagged version of the library. To prevent this from causing problems the
+SemVer version is prepended with a `v-`. Doing so means the tag will not be
+mistakenly resolved against a SHA (alphanumeric only) although it might still
+be matched against a branch. However, this is much less likely and is under the
+control of the developers.
+The unique tag doesn't need to be `v-` and is easily changed
+by updating the code in `version.extractSemVerVersion()`. The version is
+specified in [VERSION](VERSION) and would also need to be updated.
 
 ## Usage
 

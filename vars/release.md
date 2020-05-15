@@ -45,24 +45,25 @@ It takes two parameters:
 Checks GitHub to determine if a given Release Tag already exists for that repo.
 
 Takes three parameters:
-- the container tag in SemVer format to check for on GitHub e.g 1.0.0
+- the version tag in SemVer format to check for on GitHub e.g 1.0.0
 - the repository name to check
 - the GitHub connection token secret text
 
 ```
-release.releaseExists(containerTag, repoName, token)
+release.releaseExists(versionTag, repoName, token)
 ```
 
 ## trigger
 
-Triggers a release to be created on GitHub for a given repo only where a release with the identical SemVer does not already exist
+Triggers a release to be created on GitHub for a given repo only where a
+release with the identical SemVer does not already exist
 
 Takes four parameters:
-- the container tag in SemVer format to check for on GitHub e.g 1.0.0
+- the version tag in SemVer format to check for on GitHub e.g 1.0.0
 - the repository name to check
 - the release description text
 - the GitHub connection token secret text
 
 ```
-release.trigger(containerTag, repoName, releaseDescription, token)
+release.trigger(versionTag, repoName, releaseDescription, token)
 ```

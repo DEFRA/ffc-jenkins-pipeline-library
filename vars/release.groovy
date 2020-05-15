@@ -1,7 +1,7 @@
 // private
-def releaseExists(containerTag, repoName, token){
+def releaseExists(versionTag, repoName, token){
   try {
-    def result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$containerTag | jq '.tag_name'").trim().replaceAll (/"/, '') == "$containerTag" ? true : false
+    def result = sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$versionTag | jq '.tag_name'").trim().replaceAll (/"/, '') == "$versionTag" ? true : false
     return result
   }
     catch(Exception ex) {
@@ -11,18 +11,18 @@ def releaseExists(containerTag, repoName, token){
 }
 
 // public
-def trigger(containerTag, repoName, releaseDescription, token){
-  if (releaseExists(containerTag, repoName, token)){
-    echo "Release $containerTag already exists"
+def trigger(versionTag, repoName, releaseDescription, token){
+  if (releaseExists(versionTag, repoName, token)){
+    echo "Release $versionTag already exists"
     return false
   }
 
-  echo "Triggering release $containerTag for $repoName"
+  echo "Triggering release $versionTag for $repoName"
   boolean result = false
-  result = sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$containerTag\", \"name\" : \"Release $containerTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
+  result = sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
   echo "The release result is $result"
 
-  if (releaseExists(containerTag, repoName, token)){
+  if (releaseExists(versionTag, repoName, token)){
     echo "Release Successful"
   } else {
     throw new Exception("Release failed")
