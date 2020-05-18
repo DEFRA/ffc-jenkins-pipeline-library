@@ -12,4 +12,10 @@ class Utils implements Serializable {
   static def getCommitSha(ctx) {
     return ctx.sh(returnStdout: true, script: "git rev-parse HEAD").trim()
   }
+
+  static def generatePrNames(dbName, prCode) {
+    def prSchema = "pr$prCode"
+    def prUser = "${dbName}_$prSchema"
+    return [prSchema, prUser]
+  }
 }

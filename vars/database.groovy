@@ -1,14 +1,5 @@
-// private
-def generatePrNames(dbName, prCode) {
-  def prSchema = "pr$prCode"
-  def prUser = "${dbName}_$prSchema"
-  return [prSchema, prUser]
-}
-
-// private
-def runPsqlCommand(dbHost, dbUser, dbName, sqlCmd) {
-  sh returnStdout: true, script: "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\""
-}
+import src.uk.gov.defra.ffc.Database
+import src.uk.gov.defra.ffc.Utils
 
 // The design rationale for the behaviour of this function is documented here:
 // https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres
@@ -19,13 +10,13 @@ def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, pr
     string(credentialsId: host, variable: 'dbHost'),
     usernamePassword(credentialsId: prUserCredId, usernameVariable: 'ignore', passwordVariable: 'prUserPassword'),
   ]) {
-    (prSchema, prUser) = generatePrNames(dbName, prCode)
+    (prSchema, prUser) = Utils.generatePrNames(dbName, prCode)
     def roleExists = false
 
     // CREATE ROLE doesn't have a "IF NOT EXISTS" parameter so we have to check for the PR user/role manually
     if (useIfNotExists) {
       def selectRoleSqlCmd = "SELECT 1 FROM pg_roles WHERE rolname = '$prUser'"
-      roleExists = runPsqlCommand(dbHost, dbUser, dbName, selectRoleSqlCmd).contains("(1 row)")
+      roleExists = Database.runPsqlCommand(this, dbHost, dbUser, dbName, selectRoleSqlCmd).contains("(1 row)")
     }
 
     if (roleExists) {
@@ -33,21 +24,21 @@ def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, pr
     }
     else {
       def createRoleSqlCmd = "CREATE ROLE $prUser PASSWORD '$prUserPassword' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN"
-      runPsqlCommand(dbHost, dbUser, dbName, createRoleSqlCmd)
+      Database.runPsqlCommand(this, dbHost, dbUser, dbName, createRoleSqlCmd)
     }
 
     def ifNotExistsStr = useIfNotExists ? "IF NOT EXISTS" : ""
     def createSchemaSqlCmd = "CREATE SCHEMA $ifNotExistsStr $prSchema"
-    runPsqlCommand(dbHost, dbUser, dbName, createSchemaSqlCmd)
+    Database.runPsqlCommand(this, dbHost, dbUser, dbName, createSchemaSqlCmd)
 
     def grantPrivilegesSqlCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
-    runPsqlCommand(dbHost, dbUser, dbName, grantPrivilegesSqlCmd)
+    Database.runPsqlCommand(this, dbHost, dbUser, dbName, grantPrivilegesSqlCmd)
 
     def setSearchPathCmd = "ALTER ROLE $prUser SET search_path TO $prSchema"
-    runPsqlCommand(dbHost, dbUser, dbName, setSearchPathCmd)
+    Database.runPsqlCommand(this, dbHost, dbUser, dbName, setSearchPathCmd)
   }
 
-  return generatePrNames(dbName, prCode)
+  return [prSchema, prUser]
 }
 
 // The design rationale for the behaviour of this function is documented here:
@@ -58,12 +49,12 @@ def destroyPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
     string(credentialsId: host, variable: 'dbHost'),
   ]) {
-    (prSchema, prUser) = generatePrNames(dbName, prCode)
+    (prSchema, prUser) = Utils.generatePrNames(dbName, prCode)
 
     def dropSchemaSqlCmd = "DROP SCHEMA IF EXISTS $prSchema CASCADE"
-    runPsqlCommand(dbHost, dbUser, dbName, dropSchemaSqlCmd)
+    Database.runPsqlCommand(this, dbHost, dbUser, dbName, dropSchemaSqlCmd)
 
     def dropRoleSqlCmd = "DROP ROLE IF EXISTS $prUser"
-    runPsqlCommand(dbHost, dbUser, dbName, dropRoleSqlCmd)
+    Database.runPsqlCommand(this, dbHost, dbUser, dbName, dropRoleSqlCmd)
   }
 }
