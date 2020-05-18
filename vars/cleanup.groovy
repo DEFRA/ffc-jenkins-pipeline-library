@@ -1,3 +1,11 @@
+def call(Map config=[:]) {
+  node {
+    stage('delete k8s resources if PR closed') {
+      cleanupKubernetes(config.environment)
+    }
+  }
+}
+
 def cleanupKubernetes(environment) {
   if (repoName == '' || SOURCE_PROJECT_NAME == '') {
     echo "Unable to determine repo name and branch name, k8s cleanup cancelled"
@@ -8,8 +16,8 @@ def cleanupKubernetes(environment) {
     if (closedPrNo == '') {
       echo "Could not find closed PR for branch $SOURCE_PROJECT_NAME of $repoName, k8s cleanup cancelled"
     }else {
-        echo "Tidying up k8s resources for PR $closedPrNo of $repoName after branch $SOURCE_PROJECT_NAME deleted"
-        helm.undeployChart(environment, repoName, "pr$closedPrNo")
+      echo "Tidying up k8s resources for PR $closedPrNo of $repoName after branch $SOURCE_PROJECT_NAME deleted"
+      helm.undeployChart(environment, repoName, "pr$closedPrNo")
     }
   }
 }
