@@ -11,7 +11,7 @@ class Version implements Serializable {
 
   static def getPreviousFileVersion(ctx, fileName, currentVersion) {
     def majorVersion = currentVersion.split('\\.')[0]
-    // if there are no pre-existing versions of the MAJOR version no SHA will exist
+    // if there are no existing versions of the MAJOR version no SHA will exist
     def previousVersionSha = ctx.sh(returnStdout: true, script: "git ls-remote origin -t $majorVersion | cut -f 1").trim()
     return previousVersionSha
       ? ctx.sh(returnStdout: true, script: "git show $previousVersionSha:$fileName").trim()
@@ -22,9 +22,9 @@ class Version implements Serializable {
     def cleanPreviousVersion = Version.extractSemVerVersion(previousVersion)
     def cleanCurrentVersion = Version.extractSemVerVersion(currentVersion)
     if (Version.hasIncremented(cleanPreviousVersion, cleanCurrentVersion)) {
-      ctx.echo("version increment valid '$previousVersion' -> '$currentVersion'")
+      ctx.echo("Version increment valid '$previousVersion' -> '$currentVersion'.")
     } else {
-      ctx.error("version increment invalid '$previousVersion' -> '$currentVersion'")
+      ctx.error("Version increment invalid '$previousVersion' -> '$currentVersion'.")
     }
   }
 
@@ -34,8 +34,8 @@ class Version implements Serializable {
   }
 
   private static def hasIncremented(currVers, newVers) {
-    // For a newly created empty repository currVers will be empty on first merge to master
-    // consider 'newVers' the first version and return true
+    // For a newly created empty repository currVers will be empty on first
+    // merge to master consider 'newVers' the first version and return true
     if (currVers == '') {
       return true
     }
