@@ -3,10 +3,6 @@ package uk.gov.defra.ffc
 import uk.gov.defra.ffc.Utils
 
 class Build implements Serializable {
-  private static def getRepoName(ctx) {
-    return ctx.scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
-  }
-
   private static def verifyCommitBuildable(ctx, pr) {
     if (pr) {
       ctx.echo("Building PR$pr")
@@ -18,18 +14,9 @@ class Build implements Serializable {
     }
   }
 
-  private static def getMergedPrNo(ctx) {
-    def mergedPrNo = ctx.sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
-    return mergedPrNo ? "pr$mergedPrNo" : ''
-  }
-
-  private static def getRepoUrl(ctx) {
-    return ctx.sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
-  }
-
   static def getVariables(ctx) {
     def branch = ctx.BRANCH_NAME
-    def repoName = Build.getRepoName(ctx)
+    def repoName = Utils.getRepoName(ctx)
 
     // use the git API to get the open PR for a branch
     // Note: This will cause issues if one branch has two open PRs
@@ -45,14 +32,14 @@ class Build implements Serializable {
       identityTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
-    def mergedPrNo = Build.getMergedPrNo(ctx)
-    def repoUrl = Build.getRepoUrl(ctx)
+    def mergedPrNo = Utils.getMergedPrNo(ctx)
+    def repoUrl = Utils.getRepoUrl(ctx)
     return [repoName, pr, identityTag, mergedPrNo]
   }
 
   static def updateGithubCommitStatus(ctx, message, state) {
     def commitSha = Utils.getCommitSha(ctx)
-    def repoUrl = Build.getRepoUrl(ctx)
+    def repoUrl = Utils.getRepoUrl(ctx)
     ctx.step([
       $class: 'GitHubCommitStatusSetter',
       reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
