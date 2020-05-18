@@ -1,8 +1,8 @@
 // public
 def lintHelm(chartName) {
   helm.addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
-  sh "helm dependency update ./helm/$chartName"
-  sh "helm lint ./helm/$chartName"
+  sh("helm dependency update ./helm/$chartName")
+  sh("helm lint ./helm/$chartName")
 }
 
 // public
@@ -13,7 +13,7 @@ def createReportJUnit(){
 // public
 def deleteOutput(containerImage, containerWorkDir) {
   // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
-  sh "[ -d \"$WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/$containerWorkDir/test-output $containerImage rm -rf test-output/*"
+  sh("[ -d \"$WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$WORKSPACE/test-output',target=/$containerWorkDir/test-output $containerImage rm -rf test-output/*")
 }
 
 def buildCodeAnalysisDefaultParams(projectName) {
@@ -32,7 +32,7 @@ def analyseCode(sonarQubeEnv, sonarScanner, params) {
       args = args + " -D$param.key=$param.value"
     }
 
-    sh "${scannerHome}/bin/sonar-scanner$args"
+    sh("$scannerHome/bin/sonar-scanner$args")
   }
 }
 
