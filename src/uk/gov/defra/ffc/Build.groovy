@@ -14,7 +14,7 @@ class Build implements Serializable {
     }
   }
 
-  static def getVariables(ctx) {
+  static def getVariables(ctx, version) {
     def branch = ctx.BRANCH_NAME
     def repoName = Utils.getRepoName(ctx)
 
@@ -26,7 +26,7 @@ class Build implements Serializable {
     def identityTag
 
     if (branch == "master") {
-      identityTag = ctx.version
+      identityTag = version
     } else {
       def rawTag = pr ? "pr$pr" : branch
       identityTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()

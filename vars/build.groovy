@@ -1,7 +1,7 @@
 import uk.gov.defra.ffc.Build
 
 def getVariables(version) {
-  return Build.getVariables(this)
+  return Build.getVariables(this, version)
 }
 
 def setGithubStatusSuccess(message = 'Build successful') {
