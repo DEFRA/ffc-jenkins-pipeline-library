@@ -41,7 +41,7 @@ class Build implements Serializable {
     if (branch == "master") {
       identityTag = ctx.version
     } else {
-      def rawTag = pr == '' ? branch : "pr$pr"
+      def rawTag = pr ? "pr$pr" : branch
       identityTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
