@@ -3,11 +3,11 @@ package uk.gov.defra.ffc
 import uk.gov.defra.ffc.Utils
 
 class Build implements Serializable {
-  static def getRepoName(ctx) {
+  private static def getRepoName(ctx) {
     return ctx.scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
   }
 
-  static def verifyCommitBuildable(ctx, pr) {
+  private static def verifyCommitBuildable(ctx, pr) {
     if (pr) {
       ctx.echo("Building PR$pr")
     } else if (ctx.BRANCH_NAME == "master") {
@@ -18,12 +18,12 @@ class Build implements Serializable {
     }
   }
 
-  static def getMergedPrNo(ctx) {
+  private static def getMergedPrNo(ctx) {
     def mergedPrNo = ctx.sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
     return mergedPrNo ? "pr$mergedPrNo" : ''
   }
 
-  static def getRepoUrl(ctx) {
+  private static def getRepoUrl(ctx) {
     return ctx.sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
   }
 

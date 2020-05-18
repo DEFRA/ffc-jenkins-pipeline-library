@@ -1,21 +1,17 @@
 import uk.gov.defra.ffc.Build
 
-// public
 def getVariables(version) {
   return Build.getVariables(this)
 }
 
-// public
 def setGithubStatusSuccess(message = 'Build successful') {
   Build.updateGithubCommitStatus(this, message, 'SUCCESS')
 }
 
-// public
 def setGithubStatusPending(message = 'Build started') {
   Build.updateGithubCommitStatus(this, message, 'PENDING')
 }
 
-// public
 def setGithubStatusFailure(message = '') {
   Build.updateGithubCommitStatus(this, message, 'FAILURE')
 }
