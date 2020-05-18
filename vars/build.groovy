@@ -1,18 +1,20 @@
-// private
-def getMergedPrNo() {
-  def mergedPrNo = sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
-  return mergedPrNo ? "pr$mergedPrNo" : ''
-}
+import uk.gov.defra.ffc.Build
 
-// private
-def getRepoUrl() {
-  return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
-}
+// // private
+// def getMergedPrNo() {
+//   def mergedPrNo = sh(returnStdout: true, script: "git log --pretty=oneline --abbrev-commit -1 | sed -n 's/.*(#\\([0-9]\\+\\)).*/\\1/p'").trim()
+//   return mergedPrNo ? "pr$mergedPrNo" : ''
+// }
 
-// private
-def getRepoName() {
-  return scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
-}
+// // private
+// def getRepoUrl() {
+//   return sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
+// }
+
+// // private
+// def getRepoName() {
+//   return scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
+// }
 
 // private
 def verifyCommitBuildable() {
@@ -28,50 +30,51 @@ def verifyCommitBuildable() {
 
 // public
 def getVariables(version) {
-    branch = BRANCH_NAME
-    // use the git API to get the open PR for a branch
-    // Note: This will cause issues if one branch has two open PRs
-    pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
-    verifyCommitBuildable()
+  return Build.getVariables(this)
+    // branch = BRANCH_NAME
+    // // use the git API to get the open PR for a branch
+    // // Note: This will cause issues if one branch has two open PRs
+    // pr = sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
+    // verifyCommitBuildable()
 
-    if (branch == "master") {
-      identityTag = version
-    } else {
-      def rawTag = pr == '' ? branch : "pr$pr"
-      identityTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
-    }
+    // if (branch == "master") {
+    //   identityTag = version
+    // } else {
+    //   def rawTag = pr == '' ? branch : "pr$pr"
+    //   identityTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
+    // }
 
-    mergedPrNo = getMergedPrNo()
-    repoUrl = getRepoUrl()
-    def repoName = getRepoName()
-    return [repoName, pr, identityTag, mergedPrNo]
+    // mergedPrNo = getMergedPrNo()
+    // repoUrl = getRepoUrl()
+    // def repoName = getRepoName()
+    // return [repoName, pr, identityTag, mergedPrNo]
 }
 
-// private
-def updateGithubCommitStatus(message, state) {
-  def commitSha = utils.getCommitSha()
-  step([
-    $class: 'GitHubCommitStatusSetter',
-    reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
-    commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
-    errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
-    statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
-  ])
-}
+// // private
+// def updateGithubCommitStatus(message, state) {
+//   def commitSha = utils.getCommitSha()
+//   step([
+//     $class: 'GitHubCommitStatusSetter',
+//     reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+//     commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
+//     errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
+//     statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
+//   ])
+// }
 
 // public
 def setGithubStatusSuccess(message = 'Build successful') {
-  updateGithubCommitStatus(message, 'SUCCESS')
+  Build.updateGithubCommitStatus(this, message, 'SUCCESS')
 }
 
 // public
 def setGithubStatusPending(message = 'Build started') {
-  updateGithubCommitStatus(message, 'PENDING')
+  Build.updateGithubCommitStatus(this, message, 'PENDING')
 }
 
 // public
 def setGithubStatusFailure(message = '') {
-  updateGithubCommitStatus(message, 'FAILURE')
+  Build.updateGithubCommitStatus(this, message, 'FAILURE')
 }
 
 // public
