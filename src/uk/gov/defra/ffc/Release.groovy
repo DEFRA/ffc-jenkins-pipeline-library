@@ -4,8 +4,7 @@ class Release implements Serializable {
 
   static def exists(ctx, versionTag, repoName, token){
     try {
-      def result = ctx.sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$versionTag | jq '.tag_name'").trim().replaceAll (/"/, '') == "$versionTag" ? true : false
-      return result
+      return ctx.sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$versionTag | jq '.tag_name'").trim().replaceAll (/"/, '') == versionTag ? true : false
     }
     catch(Exception ex) {
       ctx.echo("Failed to check release status on github")
