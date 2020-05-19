@@ -1,4 +1,3 @@
-// public
 def buildFailure(exception, channel) {
   def branch = BRANCH_NAME
   def msg = """BUILD FAILED
@@ -22,7 +21,7 @@ def deploymentFailure(exception) {
           ${exception}
           (<${BUILD_URL}|Open>)"""
 
-  channel = "#masterbuildfailures"
+  def channel = "#masterbuildfailures"
 
   slackSend channel: channel,
             color: "#ff0000",
