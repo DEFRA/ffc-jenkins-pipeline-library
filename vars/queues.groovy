@@ -1,23 +1,4 @@
-// private
-def String[] mapToString(Map map) {
-  def output = [];
-  for (item in map) {
-    if (item.value instanceof String) {
-      output.add("${item.key} = \"${item.value}\"");
-    } else if (item.value instanceof Map) {
-      output.add("${item.key} = {\n\t${mapToString(item.value).join("\n\t")}\n}");
-    } else {
-      output.add("${item.key} = ${item.value}");
-    }
-  }
-  return output;
-}
-
-// private
-def String generateTerraformInputVariables(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName) {
-  def Map inputs = [service: [code: serviceCode, name: serviceName, type: serviceType], pr_code: prCode, queue_purpose: queuePurpose, repo_name: repoName];
-  return mapToString(inputs).join("\n")
-}
+import uk.gov.defra.ffc.Terraform
 
 // public
 def destroyPrSqsQueues(repoName, prCode) {
@@ -95,7 +76,7 @@ def provisionPrSqsQueue(repoName, prCode, queuePurpose, serviceCode, serviceName
             sh "cp -fr standard_sqs_queues ${dirName}"
             dir(dirName) {
               echo "adding queue to git"
-              writeFile file: "vars.tfvars", text: generateTerraformInputVariables(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName)
+              writeFile file: "vars.tfvars", text: Terraform.generateTerraformInputVariables(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName)
               sh "git add *.tfvars ; git commit -m \"Creating queue ${queuePurpose} for ${repoName}#${prCode}\" ; git push --set-upstream origin master"
               echo "provision infrastructure"
               sh "terragrunt apply -var-file='vars.tfvars' -auto-approve --terragrunt-non-interactive"

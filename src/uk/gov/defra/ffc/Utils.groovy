@@ -10,7 +10,7 @@ class Utils implements Serializable {
   }
 
   static def getCommitSha(ctx) {
-    return ctx.sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+    return ctx.sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
   }
 
   static def generatePrNames(dbName, prCode) {
@@ -20,7 +20,7 @@ class Utils implements Serializable {
   }
 
   static def getRepoName(ctx) {
-    return ctx.scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split("\\.git")[0]
+    return ctx.scm.getUserRemoteConfigs()[0].getUrl().tokenize('/').last().split('\\.git')[0]
   }
 
   static def getMergedPrNo(ctx) {
@@ -29,7 +29,7 @@ class Utils implements Serializable {
   }
 
   static def getRepoUrl(ctx) {
-    return ctx.sh(returnStdout: true, script: "git config --get remote.origin.url").trim()
+    return ctx.sh(returnStdout: true, script: 'git config --get remote.origin.url').trim()
   }
 
   static def getFolder(repoName) {
