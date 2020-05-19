@@ -3,7 +3,6 @@ import src.uk.gov.defra.ffc.Utils
 
 // The design rationale for the behaviour of this function is documented here:
 // https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres
-// public
 def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, prCode, useIfNotExists=false) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
@@ -16,7 +15,7 @@ def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, pr
     // CREATE ROLE doesn't have a "IF NOT EXISTS" parameter so we have to check for the PR user/role manually
     if (useIfNotExists) {
       def selectRoleSqlCmd = "SELECT 1 FROM pg_roles WHERE rolname = '$prUser'"
-      roleExists = Database.runPsqlCommand(this, dbHost, dbUser, dbName, selectRoleSqlCmd).contains("(1 row)")
+      roleExists = Database.runPsqlCommand(this, dbHost, dbUser, dbName, selectRoleSqlCmd).contains('(1 row)')
     }
 
     if (roleExists) {
@@ -27,7 +26,7 @@ def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, pr
       Database.runPsqlCommand(this, dbHost, dbUser, dbName, createRoleSqlCmd)
     }
 
-    def ifNotExistsStr = useIfNotExists ? "IF NOT EXISTS" : ""
+    def ifNotExistsStr = useIfNotExists ? 'IF NOT EXISTS' : ''
     def createSchemaSqlCmd = "CREATE SCHEMA $ifNotExistsStr $prSchema"
     Database.runPsqlCommand(this, dbHost, dbUser, dbName, createSchemaSqlCmd)
 
@@ -43,7 +42,6 @@ def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, pr
 
 // The design rationale for the behaviour of this function is documented here:
 // https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres
-// public
 def destroyPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   withCredentials([
     usernamePassword(credentialsId: jenkinsUserCredId, usernameVariable: 'dbUser', passwordVariable: 'PGPASSWORD'),
