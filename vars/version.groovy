@@ -1,31 +1,25 @@
 import uk.gov.defra.ffc.Version
 
 def getCSProjVersion(projName) {
-  return sh(returnStdout: true, script: "xmllint $projName/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
+  return Version.getCSProjVersion(this, projName)
 }
 
 def getPackageJsonVersion() {
-  return sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
+  return Version.getPackageJsonVersion(this)
 }
 
 def getFileVersion(fileName) {
-  return sh(returnStdout: true, script: "cat $fileName").trim()
+  return Version.getFileVersion(this, fileName)
 }
 
 def verifyCSProjIncremented(projectName) {
-  def masterVersion = Version.getCSProjVersionMaster(this, projectName)
-  def version = getCSProjVersion(projectName)
-  Version.errorOnNoVersionIncrement(this, masterVersion, version)
+  Version.verifyCSProjIncremented(this, projectName)
 }
 
 def verifyPackageJsonIncremented() {
-  def masterVersion = Version.getPackageJsonVersionMaster(this)
-  def version = getPackageJsonVersion()
-  Version.errorOnNoVersionIncrement(this, masterVersion, version)
+  Version.verifyPackageJsonIncremented(this)
 }
 
 def verifyFileIncremented(fileName) {
-  def currentVersion = getFileVersion(fileName)
-  def previousVersion = Version.getPreviousFileVersion(this, fileName, currentVersion)
-  Version.errorOnNoVersionIncrement(this, previousVersion, currentVersion)
+  Version.verifyFileIncremented(this, fileName)
 }

@@ -50,4 +50,34 @@ class Version implements Serializable {
       return false
     }
   }
+
+  static def getCSProjVersion(ctx, projName) {
+    return ctx.sh(returnStdout: true, script: "xmllint $projName/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
+  }
+
+  static def getPackageJsonVersion(ctx) {
+    return ctx.sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
+  }
+
+  static def getFileVersion(ctx, fileName) {
+    return ctx.sh(returnStdout: true, script: "cat $fileName").trim()
+  }
+
+  static def verifyCSProjIncremented(ctx, projectName) {
+    def masterVersion = Version.getCSProjVersionMaster(ctx, projectName)
+    def version = Version.getCSProjVersion(ctx, projectName)
+    Version.errorOnNoVersionIncrement(ctx, masterVersion, version)
+  }
+
+  static def verifyPackageJsonIncremented(ctx) {
+    def masterVersion = Version.getPackageJsonVersionMaster(ctx)
+    def version = Version.getPackageJsonVersion(ctx)
+    Version.errorOnNoVersionIncrement(ctx, masterVersion, version)
+  }
+
+  static def verifyFileIncremented(ctx, fileName) {
+    def currentVersion = Version.getFileVersion(ctx, fileName)
+    def previousVersion = Version.getPreviousFileVersion(ctx, fileName, currentVersion)
+    Version.errorOnNoVersionIncrement(ctx, previousVersion, currentVersion)
+  }
 }
