@@ -1,4 +1,4 @@
-import uk.gov.defra.ffc.Helm
+import uk.gov.defra.ffc.Tests
 
 def lintHelm(chartName) {
   Tests.lintHelm(this, chartName)
