@@ -6,8 +6,8 @@ class Build implements Serializable {
   private static def verifyCommitBuildable(ctx, pr) {
     if (pr) {
       ctx.echo("Building PR$pr")
-    } else if (ctx.BRANCH_NAME == "master") {
-      ctx.echo("Building master branch")
+    } else if (ctx.BRANCH_NAME == 'master') {
+      ctx.echo('Building master branch')
     } else {
       ctx.currentBuild.result = 'ABORTED'
       ctx.error('Build aborted - not a PR or a master branch')
@@ -25,7 +25,7 @@ class Build implements Serializable {
 
     def identityTag
 
-    if (branch == "master") {
+    if (branch == 'master') {
       identityTag = version
     } else {
       def rawTag = pr ? "pr$pr" : branch
@@ -42,10 +42,10 @@ class Build implements Serializable {
     def repoUrl = Utils.getRepoUrl(ctx)
     ctx.step([
       $class: 'GitHubCommitStatusSetter',
-      reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
-      commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
+      reposSource: [$class: 'ManuallyEnteredRepositorySource', url: repoUrl],
+      commitShaSource: [$class: 'ManuallyEnteredShaSource', sha: commitSha],
       errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
-      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
+      statusResultSource: [ $class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: message, state: state]] ]
     ])
   }
 }
