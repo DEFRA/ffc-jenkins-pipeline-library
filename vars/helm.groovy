@@ -40,7 +40,7 @@ def undeployChart(environment, chartName, tag) {
   def deploymentName = "$chartName-$tag"
   echo "removing deployment $deploymentName"
   withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
-    sh "helm uninstall $deploymentName || echo error removing deployment $deploymentName"
+    sh "helm uninstall $deploymentName -n $deploymentName || echo error removing deployment $deploymentName"
     sh "kubectl delete namespaces $deploymentName || echo error removing namespace $deploymentName"
   }
 }
