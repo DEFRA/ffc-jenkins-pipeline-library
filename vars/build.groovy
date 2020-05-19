@@ -1,4 +1,6 @@
 import uk.gov.defra.ffc.Build
+import uk.gov.defra.ffc.Docker
+import uk.gov.defra.ffc.Tests
 
 def getVariables(version) {
   return Build.getVariables(this, version)
@@ -17,25 +19,13 @@ def setGithubStatusFailure(message = '') {
 }
 
 def buildTestImage(credentialsId, registry, projectName, buildNumber, identityTag) {
-  docker.withRegistry("https://$registry", credentialsId) {
-    sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache")
-  }
+  Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, identityTag)
 }
 
 def runTests(projectName, serviceName, buildNumber, identityTag) {
-  try {
-    sh('mkdir -p test-output')
-    sh('chmod 777 test-output')
-    sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
-  } finally {
-    sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
-  }
+  Tests.runTests(this, projectName, serviceName, buildNumber, identityTag)
 }
 
 def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
-  docker.withRegistry("https://$registry", credentialsId) {
-    sh('docker-compose -f docker-compose.yaml build --no-cache')
-    sh("docker tag $imageName $registry/$imageName:$tag")
-    sh("docker push $registry/$imageName:$tag")
-  }
+  Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
