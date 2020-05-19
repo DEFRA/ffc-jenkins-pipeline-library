@@ -15,9 +15,9 @@ The `Pipeline Delete Event` event should be set to a pipeline that runs the foll
 cleanup environment: 'dev'
 ```
 
-Note: The library may be set to a specific version by with the `@` suffix, i.e. `defra-library@6`
+Note: The library may be set to a specific version with the `@` suffix, e.g. `defra-library@6`
 
-The `Pipeline Delete Event` event will need an additional parameter of `repoName` set to the name of the github repository of the current build pipeline. As one cleanup pipeline is shared by all build pipelines this is required to to notify the cleanup pipeline of the repository for the deleted branch.
+The `Pipeline Delete Event` event will need an additional parameter of `repoName` set to the name of the github repository of the current build pipeline. As one cleanup pipeline is shared by all build pipelines this is required to notify the cleanup pipeline of the repository for the deleted branch.
 
 The cleanup function determines the PR number using the [github pulls API](https://developer.github.com/v3/pulls/).
 The API call searches the repository from the `repoName` parameter for closed pull requests on the branch that has just been deleted. The PR results are sorted by updated date in descending order. Ordinarily only one branch is created per PR, but this should cover the edge case when a PR is closed and a new PR is created on the same branch.
