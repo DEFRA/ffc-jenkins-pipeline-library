@@ -15,12 +15,13 @@ class Helm implements Serializable {
   }
 
   static def getPrCommands(registry, chartName, tag, buildNumber) {
-    return [
+    def flags = [
       /image=$registry\/$chartName:$tag/,
       /namespace=$chartName-$tag/,
       /pr=$tag/,
       /deployment.redeployOnChange=$tag-$buildNumber/
       ].join(',')
+    return "--set $flags"
   }
 
   static def deployChart(ctx, environment, registry, chartName, tag) {
