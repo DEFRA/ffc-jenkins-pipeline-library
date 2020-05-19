@@ -19,16 +19,16 @@ def call(Map config=[:]) {
         }
       }
 
-      if (config.containsKey("validateClosure")) {
-        config["validateClosure"]()
+      if (config.containsKey('validateClosure')) {
+        config['validateClosure']()
       }
 
       stage('Helm lint') {
         test.lintHelm(repoName)
       }
 
-      if (config.containsKey("buildClosure")) {
-        config["buildClosure"]()
+      if (config.containsKey('buildClosure')) {
+        config['buildClosure']()
       }
 
       stage('Build test image') {
@@ -38,8 +38,8 @@ def call(Map config=[:]) {
         build.runTests(repoName, repoName, BUILD_NUMBER)
       }
 
-      if (config.containsKey("testClosure")) {
-        config["testClosure"]()
+      if (config.containsKey('testClosure')) {
+        config['testClosure']()
       }
 
       stage('Push container image') {
@@ -70,8 +70,8 @@ def call(Map config=[:]) {
         }
       }
 
-      if (config.containsKey("deployClosure")) {
-        config["deployClosure"]()
+      if (config.containsKey('deployClosure')) {
+        config['deployClosure']()
       }
 
       stage('Set GitHub status as success'){
@@ -83,17 +83,17 @@ def call(Map config=[:]) {
       }
 
       stage('Send build failure slack notification') {
-        notifySlack.buildFailure(e.message, "#generalbuildfailures")
+        notifySlack.buildFailure(e.message, '#generalbuildfailures')
       }
 
-      if (config.containsKey("failureClosure")) {
-        config["failureClosure"]()
+      if (config.containsKey('failureClosure')) {
+        config['failureClosure']()
       }
 
       throw e
     } finally {
-      if (config.containsKey("finallyClosure")) {
-        config["finallyClosure"]()
+      if (config.containsKey('finallyClosure')) {
+        config['finallyClosure']()
       }
     }
   }
