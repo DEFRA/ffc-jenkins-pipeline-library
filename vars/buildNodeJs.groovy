@@ -24,8 +24,8 @@ def call(Map config=[:]) {
         }
       }
 
-      if (config.containsKey("validateClosure")) {
-        config["validateClosure"]()
+      if (config.containsKey('validateClosure')) {
+        config['validateClosure']()
       }
 
       stage('Helm lint') {
@@ -36,8 +36,8 @@ def call(Map config=[:]) {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER)
       }
 
-      if (config.containsKey("buildClosure")) {
-        config["buildClosure"]()
+      if (config.containsKey('buildClosure')) {
+        config['buildClosure']()
       }
 
       stage('Run tests') {
@@ -52,9 +52,10 @@ def call(Map config=[:]) {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
       }
 
-      if (config.containsKey("testClosure")) {
-        config["testClosure"]()
+      if (config.containsKey('testClosure')) {
+        config['testClosure']()
       }
+
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
       }
@@ -86,8 +87,19 @@ def call(Map config=[:]) {
         }
       }
 
+<<<<<<< HEAD
       if (config.containsKey("deployClosure")) {
         config["deployClosure"]()
+=======
+      if (mergedPrNo != '') {
+        stage('Remove merged PR') {
+          helm.undeployChart(config.environment, repoName, mergedPrNo)
+        }
+      }
+
+      if (config.containsKey('deployClosure')) {
+        config['deployClosure']()
+>>>>>>> 75e7644... Use quotes consistently
       }
 
       stage('Set GitHub status as success'){
@@ -99,11 +111,11 @@ def call(Map config=[:]) {
       }
 
       stage('Send build failure slack notification') {
-        notifySlack.buildFailure(e.message, "#generalbuildfailures")
+        notifySlack.buildFailure(e.message, '#generalbuildfailures')
       }
 
-      if (config.containsKey("failureClosure")) {
-        config["failureClosure"]()
+      if (config.containsKey('failureClosure')) {
+        config['failureClosure']()
       }
 
       throw e
@@ -112,8 +124,8 @@ def call(Map config=[:]) {
         test.deleteOutput('defradigital/node-development', containerSrcFolder)
       }
 
-      if (config.containsKey("finallyClosure")) {
-        config["finallyClosure"]()
+      if (config.containsKey('finallyClosure')) {
+        config['finallyClosure']()
       }
     }
   }
