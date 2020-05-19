@@ -14,8 +14,8 @@ def destroyPrSqsQueues(repoName, prCode) {
         dir('london/eu-west-2/ffc') {
           def dirName = "${repoName}-pr${prCode}-*"
           echo("finding previous var files in directories matching ${dirName}")
-          def varFiles = findFiles glob: "${dirName}/vars.tfvars";
-          echo("found ${varFiles.size()} directories to tear down";)
+          def varFiles = findFiles glob: "${dirName}/vars.tfvars"
+          echo("found ${varFiles.size()} directories to tear down")
           if (varFiles.size() > 0) {
             for (def varFile in varFiles) {
               def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
@@ -50,7 +50,7 @@ def provisionPrSqsQueue(repoName, prCode, queuePurpose, serviceCode, serviceName
     // character limit is actually 80, but four characters are needed for prefixes and separators
     final int SQS_NAME_CHAR_LIMIT = 76
     assert repoName.size() + prCode.toString().size() + queuePurpose.size() < SQS_NAME_CHAR_LIMIT :
-      'repo name, pr code and queue purpose parameters should have fewer than 76 characters when combined';
+      'repo name, pr code and queue purpose parameters should have fewer than 76 characters when combined'
     echo('changing to terragrunt dir')
     dir('terragrunt') {
       echo('withCredentials')
