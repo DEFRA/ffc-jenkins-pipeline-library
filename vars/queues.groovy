@@ -17,7 +17,7 @@ def destroyPrSqsQueues(repoName, prCode) {
           def varFiles = findFiles glob: "${dirName}/vars.tfvars";
           echo "found ${varFiles.size()} directories to tear down";
           if (varFiles.size() > 0) {
-            for (varFile in varFiles) {
+            for (def varFile in varFiles) {
               def path = varFile.getPath().substring(0, varFile.getPath().lastIndexOf("/"))
               echo "running terragrunt in ${path}"
               dir(path) {
