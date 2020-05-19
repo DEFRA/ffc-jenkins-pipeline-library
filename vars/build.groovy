@@ -18,24 +18,24 @@ def setGithubStatusFailure(message = '') {
 
 def buildTestImage(credentialsId, registry, projectName, buildNumber) {
   docker.withRegistry("https://$registry", credentialsId) {
-    sh "docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache"
+    sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache")
   }
 }
 
 def runTests(projectName, serviceName, buildNumber) {
   try {
-    sh 'mkdir -p test-output'
-    sh 'chmod 777 test-output'
-    sh "docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName"
+    sh('mkdir -p test-output')
+    sh('chmod 777 test-output')
+    sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
   } finally {
-    sh "docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v"
+    sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
   }
 }
 
 def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   docker.withRegistry("https://$registry", credentialsId) {
-    sh "docker-compose -f docker-compose.yaml build --no-cache"
-    sh "docker tag $imageName $registry/$imageName:$tag"
-    sh "docker push $registry/$imageName:$tag"
+    sh('docker-compose -f docker-compose.yaml build --no-cache')
+    sh("docker tag $imageName $registry/$imageName:$tag")
+    sh("docker push $registry/$imageName:$tag")
   }
 }
