@@ -51,6 +51,7 @@ def call(Map config=[:]) {
       stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
       }
+
       if (config.containsKey("testClosure")) {
         config["testClosure"]()
       }
@@ -82,12 +83,6 @@ def call(Map config=[:]) {
           ]) {
             deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': containerTag, 'environment': config.environment])
           }
-        }
-      }
-
-      if (mergedPrNo != '') {
-        stage('Remove merged PR') {
-          helm.undeployChart(config.environment, repoName, mergedPrNo)
         }
       }
 

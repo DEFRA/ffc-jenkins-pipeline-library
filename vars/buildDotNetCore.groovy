@@ -70,12 +70,6 @@ def call(Map config=[:]) {
         }
       }
 
-      if (mergedPrNo != '') {
-        stage('Remove merged PR') {
-          helm.undeployChart(config.environment, repoName, mergedPrNo)
-        }
-      }
-
       if (config.containsKey("deployClosure")) {
         config["deployClosure"]()
       }
