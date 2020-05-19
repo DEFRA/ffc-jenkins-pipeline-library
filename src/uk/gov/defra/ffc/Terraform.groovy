@@ -15,7 +15,7 @@ class Terraform implements Serializable {
           ctx.string(credentialsId: 'ffc-jenkins-pipeline-terragrunt-repo', variable: 'tg_repo_url'),
           [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'devffcprovision-user']
         ]) {
-          ctx.git(credentialsId: 'helm-chart-creds', url: tg_repo_url)
+          ctx.git(credentialsId: 'helm-chart-creds', url: ctx.tg_repo_url)
           ctx.dir('london/eu-west-2/ffc') {
             def dirName = "${repoName}-pr${prCode}-*"
             ctx.echo("finding previous var files in directories matching ${dirName}")
@@ -65,7 +65,7 @@ class Terraform implements Serializable {
             ctx.sh('pwd')
             // git clone repo...
             ctx.echo('cloning repo')
-            ctx.git(credentialsId: 'helm-chart-creds', url: tg_repo_url)
+            ctx.git(credentialsId: 'helm-chart-creds', url: ctx.tg_repo_url)
             ctx.echo('cloned repo')
 
             ctx.echo('changing to dir london/eu-west-2/ffc')
