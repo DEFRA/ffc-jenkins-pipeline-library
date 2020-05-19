@@ -8,7 +8,7 @@ def call(Map config=[:]) {
 
 def cleanup(environment, repoName, branchName) {
   if (repoName == '' || branchName == '') {
-    echo "Unable to determine repo name and branch name, cleanup cancelled"
+    echo 'Unable to determine repo name and branch name, cleanup cancelled'
   } else {
     def apiParams = "state=closed&sort=updated&direction=desc&head=DEFRA:$branchName"
     def apiUrl = "https://api.github.com/repos/DEFRA/$repoName/pulls?$apiParams"
