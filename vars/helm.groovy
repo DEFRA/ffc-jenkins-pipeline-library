@@ -67,4 +67,3 @@ def deployRemoteChart(environment, namespace, chartName, chartVersion) {
     }
   }
 }
-}
