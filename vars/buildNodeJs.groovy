@@ -2,7 +2,6 @@ def call(Map config=[:]) {
   def containerSrcFolder = '\\/home\\/node'
   def localSrcFolder = '.'
   def lcovFile = './test-output/lcov.info'
-  def sonarQubeEnv = 'SonarQube'
   def sonarScanner = 'SonarScanner'
   def qualityGateTimeout = 10
   def repoName = ''
@@ -53,6 +52,9 @@ def call(Map config=[:]) {
 
       stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      }
+      if (config.containsKey("testClosure")) {
+        config["testClosure"]()
       }
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
