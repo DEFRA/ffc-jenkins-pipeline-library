@@ -13,7 +13,7 @@ def cleanup(environment) {
     def apiParams = "state=closed&sort=updated&direction=desc&head=DEFRA:$SOURCE_PROJECT_NAME"
     def apiUrl = "https://api.github.com/repos/DEFRA/$repoName/pulls?$apiParams"
     def closedPrNo = sh(returnStdout: true, script: "curl '$apiUrl' | jq 'first | .number'").trim()
-    if (closedPrNo == '') {
+    if (closedPrNo == '' ||closedPrNo == 'null') {
       echo "Could not find closed PR for branch $SOURCE_PROJECT_NAME of $repoName, cleanup cancelled"
     }else {
       echo "Tidying up kubernetes resources for PR $closedPrNo of $repoName after branch $SOURCE_PROJECT_NAME deleted"
