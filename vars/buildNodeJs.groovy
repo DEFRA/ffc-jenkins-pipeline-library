@@ -87,19 +87,8 @@ def call(Map config=[:]) {
         }
       }
 
-<<<<<<< HEAD
-      if (config.containsKey("deployClosure")) {
-        config["deployClosure"]()
-=======
-      if (mergedPrNo != '') {
-        stage('Remove merged PR') {
-          helm.undeployChart(config.environment, repoName, mergedPrNo)
-        }
-      }
-
       if (config.containsKey('deployClosure')) {
         config['deployClosure']()
->>>>>>> 75e7644... Use quotes consistently
       }
 
       stage('Set GitHub status as success'){
