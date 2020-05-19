@@ -1,5 +1,7 @@
+import uk.gov.defra.ffc.Helm
+
 def lintHelm(chartName) {
-  helm.addHelmRepo('ffc-public', HELM_CHART_REPO_PUBLIC)
+  Helm.addHelmRepo(this, 'ffc-public', HELM_CHART_REPO_PUBLIC)
   sh("helm dependency update ./helm/$chartName")
   sh("helm lint ./helm/$chartName")
 }
