@@ -45,7 +45,7 @@ def publishChart(registry, chartName, tag) {
     usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password')
   ]) {
     // jenkins doesn't tidy up folder, remove old charts before running
-    sh("rm -rf helm-charts")
+    sh('rm -rf helm-charts')
     dir('helm-charts') {
       sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
       Helm.addHelmRepo(this, 'ffc-public', HELM_CHART_REPO_PUBLIC)
