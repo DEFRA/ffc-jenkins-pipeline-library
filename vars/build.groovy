@@ -16,13 +16,13 @@ def setGithubStatusFailure(message = '') {
   Build.updateGithubCommitStatus(this, message, 'FAILURE')
 }
 
-def buildTestImage(credentialsId, registry, projectName, buildNumber) {
+def buildTestImage(credentialsId, registry, projectName, buildNumber, identityTag) {
   docker.withRegistry("https://$registry", credentialsId) {
     sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache")
   }
 }
 
-def runTests(projectName, serviceName, buildNumber) {
+def runTests(projectName, serviceName, buildNumber, identityTag) {
   try {
     sh('mkdir -p test-output')
     sh('chmod 777 test-output')
