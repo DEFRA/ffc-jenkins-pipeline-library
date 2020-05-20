@@ -20,6 +20,10 @@ def publishChart(registry, chartName, tag) {
   Helm.publishChart(this, registry, chartName, tag)
 }
 
+def publishChartToACR(registry, chartName, tag) {
+  Helm.publishChartToACR(this, registry, chartName, tag)
+}
+
 def deployRemoteChart(environment, namespace, chartName, chartVersion) {
   Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
 }

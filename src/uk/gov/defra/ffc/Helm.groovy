@@ -64,6 +64,27 @@ class Helm implements Serializable {
     }
   }
 
+  static def publishChartToACR(ctx, registry, chartName, tag) {
+    ctx.withCredentials([
+      ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
+    ]) {
+      ctx.dir('helm-charts') {
+        def helmChartName = "${ctx.DOCKER_REGISTRY}/$chartName:helm-$tag"
+
+        ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
+
+        // FIXME: Need to test how to build using template with "helm chart save"
+        // Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
+
+        ctx.sh("helm registry login ${ctx.DOCKER_REGISTRY} --username $username --password $password")
+        ctx.sh("helm chart save ../helm/$chartName $helmChartName")
+        ctx.sh("helm chart push $helmChartName")
+
+        ctx.deleteDir()
+      }
+    }
+  }
+
   static def deployRemoteChart(ctx, environment, namespace, chartName, chartVersion) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       ctx.withCredentials([
