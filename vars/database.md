@@ -3,9 +3,9 @@
 > Database related methods
 
 Below are the methods available on the script. They can be executed by calling
-`<script>.<method>` e.g. `database.destroyPrDatabaseRoleAndSchema()`
+`<script>.<method>` e.g. `database.destroyPrDbRoleAndSchema()`
 
-## destroyPrDatabaseRoleAndSchema
+## destroyPrDbRoleAndSchema
 
 Drops a Postgres database PR role and schema. See
 [associated confluence page](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres)
@@ -19,7 +19,7 @@ It takes four parameters:
   the database user and password
 - a string describing the PR number, e.g. `53`
 
-## provisionPrDatabaseRoleAndSchema
+## provisionPrDbRoleAndSchema
 
 Creates a Postgres database role and schema for use by a PR. See
 [associated confluence page](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1596653973/Creating+PR+database+namespaces+in+postgres)

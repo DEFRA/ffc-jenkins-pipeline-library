@@ -7,7 +7,3 @@ def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, pr
 def destroyPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   return Database.destroyPrDbRoleAndSchema(this, host, dbName, jenkinsUserCredId, prCode)
 }
-
-def destroyPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
-  Database.destroyPrDbRoleAndSchema(this, host, dbName, jenkinsUserCredId, prCode)
-}
