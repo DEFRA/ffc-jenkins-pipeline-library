@@ -17,7 +17,7 @@ class Release implements Serializable {
       return ctx.sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$versionTag | jq '.tag_name'").trim().replaceAll (/"/, '') == versionTag ? true : false
     }
     catch(Exception ex) {
-      ctx.echo("Failed to check release status on github")
+      ctx.echo('Failed to check release status on github')
       throw new Exception (ex)
     }
   }
