@@ -45,7 +45,7 @@ def call(Map config=[:]) {
       }
 
       stage('Create JUnit report') {
-        test.createReportJUnit()
+        test.createJUnitReport()
       }
 
       stage('Fix lcov report') {

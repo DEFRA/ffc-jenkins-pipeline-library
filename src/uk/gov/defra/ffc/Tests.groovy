@@ -20,7 +20,7 @@ class Tests implements Serializable {
     ctx.sh("helm lint ./helm/$chartName")
   }
 
-  static def createReportJUnit(ctx) {
+  static def createJUnitReport(ctx) {
     ctx.junit('test-output/junit.xml')
   }
 

@@ -4,8 +4,8 @@ def lintHelm(chartName) {
   Tests.lintHelm(this, chartName)
 }
 
-def createReportJUnit() {
-  Tests.createReportJUnit(this)
+def createJUnitReport() {
+  Tests.createJUnitReport(this)
 }
 
 def deleteOutput(containerImage, containerWorkDir) {

@@ -5,19 +5,6 @@
 Below are the methods available on the script. They can be executed by calling
 `<script>.<method>` e.g. `release.tagCommit()`
 
-## tagCommit
-
-Attaches a tag to a specified commit on a repo in the DEFRA GitHub account. If
-the provided tag already exists on origin, it is deleted and reattached to the
-given commit SHA. If the tag does not exist on origin, it is created and pushed
-to origin.
-
-It takes three parameters:
-* a string containing the tag to attach to the commit
-* a string containing the commit SHA
-* a string containing the name of the repository (assumed to be in the DEFRA
-  GitHub account)
-
 ## addSemverTags
 
 Attaches a `MAJOR` and `MINOR` version tag to the latest commit to a repo in
@@ -39,19 +26,6 @@ It takes two parameters:
   `MAJOR.MINOR.PATCH`
 * a string containing the name of the repository (assumed to be in the DEFRA
   GitHub account)
-
-## releaseExists
-
-Checks GitHub to determine if a given Release Tag already exists for that repo.
-
-Takes three parameters:
-- the version tag in SemVer format to check for on GitHub e.g 1.0.0
-- the repository name to check
-- the GitHub connection token secret text
-
-```
-release.releaseExists(versionTag, repoName, token)
-```
 
 ## trigger
 

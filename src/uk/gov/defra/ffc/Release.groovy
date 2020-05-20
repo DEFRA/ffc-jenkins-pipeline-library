@@ -4,6 +4,14 @@ import uk.gov.defra.ffc.Release
 import uk.gov.defra.ffc.Utils
 
 class Release implements Serializable {
+  /**
+   * Checks GitHub to determine if a given Release Tag already exists for that repo.
+   *
+   * Takes three parameters:
+   * - the version tag in SemVer format to check for on GitHub e.g 1.0.0
+   * - the repository name to check
+   * - the GitHub connection token secret text
+   */
   private static def exists(ctx, versionTag, repoName, token){
     try {
       return ctx.sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$versionTag | jq '.tag_name'").trim().replaceAll (/"/, '') == versionTag ? true : false
@@ -14,6 +22,18 @@ class Release implements Serializable {
     }
   }
 
+  /**
+   * Attaches a tag to a specified commit on a repo in the DEFRA GitHub
+   * account. If the provided tag already exists on origin, it is deleted and
+   * reattached to the given commit SHA. If the tag does not exist on origin,
+   * it is created and pushed to origin.
+   *
+   * It takes three parameters:
+   * - a string containing the tag to attach to the commit
+   * - a string containing the commit SHA
+   * - a string containing the name of the repository (assumed to be in the
+   *   DEFRA GitHub account)
+   */
   private static def tagCommit(ctx, tag, commitSha, repoName) {
     ctx.dir('attachTag') {
       ctx.sshagent(['ffc-jenkins-pipeline-library-deploy-key']) {
