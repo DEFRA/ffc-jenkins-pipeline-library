@@ -68,10 +68,10 @@ class Helm implements Serializable {
     ctx.withCredentials([
       ctx.usernamePassword(credentialsId: 'test_acr_creds', usernameVariable: 'username', passwordVariable: 'password')
     ]) {
-      echo "$DOCKER_REGISTRY_CREDENTIALS_ID"
       ctx.dir('helm-charts') {
         def helmChartName = "$registry/$chartName:helm-$tag"
-
+        ctx.echo "$helmChartName"
+        ctx.echo '$DOCKER_REGISTRY_CREDENTIALS_ID'
         ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
 
         // FIXME: Need to test how to build using template with "helm chart save"
