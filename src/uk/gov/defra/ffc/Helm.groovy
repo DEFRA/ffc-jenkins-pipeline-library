@@ -66,8 +66,9 @@ class Helm implements Serializable {
 
   static def publishChartToACR(ctx, registry, chartName, tag) {
     ctx.withCredentials([
-      ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
+      ctx.usernamePassword(credentialsId: 'test_acr_creds', usernameVariable: 'username', passwordVariable: 'password')
     ]) {
+      echo "$DOCKER_REGISTRY_CREDENTIALS_ID"
       ctx.dir('helm-charts') {
         def helmChartName = "$registry/$chartName:helm-$tag"
 
