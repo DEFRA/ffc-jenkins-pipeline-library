@@ -65,22 +65,24 @@ class Helm implements Serializable {
   }
 
   static def publishChartToACR(ctx, registry, chartName, tag) {
-    ctx.withCredentials([
-      ctx.usernamePassword(credentialsId: 'test_acr_creds', usernameVariable: 'username', passwordVariable: 'password')
-    ]) {
-      ctx.dir('helm-charts') {
-        def helmChartName = "$registry/$chartName:helm-$tag"
+    ctx.withEnv(['HELM_EXPERIMENTAL_OCI=1']) {
+      ctx.withCredentials([
+        ctx.usernamePassword(credentialsId: 'test_acr_creds', usernameVariable: 'username', passwordVariable: 'password')
+      ]) {
+        ctx.dir('helm-charts') {
+          def helmChartName = "$registry/$chartName:helm-$tag"
 
-        ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
+          ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
 
-        // FIXME: Need to test how to build using template with "helm chart save"
-        // Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
+          // FIXME: Need to test how to build using template with "helm chart save"
+          // Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
 
-        ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
-        ctx.sh("helm chart save ../helm/$chartName $helmChartName")
-        ctx.sh("helm chart push $helmChartName")
+          ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
+          ctx.sh("helm chart save ../helm/$chartName $helmChartName")
+          ctx.sh("helm chart push $helmChartName")
 
-        ctx.deleteDir()
+          ctx.deleteDir()
+        }
       }
     }
   }
