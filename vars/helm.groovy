@@ -27,3 +27,7 @@ def publishChartToACR(registry, chartName, tag) {
 def deployRemoteChart(environment, namespace, chartName, chartVersion) {
   Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
 }
+
+def deployRemoteChartFromACR(environment, namespace, chartName, chartVersion) {
+  Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
+}
