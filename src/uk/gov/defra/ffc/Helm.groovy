@@ -70,14 +70,13 @@ class Helm implements Serializable {
     ]) {
       ctx.dir('helm-charts') {
         def helmChartName = "$registry/$chartName:helm-$tag"
-        ctx.echo "$helmChartName"
-        ctx.echo '$DOCKER_REGISTRY_CREDENTIALS_ID'
+
         ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
 
         // FIXME: Need to test how to build using template with "helm chart save"
         // Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
 
-        ctx.sh("helm registry login $registry --username $username --password $password")
+        ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
         ctx.sh("helm chart save ../helm/$chartName $helmChartName")
         ctx.sh("helm chart push $helmChartName")
 
