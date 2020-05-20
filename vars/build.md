@@ -3,29 +3,7 @@
 > Build related methods
 
 Below are the methods available on the script. They can be executed by calling
-`<script>.<method>` e.g. `build.getRepoUrl()`
-
-## getMergedPrNo
-
-Parses the local commit log to obtain the merged PR number from the message.
-This is reliant on the standard GitHub merge message of the PR name followed by
-the PR number, i.e. `Update license details (#53)`
-
-The method returns the PR number for a merge of the appropriate format, i.e.
-`pr53` or an empty string if not.
-
-## getRepoUrl
-
-Obtains the remote URL of the current repository, i.e.
-`https://github.com/DEFRA/ffc-demo-web.git`
-
-## verifyCommitBuildable
-
-If the build is a branch with a Pull Request (PR), or the master branch a
-message will be `echoed` describing the type of build.
-
-If the build is not for a PR or the master branch an error will be thrown with
-the message `Build aborted - not a PR or a master branch`
+`<script>.<method>` e.g. `build.getVariables()`
 
 ## getVariables
 

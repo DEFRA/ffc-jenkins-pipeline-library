@@ -3,6 +3,13 @@ package uk.gov.defra.ffc
 import uk.gov.defra.ffc.Utils
 
 class Build implements Serializable {
+  /**
+   * If the build is a branch with a Pull Request (PR), or the master branch a
+   * message will be `echoed` describing the type of build.
+   *
+   * If the build is not for a PR or the master branch an error will be thrown with
+   * the message `Build aborted - not a PR or a master branch`
+   */
   private static def verifyCommitBuildable(ctx, pr) {
     if (pr) {
       ctx.echo("Building PR$pr")
