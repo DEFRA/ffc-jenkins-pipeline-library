@@ -4,7 +4,7 @@ def call(Map config=[:]) {
   def lcovFile = './test-output/lcov.info'
   def repoName = ''
   def pr = ''
-  def containerTag = ''
+  def identityTag = ''
   def mergedPrNo = ''
 
   node {
@@ -14,8 +14,8 @@ def call(Map config=[:]) {
         build.setGithubStatusPending()
       }
 
-      stage('Set PR, and containerTag variables') {
-        (repoName, pr, containerTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
+      stage('Set PR, and identityTag variables') {
+        (repoName, pr, identityTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
 
       if (pr != '') {
@@ -24,8 +24,8 @@ def call(Map config=[:]) {
         }
       }
 
-      if (config.containsKey("validateClosure")) {
-        config["validateClosure"]()
+      if (config.containsKey('validateClosure')) {
+        config['validateClosure']()
       }
 
       stage('Helm lint') {
@@ -33,47 +33,48 @@ def call(Map config=[:]) {
       }
 
       stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER)
+        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, identityTag)
       }
 
-      if (config.containsKey("buildClosure")) {
-        config["buildClosure"]()
+      if (config.containsKey('buildClosure')) {
+        config['buildClosure']()
       }
 
       stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER)
+        build.runTests(repoName, repoName, BUILD_NUMBER, identityTag)
       }
 
       stage('Create JUnit report') {
-        test.createReportJUnit()
+        test.createJUnitReport()
       }
 
       stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
       }
 
-      if (config.containsKey("testClosure")) {
-        config["testClosure"]()
+      if (config.containsKey('testClosure')) {
+        config['testClosure']()
       }
+
       stage('Push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, containerTag)
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, identityTag)
       }
 
       if (pr != '') {
         stage('Helm install') {
-          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, containerTag)
+          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, identityTag)
         }
       }
       else {
         stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, repoName, containerTag)
+          helm.publishChart(DOCKER_REGISTRY, repoName, identityTag)
         }
 
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            release.trigger(containerTag, repoName, containerTag, gitToken)
+            release.trigger(identityTag, repoName, identityTag, gitToken)
           }
         }
 
@@ -81,13 +82,13 @@ def call(Map config=[:]) {
           withCredentials([
             string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
           ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': containerTag, 'environment': config.environment])
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': identityTag, 'environment': config.environment])
           }
         }
       }
 
-      if (config.containsKey("deployClosure")) {
-        config["deployClosure"]()
+      if (config.containsKey('deployClosure')) {
+        config['deployClosure']()
       }
 
       stage('Set GitHub status as success'){
@@ -99,11 +100,11 @@ def call(Map config=[:]) {
       }
 
       stage('Send build failure slack notification') {
-        notifySlack.buildFailure(e.message, "#generalbuildfailures")
+        notifySlack.buildFailure(e.message, '#generalbuildfailures')
       }
 
-      if (config.containsKey("failureClosure")) {
-        config["failureClosure"]()
+      if (config.containsKey('failureClosure')) {
+        config['failureClosure']()
       }
 
       throw e
@@ -112,8 +113,8 @@ def call(Map config=[:]) {
         test.deleteOutput('defradigital/node-development', containerSrcFolder)
       }
 
-      if (config.containsKey("finallyClosure")) {
-        config["finallyClosure"]()
+      if (config.containsKey('finallyClosure')) {
+        config['finallyClosure']()
       }
     }
   }

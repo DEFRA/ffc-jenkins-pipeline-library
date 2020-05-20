@@ -1,15 +1,5 @@
-// public
-def trigger(jenkinsUrl, repoName, token, params) {
-  def folder = getFolder(repoName)
-  def url = "$jenkinsUrl/job/$folder/job/$repoName-deploy/buildWithParameters?token=$token"
-  params.each { param ->
-    url = url + "\\&$param.key=$param.value"
-  }
-  echo "Triggering deployment for $url"
-  sh(script: "curl -fk $url")
-}
+import uk.gov.defra.ffc.Deploy
 
-def getFolder(repoName) {
-  def folderArray = repoName.split('-')
-  return "${folderArray[0]}-${folderArray[1]}"
+def trigger(jenkinsUrl, repoName, token, params) {
+  Deploy.trigger(this, jenkinsUrl, repoName, token, params)
 }

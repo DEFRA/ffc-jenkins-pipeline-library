@@ -1,14 +1,13 @@
-// public
+import uk.gov.defra.ffc.Utils
+
 def replaceInFile(from, to, file) {
-  sh "sed -i -e 's/$from/$to/g' $file"
+  Utils.replaceInFile(this, from, to, file)
 }
 
-// public
 def getCommitMessage() {
-  return sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
+  return Utils.getCommitMessage(this)
 }
 
-// public
 def getCommitSha() {
-  return sh(returnStdout: true, script: "git rev-parse HEAD").trim()
+  return Utils.getCommitSha(this)
 }

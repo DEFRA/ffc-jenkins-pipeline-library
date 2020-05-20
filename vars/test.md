@@ -21,11 +21,11 @@ Example usage:
 test.lintHelm('ffc-demo-web')
 ```
 
-## createTestReportJUnit
+## createJUnitReport
 
-Creates a test report using JUnit
+Creates a test report using JUnit.
 
-## deleteTestOutput
+## deleteOutput
 
 Deletes the test-output folder from the workspace, acting as a user in a
 container using a given image.
@@ -37,7 +37,7 @@ Takes two parameters:
 Example usage:
 
 ```
-test.deleteTestOutput('ffc-demo-web', '/home/node')
+test.deleteOutput('ffc-demo-web', '/home/node')
 ```
 
 ## analyseCode
