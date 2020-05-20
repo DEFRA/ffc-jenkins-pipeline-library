@@ -1,14 +1,33 @@
 package uk.gov.defra.ffc
 
 class Version implements Serializable {
+  /**
+   * Returns the project version from the `[projectName].csproj` file in the master
+   * branch. It requires the project name to be passed as a parameter, but this
+   * means that in a solution of several projects, versions can be retrieved for
+   * each of them.
+   */
   static def getCSProjVersionMaster(ctx, projName) {
     return ctx.sh(returnStdout: true, script: "git show origin/master:$projName/${projName}.csproj | xmllint --xpath '//Project/PropertyGroup/Version/text()' -").trim()
   }
 
+  /**
+   * Returns the package version from the `package.json` file in the master
+   * branch.
+   */
   static def getPackageJsonVersionMaster(ctx) {
     return ctx.sh(returnStdout: true, script: "git show origin/master:package.json | jq -r '.version'").trim()
   }
 
+  /**
+   * Returns the contents of a given file in the master branch. The assumption
+   * is that this file contains a single string that is a SemVer formatted
+   * version number: `MAJOR.MINOR.PATCH`.
+   *
+   * It takes one parameter:
+   * - a string containing the file name of the file containing the version
+   *   number
+   */
   static def getPreviousFileVersion(ctx, fileName, currentVersion) {
     def majorVersion = currentVersion.split('\\.')[0]
     // if there are no existing versions of the MAJOR version no SHA will exist
@@ -18,6 +37,12 @@ class Version implements Serializable {
       : ''
   }
 
+  /**
+   * Takes two parameters - master version and branch version.
+   *
+   * The method will throw an error is the version has been incremented
+   * otherwise it will print a message stating the version increment.
+   */
   static def errorOnNoVersionIncrement(ctx, previousVersion, currentVersion){
     def cleanPreviousVersion = Version.extractSemVerVersion(previousVersion)
     def cleanCurrentVersion = Version.extractSemVerVersion(currentVersion)
@@ -33,6 +58,15 @@ class Version implements Serializable {
     return splitTag.length > 1 ? splitTag[1] : versionTag
   }
 
+  /**
+   * Takes two parameters of the versions to compare, typically master version
+   * and branch version.
+   *
+   * The method returns `true` if both versions are valid SemVers, and the
+   * second version is higher than the first. The method returns `false` if
+   * either version is invalid, or the second version is not higher than the
+   * first.
+   */
   private static def hasIncremented(currVers, newVers) {
     // For a newly created empty repository currVers will be empty on first
     // merge to master consider 'newVers' the first version and return true
