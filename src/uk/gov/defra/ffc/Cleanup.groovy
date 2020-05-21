@@ -3,7 +3,7 @@ package uk.gov.defra.ffc
 import uk.gov.defra.ffc.Helm
 
 class Cleanup implements Serializable {
-  static def kubernetesResources(ctx, environment, repoName, branchName) {
+  static def prResources(ctx, environment, repoName, branchName) {
     if (repoName == '' || branchName == '') {
       ctx.echo('Unable to determine repo name and branch name, cleanup cancelled')
     } else {
