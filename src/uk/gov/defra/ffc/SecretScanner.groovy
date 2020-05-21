@@ -72,7 +72,7 @@ class SecretScanner implements Serializable {
       }
     }
 
-    return "1"
+    return '1'
   }
 
   private static def reportSecrets(ctx, secretMessages, repo, channel) {
