@@ -72,7 +72,7 @@ class Release implements Serializable {
 
     def majorTag = "${versionList[0]}"
     def minorTag = "${versionList[0]}.${versionList[1]}"
-    def commitSha = Utils.getCommitSha()
+    def commitSha = Utils.getCommitSha(ctx)
 
     Release.tagCommit(ctx, minorTag, commitSha, repoName)
     Release.tagCommit(ctx, majorTag, commitSha, repoName)
