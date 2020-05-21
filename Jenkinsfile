@@ -1,4 +1,4 @@
-@Library("defra-library@$BRANCH_NAME") _
+library("defra-library@$BRANCH_NAME")
 
 def pr = ''
 def repoName = ''
