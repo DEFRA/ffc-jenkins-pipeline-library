@@ -9,5 +9,5 @@ def deploymentFailure(exception) {
 }
 
 def sendMessage(channel, message, useHere) {
-  Notification.sendMessage(this, channel, message, useHere)
+  Notifications.sendMessage(this, channel, message, useHere)
 }
