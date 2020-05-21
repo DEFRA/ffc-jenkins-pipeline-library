@@ -80,7 +80,7 @@ class SecretScanner implements Serializable {
 
     if (channel.length() == 0) return
 
-    def message = "POTENTIAL SECRETS DETECTED IN $repo\n$JOB_NAME/$BUILD_NUMBER\n(<$BUILD_URL|Open>)"
+    def message = "POTENTIAL SECRETS DETECTED IN $repo\n$ctx.JOB_NAME/$ctx.BUILD_NUMBER\n(<$ctx.BUILD_URL|Open>)"
 
     Notifications.sendMessage(ctx, channel, message, true)
   }
