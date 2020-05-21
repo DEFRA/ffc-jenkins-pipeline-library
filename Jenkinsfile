@@ -2,7 +2,7 @@
 
 def pr = ''
 def repoName = ''
-def versionFileName = "VERSION"
+def versionFileName = 'VERSION'
 
 node {
   checkout scm
@@ -37,7 +37,7 @@ node {
     }
   } catch(e) {
     build.setGithubStatusFailure(e.message)
-    notifySlack.buildFailure(e.message, "#generalbuildfailures")
+    notifySlack.buildFailure(e.message, '#generalbuildfailures')
     throw e
   }
 }
