@@ -6,8 +6,8 @@ This can be used to clean up resources in conjunction with the Jenkins
 [MultiBranch Action Triggers](https://plugins.jenkins.io/multibranch-action-triggers/)
 plugin which allows other pipelines to be triggered on branch events.
 
-The Helm chart and PR namespace will be deleted upon branch deletion for a
-closed PR.
+The Helm chart will be uninstalled and the PR namespace will be deleted upon
+branch deletion for a closed PR.
 
 To enable cleanup the MultiBranch pipeline of a service requires a
 `Pipeline Delete Event` configuring.
@@ -24,13 +24,13 @@ Note: The library may be set to a specific version with the `@` suffix, e.g.
 `defra-library@6`
 
 The `Pipeline Delete Event` event will need an additional parameter of
-`repoName` set to the name of the github repository of the current build
+`repoName` set to the name of the GitHub repository of the current build
 pipeline. As one cleanup pipeline is shared by all build pipelines this is
 required to notify the cleanup pipeline of the repository for the deleted
 branch.
 
 The cleanup function determines the PR number using the
-[github pulls API](https://developer.github.com/v3/pulls/). The API call
+[GitHub pulls API](https://developer.github.com/v3/pulls/). The API call
 searches the repository from the `repoName` parameter for closed pull requests
 on the branch that has just been deleted. The PR results are sorted by updated
 date in descending order. Ordinarily only one branch is created per PR, but
