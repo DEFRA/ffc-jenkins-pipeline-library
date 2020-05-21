@@ -97,7 +97,7 @@ class SecretScanner implements Serializable {
       def curlAuth = "curl --header 'Authorization: token $ctx.githubToken' --silent"
 
       def matchingRepos = SecretScanner.getMatchingRepos(ctx, curlAuth, githubOwner, repositoryPrefix)
-      def commitCheckDate = getCommitCheckDate(scanWindowHrs)
+      def commitCheckDate = SecretScanner.getCommitCheckDate(scanWindowHrs)
 
       ctx.echo("Commit check date: $commitCheckDate")
 
