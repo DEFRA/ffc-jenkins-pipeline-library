@@ -67,53 +67,8 @@ def reportSecrets(secretMessages, repo, channel) {
   notifySlack.sendMessage(channel, message, true)
 }
 
-// public
 def scanWithinWindow(githubCredentialId, dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs, excludeStrings, slackChannel="") {
-  withCredentials([string(credentialsId: githubCredentialId, variable: 'githubToken')]) {
-    def curlAuth = "curl --header 'Authorization: token $githubToken' --silent"
-
-    def matchingRepos = getMatchingRepos(curlAuth, githubOwner, repositoryPrefix)
-    def commitCheckDate = getCommitCheckDate(scanWindowHrs)
-
-    echo "Commit check date: $commitCheckDate"
-
-    def secretsFound = false
-
-    matchingRepos.each { repo ->
-      echo "Scanning $repo"
-
-      // We don't handle more than 100 branches on a repo. You shouldn't have more than 100 branches open.
-      def githubBranchUrl = "https://api.github.com/repos/$repo/branches?per_page=100"
-      def branchResults = sh returnStdout: true, script: "$curlAuth $githubBranchUrl"
-      def branches = readJSON text: branchResults
-      def commitShas = []
-
-      branches.each { branch ->
-        def githubCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${branch.name}\\&per_page=100"
-        def curlHeaders = sh returnStdout: true, script: "$curlAuth --head $githubCommitUrl"
-        def numPages = getNumPages(curlHeaders)
-
-        (numPages as Integer).times { page ->
-          def commitResults = sh returnStdout: true, script: "$curlAuth $githubCommitUrl\\&page=${page+1}"
-          def commits = readJSON text: commitResults
-          commits.each { commit -> commitShas.add(commit.sha) }
-        }
-      }
-
-      if (commitShas.size() > 0) {
-        def secretMessages = runTruffleHog(dockerImgName, repo, excludeStrings, commitShas)
-
-        if (!secretMessages.isEmpty()) {
-          secretsFound = true
-          reportSecrets(secretMessages, repo, slackChannel)
-        }
-      }
-
-      echo "Finished scanning $repo"
-    }
-
-    return secretsFound
-  }
+  return SecretScanner.scanWithinWindow(this, githubCredentialId, dockerImgName, githubOwner, repositoryPrefix, scanWindowHrs, excludeStrings, slackChannel)
 }
 
 // public
