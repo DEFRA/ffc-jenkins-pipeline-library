@@ -36,16 +36,20 @@ def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
 }
 
 def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartLocation="artifactory") {
-  def location = helmChartLocation.toLowerCase()
+  if (helmChartLocation) {
+    def location = helmChartLocation.toLowerCase()
 
-  if (location == 'acr') {
-    Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
-  }
-  else if (location == 'artifactory') {
-    Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
+    if (location == 'acr') {
+      Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
+    }
+    else if (location == 'artifactory') {
+      Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
+    }
+    else {
+      throw new Exception("Unknown Helm chart location: $helmChartLocation")
+    }
   }
   else {
-    throw new Exception("Unknown Helm chart location: $helmChartLocation")
+    Helm.publishChart(this, registry, chartName, tag)
   }
-
 }

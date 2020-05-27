@@ -67,7 +67,7 @@ def call(Map config=[:]) {
       }
       else {
         stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, repoName, identityTag)
+          helm.publishChart(DOCKER_REGISTRY, repoName, identityTag, config.helmChartLocation)
         }
 
         stage('Trigger GitHub release') {
