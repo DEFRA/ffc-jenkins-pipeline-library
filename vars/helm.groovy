@@ -18,16 +18,15 @@ def undeployChart(environment, chartName, tag) {
 
 def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
   if (helmChartLocation) {
-    def location = helmChartLocation.toLowerCase()
-
-    if (location == 'acr') {
-      Helm.publishChartToACR(this, registry, chartName, tag)
-    }
-    else if (location == 'artifactory') {
-      Helm.publishChart(this, registry, chartName, tag)
-    }
-    else {
-      throw new Exception("Unknown Helm chart location: $helmChartLocation")
+    switch (helmChartLocation.toLowerCase()) {
+      case 'artifactory':
+        Helm.publishChart(this, registry, chartName, tag)
+        break
+      case 'acr':
+        Helm.publishChartToACR(this, registry, chartName, tag)
+        break
+      default:
+        throw new Exception("Unknown Helm chart location: $helmChartLocation")
     }
   }
   else {
@@ -37,16 +36,15 @@ def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
 
 def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartLocation="artifactory") {
   if (helmChartLocation) {
-    def location = helmChartLocation.toLowerCase()
-
-    if (location == 'acr') {
-      Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
-    }
-    else if (location == 'artifactory') {
-      Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
-    }
-    else {
-      throw new Exception("Unknown Helm chart location: $helmChartLocation")
+    switch (helmChartLocation.toLowerCase()) {
+      case 'artifactory':
+        Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
+        break
+      case 'acr':
+        Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
+        break
+      default:
+        throw new Exception("Unknown Helm chart location: $helmChartLocation")
     }
   }
   else {
