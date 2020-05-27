@@ -26,7 +26,7 @@ def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
     Helm.publishChart(this, registry, chartName, tag)
   }
   else {
-    throw Exception("Unknown Helm chart location: $helmChartLocation")
+    throw new Exception("Unknown Helm chart location: $helmChartLocation")
   }
 }
 
@@ -40,7 +40,7 @@ def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChart
     Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
   }
   else {
-    throw Exception("Unknown Helm chart location: $helmChartLocation")
+    throw new Exception("Unknown Helm chart location: $helmChartLocation")
   }
 
 }
