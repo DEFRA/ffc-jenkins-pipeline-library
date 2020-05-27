@@ -17,16 +17,21 @@ def undeployChart(environment, chartName, tag) {
 }
 
 def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
-  def location = helmChartLocation.toLowerCase()
+  if (helmChartLocation) {
+    def location = helmChartLocation.toLowerCase()
 
-  if (location == 'acr') {
-    Helm.publishChartToACR(this, registry, chartName, tag)
-  }
-  else if (location == 'artifactory') {
-    Helm.publishChart(this, registry, chartName, tag)
+    if (location == 'acr') {
+      Helm.publishChartToACR(this, registry, chartName, tag)
+    }
+    else if (location == 'artifactory') {
+      Helm.publishChart(this, registry, chartName, tag)
+    }
+    else {
+      throw new Exception("Unknown Helm chart location: $helmChartLocation")
+    }
   }
   else {
-    throw new Exception("Unknown Helm chart location: $helmChartLocation")
+    Helm.publishChart(this, registry, chartName, tag)
   }
 }
 
