@@ -17,10 +17,12 @@ def undeployChart(environment, chartName, tag) {
 }
 
 def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
-  if (helmChartLocation == 'acr') {
+  def location = helmChartLocation.toLowerCase()
+
+  if (location == 'acr') {
     Helm.publishChartToACR(this, registry, chartName, tag)
   }
-  else if (helmChartLocation == 'artifactory')
+  else if (location == 'artifactory')
     Helm.publishChart(this, registry, chartName, tag)
   }
   else {
@@ -29,10 +31,12 @@ def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
 }
 
 def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartLocation="artifactory") {
-  if (helmChartLocation == 'acr') {
+  def location = helmChartLocation.toLowerCase()
+
+  if (location == 'acr') {
     Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
   }
-  else if (helmChartLocation == 'artifactory')
+  else if (location == 'artifactory')
     Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
   }
   else {
