@@ -16,18 +16,21 @@ def undeployChart(environment, chartName, tag) {
   Helm.undeployChart(this, environment, chartName, tag)
 }
 
-def publishChart(registry, chartName, tag) {
-  Helm.publishChart(this, registry, chartName, tag)
+def publishChart(registry, chartName, tag, helmChartLocation) {
+  if (helmChartLocation == 'acr') {
+    Helm.publishChartToACR(this, registry, chartName, tag)
+  }
+  else {
+    Helm.publishChart(this, registry, chartName, tag)
+  }
 }
 
-def publishChartToACR(registry, chartName, tag) {
-  Helm.publishChartToACR(this, registry, chartName, tag)
-}
+def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartLocation) {
+  if (helmChartLocation == 'acr') {
+    Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
+  }
+  else {
+    Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
+  }
 
-def deployRemoteChart(environment, namespace, chartName, chartVersion) {
-  Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
-}
-
-def deployRemoteChartFromACR(environment, namespace, chartName, chartVersion) {
-  Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
 }
