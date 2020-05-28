@@ -52,7 +52,7 @@ def call(Map config=[:]) {
       }
       else {
         stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, repoName, identityTag)
+          helm.publishChart(DOCKER_REGISTRY, repoName, identityTag, HELM_CHART_REPO_TYPE)
         }
         stage('Trigger GitHub release') {
           withCredentials([
@@ -65,7 +65,7 @@ def call(Map config=[:]) {
           withCredentials([
             string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
           ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': identityTag])
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': identityTag, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
           }
         }
       }

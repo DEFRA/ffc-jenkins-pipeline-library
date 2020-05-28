@@ -47,35 +47,36 @@ helm.undeployChart('dev', 'ffc-demo-web', 'pr53')
 
 Publishes the local Helm chart to an Artifactory Helm chart repository.
 
-Takes three parameters:
+Takes four parameters:
 - docker registry without the protocol
 - chart name
 - container image tag
+- Helm chart repository technology: 'artifactory' (default) or 'acr'
 
 Uses the environment variable `HELM_CHART_REPO_PUBLIC` (set within Jenkins)
-to provide the location of a packaged library chart.
+to provide the location of a packaged library chart template used to build the Helm chart. If the Helm chart server type is 'artifactory', the Artifactory repository is specified by an env var (set in Jenkins) - `ARTIFACTORY_REPO_URL`. If 'acr' is set, the docker registry (first parameter) is used.
 
 Example usage:
 
 ```
-helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
+helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master', 'artifactory')
 ```
 
 ## deployRemoteChart
 
 Deploys a Helm chart from a remote chart repository (Artifactory) to Kubernetes.
 
-Takes four parameters:
+Takes five parameters:
 - the environment to deploy into
 - the Kubernetes namespace to deploy into
 - the chart name
 - the chart version
+- Helm chart repository technology: 'artifactory' (default) or 'acr'
 
-The Artifactory repository is specified by an env var (set in Jenkins) -
-`ARTIFACTORY_REPO_URL`.
+If the Helm chart server type is 'artifactory', the Artifactory repository is specified by an env var (set in Jenkins) - `ARTIFACTORY_REPO_URL`. If 'acr' is set, the `DOCKER_REGISTRY` is used.
 
 Example usage:
 
 ```
-helm.deployRemoteChart('dev', 'ffc-demo', 'ffc-demo-web', '1.1.7')
+helm.deployRemoteChart('dev', 'ffc-demo', 'ffc-demo-web', '1.1.7',  'artifactory')
 ```

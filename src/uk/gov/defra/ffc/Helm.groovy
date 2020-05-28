@@ -64,6 +64,29 @@ class Helm implements Serializable {
     }
   }
 
+  static def publishChartToACR(ctx, registry, chartName, tag) {
+    ctx.withEnv(['HELM_EXPERIMENTAL_OCI=1']) {
+      ctx.withCredentials([
+        ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
+      ]) {
+        ctx.dir('helm-charts') {
+          def helmChartName = "$registry/$chartName:helm-$tag"
+
+          ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
+
+          Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
+          ctx.sh("helm package ../helm/$chartName --version $tag --dependency-update")
+
+          ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
+          ctx.sh("helm chart save $chartName-${tag}.tgz $helmChartName")
+          ctx.sh("helm chart push $helmChartName")
+
+          ctx.deleteDir()
+        }
+      }
+    }
+  }
+
   static def deployRemoteChart(ctx, environment, namespace, chartName, chartVersion) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       ctx.withCredentials([
@@ -73,6 +96,31 @@ class Helm implements Serializable {
         Helm.addHelmRepo(ctx, 'ffc', "${ctx.ARTIFACTORY_REPO_URL}ffc-helm-virtual")
         ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
         ctx.sh("helm upgrade --namespace=$namespace $chartName -f $ctx.values --set namespace=$namespace ffc/$chartName $extraCommands")
+      }
+    }
+  }
+
+  static def deployRemoteChartFromACR(ctx, environment, namespace, chartName, chartVersion) {
+    ctx.withEnv(['HELM_EXPERIMENTAL_OCI=1']) {
+      ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+        ctx.withCredentials([
+          ctx.file(credentialsId: "$chartName-$environment-values", variable: 'values'),
+          ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
+        ]) {
+          ctx.dir('helm-install') {
+            def extraCommands = Helm.getExtraCommands(chartVersion)
+            def helmChartName = "$ctx.DOCKER_REGISTRY/$chartName:helm-$chartVersion"
+
+            ctx.sh("helm registry login $ctx.DOCKER_REGISTRY --username $ctx.username --password $ctx.password")
+            ctx.sh("helm chart pull $helmChartName")
+            ctx.sh("helm chart export $helmChartName --destination .")
+
+            ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
+            ctx.sh("helm upgrade $chartName $chartName --namespace=$namespace -f $ctx.values --set namespace=$namespace $extraCommands")
+
+            ctx.deleteDir()
+          }
+        }
       }
     }
   }

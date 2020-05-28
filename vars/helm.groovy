@@ -16,10 +16,38 @@ def undeployChart(environment, chartName, tag) {
   Helm.undeployChart(this, environment, chartName, tag)
 }
 
-def publishChart(registry, chartName, tag) {
-  Helm.publishChart(this, registry, chartName, tag)
+def publishChart(registry, chartName, tag, helmChartRepoType="artifactory") {
+  if (helmChartRepoType) {
+    switch (helmChartRepoType.toLowerCase()) {
+      case 'artifactory':
+        Helm.publishChart(this, registry, chartName, tag)
+        break
+      case 'acr':
+        Helm.publishChartToACR(this, registry, chartName, tag)
+        break
+      default:
+        throw new Exception("Unknown Helm chart location: $helmChartRepoType")
+    }
+  }
+  else {
+    Helm.publishChart(this, registry, chartName, tag)
+  }
 }
 
-def deployRemoteChart(environment, namespace, chartName, chartVersion) {
-  Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
+def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartRepoType="artifactory") {
+  if (helmChartRepoType) {
+    switch (helmChartRepoType.toLowerCase()) {
+      case 'artifactory':
+        Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
+        break
+      case 'acr':
+        Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
+        break
+      default:
+        throw new Exception("Unknown Helm chart location: $helmChartRepoType")
+    }
+  }
+  else {
+    Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
+  }
 }
