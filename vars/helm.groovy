@@ -16,9 +16,9 @@ def undeployChart(environment, chartName, tag) {
   Helm.undeployChart(this, environment, chartName, tag)
 }
 
-def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
-  if (helmChartLocation) {
-    switch (helmChartLocation.toLowerCase()) {
+def publishChart(registry, chartName, tag, helmChartRepoType="artifactory") {
+  if (helmChartRepoType) {
+    switch (helmChartRepoType.toLowerCase()) {
       case 'artifactory':
         Helm.publishChart(this, registry, chartName, tag)
         break
@@ -26,7 +26,7 @@ def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
         Helm.publishChartToACR(this, registry, chartName, tag)
         break
       default:
-        throw new Exception("Unknown Helm chart location: $helmChartLocation")
+        throw new Exception("Unknown Helm chart location: $helmChartRepoType")
     }
   }
   else {
@@ -34,9 +34,9 @@ def publishChart(registry, chartName, tag, helmChartLocation="artifactory") {
   }
 }
 
-def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartLocation="artifactory") {
-  if (helmChartLocation) {
-    switch (helmChartLocation.toLowerCase()) {
+def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartRepoType="artifactory") {
+  if (helmChartRepoType) {
+    switch (helmChartRepoType.toLowerCase()) {
       case 'artifactory':
         Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
         break
@@ -44,10 +44,10 @@ def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChart
         Helm.deployRemoteChartFromACR(this, environment, namespace, chartName, chartVersion)
         break
       default:
-        throw new Exception("Unknown Helm chart location: $helmChartLocation")
+        throw new Exception("Unknown Helm chart location: $helmChartRepoType")
     }
   }
   else {
-    Helm.publishChart(this, registry, chartName, tag)
+    Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
   }
 }
