@@ -4,13 +4,13 @@ import uk.gov.defra.ffc.Helm
 import uk.gov.defra.ffc.Utils
 
 class Tests implements Serializable {
-  static def runTests(ctx, projectName, serviceName, buildNumber, identityTag) {
+  static def runTests(ctx, projectName, serviceName, buildNumber, tag) {
     try {
       ctx.sh('mkdir -p test-output')
       ctx.sh('chmod 777 test-output')
-      ctx.sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
+      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
     } finally {
-      ctx.sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
+      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
     }
   }
 

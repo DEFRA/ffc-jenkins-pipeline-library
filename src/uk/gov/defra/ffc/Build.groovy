@@ -21,9 +21,9 @@ class Build implements Serializable {
     }
   }
 
-  static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, identityTag) {
+  static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
     ctx.docker.withRegistry("https://$registry", credentialsId) {
-      ctx.sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache")
+      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache")
     }
   }
 
@@ -36,18 +36,18 @@ class Build implements Serializable {
     def pr = ctx.sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
     Build.verifyCommitBuildable(ctx, pr)
 
-    def identityTag
+    def tag
 
     if (branch == 'master') {
-      identityTag = version
+      tag = version
     } else {
       def rawTag = pr ? "pr$pr" : branch
-      identityTag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
+      tag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
     def mergedPrNo = Utils.getMergedPrNo(ctx)
     def repoUrl = Utils.getRepoUrl(ctx)
-    return [repoName, pr, identityTag, mergedPrNo]
+    return [repoName, pr, tag, mergedPrNo]
   }
 
   static def updateGithubCommitStatus(ctx, message, state) {

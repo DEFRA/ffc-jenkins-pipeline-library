@@ -18,12 +18,12 @@ def setGithubStatusFailure(message = '') {
   Build.updateGithubCommitStatus(this, message, 'FAILURE')
 }
 
-def buildTestImage(credentialsId, registry, projectName, buildNumber, identityTag) {
-  Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, identityTag)
+def buildTestImage(credentialsId, registry, projectName, buildNumber, tag) {
+  Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, tag)
 }
 
-def runTests(projectName, serviceName, buildNumber, identityTag) {
-  Tests.runTests(this, projectName, serviceName, buildNumber, identityTag)
+def runTests(projectName, serviceName, buildNumber, tag) {
+  Tests.runTests(this, projectName, serviceName, buildNumber, tag)
 }
 
 def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {

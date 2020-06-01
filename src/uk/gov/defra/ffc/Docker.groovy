@@ -3,9 +3,9 @@ package uk.gov.defra.ffc
 import uk.gov.defra.ffc.Utils
 
 class Docker implements Serializable {
-  static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, identityTag) {
+  static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
     ctx.docker.withRegistry("https://$registry", credentialsId) {
-      ctx.sh("docker-compose -p $projectName-$identityTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache")
+      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache")
     }
   }
 
