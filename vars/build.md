@@ -11,16 +11,16 @@ Supplied with the version of the repo being built, an array containing the
 following will be returned:
 - the repo name, e.g. `ffc-demo-web`
 - the PR number, i.e. `53`
-- the identity tag that will be used, either the SemVer number (for master
+- the tag that will be used, either the SemVer number (for master
   branch) or the PR number prefixed with pr, i.e. `pr53`
 - the merged PR number
 
 Example usage:
 
 ```
-(repoName, pr, identityTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
+(repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
     or
-(repoName, pr, identityTag, mergedPrNo) = build.getVariables(version.getCSProjVersion())
+(repoName, pr, tag, mergedPrNo) = build.getVariables(version.getCSProjVersion())
 ```
 
 ## updateGithubCommitStatus

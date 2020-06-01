@@ -4,7 +4,7 @@ def call(Map config=[:]) {
   def lcovFile = './test-output/lcov.info'
   def repoName = ''
   def pr = ''
-  def identityTag = ''
+  def tag = ''
   def mergedPrNo = ''
 
   node {
@@ -14,8 +14,8 @@ def call(Map config=[:]) {
         build.setGithubStatusPending()
       }
 
-      stage('Set PR, and identityTag variables') {
-        (repoName, pr, identityTag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
+      stage('Set PR, and tag variables') {
+        (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
 
       if (pr != '') {
@@ -33,7 +33,7 @@ def call(Map config=[:]) {
       }
 
       stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, identityTag)
+        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }
 
       if (config.containsKey('buildClosure')) {
@@ -41,7 +41,7 @@ def call(Map config=[:]) {
       }
 
       stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER, identityTag)
+        build.runTests(repoName, repoName, BUILD_NUMBER, tag)
       }
 
       stage('Create JUnit report') {
@@ -57,24 +57,24 @@ def call(Map config=[:]) {
       }
 
       stage('Push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, identityTag)
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
       if (pr != '') {
         stage('Helm install') {
-          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, identityTag)
+          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag)
         }
       }
       else {
         stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, repoName, identityTag, HELM_CHART_REPO_TYPE)
+          helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
         }
 
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            release.trigger(identityTag, repoName, identityTag, gitToken)
+            release.trigger(tag, repoName, tag, gitToken)
           }
         }
 
@@ -82,7 +82,7 @@ def call(Map config=[:]) {
           withCredentials([
             string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
           ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': identityTag, 'environment': config.environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': config.environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
           }
         }
       }

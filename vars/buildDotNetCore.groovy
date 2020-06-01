@@ -1,5 +1,5 @@
 def call(Map config=[:]) {
-  def identityTag = ''
+  def tag = ''
   def mergedPrNo = ''
   def pr = ''
   def repoName = ''
@@ -10,8 +10,8 @@ def call(Map config=[:]) {
       stage('Set GitHub status as pending') {
         build.setGithubStatusPending()
       }
-      stage('Set PR, and identityTag variables') {
-        (repoName, pr, identityTag, mergedPrNo) = build.getVariables(version.getCSProjVersion(config.project))
+      stage('Set PR, and tag variables') {
+        (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getCSProjVersion(config.project))
       }
       if (pr != '') {
         stage('Verify version incremented') {
@@ -32,10 +32,10 @@ def call(Map config=[:]) {
       }
 
       stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, identityTag)
+        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }
       stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER, identityTag)
+        build.runTests(repoName, repoName, BUILD_NUMBER, tag)
       }
 
       if (config.containsKey('testClosure')) {
@@ -43,29 +43,29 @@ def call(Map config=[:]) {
       }
 
       stage('Push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, identityTag)
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
       if (pr != '') {
         stage('Helm install') {
-          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, identityTag)
+          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag)
         }
       }
       else {
         stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, repoName, identityTag, HELM_CHART_REPO_TYPE)
+          helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
         }
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            release.trigger(identityTag, repoName, identityTag, gitToken)
+            release.trigger(tag, repoName, tag, gitToken)
           }
         }
         stage('Trigger Deployment') {
           withCredentials([
             string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
           ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': identityTag, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
           }
         }
       }
