@@ -24,6 +24,10 @@ def call(Map config=[:]) {
         }
       }
 
+      stage('npm audit') {
+        build.npmAudit()
+      }
+
       if (config.containsKey('validateClosure')) {
         config['validateClosure']()
       }

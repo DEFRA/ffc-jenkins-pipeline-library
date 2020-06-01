@@ -61,4 +61,8 @@ class Build implements Serializable {
       statusResultSource: [ $class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: message, state: state]] ]
     ])
   }
+
+  static def npmAudit(ctx) {
+    ctx.sh("npm audit")
+  }
 }

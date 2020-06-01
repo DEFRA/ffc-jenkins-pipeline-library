@@ -140,3 +140,7 @@ Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 ```
 build.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', BUILD_NUMBER)
 ```
+
+## npmAudit
+
+Runs [npm audit](https://docs.npmjs.com/cli/audit) against the project.

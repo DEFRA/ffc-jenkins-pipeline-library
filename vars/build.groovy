@@ -29,3 +29,7 @@ def runTests(projectName, serviceName, buildNumber, tag) {
 def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
+
+def npmAudit() {
+  Build.npmAudit(this)
+}
