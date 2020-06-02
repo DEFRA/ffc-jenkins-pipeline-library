@@ -70,4 +70,17 @@ class Build implements Serializable {
     // without affecting the build status
     ctx.sh(returnStatus: !failOnIssues, script: "npm audit --audit-level=$auditLevel --$logType")
   }
+
+  static def snykTest(ctx) {
+    ctx.docker('snyk/snyk-cli:npm').inside {
+      ctx.withCredentials([
+        ctx.string(credentialsId: 'snyk-token', variable: 'snykToken')
+        ctx.string(credentialsId: 'snyk-org', variable: 'snykOrg')
+      ]) {
+        ctx.sh("npm ci")
+        ctx.sh("snyk auth $snykToken")
+        ctx.sh("snyk test --org=$snykOrg --fail-on=upgradable --severity-threshold=medium")
+      }
+    }
+  }
 }

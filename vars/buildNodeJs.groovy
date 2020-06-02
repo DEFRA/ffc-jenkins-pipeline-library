@@ -28,6 +28,10 @@ def call(Map config=[:]) {
         config['validateClosure']()
       }
 
+      stage('Snyk test') {
+        build.snykTest()
+      }
+
       stage('Helm lint') {
         test.lintHelm(repoName)
       }
