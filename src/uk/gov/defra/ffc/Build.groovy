@@ -72,10 +72,6 @@ class Build implements Serializable {
   }
 
   static def snykTest(ctx) {
-    ctx.withCredentials([
-      ctx.string(credentialsId: 'snyk-token', variable: 'snykToken')
-    ]) {
-      ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: ctx.snykToken, failOnIssues: false, organisation: 'defra-4kb')
-    }
+    ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token', failOnIssues: false, organisation: 'defra-4kb')
   }
 }
