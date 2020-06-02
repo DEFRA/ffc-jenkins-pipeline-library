@@ -72,10 +72,12 @@ class Build implements Serializable {
   }
 
   static def snykTest(ctx) {
-    ctx.docker('snyk/snyk-cli:npm').inside {
+    ctx.docker.image('snyk/snyk-cli:npm').inside {
+      ctx.echo("running inside the snyk container")
       ctx.withCredentials([
         ctx.string(credentialsId: 'snyk-token', variable: 'snykToken')
       ]) {
+        ctx.echo("install in container")
         ctx.sh("npm ci")
         ctx.sh("snyk auth $snykToken")
         ctx.sh("snyk test --org=defra-4kb --fail-on=upgradable --severity-threshold=medium")
