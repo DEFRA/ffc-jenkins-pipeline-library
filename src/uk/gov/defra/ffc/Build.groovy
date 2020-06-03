@@ -62,7 +62,8 @@ class Build implements Serializable {
     ])
   }
 
-  static def npmAudit(ctx, auditLevel) {
-    ctx.sh("npm audit --audit-level=$auditLevel")
+  static def npmAudit(ctx, auditLevel, logType) {
+    auditLevel = auditLevel ?: 'moderate'
+    ctx.sh("npm audit --audit-level=$auditLevel --$logType")
   }
 }

@@ -24,16 +24,16 @@ def call(Map config=[:]) {
         }
       }
 
-      stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel)
-      }
-
       if (config.containsKey('validateClosure')) {
         config['validateClosure']()
       }
 
       stage('Helm lint') {
         test.lintHelm(repoName)
+      }
+
+      stage('npm audit') {
+        build.npmAudit(config.npmAuditLevel, config.npmLogType)
       }
 
       stage('Build test image') {

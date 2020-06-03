@@ -30,6 +30,6 @@ def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
 
-def npmAudit(auditLevel = 'moderate') {
-  Build.npmAudit(this, auditLevel)
+def npmAudit(auditLevel, logType) {
+  Build.npmAudit(this, auditLevel, logType)
 }
