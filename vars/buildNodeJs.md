@@ -13,10 +13,17 @@ For the details of what happens please review the
 buildNodeJs environment: 'dev'
 ```
 
-By default an [npm audit](https://docs.npmjs.com/cli/audit) will run and
-fail the build if there are any vulnerabilities at `moderate` level or above.
-It is possible to override the level via the `npmAuditLevel` config parameter.
-The audit level is not validated beyond the validation npm audit performs.
-Currently, acceptable levels are `low`, `moderate` and `high`. Example setting
-level to fail at as `high` -
-`buildNodeJs environment: 'dev' npmAuditLevel: 'high'`.
+By default an [npm audit](https://docs.npmjs.com/cli/audit) will run for every
+build. Currently the job will not fail the build regardless of any
+vulnerabilities being found. This is a temporary measure and when it changes,
+the library will be a new `MAJOR` version as there is a high likelihood
+existing builds will fail.
+The job has been setup to allow several options to be configured, details of
+those options are available in [build](build.md). In order to override the
+options when running the `buildNodeJs` pipeline, the config option requires the
+keys `npmAuditLevel` and `npmLogType`.
+An example overriding the default values:
+
+```
+buildNodeJs environment: 'dev', npmAuditLevel: 'low', npmLogType: 'json'
+```

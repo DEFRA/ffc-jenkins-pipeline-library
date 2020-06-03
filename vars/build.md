@@ -143,16 +143,17 @@ build.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web',
 
 ## npmAudit
 
-Runs [npm audit](https://docs.npmjs.com/cli/audit) against the project. By
-default the audit level is set to `moderate`. It is possible to override the
-level by passing the `npmAuditLevel` parameter.
+Runs [npm audit](https://docs.npmjs.com/cli/audit) against the project.
 
-Takes one parameter:
-- the level of vulnerabilities at which the audit should fail, set to
-  `moderate` by default
+Takes two parameters:
+- `auditLevel` - level of vulnerabilities at which the audit should fail.
+  Default is `moderate`. Suitable options are detailed in the
+  [audit docs](https://docs.npmjs.com/cli/audit.html#synopsis)
+- `logType` - type of log to output. Default is a long format. Suitable options
+  are `parseable` or `json`
 
 Example usage:
 
 ```
-build.npmAudit('high')
+build.npmAudit('critical', 'parseable')
 ```
