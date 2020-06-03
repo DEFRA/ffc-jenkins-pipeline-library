@@ -29,7 +29,7 @@ def call(Map config=[:]) {
       }
 
       stage('Snyk test') {
-        build.snykTest()
+        build.snykTest(config.synkFailOnIssues, config.synkOrganisation)
       }
 
       stage('Helm lint') {

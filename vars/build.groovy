@@ -34,6 +34,6 @@ def npmAudit(auditLevel, logType, failOnIssues) {
   Build.npmAudit(this, auditLevel, logType, failOnIssues)
 }
 
-def snykTest() {
-  Build.snykTest(this)
+def snykTest(failOnIssues = false, organisation = 'defra-4kb') {
+  Build.snykTest(this, failOnIssues, organisation)
 }
