@@ -110,7 +110,6 @@ def call(Map config=[:]) {
       }
 
       stage('Send build failure slack notification') {
-        echo("Build failed with message: $e.message")
         notifySlack.buildFailure(e.message, '#generalbuildfailures')
       }
 
