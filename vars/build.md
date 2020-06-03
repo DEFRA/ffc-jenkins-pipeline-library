@@ -166,9 +166,9 @@ build.npmAudit('critical', null, true)
 Runs [snyk test](https://support.snyk.io/hc/en-us/articles/360003812578-CLI-reference) against the project.
 
 Takes three parameters:
-- whether the job should fail when issues are detected. Default is `false`
-- the organisation against which the report should be recorded. Default is `defra-4kb`
-- the severity of issues to be reported. Default is `medium`
+- `failOnIssues` - should the job fail when issues are detected. Default is `false`
+- `organisation` - against which the report should be recorded. Default is `defra-4kb`
+- `severity` - of issues to be reported. Default is `medium`
 
 ```
 build.snykTest(true, 'my-org-name', 'low')

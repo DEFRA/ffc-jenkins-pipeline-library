@@ -30,15 +30,15 @@ buildNodeJs environment: 'dev', npmAuditLevel: 'low', npmAuditLogType: 'json', n
 
 By default a
 [snyk test](https://support.snyk.io/hc/en-us/articles/360003812578#UUID-c88e66cf-431c-9ab1-d388-a8f82991c6e0)
-will run during the build. This is achieved through the use the
+will run during the build. This is achieved through the use of the
 [snyk security scanner](https://plugins.jenkins.io/snyk-security-scanner/)
 plugin for Jenkins.
 The default settings will not fail the build if vulnerabilities are
-detected, however, this is likely to change in the future (a MAJOR version
-increment to the library will be made when this happens).
+detected, (this is likely to change in the future at which time a MAJOR version
+increment to the library will be made).
 The job has been setup to allow several options to be configured, details of
 those options are available in [build](build.md). In order to override the
-options from the `buildNodeJs` pipeline the config requires the keys
+options from the `buildNodeJs` pipeline the config object requires the keys
 `snykFailOnIssues`, `snykOrganisation` and `synkSeverity`.
 An example overriding the default values:
 
