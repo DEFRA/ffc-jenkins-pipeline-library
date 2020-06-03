@@ -141,7 +141,6 @@ Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 build.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', BUILD_NUMBER)
 ```
 
-<<<<<<< HEAD
 ## npmAudit
 
 Runs [npm audit](https://docs.npmjs.com/cli/audit) against the project.
@@ -160,18 +159,17 @@ Example usage:
 
 ```
 build.npmAudit('critical', null, true)
-=======
+```
+
 ## snykTest
 
 Runs [snyk test](https://support.snyk.io/hc/en-us/articles/360003812578-CLI-reference) against the project.
 
-Takes two parameters:
-- whether the job should fail when issues are detected. Set to `false` by
-  default
-- the organisation against which the report should be counted. Set to
-  `defra-4kb` by default
+Takes three parameters:
+- whether the job should fail when issues are detected. Default is `false`
+- the organisation against which the report should be recorded. Default is `defra-4kb`
+- the severity of issues to be reported. Default is `medium`
 
 ```
-build.snykTest(true, `my-org-name`)
->>>>>>> bb29a9a... docs: add documentation for snyk test job
+build.snykTest(true, 'my-org-name', 'low')
 ```

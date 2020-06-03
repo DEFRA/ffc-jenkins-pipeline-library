@@ -28,16 +28,16 @@ def call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      stage('Snyk test') {
-        build.snykTest(config.synkFailOnIssues, config.synkOrganisation)
-      }
-
       stage('Helm lint') {
         test.lintHelm(repoName)
       }
 
       stage('npm audit') {
         build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues)
+      }
+
+      stage('Snyk test') {
+        build.snykTest(config.synkFailOnIssues, config.synkOrganisation, config.synkSeverity)
       }
 
       stage('Build test image') {

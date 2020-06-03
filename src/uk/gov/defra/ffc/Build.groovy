@@ -71,7 +71,8 @@ class Build implements Serializable {
     ctx.sh(returnStatus: !failOnIssues, script: "npm audit --audit-level=$auditLevel --$logType")
   }
 
-  static def snykTest(ctx, failOnIssues, organisation) {
-    ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token', failOnIssues: failOnIssues, organisation: organisation)
+  static def snykTest(ctx, failOnIssues, organisation, severity) {
+    ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token')
+    //, failOnIssues: failOnIssues, organisation: organisation, severity: severity)
   }
 }
