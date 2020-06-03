@@ -34,9 +34,9 @@ def npmAudit(auditLevel, logType, failOnIssues) {
   Build.npmAudit(this, auditLevel, logType, failOnIssues)
 }
 
-def snykTest(failOnIssues=false, organisation='defra-4kb', severity='medium') {
-  echo("failOnIssues: $failOnIssues")
-  echo("organisation: $organisation")
-  echo("severity: $severity")
+def snykTest(failOnIssues, organisation, severity) {
+  failOnIssues = failOnIssues ?: false
+  organisation = organisation ?: 'defra-4kb'
+  severity = severity ?: 'medium'
   Build.snykTest(this, failOnIssues, organisation, severity)
 }
