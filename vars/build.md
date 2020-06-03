@@ -151,7 +151,7 @@ Takes two parameters:
   [audit docs](https://docs.npmjs.com/cli/audit.html#synopsis)
 - `logType` - type of log to output. Default is `parseable` due to its succinct
   nature. Other options include `json` and if the default option of the very
-  long log is required, `null` can be used.
+  long log is required any truthy value can be used e.g. `long`.
 
 Example usage:
 
