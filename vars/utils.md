@@ -9,6 +9,10 @@ Below are the methods available on the script. They can be executed by calling
 
 Return the message of the latest commit for the current repository.
 
+## getRepoName
+
+Return the name for the current git repository.
+
 ## getCommitSha
 
 Return the SHA hash of the latest commit for the current repository, i.e.

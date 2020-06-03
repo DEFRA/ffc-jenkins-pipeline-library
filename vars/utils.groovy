@@ -11,3 +11,7 @@ def getCommitMessage() {
 def getCommitSha() {
   return Utils.getCommitSha(this)
 }
+
+def getRepoName() {
+  return Utils.getRepoName(this)
+}
