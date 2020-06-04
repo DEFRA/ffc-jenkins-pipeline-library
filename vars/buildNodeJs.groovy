@@ -37,7 +37,7 @@ def call(Map config=[:]) {
       }
 
       stage('Snyk test') {
-        build.snykTest(config.synkFailOnIssues, config.synkOrganisation, config.synkSeverity)
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
       }
 
       stage('Build test image') {

@@ -39,7 +39,7 @@ increment to the library will be made).
 The job has been setup to allow several options to be configured, details of
 those options are available in [build](build.md). In order to override the
 options from the `buildNodeJs` pipeline the config object requires the keys
-`snykFailOnIssues`, `snykOrganisation` and `synkSeverity`.
+`snykFailOnIssues`, `snykOrganisation` and `snykSeverity`.
 An example overriding the default values:
 
 ```
