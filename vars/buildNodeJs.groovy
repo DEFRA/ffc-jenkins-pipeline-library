@@ -103,7 +103,7 @@ def call(Map config=[:]) {
         build.setGithubStatusSuccess()
       }
     } catch(e) {
-      echo("ERROR: $e")
+      echo("ERROR: ${e.toString()}")
       echo("Build failed with message: $e.message")
 
       stage('Set GitHub status as fail') {
