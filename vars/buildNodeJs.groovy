@@ -112,9 +112,8 @@ def call(Map config=[:]) {
               errMessage = errCause.getShortDescription()
             }
           }
-        } else {
-          errMessage = 'No error message available.'
         }
+        errMessage = errMessage ?: 'No error message available.'
       }
       echo("Build failed with message: $errMessage")
 
