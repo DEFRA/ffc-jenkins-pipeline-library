@@ -105,6 +105,7 @@ def call(Map config=[:]) {
     } catch(e) {
       echo("ERROR getResult: ${e.getResult()}")
       echo("ERROR getCauses: ${e.getCauses()}")
+      echo("ERROR getCauses description: ${e.getCauses()[0].getShortDescription}")
       echo("Build failed with message: $e.message")
 
       stage('Set GitHub status as fail') {
