@@ -103,28 +103,15 @@ def call(Map config=[:]) {
         build.setGithubStatusSuccess()
       }
     } catch(e) {
-      def errMessage = e.message
-      if (!errMessage) {
-        def errCauses = e.getCauses()
-        if (errCauses) {
-          def errMessages = []
-          errCauses.each { errCause ->
-            if (errCause instanceof io.snyk.jenkins.workflow.FoundIssuesCause) {
-              errMessages.add(errCause.getShortDescription())
-            }
-          }
-          errMessage = errMessages.join(', ')
-        }
-        errMessage = errMessage ?: 'No error message available.'
-      }
-      echo("Build failed with message: $errMessage")
+      def errMsg = utils.getErrorMessage(e)
+      echo("Build failed with message: $errMsg")
 
       stage('Set GitHub status as fail') {
-        build.setGithubStatusFailure(errMessage)
+        build.setGithubStatusFailure(errMsg)
       }
 
       stage('Send build failure slack notification') {
-        notifySlack.buildFailure(errMessage, '#generalbuildfailures')
+        notifySlack.buildFailure(errMsg, '#generalbuildfailures')
       }
 
       if (config.containsKey('failureClosure')) {

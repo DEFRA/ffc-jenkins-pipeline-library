@@ -18,6 +18,13 @@ Return the name for the current git repository.
 Return the SHA hash of the latest commit for the current repository, i.e.
 `9fd0a77d3eaa3d4370d3f31158f37dd8abd19fae`
 
+## getErrorMessage
+
+Return `message` from the passed error argument, if it exists. If there is no
+`message` property the argument will be checked for `getCauses`. If there are
+causes these will be returned in a comma separated string. If there are no
+causes the default message will be returned i.e. `No error message available.`.
+
 ## replaceInFile
 
 Utility method to globally substitute text in a file.
