@@ -62,11 +62,12 @@ class Build implements Serializable {
     ])
   }
 
-  static def npmAudit(ctx, auditLevel, logType) {
+  static def npmAudit(ctx, auditLevel, logType, failOnIssues) {
     auditLevel = auditLevel ?: 'moderate'
     logType = logType ?: 'parseable'
+    failOnIssues = failOnIssues ?: false
     // setting `returnStatus` means the sh cmd can return non-zero exit codes
     // without affecting the build status
-    ctx.sh(returnStatus: true, script: "npm audit --audit-level=$auditLevel --$logType")
+    ctx.sh(returnStatus: !failOnIssues, script: "npm audit --audit-level=$auditLevel --$logType")
   }
 }

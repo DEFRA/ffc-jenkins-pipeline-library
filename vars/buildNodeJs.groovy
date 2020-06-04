@@ -33,7 +33,7 @@ def call(Map config=[:]) {
       }
 
       stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmLogType)
+        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues)
       }
 
       stage('Build test image') {
