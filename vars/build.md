@@ -140,3 +140,23 @@ Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 ```
 build.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', BUILD_NUMBER)
 ```
+
+## npmAudit
+
+Runs [npm audit](https://docs.npmjs.com/cli/audit) against the project.
+
+Takes three parameters:
+- `auditLevel` - level of vulnerabilities at which the audit will fail.
+  Default is `moderate`. Suitable options are detailed in the
+  [audit docs](https://docs.npmjs.com/cli/audit.html#synopsis)
+- `logType` - type of log to output. Default is `parseable` due to its succinct
+  nature. Other options include `json` and if the default option of the very
+  long log is required any truthy value can be used e.g. `long`.
+- `failOnIssues` - flag to determine if the step should fail if issues are
+  found in the audit. Default is `false`
+
+Example usage:
+
+```
+build.npmAudit('critical', null, true)
+```

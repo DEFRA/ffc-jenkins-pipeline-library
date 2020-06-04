@@ -61,4 +61,13 @@ class Build implements Serializable {
       statusResultSource: [ $class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: message, state: state]] ]
     ])
   }
+
+  static def npmAudit(ctx, auditLevel, logType, failOnIssues) {
+    auditLevel = auditLevel ?: 'moderate'
+    logType = logType ?: 'parseable'
+    failOnIssues = failOnIssues ?: false
+    // setting `returnStatus` means the sh cmd can return non-zero exit codes
+    // without affecting the build status
+    ctx.sh(returnStatus: !failOnIssues, script: "npm audit --audit-level=$auditLevel --$logType")
+  }
 }

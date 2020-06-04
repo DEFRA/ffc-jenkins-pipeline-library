@@ -32,6 +32,10 @@ def call(Map config=[:]) {
         test.lintHelm(repoName)
       }
 
+      stage('npm audit') {
+        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues)
+      }
+
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }
