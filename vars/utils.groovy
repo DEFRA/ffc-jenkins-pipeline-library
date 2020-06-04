@@ -15,3 +15,7 @@ def getCommitSha() {
 def getRepoName() {
   return Utils.getRepoName(this)
 }
+
+def getErrorMessage(e) {
+  return Utils.getErrorMessage(e)
+}

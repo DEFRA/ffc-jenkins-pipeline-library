@@ -36,6 +36,10 @@ def call(Map config=[:]) {
         build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues)
       }
 
+      stage('Snyk test') {
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
+      }
+
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }
@@ -99,14 +103,15 @@ def call(Map config=[:]) {
         build.setGithubStatusSuccess()
       }
     } catch(e) {
-      echo("Build failed with message: $e.message")
+      def errMsg = utils.getErrorMessage(e)
+      echo("Build failed with message: $errMsg")
 
       stage('Set GitHub status as fail') {
-        build.setGithubStatusFailure(e.message)
+        build.setGithubStatusFailure(errMsg)
       }
 
       stage('Send build failure slack notification') {
-        notifySlack.buildFailure(e.message, '#generalbuildfailures')
+        notifySlack.buildFailure(errMsg, '#generalbuildfailures')
       }
 
       if (config.containsKey('failureClosure')) {

@@ -33,3 +33,7 @@ def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
 def npmAudit(auditLevel, logType, failOnIssues) {
   Build.npmAudit(this, auditLevel, logType, failOnIssues)
 }
+
+def snykTest(failOnIssues, organisation, severity) {
+  Build.snykTest(this, failOnIssues, organisation, severity)
+}
