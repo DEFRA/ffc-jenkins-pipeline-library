@@ -11,7 +11,8 @@ class Helm implements Serializable {
   }
 
   static def getExtraCommands(tag) {
-    return "--set labels.version=$tag --install --atomic --version=$tag"
+    def moreExtra = "--set testValue=\"Injected from Jenkins Lib\""
+    return "$moreExtra --set labels.version=$tag --install --atomic --version=$tag"
   }
 
   static def getPrCommands(registry, chartName, tag, buildNumber) {
