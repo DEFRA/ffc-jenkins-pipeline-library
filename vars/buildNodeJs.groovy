@@ -44,13 +44,13 @@ def call(Map config=[:]) {
         build.runTests(repoName, repoName, BUILD_NUMBER, identityTag)
       }
 
-      // stage('Create JUnit report') {
-      //   test.createJUnitReport()
-      // }
+      stage('Create JUnit report') {
+        test.createJUnitReport()
+      }
 
-      // stage('Fix lcov report') {
-      //   utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      // }
+      stage('Fix lcov report') {
+        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      }
 
       if (config.containsKey('testClosure')) {
         config['testClosure']()
@@ -99,9 +99,9 @@ def call(Map config=[:]) {
         build.setGithubStatusFailure(e.message)
       }
 
-      // stage('Send build failure slack notification') {
-      //   notifySlack.buildFailure(e.message, '#generalbuildfailures')
-      // }
+      stage('Send build failure slack notification') {
+        notifySlack.buildFailure(e.message, '#generalbuildfailures')
+      }
 
       if (config.containsKey('failureClosure')) {
         config['failureClosure']()
@@ -109,9 +109,9 @@ def call(Map config=[:]) {
 
       throw e
     } finally {
-      // stage('Clean up test output') {
-      //   test.deleteOutput('defradigital/node-development', containerSrcFolder)
-      // }
+      stage('Clean up test output') {
+        test.deleteOutput('defradigital/node-development', containerSrcFolder)
+      }
 
       if (config.containsKey('finallyClosure')) {
         config['finallyClosure']()
