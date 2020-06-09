@@ -36,8 +36,18 @@ class Helm implements Serializable {
         def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
         def yamlFile = "postgresConfig.yaml"
-        ctx.sh("az appconfig kv export --connection-string \"$ctx.appConfigConnectionString\" -d file --path $yamlFile --key \"postgresUsername\" --resolve-keyvault --format yaml --yes")
-        ctx.sh("cat $yamlFile")
+
+        withCredentials([azureServicePrincipal(credentialsId: 'ctx.SERVICE_PRINCIPAL_CRED_ID',
+                                    subscriptionIdVariable: 'SUBS_ID',
+                                    clientIdVariable: 'CLIENT_ID',
+                                    clientSecretVariable: 'CLIENT_SECRET',
+                                    tenantIdVariable: 'TENANT_ID')]) {
+          ctx.sh("az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET -t $TENANT_ID")
+          ctx.sh("az appconfig kv export --connection-string \"$ctx.appConfigConnectionString\" -d file --path $yamlFile --key \"postgresUsername\" --resolve-keyvault --format yaml --yes")
+          ctx.sh("cat $yamlFile")
+        }
+
+
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues -f $yamlFile $prCommands $extraCommands")
