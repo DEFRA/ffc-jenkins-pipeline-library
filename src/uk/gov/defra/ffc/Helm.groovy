@@ -37,17 +37,11 @@ class Helm implements Serializable {
 
         def yamlFile = "postgresConfig.yaml"
 
-        withCredentials([azureServicePrincipal(credentialsId: 'ctx.SERVICE_PRINCIPAL_CRED_ID',
-                                    subscriptionIdVariable: 'SUBS_ID',
-                                    clientIdVariable: 'CLIENT_ID',
-                                    clientSecretVariable: 'CLIENT_SECRET',
-                                    tenantIdVariable: 'TENANT_ID')]) {
-          ctx.sh("az login --service-principal -u $CLIENT_ID -p $CLIENT_SECRET -t $TENANT_ID")
+        withCredentials([azureServicePrincipal(ctx.SERVICE_PRINCIPAL_CRED_ID)]) {
+          ctx.sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
           ctx.sh("az appconfig kv export --connection-string \"$ctx.appConfigConnectionString\" -d file --path $yamlFile --key \"postgresUsername\" --resolve-keyvault --format yaml --yes")
           ctx.sh("cat $yamlFile")
         }
-
-
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues -f $yamlFile $prCommands $extraCommands")
