@@ -28,14 +28,15 @@ class Helm implements Serializable {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       ctx.withCredentials([
         ctx.file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
-        ctx.file(credentialsId: "$chartName-pr-values", variable: 'prValues')
+        ctx.file(credentialsId: "$chartName-pr-values", variable: 'prValues'),
+        ctx.string(credentialsId: 'app-config-connection-string', variable: 'appConfigConnectionString'),
       ]) {
         def deploymentName = "$chartName-$tag"
         def extraCommands = Helm.getExtraCommands(tag)
         def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
         def yamlFile = "postgresConfig.yaml"
-        ctx.sh("az appconfig kv export --name ${ctx.APP_CONFIG_TEST} -d file --path $yamlFile --key \"postgresService.*\" --resolve-keyvault --format yaml --yes")
+        ctx.sh("az appconfig kv export --connection-string $appConfigConnectionString -d file --path $yamlFile --key \"postgresService.*\" --resolve-keyvault --format yaml --yes")
         ctx.sh("cat $yamlFile")
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
