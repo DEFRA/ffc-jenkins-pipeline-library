@@ -40,7 +40,7 @@ class Helm implements Serializable {
         ctx.sh("cat $yamlFile")
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $prCommands $extraCommands")
+        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues -f $yamlFile $prCommands $extraCommands")
         Helm.writeUrlIfIngress(ctx, deploymentName)
       }
     }
