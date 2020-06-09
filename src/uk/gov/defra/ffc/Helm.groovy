@@ -11,11 +11,7 @@ class Helm implements Serializable {
   }
 
   static def getExtraCommands(tag) {
-    def yamlFile = "postgresConfig.yaml"
-    ctx.sh("az appconfig kv export --name ${ctx.APP_CONFIG_TEST} -d file --path $yamlFile --key \"postgresService.*\" --resolve-keyvault --format yaml --yes")
-    ctx.sh("cat $yamlFile")
-    def moreExtra = "-f $yamlFile"
-    return "$moreExtra --set labels.version=$tag --install --atomic --version=$tag"
+    return "--set labels.version=$tag --install --atomic --version=$tag"
   }
 
   static def getPrCommands(registry, chartName, tag, buildNumber) {
@@ -37,8 +33,13 @@ class Helm implements Serializable {
         def deploymentName = "$chartName-$tag"
         def extraCommands = Helm.getExtraCommands(tag)
         def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
+
+        def yamlFile = "postgresConfig.yaml"
+        ctx.sh("az appconfig kv export --name ${ctx.APP_CONFIG_TEST} -d file --path $yamlFile --key \"postgresService.*\" --resolve-keyvault --format yaml --yes")
+        ctx.sh("cat $yamlFile")
+
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $prCommands $extraCommands")
+        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $prCommands $extraCommands -f $yamlFile")
         Helm.writeUrlIfIngress(ctx, deploymentName)
       }
     }
