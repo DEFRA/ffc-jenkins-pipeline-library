@@ -38,7 +38,7 @@ class Helm implements Serializable {
         def yamlFile = "postgresConfig.yaml"
 
         ctx.withCredentials([ctx.azureServicePrincipal(ctx.SERVICE_PRINCIPAL_CRED_ID)]) {
-          ctx.sh 'az login --service-principal --username=$AZURE_CLIENT_ID --password=$AZURE_CLIENT_SECRET --tenant=$AZURE_TENANT_ID'
+          ctx.sh('az login --service-principal --username=$AZURE_CLIENT_ID --password=$AZURE_CLIENT_SECRET --tenant=$AZURE_TENANT_ID')
           ctx.sh("az appconfig kv export --connection-string \"$ctx.appConfigConnectionString\" -d file --path $yamlFile --key \"postgresUsername\" --resolve-keyvault --format yaml --yes")
           ctx.sh("cat $yamlFile")
         }
