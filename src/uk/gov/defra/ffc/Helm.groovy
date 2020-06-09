@@ -11,7 +11,10 @@ class Helm implements Serializable {
   }
 
   static def getExtraCommands(tag) {
-    def moreExtra = "--set testValue=\"Injected from Jenkins Lib\""
+    def yamlFile = "postgresConfig.yaml"
+    ctx.sh("az appconfig kv export --name ${ctx.APP_CONFIG_TEST} -d file --path $yamlFile --key \"postgresService.*\" --resolve-keyvault --format yaml --yes")
+    ctx.sh("cat $yamlFile")
+    def moreExtra = "-f $yamlFile"
     return "$moreExtra --set labels.version=$tag --install --atomic --version=$tag"
   }
 
