@@ -30,7 +30,7 @@ class Tests implements Serializable {
   }
 
   static def analyseCode(ctx, sonarQubeEnv, sonarScanner, params) {
-    def scannerHome = tool sonarScanner
+    def scannerHome = ctx.tool sonarScanner
     ctx.withSonarQubeEnv(sonarQubeEnv) {
       def args = ''
       params.each { param ->
