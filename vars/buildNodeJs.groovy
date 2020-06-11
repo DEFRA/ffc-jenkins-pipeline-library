@@ -6,6 +6,8 @@ def call(Map config=[:]) {
   def pr = ''
   def tag = ''
   def mergedPrNo = ''
+  def sonarQubeEnv = 'SonarCloud'
+  def sonarScanner = 'SonarScanner'
 
   node {
     checkout scm
@@ -16,6 +18,11 @@ def call(Map config=[:]) {
 
       stage('Set PR, and tag variables') {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
+      }
+
+      stage('SonarCloud analysis') {
+          test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))
+        }
       }
 
       if (pr != '') {
