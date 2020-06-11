@@ -72,7 +72,7 @@ class Build implements Serializable {
     "--mount type=bind,source='$ctx.WORKSPACE/package.json',target=$containerWorkDir/package.json " +
     "--mount type=bind,source='$ctx.WORKSPACE/package-lock.json',target=$containerWorkDir/package-lock.json " +
     "$containerImage npm audit --audit-level=$auditLevel --$logType"
-    ctx.sh(returnStatus: !failOnIssues, script:script)
+    ctx.sh(returnStatus: !failOnIssues, script: script)
   }
 
   static def snykTest(ctx, failOnIssues, organisation, severity) {
