@@ -145,7 +145,7 @@ build.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web',
 
 Runs [npm audit](https://docs.npmjs.com/cli/audit) against the project.
 
-Takes three parameters:
+Takes five parameters:
 - `auditLevel` - level of vulnerabilities at which the audit will fail.
   Default is `moderate`. Suitable options are detailed in the
   [audit docs](https://docs.npmjs.com/cli/audit.html#synopsis)
@@ -154,6 +154,8 @@ Takes three parameters:
   long log is required any truthy value can be used e.g. `long`.
 - `failOnIssues` - flag to determine if the step should fail if issues are
   found in the audit. Default is `false`
+- `containerImage` - name of the container image to use for the npm audit
+- `containerWorkDir` - path to the default working directory of the container image
 
 Example usage:
 

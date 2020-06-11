@@ -62,13 +62,17 @@ class Build implements Serializable {
     ])
   }
 
-  static def npmAudit(ctx, auditLevel, logType, failOnIssues) {
+  static def npmAudit(ctx, auditLevel, logType, failOnIssues, containerImage, containerWorkDir) {
     auditLevel = auditLevel ?: 'moderate'
     logType = logType ?: 'parseable'
     failOnIssues = failOnIssues ?: false
     // setting `returnStatus` means the sh cmd can return non-zero exit codes
     // without affecting the build status
-    ctx.sh(returnStatus: !failOnIssues, script: "npm audit --audit-level=$auditLevel --$logType")
+    def script = "docker run --rm -u node " + 
+    "--mount type=bind,source='$ctx.WORKSPACE/package.json',target=$containerWorkDir/package.json " +
+    "--mount type=bind,source='$ctx.WORKSPACE/package-lock.json',target=$containerWorkDir/package-lock.json " +
+    "$containerImage npm audit --audit-level=$auditLevel --$logType"
+    ctx.sh(returnStatus: !failOnIssues, script: script)
   }
 
   static def snykTest(ctx, failOnIssues, organisation, severity) {
