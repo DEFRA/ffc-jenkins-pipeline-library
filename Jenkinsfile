@@ -18,8 +18,7 @@ node {
       stage('Verify version incremented') {
         version.verifyFileIncremented(versionFileName)
       }
-    }
-    else {
+    } else {
       stage('Trigger GitHub release') {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
