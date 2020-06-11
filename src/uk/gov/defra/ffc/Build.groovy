@@ -68,7 +68,7 @@ class Build implements Serializable {
     failOnIssues = failOnIssues ?: false
     // setting `returnStatus` means the sh cmd can return non-zero exit codes
     // without affecting the build status
-    def script = "docker run --rm -u node " + 
+    def script = "docker run --rm -u node " +
     "--mount type=bind,source='$ctx.WORKSPACE/package.json',target=$containerWorkDir/package.json " +
     "--mount type=bind,source='$ctx.WORKSPACE/package-lock.json',target=$containerWorkDir/package-lock.json " +
     "$containerImage npm audit --audit-level=$auditLevel --$logType"
