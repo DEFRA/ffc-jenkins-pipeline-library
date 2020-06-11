@@ -30,15 +30,28 @@ class Tests implements Serializable {
   }
 
   static def analyseCode(ctx, sonarQubeEnv, sonarScanner, params) {
-    def scannerHome = tool sonarScanner
+    // def scannerHome = tool sonarScanner
     ctx.withSonarQubeEnv(sonarQubeEnv) {
       def args = ''
       params.each { param ->
         args = args + " -D$param.key=$param.value"
       }
 
-      ctx.sh("$scannerHome/bin/sonar-scanner$args")
+      // ctx.sh("$scannerHome/bin/sonar-scanner$args")
     }
+  }
+
+  static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
+    return [
+    'sonar.projectKey' : projectName,
+    'sonar.sources': '.',
+    'sonar.branch.name': branch,
+    'sonar.pullrequest.base': 'master',
+    'sonar.pullrequest.branch': branch,
+    'sonar.pullrequest.key': pr,
+    'sonar.pullrequest.provider': 'GitHub',
+    'sonar.pullrequest.github.repository': "defra/${projectName}"
+    ];
   }
 
   static def waitForQualityGateResult(ctx, timeoutInMinutes) {
