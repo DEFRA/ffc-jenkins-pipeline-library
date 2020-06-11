@@ -30,8 +30,8 @@ def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
 
-def npmAudit(auditLevel, logType, failOnIssues) {
-  Build.npmAudit(this, auditLevel, logType, failOnIssues)
+def npmAudit(auditLevel, logType, failOnIssues, containerImage, containerWorkDir) {
+  Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir)
 }
 
 def snykTest(failOnIssues, organisation, severity) {

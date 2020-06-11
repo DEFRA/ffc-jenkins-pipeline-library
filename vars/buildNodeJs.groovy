@@ -1,5 +1,6 @@
 def call(Map config=[:]) {
   def containerSrcFolder = '\\/home\\/node'
+  def nodeDevImageName = 'defradigital/node-development'
   def localSrcFolder = '.'
   def lcovFile = './test-output/lcov.info'
   def repoName = ''
@@ -33,7 +34,7 @@ def call(Map config=[:]) {
       }
 
       stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues)
+        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevImageName, containerSrcFolder)
       }
 
       stage('Snyk test') {
@@ -121,7 +122,7 @@ def call(Map config=[:]) {
       throw e
     } finally {
       stage('Clean up test output') {
-        test.deleteOutput('defradigital/node-development', containerSrcFolder)
+        test.deleteOutput(nodeDevImageName, containerSrcFolder)
       }
 
       if (config.containsKey('finallyClosure')) {
