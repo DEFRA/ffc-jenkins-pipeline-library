@@ -21,5 +21,5 @@ def waitForQualityGateResult(timeoutInMinutes) {
 }
 
 def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
-  return Tests.buildCodeAnalysisDefaultParams(projectName, branch, pr)  
+  return Tests.buildCodeAnalysisDefaultParams(projectName, branch, pr)
 }
