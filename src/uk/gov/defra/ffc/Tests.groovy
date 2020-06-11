@@ -30,14 +30,14 @@ class Tests implements Serializable {
   }
 
   static def analyseCode(ctx, sonarQubeEnv, sonarScanner, params) {
-    // def scannerHome = tool sonarScanner
+    def scannerHome = tool sonarScanner
     ctx.withSonarQubeEnv(sonarQubeEnv) {
       def args = ''
       params.each { param ->
         args = args + " -D$param.key=$param.value"
       }
 
-      // ctx.sh("$scannerHome/bin/sonar-scanner$args")
+      ctx.sh("$scannerHome/bin/sonar-scanner$args")
     }
   }
 
