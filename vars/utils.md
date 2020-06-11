@@ -43,7 +43,8 @@ be escaped with a back slash so the valid encoding for `/` is  `\\/`.
 
 Forward slashes in the final `file` parameter do not need escaping.
 
-Example usage to replace the path `/usr/src/app` with `./app` a path in the file `./lcov.info`:
+Example usage to replace the path `/usr/src/app` with `./app` a path in the
+file `./lcov.info`:
 
 ```
 utils.replaceInFile('\\/usr\\/src\\/app', '.\\/app', './lcov.info')

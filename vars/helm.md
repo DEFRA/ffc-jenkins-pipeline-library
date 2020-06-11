@@ -54,7 +54,11 @@ Takes four parameters:
 - Helm chart repository technology: 'artifactory' (default) or 'acr'
 
 Uses the environment variable `HELM_CHART_REPO_PUBLIC` (set within Jenkins)
-to provide the location of a packaged library chart template used to build the Helm chart. If the Helm chart server type is 'artifactory', the Artifactory repository is specified by an env var (set in Jenkins) - `ARTIFACTORY_REPO_URL`. If 'acr' is set, the docker registry (first parameter) is used.
+to provide the location of a packaged library chart template used to build the
+Helm chart. If the Helm chart server type is 'artifactory', the Artifactory
+repository is specified by an env var (set in Jenkins) -
+`ARTIFACTORY_REPO_URL`. If 'acr' is set, the docker registry (first parameter)
+is used.
 
 Example usage:
 
@@ -73,7 +77,9 @@ Takes five parameters:
 - the chart version
 - Helm chart repository technology: 'artifactory' (default) or 'acr'
 
-If the Helm chart server type is 'artifactory', the Artifactory repository is specified by an env var (set in Jenkins) - `ARTIFACTORY_REPO_URL`. If 'acr' is set, the `DOCKER_REGISTRY` is used.
+If the Helm chart server type is 'artifactory', the Artifactory repository is
+specified by an env var (set in Jenkins) - `ARTIFACTORY_REPO_URL`. If 'acr' is
+set, the `DOCKER_REGISTRY` is used.
 
 Example usage:
 
