@@ -8,6 +8,7 @@ def call(Map config=[:]) {
   def mergedPrNo = ''
   def sonarQubeEnv = 'SonarCloud'
   def sonarScanner = 'SonarScanner'
+  def qualityGateTimeoutInMinutes = 10
 
   node {
     checkout scm
@@ -21,8 +22,11 @@ def call(Map config=[:]) {
       }
 
       stage('SonarCloud analysis') {
-          test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))
-        }
+        test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
+      }
+
+      stage('Wait for Quality Gate') {
+        test.waitForQualityGateResult(qualityGateTimeoutInMinutes)
       }
 
       if (pr != '') {
