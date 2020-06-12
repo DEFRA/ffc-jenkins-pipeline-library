@@ -36,7 +36,7 @@ class Helm implements Serializable {
         def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
         def yamlFile = "postgresConfig.yaml"
-        ctx.sh("az appconfig kv export --connection-string \"$ctx.appConfigConnectionString\" -d file --path $yamlFile --key \"post*\" --resolve-keyvault --format yaml --yes")
+        ctx.sh("az appconfig kv export --connection-string \"$ctx.appConfigConnectionString\" -d file --path $yamlFile --key \"post*\" --separator \".\" --resolve-keyvault --format yaml --yes")
         ctx.sh("cat $yamlFile")
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
