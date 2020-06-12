@@ -20,15 +20,7 @@ def call(Map config=[:]) {
 
       stage('Set PR, and tag variables') {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
-      }
-
-      stage('SonarCloud analysis') {
-        test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
-      }
-
-      stage('Wait for Quality Gate') {
-        test.waitForQualityGateResult(qualityGateTimeoutInMinutes)
-      }
+      }      
 
       if (pr != '') {
         stage('Verify version incremented') {
@@ -70,6 +62,14 @@ def call(Map config=[:]) {
 
       stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      }
+
+      stage('SonarCloud analysis') {
+        test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
+      }
+
+      stage('Wait for Quality Gate') {
+        test.waitForQualityGateResult(qualityGateTimeoutInMinutes)
       }
 
       if (config.containsKey('testClosure')) {
