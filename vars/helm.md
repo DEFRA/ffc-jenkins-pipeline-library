@@ -45,13 +45,17 @@ helm.undeployChart('dev', 'ffc-demo-web', 'pr53')
 
 ## publishChart
 
-Publishes the local Helm chart to an Artifactory Helm chart repository.
+Publishes the local Helm chart to a Helm chart repository.
 
-Takes four parameters:
+Takes five parameters:
 - docker registry without the protocol
 - chart name
 - container image tag
 - Helm chart repository technology: 'artifactory' (default) or 'acr'
+- a boolean representing if the image path in `values.yaml` should be updated
+  to be the path of the (about to be) published chart. The default is `true`. A
+  scenario when this should be set to `false` is when the chart being published
+  uses a third party image.
 
 Uses the environment variable `HELM_CHART_REPO_PUBLIC` (set within Jenkins)
 to provide the location of a packaged library chart template used to build the
@@ -63,7 +67,8 @@ is used.
 Example usage:
 
 ```
-helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master', 'artifactory')
+helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
+helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master', 'acr', false)
 ```
 
 ## deployRemoteChart
