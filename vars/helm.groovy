@@ -34,7 +34,7 @@ def publishChart(registry, chartName, tag, helmChartRepoType="artifactory", over
   }
 }
 
-def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartRepoType="artifactory") {
+def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartRepoType='artifactory') {
   if (helmChartRepoType) {
     switch (helmChartRepoType.toLowerCase()) {
       case 'artifactory':
