@@ -34,7 +34,6 @@ def publishChart(registry, chartName, tag, helmChartRepoType="artifactory", over
 }
 
 def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartRepoType='artifactory') {
-  deleteDir()
   if (helmChartRepoType) {
     switch (helmChartRepoType.toLowerCase()) {
       case 'artifactory':
