@@ -44,10 +44,7 @@ class Tests implements Serializable {
   static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
     return [
     'sonar.projectKey' : projectName,
-    'sonar.sources': '.', 
-    'sonar.pullrequest.base': 'master',
-    'sonar.pullrequest.branch': branch,
-    'sonar.pullrequest.key': pr,
+    'sonar.sources': '.',
     'sonar.pullrequest.provider': 'GitHub',
     'sonar.pullrequest.github.repository': "defra/${projectName}",
     'sonar.javascript.exclusions': '**/jest.config.js,**/__mocks__/**,**/node_modules/**,**/test/**,**/test-output/**',
