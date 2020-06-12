@@ -45,7 +45,6 @@ class Tests implements Serializable {
     return [
     'sonar.projectKey' : projectName,
     'sonar.sources': '.', 
-    // 'sonar.branch.name': branch,
     'sonar.pullrequest.base': 'master',
     'sonar.pullrequest.branch': branch,
     'sonar.pullrequest.key': pr,
