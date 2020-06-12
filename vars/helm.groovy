@@ -16,14 +16,14 @@ def undeployChart(environment, chartName, tag) {
   Helm.undeployChart(this, environment, chartName, tag)
 }
 
-def publishChart(registry, chartName, tag, helmChartRepoType="artifactory") {
+def publishChart(registry, chartName, tag, helmChartRepoType="artifactory", overwriteImagePath=true) {
   if (helmChartRepoType) {
     switch (helmChartRepoType.toLowerCase()) {
       case 'artifactory':
         Helm.publishChart(this, registry, chartName, tag)
         break
       case 'acr':
-        Helm.publishChartToACR(this, registry, chartName, tag)
+        Helm.publishChartToACR(this, registry, chartName, tag, overwriteImagePath)
         break
       default:
         throw new Exception("Unknown Helm chart location: $helmChartRepoType")

@@ -64,7 +64,7 @@ class Helm implements Serializable {
     }
   }
 
-  static def publishChartToACR(ctx, registry, chartName, tag) {
+  static def publishChartToACR(ctx, registry, chartName, tag, overwriteImagePath) {
     ctx.withEnv(['HELM_EXPERIMENTAL_OCI=1']) {
       ctx.withCredentials([
         ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
@@ -72,7 +72,9 @@ class Helm implements Serializable {
         ctx.dir('helm-charts') {
           def helmChartName = "$registry/$chartName:helm-$tag"
 
-          ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
+          if (overwriteImagePath) {
+            ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
+          }
 
           Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
           ctx.sh("helm package ../helm/$chartName --version $tag --dependency-update")
