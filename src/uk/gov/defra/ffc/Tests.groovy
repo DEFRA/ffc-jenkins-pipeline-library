@@ -45,6 +45,9 @@ class Tests implements Serializable {
     return [
     'sonar.projectKey' : projectName,
     'sonar.sources': '.',
+    'sonar.pullrequest.base': 'master',
+    'sonar.pullrequest.branch': branch,
+    'sonar.pullrequest.key': pr,
     'sonar.pullrequest.provider': 'GitHub',
     'sonar.pullrequest.github.repository': "defra/${projectName}",
     'sonar.javascript.exclusions': '**/jest.config.js,**/__mocks__/**,**/node_modules/**,**/test/**,**/test-output/**',
