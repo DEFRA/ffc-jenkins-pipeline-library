@@ -28,13 +28,12 @@ def publishChart(registry, chartName, tag, helmChartRepoType="artifactory", over
       default:
         throw new Exception("Unknown Helm chart location: $helmChartRepoType")
     }
-  }
-  else {
+  } else {
     Helm.publishChart(this, registry, chartName, tag)
   }
 }
 
-def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartRepoType="artifactory") {
+def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChartRepoType='artifactory') {
   if (helmChartRepoType) {
     switch (helmChartRepoType.toLowerCase()) {
       case 'artifactory':
@@ -46,8 +45,7 @@ def deployRemoteChart(environment, namespace, chartName, chartVersion, helmChart
       default:
         throw new Exception("Unknown Helm chart location: $helmChartRepoType")
     }
-  }
-  else {
+  } else {
     Helm.deployRemoteChart(this, environment, namespace, chartName, chartVersion)
   }
 }

@@ -69,6 +69,8 @@ class Helm implements Serializable {
       ctx.withCredentials([
         ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
       ]) {
+        // jenkins doesn't tidy up folder, remove old charts before running
+        ctx.sh('rm -rf helm-charts')
         ctx.dir('helm-charts') {
           def helmChartName = "$registry/$chartName:helm-$tag"
 
@@ -109,6 +111,8 @@ class Helm implements Serializable {
           ctx.file(credentialsId: "$chartName-$environment-values", variable: 'values'),
           ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
         ]) {
+          // jenkins doesn't tidy up folder, remove old charts before running
+          ctx.sh('rm -rf helm-install')
           ctx.dir('helm-install') {
             def extraCommands = Helm.getExtraCommands(chartVersion)
             def helmChartName = "$ctx.DOCKER_REGISTRY/$chartName:helm-$chartVersion"
