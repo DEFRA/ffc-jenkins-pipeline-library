@@ -35,7 +35,9 @@ class Helm implements Serializable {
         def extraCommands = Helm.getExtraCommands(tag)
         def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-        def setString = ''
+        def configKeys = ctx.readFile("helm/$chartName/deployment-keys.txt")
+        def configItems = configKeys.tokenize('\n')
+        echo "$configItems"
 
         def chartValues = []
 
