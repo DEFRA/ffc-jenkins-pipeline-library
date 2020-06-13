@@ -35,12 +35,25 @@ class Helm implements Serializable {
         def extraCommands = Helm.getExtraCommands(tag)
         def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-        def yamlFile = "postgresConfig.yaml"
-        ctx.sh("az appconfig kv export --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME -d file --path $yamlFile --key \"post*\" --separator \".\" --resolve-keyvault --format yaml --yes")
-        ctx.sh("cat $yamlFile")
+        def setString = ''
+
+        def chartValues = []
+
+        ['post.password', 'post.username'].each {
+          def label = 'pr'
+          def value = ctx.sh("az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $it --resolve-keyvault --label $label | jq -r '.[0] | .value'")
+          chartValues.add("$it=$value"
+        }
+
+        def chartSetValues = '--set ' + chartValues.join(',')
+
+
+        // def yamlFile = "postgresConfig.yaml"
+        // ctx.sh("az appconfig kv export --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME -d file --path $yamlFile --key \"post*\" --separator \".\" --resolve-keyvault --format yaml --yes")
+        // ctx.sh("cat $yamlFile")
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues -f $yamlFile $prCommands $extraCommands")
+        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $chartSetValues $prCommands $extraCommands")
         Helm.writeUrlIfIngress(ctx, deploymentName)
       }
     }
