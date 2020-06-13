@@ -41,7 +41,7 @@ class Helm implements Serializable {
 
         ['post.password', 'post.username'].each {
           def label = 'pr'
-          def value = ctx.sh("az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $it --resolve-keyvault --label $label | jq -r '.[0] | .value'")
+          def value = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $it --resolve-keyvault --label $label | jq -r '.[0] | .value'").trim()
           chartValues.add("$it=$value")
         }
 
