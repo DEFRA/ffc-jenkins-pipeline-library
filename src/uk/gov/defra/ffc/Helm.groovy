@@ -43,8 +43,10 @@ class Helm implements Serializable {
         configItems.each {
           def label = 'pr'
           def value = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $environment/$it --resolve-keyvault | jq -r '.[0] | .value'").trim()
-          def value = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $environment/$it --label $label --resolve-keyvault | jq -r '.[0] | .value'").trim()
+          def prValue = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $environment/$it --label $label --resolve-keyvault | jq -r '.[0] | .value'").trim()
+
           chartValues.add("$it=$value")
+          chartValues.add("$it=$prValue")
         }
 
         def chartSetValues = '--set ' + chartValues.join(',')
