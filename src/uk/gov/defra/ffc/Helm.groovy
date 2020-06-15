@@ -29,7 +29,6 @@ class Helm implements Serializable {
       ctx.withCredentials([
         ctx.file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
         ctx.file(credentialsId: "$chartName-pr-values", variable: 'prValues'),
-        ctx.string(credentialsId: 'app-config-connection-string', variable: 'appConfigConnectionString'),
       ]) {
         def deploymentName = "$chartName-$tag"
         def extraCommands = Helm.getExtraCommands(tag)
@@ -44,8 +43,7 @@ class Helm implements Serializable {
           def label = 'pr'
           def value = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $environment/$it --resolve-keyvault | jq -r '.[0] | .value'").trim()
           def prValue = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $environment/$it --label $label --resolve-keyvault | jq -r '.[0] | .value'").trim()
-
-          chartValues.add(prValue ? "$it=$value" : "$it=$prValue")
+          chartValues.add(prValue == 'null' ? "$it=$value" : "$it=$prValue")
         }
 
         def chartSetValues = '--set ' + chartValues.join(',')
