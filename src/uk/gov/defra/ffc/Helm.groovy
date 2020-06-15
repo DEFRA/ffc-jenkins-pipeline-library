@@ -45,8 +45,7 @@ class Helm implements Serializable {
           def value = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $environment/$it --resolve-keyvault | jq -r '.[0] | .value'").trim()
           def prValue = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $environment/$it --label $label --resolve-keyvault | jq -r '.[0] | .value'").trim()
 
-          chartValues.add("$it=$value")
-          chartValues.add("$it=$prValue")
+          chartValues.add(prValue ? "$it=$value" : "$it=$prValue")
         }
 
         def chartSetValues = '--set ' + chartValues.join(',')
