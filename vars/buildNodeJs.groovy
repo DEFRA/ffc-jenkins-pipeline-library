@@ -43,6 +43,14 @@ def call(Map config=[:]) {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
       }
 
+      stage('SonarCloud analysis') {
+        test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
+      }
+
+      stage('Wait for Quality Gate') {
+        test.waitForQualityGateResult(qualityGateTimeoutInMinutes)
+      }
+
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }
@@ -61,15 +69,7 @@ def call(Map config=[:]) {
 
       stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      }
-
-      stage('SonarCloud analysis') {
-        test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
-      }
-
-      stage('Wait for Quality Gate') {
-        test.waitForQualityGateResult(qualityGateTimeoutInMinutes)
-      }
+      }      
 
       if (config.containsKey('testClosure')) {
         config['testClosure']()
