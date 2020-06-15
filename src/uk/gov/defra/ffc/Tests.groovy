@@ -43,7 +43,7 @@ class Tests implements Serializable {
 
   static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
     return [
-    'sonar.organization': 'defra'
+    'sonar.organization': 'defra',
     'sonar.projectKey': projectName,
     'sonar.sources': '.',
     'sonar.pullrequest.base': 'master',
