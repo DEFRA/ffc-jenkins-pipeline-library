@@ -52,26 +52,25 @@ class Helm implements Serializable {
     return configItems.size() > 0 ? '--set ' + configItems.collect { "$it.key=$it.value" }.join(',') : ''
   }
 
+  static def getConfigKeysFromFile(ctx, filename) {
+    def keysFileContent = ctx.readFile(filename)
+    return keysFileContent.tokenize('\n')
+  }
+
   static def deployChart(ctx, environment, registry, chartName, tag) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
-      ctx.withCredentials([
-        ctx.file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
-        ctx.file(credentialsId: "$chartName-pr-values", variable: 'prValues'),
-      ]) {
-        def deploymentName = "$chartName-$tag"
-        def extraCommands = Helm.getExtraCommands(tag)
-        def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
+      def deploymentName = "$chartName-$tag"
+      def extraCommands = Helm.getExtraCommands(tag)
+      def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-        def keysFileContent = ctx.readFile("helm/$chartName/deployment-keys.txt")
-        def configKeys = keysFileContent.tokenize('\n')
-        def defaultConfigValues = configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment))
-        def prConfigValues = configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
+      def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-keys.txt")
+      def defaultConfigValues = Helm.configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment))
+      def prConfigValues = Helm.configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
 
-        ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-        ctx.echo('Running helm upgrade, console output suppressed')
-        ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $defaultConfigValues $prConfigValues $prCommands $extraCommands")
-        Helm.writeUrlIfIngress(ctx, deploymentName)
-      }
+      ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
+      ctx.echo('Running helm upgrade, console output suppressed')
+      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
+      Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
 
