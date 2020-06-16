@@ -63,8 +63,8 @@ class Helm implements Serializable {
         def extraCommands = Helm.getExtraCommands(tag)
         def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-        def configKeys = ctx.readFile("helm/$chartName/deployment-keys.txt")
-        def configItems = configKeys.tokenize('\n')
+        def keysFileContent = ctx.readFile("helm/$chartName/deployment-keys.txt")
+        def configKeys = keysFileContent.tokenize('\n')
         def defaultConfigValues = configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment))
         def prConfigValues = configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
         def suppressConsoleOutput = '#!/bin/bash +x\n'
