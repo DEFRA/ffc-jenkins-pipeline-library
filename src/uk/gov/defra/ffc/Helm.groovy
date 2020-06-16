@@ -24,19 +24,19 @@ class Helm implements Serializable {
     return "--set $flags"
   }
 
-  static def getValuesFromAppConfig(configKeys, prefix, failIfNotFound=true, label='\\\0', delimiter='/') {
-    def configValues = [:]
+  static def getValuesFromAppConfig(configKeys, prefix, label='\\\0', failIfNotFound=true, delimiter='/') {
+    def configItems = [:]
     def suppressConsoleOutput = '#!/bin/bash +x\n'
 
     configKeys.each {
-        def configItem = sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$it --label $label --resolve-keyvault").trim()
+        def appConfigResults = sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$it --label $label --resolve-keyvault").trim()
 
         // Check value. It should alway be only one string
-        def numResults = sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$configItem | length'").trim()
+        def numResults = sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | length'").trim()
 
         if (numResults == '1') {
-            def value = sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$configItem | .[0] | .value'").trim()
-            configValues[it] = value
+            def value = sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | .[0] | .value'").trim()
+            configItems[it] = value
         }
         else if (numResults == '0' && !failIfNotFound) { }
         else {
@@ -44,7 +44,11 @@ class Helm implements Serializable {
         }
     }
 
-    return configValues
+    return configItems
+  }
+
+  static def configItemsToSetString(configItems) {
+    return configItems.size() > 0 ? '--set ' + configItems.collect { "$it.key=$it.value" }.join(',') : ''
   }
 
   static def deployChart(ctx, environment, registry, chartName, tag) {
@@ -59,24 +63,11 @@ class Helm implements Serializable {
 
         def configKeys = ctx.readFile("helm/$chartName/deployment-keys.txt")
         def configItems = configKeys.tokenize('\n')
-
-        def chartValues = []
-
-        configItems.each {
-          def label = 'pr'
-          def value = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $environment/$it --resolve-keyvault | jq -r '.[0] | .value'").trim()
-          def prValue = ctx.sh(returnStdout: true, script:"az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $environment/$it --label $label --resolve-keyvault | jq -r '.[0] | .value'").trim()
-          chartValues.add(prValue == 'null' ? "$it=$value" : "$it=$prValue")
-        }
-
-        def chartSetValues = '--set ' + chartValues.join(',')
-
-        // def yamlFile = "postgresConfig.yaml"
-        // ctx.sh("az appconfig kv export --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME -d file --path $yamlFile --key \"post*\" --separator \".\" --resolve-keyvault --format yaml --yes")
-        // ctx.sh("cat $yamlFile")
+        def defaultConfigValues = configItemsToSetString(getValuesFromAppConfig(configKeys, environment))
+        def prConfigValues = configItemsToSetString(getValuesFromAppConfig(configKeys, environment, 'pr', false))
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $chartSetValues $prCommands $extraCommands")
+        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $defaultConfigValues $prConfigValues $prCommands $extraCommands")
         Helm.writeUrlIfIngress(ctx, deploymentName)
       }
     }
