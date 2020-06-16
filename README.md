@@ -203,3 +203,32 @@ Example usage from Jenkins pipeline configuration.
 ```
 deployToCluster environment: 'dev, namespace: 'ffc-demo', chartName: 'ffc-demo-web', chartVersion: '1.0.0'
 ```
+
+## Setup Jenkins for use with the library
+
+### Add global pipeline library
+
+As per the
+[documentation](https://www.jenkins.io/doc/book/pipeline/shared-libraries/#using-libraries)
+the library needs to be setup as a global pipeline library. The name needs to
+be set to `defra-library` (for the examples above to work). This feature is
+enabled through the
+[Shared Groovy Libraries](https://plugins.jenkins.io/workflow-cps-global-lib/)
+plugin.
+
+### Configure environment variables
+
+A number of environment variables are used by the library. The following table
+includes the list of variables that need to be setup as global properties.
+
+| Name                             | Description                                                                                          | Value                                                               |
+| ----                             | -----------                                                                                          | -----                                                               |
+| `APP_CONFIG_NAME`                | Name of Azure App Config                                                                             | :see_no_evil:                                                       |
+| `APP_CONFIG_SUBSCRIPTION`        | Name of subscription (in Azure) where the App Config resides                                         | :see_no_evil:                                                       |
+| `DOCKER_REGISTRY`                | Domain of Docker registry where non-public images are pushed to and pulled from                      | :see_no_evil:                                                       |
+| `DOCKER_REGISTRY_CREDENTIALS_ID` | Name of credential stored in Jenkins containing the credentials used to access the `DOCKER_REGISTRY` | :see_no_evil:                                                       |
+| `HELM_CHART_REPO_PUBLIC`         | Path to the public Helm chart repository                                                             | https://raw.githubusercontent.com/defra/ffc-helm-repository/master/ |
+| `HELM_CHART_REPO_TYPE`           | Type of repository where Helm charts are stored. Options are `acr` or `artifactory`                  | `acr`                                                               |
+| `JENKINS_DEPLOY_SITE_ROOT`       | FQDN of Jenkins instance                                                                             | :see_no_evil:                                                       |
+| `SERVICE_PRINCIPLE_CRED_ID`      | Name of Azure Service Principal used by Jenkins                                                      | :see_no_evil:                                                       |
+| `SNYK_ORG`                       | Name of Snyk organisation                                                                            | `defra-ffc`                                                         |
