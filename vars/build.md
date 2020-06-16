@@ -115,7 +115,8 @@ the contents of `test-output` are removed after tests are published.
 
 Takes three parameters:
 - project name, e.g. `ffc-demo-web`
-- service name to run from the project's docker-compose configuration e.g. `app`
+- service name to run from the project's docker-compose configuration e.g.
+  `app`
 - build number
 
 Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
@@ -155,7 +156,8 @@ Takes five parameters:
 - `failOnIssues` - flag to determine if the step should fail if issues are
   found in the audit. Default is `false`
 - `containerImage` - name of the container image to use for the npm audit
-- `containerWorkDir` - path to the default working directory of the container image
+- `containerWorkDir` - path to the default working directory of the container
+  image
 
 Example usage:
 
@@ -168,8 +170,10 @@ build.npmAudit('critical', null, true)
 Runs [snyk test](https://support.snyk.io/hc/en-us/articles/360003812578-CLI-reference) against the project.
 
 Takes three parameters:
-- `failOnIssues` - should the job fail when issues are detected. Default is `false`
-- `organisation` - against which the report should be recorded. Default is `defra-4kb`
+- `failOnIssues` - should the job fail when issues are detected. Default is
+  `false`
+- `organisation` - against which the report should be recorded. Default is the
+  env var `SNYK_ORG`
 - `severity` - of issues to be reported. Default is `medium`
 
 ```
