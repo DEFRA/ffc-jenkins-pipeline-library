@@ -24,18 +24,18 @@ class Helm implements Serializable {
     return "--set $flags"
   }
 
-  static def getValuesFromAppConfig(configKeys, prefix, label='\\\0', failIfNotFound=true, delimiter='/') {
+  static def getValuesFromAppConfig(ctx, configKeys, prefix, label='\\\0', failIfNotFound=true, delimiter='/') {
     def configItems = [:]
     def suppressConsoleOutput = '#!/bin/bash +x\n'
 
     configKeys.each {
-        def appConfigResults = sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$it --label $label --resolve-keyvault").trim()
+        def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$it --label $label --resolve-keyvault").trim()
 
         // Check value. It should alway be only one string
-        def numResults = sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | length'").trim()
+        def numResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | length'").trim()
 
         if (numResults == '1') {
-            def value = sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | .[0] | .value'").trim()
+            def value = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | .[0] | .value'").trim()
             configItems[it] = value
         }
         else if (numResults == '0' && !failIfNotFound) { }
@@ -63,11 +63,15 @@ class Helm implements Serializable {
 
         def configKeys = ctx.readFile("helm/$chartName/deployment-keys.txt")
         def configItems = configKeys.tokenize('\n')
-        def defaultConfigValues = configItemsToSetString(getValuesFromAppConfig(configKeys, environment))
-        def prConfigValues = configItemsToSetString(getValuesFromAppConfig(configKeys, environment, 'pr', false))
+        def defaultConfigValues = configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment))
+        def prConfigValues = configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
+        def suppressConsoleOutput = '#!/bin/bash +x\n'
+
+        echo "$defaultConfigValues"
+        echo "$prConfigValues"
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $defaultConfigValues $prConfigValues $prCommands $extraCommands")
+        ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $defaultConfigValues $prConfigValues $prCommands $extraCommands")
         Helm.writeUrlIfIngress(ctx, deploymentName)
       }
     }
