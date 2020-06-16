@@ -70,8 +70,8 @@ class Helm implements Serializable {
         def prConfigValues = configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
         def suppressConsoleOutput = '#!/bin/bash +x\n'
 
-        echo "$defaultConfigValues"
-        echo "$prConfigValues"
+        ctx.echo "$defaultConfigValues"
+        ctx.echo "$prConfigValues"
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $defaultConfigValues $prConfigValues $prCommands $extraCommands")
