@@ -28,8 +28,8 @@ class Helm implements Serializable {
     def configItems = [:]
     def suppressConsoleOutput = '#!/bin/bash +x\n'
 
-    ctx.echo "$configKeys"
-    ctx.echo "${configKeys.getClass()}"
+    ctx.echo("Running with $label, $failIfNotFound, $delimiter")
+
     for ( int i = 0 ; i < configKeys.size() ; i++ ) {
       def key = configKeys[i]
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault").trim()
