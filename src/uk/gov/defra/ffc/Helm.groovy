@@ -24,8 +24,31 @@ class Helm implements Serializable {
     return "--set $flags"
   }
 
+  static def getValuesFromAppConfig(configKeys, prefix, failIfNotFound=true, label='\\\0', delimiter='/') {
+    def configValues = [:]
+    def suppressConsoleOutput = '#!/bin/bash +x\n'
+
+    configKeys.each {
+        def configItem = sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$it --label $label --resolve-keyvault").trim()
+
+        // Check value. It should alway be only one string
+        def numResults = sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$configItem | length'").trim()
+
+        if (numResults == '1') {
+            def value = sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$configItem | .[0] | .value'").trim()
+            configValues[it] = value
+        }
+        else if (numResults == '0' && !failIfNotFound) { }
+        else {
+            throw new Exception("Unexpected number of results from App Configuration when retrieving $it: $numResults")
+        }
+    }
+
+    return configValues
+  }
+
   static def deployChart(ctx, environment, registry, chartName, tag) {
-    // ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+    ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       ctx.withCredentials([
         ctx.file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
         ctx.file(credentialsId: "$chartName-pr-values", variable: 'prValues'),
@@ -56,7 +79,7 @@ class Helm implements Serializable {
         ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $chartSetValues $prCommands $extraCommands")
         Helm.writeUrlIfIngress(ctx, deploymentName)
       }
-    // }
+    }
   }
 
   static def undeployChart(ctx, environment, chartName, tag) {
