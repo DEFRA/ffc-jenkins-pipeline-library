@@ -45,6 +45,7 @@ class Helm implements Serializable {
         }
     }
 
+    ctx.echo "$configItems"
     return configItems
   }
 
