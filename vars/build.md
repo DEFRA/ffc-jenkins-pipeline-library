@@ -169,7 +169,8 @@ Runs [snyk test](https://support.snyk.io/hc/en-us/articles/360003812578-CLI-refe
 
 Takes three parameters:
 - `failOnIssues` - should the job fail when issues are detected. Default is `false`
-- `organisation` - against which the report should be recorded. Default is `defra-4kb`
+- `organisation` - against which the report should be recorded. Default is the
+  env var `SNYK_ORG`
 - `severity` - of issues to be reported. Default is `medium`
 
 ```
