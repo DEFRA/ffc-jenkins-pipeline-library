@@ -28,26 +28,25 @@ class Helm implements Serializable {
     def configItems = [:]
     def suppressConsoleOutput = '#!/bin/bash +x\n'
 
-    configKeys.each {
-        def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$it --label $label --resolve-keyvault").trim()
+    for (key in configKeys){
+        def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault").trim()
 
         // Check value. It should alway be only one string
         def numResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | length'").trim()
 
         if (numResults == '1') {
             def value = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | .[0] | .value'").trim()
-            configItems[it] = value
+            configItems[key] = value
         }
         else if (numResults == '0' && !failIfNotFound) { }
         else {
-            throw new Exception("Unexpected number of results from App Configuration when retrieving $it: $numResults")
+            throw new Exception("Unexpected number of results from App Configuration when retrieving $key: $numResults")
         }
     }
 
     return configItems
   }
 
-  @NonCPS
   static def configItemsToSetString(configItems) {
     return configItems.size() > 0 ? '--set ' + configItems.collect { "$it.key=$it.value" }.join(',') : ''
   }
