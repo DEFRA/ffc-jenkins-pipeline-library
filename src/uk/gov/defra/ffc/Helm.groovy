@@ -25,7 +25,7 @@ class Helm implements Serializable {
   }
 
   static def deployChart(ctx, environment, registry, chartName, tag) {
-    ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+    // ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       ctx.withCredentials([
         ctx.file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
         ctx.file(credentialsId: "$chartName-pr-values", variable: 'prValues'),
@@ -56,7 +56,7 @@ class Helm implements Serializable {
         ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $chartSetValues $prCommands $extraCommands")
         Helm.writeUrlIfIngress(ctx, deploymentName)
       }
-    }
+    // }
   }
 
   static def undeployChart(ctx, environment, chartName, tag) {
