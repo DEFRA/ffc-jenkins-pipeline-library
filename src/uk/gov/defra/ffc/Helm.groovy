@@ -24,7 +24,6 @@ class Helm implements Serializable {
     return "--set $flags"
   }
 
-  @NonCPS
   static def getValuesFromAppConfig(ctx, configKeys, prefix, label='\\\0', failIfNotFound=true, delimiter='/') {
     def configItems = [:]
     def suppressConsoleOutput = '#!/bin/bash +x\n'
@@ -45,7 +44,6 @@ class Helm implements Serializable {
         }
     }
 
-    ctx.echo "$configItems"
     return configItems
   }
 
