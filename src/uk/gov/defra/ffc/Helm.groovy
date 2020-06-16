@@ -64,8 +64,8 @@ class Helm implements Serializable {
       def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
       def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-keys.txt")
-      def defaultConfigValues = Helm.configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment))
-      def prConfigValues = Helm.configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
+      def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+      def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       ctx.echo('Running helm upgrade, console output suppressed')
@@ -142,21 +142,23 @@ class Helm implements Serializable {
     ctx.withEnv(['HELM_EXPERIMENTAL_OCI=1']) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
         ctx.withCredentials([
-          ctx.file(credentialsId: "$chartName-$environment-values", variable: 'values'),
           ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
         ]) {
           // jenkins doesn't tidy up folder, remove old charts before running
           ctx.sh('rm -rf helm-install')
           ctx.dir('helm-install') {
-            def extraCommands = Helm.getExtraCommands(chartVersion)
             def helmChartName = "$ctx.DOCKER_REGISTRY/$chartName:helm-$chartVersion"
-
             ctx.sh("helm registry login $ctx.DOCKER_REGISTRY --username $ctx.username --password $ctx.password")
             ctx.sh("helm chart pull $helmChartName")
             ctx.sh("helm chart export $helmChartName --destination .")
 
+            def extraCommands = Helm.getExtraCommands(chartVersion)
+            def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-keys.txt")
+            def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
-            ctx.sh("helm upgrade $chartName $chartName --namespace=$namespace -f $ctx.values --set namespace=$namespace $extraCommands")
+            ctx.echo('Running helm upgrade, console output suppressed')
+            ctx.sh("$suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues --set namespace=$namespace $extraCommands")
 
             ctx.deleteDir()
           }
