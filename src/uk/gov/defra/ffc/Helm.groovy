@@ -1,6 +1,8 @@
 package uk.gov.defra.ffc
 
 class Helm implements Serializable {
+  static String suppressConsoleOutput = '#!/bin/bash +x\n'
+
   static def writeUrlIfIngress(ctx, deploymentName) {
     ctx.sh("kubectl get ingress -n $deploymentName -o json --ignore-not-found | jq '.items[0].spec.rules[0].host // empty' | xargs --no-run-if-empty printf 'Build available for review at https://%s\n'")
   }
@@ -26,7 +28,6 @@ class Helm implements Serializable {
 
   static def getValuesFromAppConfig(ctx, configKeys, prefix, label='\\\\0', failIfNotFound=true, delimiter='/') {
     def configItems = [:]
-    def suppressConsoleOutput = '#!/bin/bash +x\n'
 
     configKeys.each { key ->
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault").trim()
@@ -65,12 +66,9 @@ class Helm implements Serializable {
         def configKeys = keysFileContent.tokenize('\n')
         def defaultConfigValues = configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment))
         def prConfigValues = configItemsToSetString(getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
-        def suppressConsoleOutput = '#!/bin/bash +x\n'
-
-        ctx.echo "$defaultConfigValues"
-        ctx.echo "$prConfigValues"
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
+        ctx.echo('Running helm upgrade, console output suppressed')
         ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $defaultConfigValues $prConfigValues $prCommands $extraCommands")
         Helm.writeUrlIfIngress(ctx, deploymentName)
       }
