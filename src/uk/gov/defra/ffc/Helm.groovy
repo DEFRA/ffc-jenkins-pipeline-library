@@ -39,7 +39,9 @@ class Helm implements Serializable {
 
       if (numResults == 1) {
           configItems[key] = appConfigResults
-          ctx.sh "echo $appConfigResults"
+          def str = $/"!@£$%^&*(')\`_+\,-={}[]:;\"<>.?/|\\\~"/$
+
+          ctx.sh "echo $str"
       }
       else if (numResults == 0 && !failIfNotFound) { }
       else {
