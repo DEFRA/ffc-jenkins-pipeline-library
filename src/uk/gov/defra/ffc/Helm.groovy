@@ -31,11 +31,11 @@ class Helm implements Serializable {
     def configItems = [:]
 
     configKeys.each { key ->
-      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault").trim()
-      def numResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | length'").trim()
+      // def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault").trim()
+      def numResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq '. | length'").trim()
 
       if (numResults == '1') {
-          def value = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -nr '$appConfigResults | .[0] | .value'").trim()
+          def value = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq '.[0] | .value'").trim()
           configItems[key] = value
       }
       else if (numResults == '0' && !failIfNotFound) { }
