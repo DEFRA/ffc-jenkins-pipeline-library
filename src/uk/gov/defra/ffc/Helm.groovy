@@ -69,7 +69,9 @@ class Helm implements Serializable {
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       // ctx.echo('Running helm upgrade, console output suppressed')
       // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
-      ctx.sh($/helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands/$)
+
+      def chartyName = "./helm/$chartName"
+      ctx.sh($/helm upgrade $deploymentName --namespace=$deploymentName $chartyName $defaultConfigValues $prConfigValues $prCommands $extraCommands/$)
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
