@@ -47,7 +47,7 @@ class Helm implements Serializable {
   }
 
   static def configItemsToSetString(configItems) {
-    return configItems.size() > 0 ? ("--set " + configItems.collect { "$it.key=$it.value" }.join(',')) : ''
+    return configItems.size() > 0 ? ("--set '" + configItems.collect { "$it.key=$it.value" }.join(',') + "'") : ''
   }
 
   static def getConfigKeysFromFile(ctx, filename) {
