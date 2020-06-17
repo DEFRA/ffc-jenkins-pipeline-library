@@ -47,7 +47,7 @@ class Helm implements Serializable {
   }
 
   static def configItemsToSetString(configItems) {
-    return configItems.size() > 0 ? ("--set '" + configItems.collect { "$it.key=$it.value" }.join(',') + "'") : ''
+    return configItems.size() > 0 ? ("--set " + configItems.collect { "$it.key=$it.value" }.join(',')) : ''
   }
 
   static def getConfigKeysFromFile(ctx, filename) {
@@ -69,7 +69,7 @@ class Helm implements Serializable {
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       // ctx.echo('Running helm upgrade, console output suppressed')
       // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
-      ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands --dry-run")
+      ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
