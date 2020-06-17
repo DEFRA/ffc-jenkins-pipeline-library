@@ -61,7 +61,8 @@ class Helm implements Serializable {
       def extraCommands = Helm.getExtraCommands(tag)
       def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-      def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-keys.txt")
+      // FIXME: Use an env var for filename
+      def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-config-keys.txt")
       def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
       def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
 
@@ -151,7 +152,7 @@ class Helm implements Serializable {
             ctx.sh("helm chart export $helmChartName --destination .")
 
             def extraCommands = Helm.getExtraCommands(chartVersion)
-            def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-keys.txt")
+            def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-config-keys.txt")
             def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
