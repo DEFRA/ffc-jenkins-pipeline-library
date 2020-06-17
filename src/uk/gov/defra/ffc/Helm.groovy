@@ -39,7 +39,6 @@ class Helm implements Serializable {
 
       if (numResults == 1) {
           configItems[key] = $/"$appConfigResults"/$
-          // def str = $/"!@£$%^&*(')\`_+\,-={}[]:;\"<>.?/|\\\~"/$
           ctx.sh "echo ${configItems[key]}"
       }
       else if (numResults == 0 && !failIfNotFound) { }
@@ -76,7 +75,8 @@ class Helm implements Serializable {
       // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
 
       def chartyName = "./helm/$chartName"
-      ctx.sh($/$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName $defaultConfigValues $prConfigValues $prCommands $extraCommands/$)
+      def myStr = $/"!@£$%^&*(')\`_+\,-={}[]:;\"<>.?/|\\\~"/$
+      ctx.sh($/$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName --set post.username=$myStr $prCommands $extraCommands/$)
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
