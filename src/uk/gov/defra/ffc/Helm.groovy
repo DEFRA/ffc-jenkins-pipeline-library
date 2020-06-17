@@ -39,7 +39,7 @@ class Helm implements Serializable {
       }
       else if (numResults == '0' && !failIfNotFound) { }
       else {
-          throw new Exception("Unexpected number of results from App Configuration when retrieving $key: $numResults")
+          throw new Exception("Unexpected number of results from App Configuration when retrieving $prefix$delimiter$key: $numResults")
       }
     }
 
