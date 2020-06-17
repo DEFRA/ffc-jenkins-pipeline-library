@@ -230,5 +230,4 @@ includes the list of variables that need to be setup as global properties.
 | `HELM_CHART_REPO_PUBLIC`         | Path to the public Helm chart repository                                                             | https://raw.githubusercontent.com/defra/ffc-helm-repository/master/ |
 | `HELM_CHART_REPO_TYPE`           | Type of repository where Helm charts are stored. Options are `acr` or `artifactory`                  | `acr`                                                               |
 | `JENKINS_DEPLOY_SITE_ROOT`       | FQDN of Jenkins instance                                                                             | :see_no_evil:                                                       |
-| `SERVICE_PRINCIPLE_CRED_ID`      | Name of Azure Service Principal used by Jenkins                                                      | :see_no_evil:                                                       |
 | `SNYK_ORG`                       | Name of Snyk organisation                                                                            | `defra-ffc`                                                         |
