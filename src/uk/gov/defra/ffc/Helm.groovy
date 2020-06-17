@@ -39,6 +39,7 @@ class Helm implements Serializable {
 
       if (numResults == 1) {
           configItems[key] = appConfigResults
+          ctx.sh "echo $appConfigResults"
       }
       else if (numResults == 0 && !failIfNotFound) { }
       else {
