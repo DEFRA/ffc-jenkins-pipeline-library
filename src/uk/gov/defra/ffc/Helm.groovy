@@ -31,14 +31,13 @@ class Helm implements Serializable {
     def configItems = [:]
 
     configKeys.each { key ->
-      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault").trim()
-      def numResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -nr '\"$appConfigResults\" | length'").trim()
+      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq -r '.[] | .value'").trim()
+      def numResults = appConfigResults.tokenize('\n').size()
 
-      if (numResults == '1') {
-          def value = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq '.[0] | .value'").trim()
-          configItems[key] = value
+      if (numResults == 1) {
+          configItems[key] = appConfigResults
       }
-      else if (numResults == '0' && !failIfNotFound) { }
+      else if (numResults == 0 && !failIfNotFound) { }
       else {
           throw new Exception("Unexpected number of results from App Configuration when retrieving $prefix$delimiter$key: $numResults")
       }
