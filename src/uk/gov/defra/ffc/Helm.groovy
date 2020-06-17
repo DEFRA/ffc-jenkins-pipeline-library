@@ -1,7 +1,7 @@
 package uk.gov.defra.ffc
 
 class Helm implements Serializable {
-  static String suppressConsoleOutput = '#!/bin/bash +x\n'
+  static String suppressConsoleOutput = '#!/bin/bash +xe\n'
 
   static def writeUrlIfIngress(ctx, deploymentName) {
     ctx.sh("kubectl get ingress -n $deploymentName -o json --ignore-not-found | jq '.items[0].spec.rules[0].host // empty' | xargs --no-run-if-empty printf 'Build available for review at https://%s\n'")
@@ -71,7 +71,7 @@ class Helm implements Serializable {
       // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
 
       def chartyName = "./helm/$chartName"
-      ctx.sh($/helm upgrade $deploymentName --namespace=$deploymentName $chartyName $defaultConfigValues $prConfigValues $prCommands $extraCommands/$)
+      ctx.sh($/$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName $defaultConfigValues $prConfigValues $prCommands $extraCommands/$)
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
