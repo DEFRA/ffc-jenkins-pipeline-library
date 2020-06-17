@@ -35,7 +35,7 @@ class Helm implements Serializable {
       def numResults = appConfigResults.tokenize('\n').size()
 
       // FIXME: NEEDS TESTING
-      echo "NUMBER OF RESULTS FOUND: $numResults"
+      ctx.echo "NUMBER OF RESULTS FOUND: $numResults"
 
       if (numResults == 1) {
           configItems[key] = appConfigResults
