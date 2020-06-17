@@ -34,7 +34,7 @@ class Helm implements Serializable {
       def numResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | length'").trim()
 
       if (numResults == '1') {
-          def value = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -n '$appConfigResults | .[0] | .value'").trim()
+          def value = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput jq -nr '$appConfigResults | .[0] | .value'").trim()
           configItems[key] = value
       }
       else if (numResults == '0' && !failIfNotFound) { }
