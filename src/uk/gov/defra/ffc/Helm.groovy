@@ -83,7 +83,7 @@ class Helm implements Serializable {
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key dev/post.username --label \\\\0 --resolve-keyvault | jq -r '.[] | .value'").trim()
       def qqq = Helm.escapeSpecialChars(appConfigResults)
       def myStr = $/"$qqq"/$
-      ctx.sh($/$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName --set post.username=$myStr $prCommands $extraCommands/$)
+      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName --set post.username=$myStr $prCommands $extraCommands")
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
