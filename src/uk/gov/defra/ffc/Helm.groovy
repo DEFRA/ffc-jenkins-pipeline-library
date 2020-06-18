@@ -80,7 +80,7 @@ class Helm implements Serializable {
       appConfigResults = appConfigResults.replaceAll(/,/,/\\,/)
       appConfigResults = appConfigResults.replaceAll(/"/,/\\"/)
       appConfigResults = appConfigResults.replaceAll(/`/,/\\`/)
-      appConfigResults = appConfigResults.replaceAll(/\/,/P/)
+      appConfigResults = appConfigResults.replaceAll(/\\/,/P/)
       def myStr = $/"$appConfigResults"/$
       ctx.sh($/$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName --set post.username=$myStr $prCommands $extraCommands/$)
       Helm.writeUrlIfIngress(ctx, deploymentName)
