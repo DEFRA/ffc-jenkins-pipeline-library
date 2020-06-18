@@ -31,7 +31,7 @@ class Helm implements Serializable {
     def configItems = [:]
 
     configKeys.each { key ->
-      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq -r '.[] | .value'").trim()
+      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key  --resolve-keyvault | jq -r '.[] | .value'").trim()
       def numResults = appConfigResults.tokenize('\n').size()
 
       // FIXME: NEEDS TESTING
@@ -78,12 +78,10 @@ class Helm implements Serializable {
       // ctx.echo('Running helm upgrade, console output suppressed')
       // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
 
-      def chartyName = "./helm/$chartName"
-
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key dev/post.username --label \\\\0 --resolve-keyvault | jq -r '.[] | .value'").trim()
       def qqq = Helm.escapeSpecialChars(appConfigResults)
       def myStr = $/"$qqq"/$
-      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName --set post.username=$myStr $prCommands $extraCommands")
+      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName --set post.username=$myStr $prCommands $extraCommands")
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
