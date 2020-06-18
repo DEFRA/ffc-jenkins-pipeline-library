@@ -1,8 +1,7 @@
 package uk.gov.defra.ffc
 
 class Helm implements Serializable {
-  // static String suppressConsoleOutput = '#!/bin/bash +xe\n'
-  static String suppressConsoleOutput = ''
+  static String suppressConsoleOutput = '#!/bin/bash +x\n'
 
   static def writeUrlIfIngress(ctx, deploymentName) {
     ctx.sh("kubectl get ingress -n $deploymentName -o json --ignore-not-found | jq '.items[0].spec.rules[0].host // empty' | xargs --no-run-if-empty printf 'Build available for review at https://%s\n'")
@@ -66,8 +65,7 @@ class Helm implements Serializable {
       def extraCommands = Helm.getExtraCommands(tag)
       def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-      // FIXME: Use an env var for filename
-      def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-config-keys.txt")
+      def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
       def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
       def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
 
@@ -157,7 +155,7 @@ class Helm implements Serializable {
             ctx.sh("helm chart export $helmChartName --destination .")
 
             def extraCommands = Helm.getExtraCommands(chartVersion)
-            def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-config-keys.txt")
+            def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
             def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
