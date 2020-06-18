@@ -52,7 +52,7 @@ class Helm implements Serializable {
   }
 
   static def configItemsToSetString(configItems) {
-    return configItems.size() > 0 ? ("--set '" + configItems.collect { "$it.key=$it.value" }.join(',') + "'") : ''
+    return configItems.size() > 0 ? ("--set " + configItems.collect { "$it.key=$it.value" }.join(',')) : ''
   }
 
   static def getConfigKeysFromFile(ctx, filename) {
@@ -68,12 +68,12 @@ class Helm implements Serializable {
 
       // FIXME: Use an env var for filename
       def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-config-keys.txt")
-      // def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+      def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
       // def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
 
       def prConfigValues = ''
-      def qqq = Helm.getValuesFromAppConfig(ctx, configKeys, environment)
-      def defaultConfigValues = "--set post.username=${qqq['post.username']}"
+      // def qqq = Helm.getValuesFromAppConfig(ctx, configKeys, environment)
+      // def defaultConfigValues = "--set post.username=${qqq['post.username']}"
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       ctx.echo('Running helm upgrade, console output suppressed')
