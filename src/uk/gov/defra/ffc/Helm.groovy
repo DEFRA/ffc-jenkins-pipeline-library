@@ -31,7 +31,7 @@ class Helm implements Serializable {
     def configItems = [:]
 
     configKeys.each { key ->
-      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key  --resolve-keyvault | jq -r '.[] | .value'").trim()
+      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq -r '.[] | .value'").trim()
       def numResults = appConfigResults.tokenize('\n').size()
 
       // FIXME: NEEDS TESTING
