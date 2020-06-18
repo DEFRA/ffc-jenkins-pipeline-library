@@ -66,16 +66,18 @@ class Helm implements Serializable {
       def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
       // FIXME: Use an env var for filename
-      def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-config-keys.txt")
-      def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
-      def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
+      // def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-config-keys.txt")
+      // def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+      // def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       // ctx.echo('Running helm upgrade, console output suppressed')
       // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
 
       def chartyName = "./helm/$chartName"
-      def myStr = $/"!@£$%^&*(')\`_+\,-={}[]:;\"<>.?/|\\\~"/$
+
+      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix${delimiter}post.username --label $label --resolve-keyvault | jq -r '.[] | .value'").trim()
+      def myStr = $/"$appConfigResults"/$
       ctx.sh($/$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName --set post.username=$myStr $prCommands $extraCommands/$)
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
