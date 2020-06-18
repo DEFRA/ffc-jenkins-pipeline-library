@@ -69,21 +69,11 @@ class Helm implements Serializable {
       // FIXME: Use an env var for filename
       def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/deployment-config-keys.txt")
       def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
-      // def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
-
-      def prConfigValues = ''
-      // def qqq = Helm.getValuesFromAppConfig(ctx, configKeys, environment)
-      // def defaultConfigValues = "--set post.username=${qqq['post.username']}"
+      def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       ctx.echo('Running helm upgrade, console output suppressed')
       ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
-
-      // def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key dev/post.username --label \\\\0 --resolve-keyvault | jq -r '.[] | .value'").trim()
-      // def qqq = Helm.escapeSpecialChars(appConfigResults)
-      // def myStr = $/"$qqq"/$
-      // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName --set post.username=$myStr $prCommands $extraCommands")
-
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
