@@ -38,7 +38,7 @@ class Helm implements Serializable {
       ctx.echo "NUMBER OF RESULTS FOUND: $numResults"
 
       if (numResults == 1) {
-          configItems[key] = $/"$appConfigResults"/$
+          configItems[key] = $/"${Helm.escapeSpecialChars(appConfigResults)}"/$
           ctx.sh "echo ${configItems[key]}"
       }
       else if (numResults == 0 && !failIfNotFound) { }
