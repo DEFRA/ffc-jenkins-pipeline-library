@@ -39,7 +39,6 @@ class Helm implements Serializable {
 
       if (numResults == 1) {
           configItems[key] = $/"${Helm.escapeSpecialChars(appConfigResults)}"/$
-          ctx.sh "echo ${configItems[key]}"
       }
       else if (numResults == 0 && !failIfNotFound) { }
       else {
