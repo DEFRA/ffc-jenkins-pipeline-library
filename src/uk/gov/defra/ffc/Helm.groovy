@@ -54,8 +54,7 @@ class Helm implements Serializable {
   }
 
   static def getConfigKeysFromFile(ctx, filename) {
-    def keysFileContent = ctx.readFile(filename)
-    return keysFileContent.tokenize('\n')
+    return ctx.readFile(filename).tokenize('\n')
   }
 
   static def deployChart(ctx, environment, registry, chartName, tag) {
