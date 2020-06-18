@@ -78,9 +78,9 @@ class Helm implements Serializable {
 
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key dev/post.username --label \\\\0 --resolve-keyvault | jq -r '.[] | .value'").trim()
       // appConfigResults = appConfigResults.replaceAll(/{/, /qqq/) // Need to do the backslash replacing first as we are adding them below!
-      appConfigResults = appConfigResults.replaceAll(/,/, /\\,/)
-      appConfigResults = appConfigResults.replaceAll(/"/, /\\"/)
-      appConfigResults = appConfigResults.replaceAll(/`/, /\\`/)
+      appConfigResults = appConfigResults.replace(/,/, /\,/)
+      appConfigResults = appConfigResults.replace(/"/, /\"/)
+      appConfigResults = appConfigResults.replace(/`/, /\`/)
       def myStr = $/"$appConfigResults"/$
       ctx.sh($/$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName --set post.username=$myStr $prCommands $extraCommands/$)
       Helm.writeUrlIfIngress(ctx, deploymentName)
