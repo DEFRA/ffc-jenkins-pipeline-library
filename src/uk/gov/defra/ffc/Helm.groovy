@@ -77,8 +77,8 @@ class Helm implements Serializable {
       def chartyName = "./helm/$chartName"
 
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key dev/post.username --label \\\\0 --resolve-keyvault | jq -r '.[] | .value'").trim()
-      // appConfigResults = appConfigResults.replaceAll('{', 'P') // Need to do the backslash replacing first as we are adding them below!
-      appConfigResults = appConfigResults.replaceAll(/,/, /\\,/)
+      // appConfigResults = appConfigResults.replaceAll(/{/, /qqq/) // Need to do the backslash replacing first as we are adding them below!
+      appConfigResults = appConfigResults.replaceAll(',', '\\,')
       appConfigResults = appConfigResults.replaceAll(/"/, /\\"/)
       appConfigResults = appConfigResults.replaceAll(/`/, /\\`/)
       def myStr = $/"$appConfigResults"/$
