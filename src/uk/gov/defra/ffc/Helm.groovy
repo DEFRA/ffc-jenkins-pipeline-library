@@ -39,7 +39,7 @@ class Helm implements Serializable {
       def numResults = appConfigResults.tokenize('\n').size()
 
       if (numResults == 1) {
-          configItems[key] = $/"${Helm.escapeSpecialChars(appConfigResults)}"/$
+          configItems[key.trim()] = $/"${Helm.escapeSpecialChars(appConfigResults)}"/$
       }
       else if (numResults == 0 && !failIfNotFound) { }
       else {
