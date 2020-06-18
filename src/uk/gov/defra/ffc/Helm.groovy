@@ -27,15 +27,16 @@ class Helm implements Serializable {
     return "--set $flags"
   }
 
+  static def escapeSpecialChars(str) {
+    return str.replace('\\', '\\\\\\\\').replace(/,/, /\,/).replace(/"/, /\"/).replace(/`/, /\`/)
+  }
+
   static def getValuesFromAppConfig(ctx, configKeys, prefix, label='\\\\0', failIfNotFound=true, delimiter='/') {
     def configItems = [:]
 
     configKeys.each { key ->
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq -r '.[] | .value'").trim()
       def numResults = appConfigResults.tokenize('\n').size()
-
-      // FIXME: NEEDS TESTING
-      ctx.echo "NUMBER OF RESULTS FOUND: $numResults"
 
       if (numResults == 1) {
           configItems[key] = $/"${Helm.escapeSpecialChars(appConfigResults)}"/$
@@ -59,10 +60,6 @@ class Helm implements Serializable {
     return keysFileContent.tokenize('\n')
   }
 
-  static def escapeSpecialChars(str) {
-    return str.replace('\\', '\\\\\\\\').replace(/,/, /\,/).replace(/"/, /\"/).replace(/`/, /\`/)
-  }
-
   static def deployChart(ctx, environment, registry, chartName, tag) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       def deploymentName = "$chartName-$tag"
@@ -75,8 +72,8 @@ class Helm implements Serializable {
       def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-      // ctx.echo('Running helm upgrade, console output suppressed')
-      // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
+      ctx.echo('Running helm upgrade, console output suppressed')
+      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
 
       // def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key dev/post.username --label \\\\0 --resolve-keyvault | jq -r '.[] | .value'").trim()
       // def qqq = Helm.escapeSpecialChars(appConfigResults)
