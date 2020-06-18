@@ -59,6 +59,14 @@ class Helm implements Serializable {
     return keysFileContent.tokenize('\n')
   }
 
+  static def escapeSpecialChars(str) {
+    def newStr = str.replace('\\', '\\\\\\\\')
+    newStr = newStr.replace(/,/, /\,/)
+    newStr = newStr.replace(/"/, /\"/)
+    newStr = newStr.replace(/`/, /\`/)
+    return newStr
+  }
+
   static def deployChart(ctx, environment, registry, chartName, tag) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       def deploymentName = "$chartName-$tag"
@@ -77,11 +85,8 @@ class Helm implements Serializable {
       def chartyName = "./helm/$chartName"
 
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key dev/post.username --label \\\\0 --resolve-keyvault | jq -r '.[] | .value'").trim()
-      appConfigResults = appConfigResults.replace('\\', '\\\\\\\\') // Need to do the backslash replacing first as we are adding them below!
-      appConfigResults = appConfigResults.replace(/,/, /\,/)
-      appConfigResults = appConfigResults.replace(/"/, /\"/)
-      appConfigResults = appConfigResults.replace(/`/, /\`/)
-      def myStr = $/"$appConfigResults"/$
+      def qqq = escapeSpecialChars(appConfigResults)
+      def myStr = $/"$qqq"/$
       ctx.sh($/$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName $chartyName --set post.username=$myStr $prCommands $extraCommands/$)
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
