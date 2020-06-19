@@ -14,10 +14,9 @@ buildNodeJs environment: 'dev'
 ```
 
 By default an [npm audit](https://docs.npmjs.com/cli/audit) will run for every
-build. Currently the job will not fail the build regardless of any
-vulnerabilities being found. This is a temporary measure and when it changes,
-the library will be a new `MAJOR` version as there is a high likelihood
-existing builds will fail.
+build. If any issues are identified at a level of `moderate` or above the build
+will be marked as failed.
+
 The job has been setup to allow several options to be configured, details of
 those options are available in [build](build.md). In order to override the
 options when running the `buildNodeJs` pipeline, the config option requires the
@@ -33,9 +32,8 @@ By default a
 will run during the build. This is achieved through the use of the
 [snyk security scanner](https://plugins.jenkins.io/snyk-security-scanner/)
 plugin for Jenkins.
-The default settings will not fail the build if vulnerabilities are
-detected, (this is likely to change in the future at which time a MAJOR version
-increment to the library will be made).
+The default settings will fail the build when an issue of `medium` or above is
+identified.
 The job has been setup to allow several options to be configured, details of
 those options are available in [build](build.md). In order to override the
 options from the `buildNodeJs` pipeline the config object requires the keys

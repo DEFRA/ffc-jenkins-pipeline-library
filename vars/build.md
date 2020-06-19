@@ -144,7 +144,13 @@ build.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web',
 
 ## npmAudit
 
-Runs [npm audit](https://docs.npmjs.com/cli/audit) against the project.
+Runs [npm audit](https://docs.npmjs.com/cli/audit) against the project. If any
+issues are identified with a
+[severity](https://docs.npmjs.com/about-audit-reports#severity) of `moderate`
+or above the build will be failed.
+
+Issues can be resolved by running
+[`npm audit fix`](https://docs.npmjs.com/cli/audit).
 
 Takes five parameters:
 - `auditLevel` - level of vulnerabilities at which the audit will fail.
@@ -154,7 +160,7 @@ Takes five parameters:
   nature. Other options include `json` and if the default option of the very
   long log is required any truthy value can be used e.g. `long`.
 - `failOnIssues` - flag to determine if the step should fail if issues are
-  found in the audit. Default is `false`
+  found in the audit. Default is `true`
 - `containerImage` - name of the container image to use for the npm audit
 - `containerWorkDir` - path to the default working directory of the container
   image
@@ -162,7 +168,7 @@ Takes five parameters:
 Example usage:
 
 ```
-build.npmAudit('critical', null, true)
+build.npmAudit('critical', null, false)
 ```
 
 ## snykTest
@@ -175,7 +181,8 @@ of `medium` or above, the build will be failed.
 
 Details of how to resolve issues are covered within the (internal)
 [Snyk](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1943897107/Snyk#Resolving-issues)
-confluence page.
+confluence page. If the page is not accessible, see the documentation on
+[snyk.io](https://support.snyk.io/hc/en-us/articles/360003891038-Fix-your-vulnerabilities).
 
 Takes three parameters:
 - `failOnIssues` - should the job fail when issues are detected. Default is
