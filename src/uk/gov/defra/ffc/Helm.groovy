@@ -1,6 +1,8 @@
 package uk.gov.defra.ffc
 
 class Helm implements Serializable {
+  static String suppressConsoleOutput = '#!/bin/bash +x\n'
+
   static def writeUrlIfIngress(ctx, deploymentName) {
     ctx.sh("kubectl get ingress -n $deploymentName -o json --ignore-not-found | jq '.items[0].spec.rules[0].host // empty' | xargs --no-run-if-empty printf 'Build available for review at https://%s\n'")
   }
@@ -24,19 +26,51 @@ class Helm implements Serializable {
     return "--set $flags"
   }
 
+  static def escapeSpecialChars(str) {
+    return str.replace('\\', '\\\\\\\\').replace(/,/, /\,/).replace(/"/, /\"/).replace(/`/, /\`/)
+  }
+
+  static def getValuesFromAppConfig(ctx, configKeys, prefix, label='\\\\0', failIfNotFound=true, delimiter='/') {
+    def configItems = [:]
+
+    configKeys.each { key ->
+      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq -r '.[] | .value'").trim()
+      def numResults = appConfigResults.tokenize('\n').size()
+
+      if (numResults == 1) {
+          configItems[key.trim()] = $/"${Helm.escapeSpecialChars(appConfigResults)}"/$
+      }
+      else if (numResults == 0 && !failIfNotFound) { }
+      else {
+          throw new Exception("Unexpected number of results from App Configuration when retrieving $prefix$delimiter$key: $numResults")
+      }
+    }
+
+    return configItems
+  }
+
+  static def configItemsToSetString(configItems) {
+    return configItems.size() > 0 ? ("--set " + configItems.collect { "$it.key=$it.value" }.join(',')) : ''
+  }
+
+  static def getConfigKeysFromFile(ctx, filename) {
+    return ctx.readFile(filename).tokenize('\n')
+  }
+
   static def deployChart(ctx, environment, registry, chartName, tag) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
-      ctx.withCredentials([
-        ctx.file(credentialsId: "$chartName-$environment-values", variable: 'envValues'),
-        ctx.file(credentialsId: "$chartName-pr-values", variable: 'prValues')
-      ]) {
-        def deploymentName = "$chartName-$tag"
-        def extraCommands = Helm.getExtraCommands(tag)
-        def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
-        ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName -f $ctx.envValues -f $ctx.prValues $prCommands $extraCommands")
-        Helm.writeUrlIfIngress(ctx, deploymentName)
-      }
+      def deploymentName = "$chartName-$tag"
+      def extraCommands = Helm.getExtraCommands(tag)
+      def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
+
+      def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
+      def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+      def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
+
+      ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
+      ctx.echo('Running helm upgrade, console output suppressed')
+      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
+      Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
 
@@ -108,21 +142,23 @@ class Helm implements Serializable {
     ctx.withEnv(['HELM_EXPERIMENTAL_OCI=1']) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
         ctx.withCredentials([
-          ctx.file(credentialsId: "$chartName-$environment-values", variable: 'values'),
           ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
         ]) {
           // jenkins doesn't tidy up folder, remove old charts before running
           ctx.sh('rm -rf helm-install')
           ctx.dir('helm-install') {
-            def extraCommands = Helm.getExtraCommands(chartVersion)
             def helmChartName = "$ctx.DOCKER_REGISTRY/$chartName:helm-$chartVersion"
-
             ctx.sh("helm registry login $ctx.DOCKER_REGISTRY --username $ctx.username --password $ctx.password")
             ctx.sh("helm chart pull $helmChartName")
             ctx.sh("helm chart export $helmChartName --destination .")
 
+            def extraCommands = Helm.getExtraCommands(chartVersion)
+            def configKeys = Helm.getConfigKeysFromFile(ctx, "$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
+            def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
-            ctx.sh("helm upgrade $chartName $chartName --namespace=$namespace -f $ctx.values --set namespace=$namespace $extraCommands")
+            ctx.echo('Running helm upgrade, console output suppressed')
+            ctx.sh("$suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues --set namespace=$namespace $extraCommands")
 
             ctx.deleteDir()
           }
