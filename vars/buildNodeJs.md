@@ -32,9 +32,8 @@ By default a
 will run during the build. This is achieved through the use of the
 [snyk security scanner](https://plugins.jenkins.io/snyk-security-scanner/)
 plugin for Jenkins.
-The default settings will not fail the build if vulnerabilities are
-detected, (this is likely to change in the future at which time a MAJOR version
-increment to the library will be made).
+The default settings will fail the build when an issue of `medium` or above is
+identified.
 The job has been setup to allow several options to be configured, details of
 those options are available in [build](build.md). In order to override the
 options from the `buildNodeJs` pipeline the config object requires the keys

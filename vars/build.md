@@ -181,7 +181,8 @@ of `medium` or above, the build will be failed.
 
 Details of how to resolve issues are covered within the (internal)
 [Snyk](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1943897107/Snyk#Resolving-issues)
-confluence page.
+confluence page. If the page is not accessible, see the documentation on
+[snyk.io](https://support.snyk.io/hc/en-us/articles/360003891038-Fix-your-vulnerabilities).
 
 Takes three parameters:
 - `failOnIssues` - should the job fail when issues are detected. Default is
