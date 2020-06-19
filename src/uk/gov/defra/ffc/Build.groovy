@@ -65,7 +65,7 @@ class Build implements Serializable {
   static def npmAudit(ctx, auditLevel, logType, failOnIssues, containerImage, containerWorkDir) {
     auditLevel = auditLevel ?: 'moderate'
     logType = logType ?: 'parseable'
-    failOnIssues = failOnIssues ?: false
+    failOnIssues = failOnIssues ?: true
     // setting `returnStatus` means the sh cmd can return non-zero exit codes
     // without affecting the build status
     def script = "docker run --rm -u node " +
