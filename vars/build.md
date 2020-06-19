@@ -167,11 +167,19 @@ build.npmAudit('critical', null, true)
 
 ## snykTest
 
-Runs [snyk test](https://support.snyk.io/hc/en-us/articles/360003812578-CLI-reference) against the project.
+Runs
+[snyk test](https://support.snyk.io/hc/en-us/articles/360003812578-CLI-reference)
+against the project. If any issues are identified with a
+[severity](https://support.snyk.io/hc/en-us/articles/360001040078-How-is-a-vulnerability-s-severity-determined-)
+of `medium` or above, the build will be failed.
+
+Details of how to resolve issues are covered within the (internal)
+[Snyk](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1943897107/Snyk#Resolving-issues)
+confluence page.
 
 Takes three parameters:
 - `failOnIssues` - should the job fail when issues are detected. Default is
-  `false`
+  `true`
 - `organisation` - against which the report should be recorded. Default is the
   env var `SNYK_ORG`
 - `severity` - of issues to be reported. Default is `medium`
