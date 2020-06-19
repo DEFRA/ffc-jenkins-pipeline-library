@@ -153,7 +153,7 @@ class Helm implements Serializable {
             ctx.sh("helm chart export $helmChartName --destination .")
 
             def extraCommands = Helm.getExtraCommands(chartVersion)
-            def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
+            def configKeys = Helm.getConfigKeysFromFile(ctx, "$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
             def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
