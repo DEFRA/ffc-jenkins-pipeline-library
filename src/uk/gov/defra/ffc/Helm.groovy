@@ -67,14 +67,11 @@ class Helm implements Serializable {
       def searchKey = prefix + key
 
       if (appConfigMap.containsKey(searchKey)) {
-        results[key] = appConfigMap[searchKey]
+        results[key.trim()] = $/"${Helm.escapeSpecialChars(appConfigMap[searchKey])}"/$
       }
     }
 
-    ctx.echo("$label, $prefix")
-    results.each { key, value ->
-      ctx.echo("$key => $value")
-    }
+    return results
   }
 
   static def deployChart(ctx, environment, registry, chartName, tag) {
@@ -85,10 +82,15 @@ class Helm implements Serializable {
 
       def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
 
-      getConfig(ctx, configKeys, '\\\\0', (environment + '/'))
-      getConfig(ctx, configKeys, chartName, (environment + '/'))
-      getConfig(ctx, configKeys, '\\\\0', (environment + '/pr/'))
-      getConfig(ctx, configKeys, chartName, (environment + '/pr/'))
+      def defaultConfigValues = Helm.configItemsToSetString(Helm.getConfig(ctx, configKeys, '\\\\0', (environment + '/')))
+      def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getConfig(ctx, configKeys, chartName, (environment + '/')))
+      def prConfigValues = Helm.configItemsToSetString(Helm.getConfig(ctx, configKeys, '\\\\0', (environment + '/pr/')))
+      def prConfigValuesChart = Helm.configItemsToSetString(Helm.getConfig(ctx, configKeys, chartName, (environment + '/pr/')))
+
+      ctx.echo(defaultConfigValues)
+      ctx.echo(defaultConfigValuesChart)
+      ctx.echo(prConfigValues)
+      ctx.echo(prConfigValuesChart)
 
       // def items = Helm.getValuesFromAppConfig(ctx, configKeys, environment)
       // def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
