@@ -58,7 +58,9 @@ class Helm implements Serializable {
     return ctx.readFile(filename).tokenize('\n')
   }
 
-  static def findKV(helmKeys, appConfigMap, prefix) {
+  static def getConfig(ctx, helmKeys, label, prefix) {
+    def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$label --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
+    def configMap = ctx.readJSON text: appConfigResults, returnPojo: true
     def results = [:]
 
     helmKeys.each { key ->
@@ -69,27 +71,9 @@ class Helm implements Serializable {
       }
     }
 
-    return results
-  }
-
-  static def testQqq(ctx, helmKeys, label, delimiter, prefix, checkPR) {
-    def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$label --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
-    def configMap = ctx.readJSON text: appConfigResults, returnPojo: true
-
-    def results1 = findKV(helmKeys, configMap, (prefix + delimiter))
-
-    ctx.echo("$label, $prefix$delimiter")
-    results1.each { key, value ->
+    ctx.echo("$label, $prefix$key")
+    results.each { key, value ->
       ctx.echo("$key => $value")
-    }
-
-    if (checkPR) {
-      def results2 = findKV(helmKeys, configMap, (prefix + delimiter + 'pr' + delimiter))
-
-      ctx.echo("$label, $prefix${delimiter}pr$delimiter")
-      results2.each { key, value ->
-        ctx.echo("$key => $value")
-      }
     }
   }
 
@@ -101,15 +85,10 @@ class Helm implements Serializable {
 
       def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
 
-      testQqq(ctx, configKeys, '\\\\0', '/', environment, true)
-      testQqq(ctx, configKeys, chartName, '/', environment, true)
-
-      // if (configMap.containsKey("dev/environment")) {
-      //   ctx.echo("HAS KEY")
-      // }
-      // else {
-      //   ctx.echo("NOT HAS KEY")
-      // }
+      getConfig(ctx, configKeys, '\\\\0', (environment + '/'))
+      getConfig(ctx, configKeys, chartName, (environment + '/'))
+      getConfig(ctx, configKeys, '\\\\0', (environment + '/pr/'))
+      getConfig(ctx, configKeys, chartName, (environment + '/pr/'))
 
       // def items = Helm.getValuesFromAppConfig(ctx, configKeys, environment)
       // def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
