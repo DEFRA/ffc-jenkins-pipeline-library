@@ -74,11 +74,10 @@ class Helm implements Serializable {
       // }
 
       configKeys.each { key ->
-        def qqq = "dev/" + key
-        ctx.echo("Checking $qqq")
+        def searchKey = "dev/" + key
 
-        if (configMap.containsKey(qqq)) {
-          def value = configMap["dev/$key"]
+        if (configMap.containsKey(searchKey)) {
+          def value = configMap[searchKey]
           ctx.echo("FOUND!! $key => $value")
         }
         // else {
