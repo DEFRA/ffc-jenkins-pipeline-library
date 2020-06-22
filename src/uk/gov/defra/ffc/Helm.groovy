@@ -67,13 +67,15 @@ class Helm implements Serializable {
       def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
 
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key dev/* --label \\\\0 --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
-      def configObj = readJSON text: appConfigResults
 
-      println("HERE WE GO")
-      configObj.each { key, val ->
-        println("$key => $val")
-      }
-      println("HERE WE WERE")
+      println(appConfigResults)
+      // def configObj = readJSON text: appConfigResults
+
+      // println("HERE WE GO")
+      // configObj.each { key, val ->
+      //   println("$key => $val")
+      // }
+      // println("HERE WE WERE")
 
       // def items = Helm.getValuesFromAppConfig(ctx, configKeys, environment)
       // def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
