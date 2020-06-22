@@ -74,7 +74,7 @@ class Helm implements Serializable {
       }
 
       configKeys.each { key ->
-        ctx.echo("$key")
+        ctx.echo("dev/$key")
         // if (configMap.containsKey("dev/$key")) {
         //   def value = configMap["dev/$key"]
         //   ctx.echo("$key => $value")
@@ -84,6 +84,12 @@ class Helm implements Serializable {
         // }
       }
 
+      if (configMap.containsKey("dev/environment")) {
+        ctx.echo("HAS KEY")
+      }
+      else {
+        ctx.echo("NOT HAS KEY")
+      }
 
       // def items = Helm.getValuesFromAppConfig(ctx, configKeys, environment)
       // def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
