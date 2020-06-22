@@ -59,7 +59,7 @@ class Helm implements Serializable {
   }
 
   static def findKV(helmKeys, appConfigMap, prefix) {
-    def results = []
+    def results = [:]
 
     helmKeys.each { key ->
       def searchKey = prefix + key
