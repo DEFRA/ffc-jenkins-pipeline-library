@@ -68,7 +68,7 @@ class Helm implements Serializable {
 
       def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
 
-      println(appConfigResults)
+      ctx.echo "$appConfigResults"
       // def configObj = readJSON text: appConfigResults
 
       // println("HERE WE GO")
