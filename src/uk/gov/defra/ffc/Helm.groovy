@@ -71,7 +71,7 @@ class Helm implements Serializable {
       }
     }
 
-    ctx.echo("$label, $prefix$key")
+    ctx.echo("$label, $prefix")
     results.each { key, value ->
       ctx.echo("$key => $value")
     }
