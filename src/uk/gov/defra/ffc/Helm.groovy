@@ -1,7 +1,8 @@
 package uk.gov.defra.ffc
 
 class Helm implements Serializable {
-  static String suppressConsoleOutput = '#!/bin/bash +x\n'
+  // static String suppressConsoleOutput = '#!/bin/bash +x\n'
+  static String suppressConsoleOutput = ''
 
   static def writeUrlIfIngress(ctx, deploymentName) {
     ctx.sh("kubectl get ingress -n $deploymentName -o json --ignore-not-found | jq '.items[0].spec.rules[0].host // empty' | xargs --no-run-if-empty printf 'Build available for review at https://%s\n'")
@@ -34,16 +35,16 @@ class Helm implements Serializable {
     def configItems = [:]
 
     configKeys.each { key ->
-      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq -r '.[] | .value'").trim()
-      def numResults = appConfigResults.tokenize('\n').size()
+      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter* --label $label --resolve-keyvault | jq '.[] | {.value'").trim()
+      // def numResults = appConfigResults.tokenize('\n').size()
 
-      if (numResults == 1) {
-          configItems[key.trim()] = $/"${Helm.escapeSpecialChars(appConfigResults)}"/$
-      }
-      else if (numResults == 0 && !failIfNotFound) { }
-      else {
-          throw new Exception("Unexpected number of results from App Configuration when retrieving $prefix$delimiter$key: $numResults")
-      }
+      // if (numResults == 1) {
+      //     configItems[key.trim()] = $/"${Helm.escapeSpecialChars(appConfigResults)}"/$
+      // }
+      // else if (numResults == 0 && !failIfNotFound) { }
+      // else {
+      //     throw new Exception("Unexpected number of results from App Configuration when retrieving $prefix$delimiter$key: $numResults")
+      // }
     }
 
     return configItems
@@ -64,15 +65,27 @@ class Helm implements Serializable {
       def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
       def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
-      def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
-      def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, chartName, false))
-      def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, "$environment/pr", '\\\\0', false))
-      def prConfigValuesChart = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, "$environment/pr", chartName, false))
 
-      ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-      ctx.echo('Running helm upgrade, console output suppressed')
-      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
-      Helm.writeUrlIfIngress(ctx, deploymentName)
+      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key dev/* --label \\\\0 --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
+      def configObj = readJSON text: appConfigResults
+
+      println("HERE WE GO")
+      configObj.each { key, val ->
+        println("$key => $val")
+      }
+      println("HERE WE WERE")
+
+      // def items = Helm.getValuesFromAppConfig(ctx, configKeys, environment)
+      // def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+      // def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, chartName, false))
+      // def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, "$environment/pr", '\\\\0', false))
+      // def prConfigValuesChart = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, "$environment/pr", chartName, false))
+
+      // ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
+      // ctx.echo('Running helm upgrade, console output suppressed')
+      // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
+      // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prCommands $extraCommands")
+      // Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
 
