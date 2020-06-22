@@ -70,7 +70,7 @@ class Helm implements Serializable {
 
       ctx.echo "$appConfigResults"
       ctx.echo "${appConfigResults.getClass()}"
-      // def configObj = readJSON text: appConfigResults
+      def configObj = readJSON text: appConfigResults
 
       // println("HERE WE GO")
       // configObj.each { key, val ->
