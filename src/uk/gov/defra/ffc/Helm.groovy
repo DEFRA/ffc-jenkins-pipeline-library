@@ -71,9 +71,9 @@ class Helm implements Serializable {
 
       // def configMap = []
 
-      // configArray.each { obj ->
-      //   configMap[obj['key']] = obj['value']
-      // }
+      configArray.each { obj ->
+        ctx.echo("$obj")
+      }
 
       // configMap.each { key, value ->
       //   ctx.echo("$key => $value")
