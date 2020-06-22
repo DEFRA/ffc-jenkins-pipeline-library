@@ -70,7 +70,7 @@ class Helm implements Serializable {
       def configMap = ctx.readJSON text: appConfigResults, returnPojo: true
 
       configKeys.each { key ->
-        if (configMap.hasKey("dev/$key")) {
+        if (configMap.containsKey("dev/$key")) {
           def value = configMap["dev/$key"]
           ctx.echo("$key => $value")
         }
