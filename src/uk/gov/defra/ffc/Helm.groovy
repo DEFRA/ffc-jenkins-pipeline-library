@@ -58,6 +58,41 @@ class Helm implements Serializable {
     return ctx.readFile(filename).tokenize('\n')
   }
 
+  static def findKV(helmKeys, appConfigMap, prefix) {
+    def results = []
+
+    helmKeys.each { key ->
+      def searchKey = prefix + key
+
+      if (appConfigMap.containsKey(searchKey)) {
+        results[key] = appConfigMap[searchKey]
+      }
+    }
+
+    return results
+  }
+
+  static def testQqq(ctx, helmKeys, label, delimiter, prefix, checkPR) {
+    def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$label --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
+    def configMap = ctx.readJSON text: appConfigResults, returnPojo: true
+
+    def results1 = findKV(helmKeys, configMap, (prefix + delimiter))
+
+    ctx.echo("$label, $prefix$delimiter")
+    results1.each { key, value ->
+      ctx.echo("$key => $value")
+    }
+
+    if (checkPR) {
+      def results2 = findKV(helmKeys, configMap, (prefix + delimiter + 'pr' + delimiter))
+
+      ctx.echo("$label, $prefix${delimiter}pr$delimiter")
+      results2.each { key, value ->
+        ctx.echo("$key => $value")
+      }
+    }
+  }
+
   static def deployChart(ctx, environment, registry, chartName, tag) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       def deploymentName = "$chartName-$tag"
@@ -66,24 +101,8 @@ class Helm implements Serializable {
 
       def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
 
-      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=\\\\0 --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
-      def configMap = ctx.readJSON text: appConfigResults, returnPojo: true
-
-      // configMap.each { key, value ->
-      //   ctx.echo("$key")
-      // }
-
-      configKeys.each { key ->
-        def searchKey = "dev/" + key
-
-        if (configMap.containsKey(searchKey)) {
-          def value = configMap[searchKey]
-          ctx.echo("FOUND!! $key => $value")
-        }
-        // else {
-        //   ctx.echo("No value for $key")
-        // }
-      }
+      testQqq(ctx, configKeys, '\\\\0', '/', environment, true)
+      testQqq(ctx, configKeys, chartName, '/', environment, true)
 
       // if (configMap.containsKey("dev/environment")) {
       //   ctx.echo("HAS KEY")
