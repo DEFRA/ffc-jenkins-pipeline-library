@@ -65,11 +65,13 @@ class Helm implements Serializable {
 
       def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
       def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+      def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, chartName, false))
       def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, "$environment/pr", '\\\\0', false))
+      def prConfigValuesChart = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, "$environment/pr", chartName, false))
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       ctx.echo('Running helm upgrade, console output suppressed')
-      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
+      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
       Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
