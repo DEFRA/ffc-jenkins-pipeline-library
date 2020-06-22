@@ -60,7 +60,7 @@ class Helm implements Serializable {
 
   static def getConfig(ctx, helmKeys, label, prefix) {
     def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$label --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
-    def configMap = ctx.readJSON text: appConfigResults, returnPojo: true
+    def appConfigMap = ctx.readJSON text: appConfigResults, returnPojo: true
     def results = [:]
 
     helmKeys.each { key ->
