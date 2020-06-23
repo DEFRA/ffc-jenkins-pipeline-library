@@ -50,12 +50,13 @@ class Build implements Serializable {
     return [repoName, pr, tag, mergedPrNo]
   }
 
-  static def updateGithubCommitStatus(ctx, message, state) {
+  static def updateGithubCommitStatus(ctx, message, state, commitCtx='ci/jenkins/build-status') {
     def commitSha = Utils.getCommitSha(ctx)
     def repoUrl = Utils.getRepoUrl(ctx)
     ctx.step([
       $class: 'GitHubCommitStatusSetter',
       reposSource: [$class: 'ManuallyEnteredRepositorySource', url: repoUrl],
+      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: commitCtx],
       commitShaSource: [$class: 'ManuallyEnteredShaSource', sha: commitSha],
       errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
       statusResultSource: [ $class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: message, state: state]] ]

@@ -18,6 +18,10 @@ def setGithubStatusFailure(message = '') {
   Build.updateGithubCommitStatus(this, message, 'FAILURE')
 }
 
+def setGithubStatus(message, status, commitCtx) {
+  Build.updateGithubCommitStatus(this, message, status, commitCtx)
+}
+
 def buildTestImage(credentialsId, registry, projectName, buildNumber, tag) {
   Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, tag)
 }

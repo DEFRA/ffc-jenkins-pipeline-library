@@ -16,7 +16,9 @@ node {
     }
     if (pr != '') {
       stage('Verify version incremented') {
+        build.setGithubStatus('verify version', 'PENDING', 'ci/jenkins/version-check')
         version.verifyFileIncremented(versionFileName)
+        build.setGithubStatus('verify version', 'SUCCESS', 'ci/jenkins/version-check')
       }
     } else {
       stage('Trigger GitHub release') {
