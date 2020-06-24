@@ -20,7 +20,7 @@ def call(Map config=[:]) {
 
       stage('Set PR, and tag variables') {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
-      }      
+      }
 
       if (pr != '') {
         stage('Verify version incremented') {
@@ -70,7 +70,7 @@ def call(Map config=[:]) {
 
       stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      }      
+      }
 
       if (config.containsKey('testClosure')) {
         config['testClosure']()
