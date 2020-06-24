@@ -48,10 +48,6 @@ def call(Map config=[:]) {
         test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
       }
 
-      stage('Wait for Quality Gate') {
-        test.waitForQualityGateResult(qualityGateTimeoutInMinutes)
-      }
-
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }

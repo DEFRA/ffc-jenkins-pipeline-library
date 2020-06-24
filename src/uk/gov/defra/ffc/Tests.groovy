@@ -53,14 +53,5 @@ class Tests implements Serializable {
     'sonar.pullrequest.github.repository': "defra/${projectName}",
     'sonar.language': 'js'
     ];
-  }
-
-  static def waitForQualityGateResult(ctx, timeoutInMinutes) {
-    ctx.timeout(time: timeoutInMinutes, unit: 'MINUTES') {
-      def qualityGateResult = ctx.waitForQualityGate()
-      if (qualityGateResult.status != 'OK') {
-        ctx.error("Pipeline aborted due to quality gate failure: ${qualityGateResult.status}")
-      }
-    }
-  }
+  }  
 }
