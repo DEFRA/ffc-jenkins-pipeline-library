@@ -39,11 +39,7 @@ def call(Map config=[:]) {
 
       stage('Snyk test') {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
-      }
-
-      stage('SonarCloud analysis') {
-        test.analyseCode(SONARCLOUD_ENV, SONAR_SCANNER, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
-      }
+      }      
 
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
@@ -63,6 +59,10 @@ def call(Map config=[:]) {
 
       stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      }
+
+      stage('SonarCloud analysis') {
+        test.analyseCode(SONARCLOUD_ENV, SONAR_SCANNER, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
       }
 
       if (config.containsKey('testClosure')) {
