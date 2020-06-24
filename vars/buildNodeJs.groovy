@@ -9,7 +9,6 @@ def call(Map config=[:]) {
   def mergedPrNo = ''
   def sonarQubeEnv = 'SonarCloud'
   def sonarScanner = 'SonarScanner'
-  def qualityGateTimeoutInMinutes = 10
 
   node {
     checkout scm
