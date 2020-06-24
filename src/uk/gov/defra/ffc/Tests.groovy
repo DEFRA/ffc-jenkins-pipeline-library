@@ -30,7 +30,7 @@ class Tests implements Serializable {
   }
 
   static def analyseCode(ctx, sonarQubeEnv, sonarScanner, params) {
-    def scannerHome = tool sonarScanner
+    def scannerHome = ctx.tool sonarScanner
     ctx.withSonarQubeEnv(sonarQubeEnv) {
       def args = ''
       params.each { param ->
@@ -41,12 +41,17 @@ class Tests implements Serializable {
     }
   }
 
-  static def waitForQualityGateResult(ctx, timeoutInMinutes) {
-    ctx.timeout(time: timeoutInMinutes, unit: 'MINUTES') {
-      def qualityGateResult = waitForQualityGate()
-      if (qualityGateResult.status != 'OK') {
-        ctx.error("Pipeline aborted due to quality gate failure: ${qualityGateResult.status}")
-      }
-    }
-  }
+  static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
+    return [
+    'sonar.organization': 'defra',
+    'sonar.projectKey': projectName,
+    'sonar.sources': '.',
+    'sonar.pullrequest.base': 'master',
+    'sonar.pullrequest.branch': branch,
+    'sonar.pullrequest.key': pr,
+    'sonar.pullrequest.provider': 'GitHub',
+    'sonar.pullrequest.github.repository': "defra/${projectName}",
+    'sonar.language': 'js'
+    ];
+  }  
 }

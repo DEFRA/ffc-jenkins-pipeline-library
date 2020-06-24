@@ -16,6 +16,6 @@ def analyseCode(sonarQubeEnv, sonarScanner, params) {
   Tests.analyseCode(this, sonarQubeEnv, sonarScanner, params)
 }
 
-def waitForQualityGateResult(timeoutInMinutes) {
-  Tests.waitForQualityGateResult(this, timeoutInMinutes)
+def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
+  return Tests.buildCodeAnalysisDefaultParams(projectName, branch, pr)
 }
