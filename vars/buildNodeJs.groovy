@@ -7,8 +7,6 @@ def call(Map config=[:]) {
   def pr = ''
   def tag = ''
   def mergedPrNo = ''
-  def sonarQubeEnv = 'SonarCloud'
-  def sonarScanner = 'SonarScanner'
 
   node {
     checkout scm
@@ -44,7 +42,7 @@ def call(Map config=[:]) {
       }
 
       stage('SonarCloud analysis') {
-        test.analyseCode(sonarQubeEnv, sonarScanner, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
+        test.analyseCode(SONARCLOUD_ENV, SONAR_SCANNER, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
       }
 
       stage('Build test image') {
