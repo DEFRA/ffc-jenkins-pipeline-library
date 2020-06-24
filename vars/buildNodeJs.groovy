@@ -39,7 +39,7 @@ def call(Map config=[:]) {
 
       stage('Snyk test') {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
-      }      
+      }
 
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
