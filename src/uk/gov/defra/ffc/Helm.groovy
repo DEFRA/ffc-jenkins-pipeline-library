@@ -36,6 +36,7 @@ class Helm implements Serializable {
 
   static def getHelmValuesKeys(ctx, helmValuesFileLocation) {
     def helmValuesKeys = ctx.sh(returnStdout: true, script:"yq r $helmValuesFileLocation --printMode p \"**\"").trim()
+    return helmValuesKeys.tokenize('\n')
   }
 
   static def getConfigValues(ctx, helmKeys, label, prefix) {
