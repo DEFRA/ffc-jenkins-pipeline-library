@@ -48,12 +48,14 @@ class Helm implements Serializable {
     def configValues = [:]
 
     helmKeys.each { key ->
-      // We can't use a GString here as the map keys are plain Java strings, so the containsKey won't match
+      // yq outputs arrays elements as .[ but the --set syntax for the helm command doesn't use the dot so remove it
+      key = key.replace('.[', '[').trim()
+
+      // We can't use a GString here as the map keys are plain Java strings, so the containsKey won't match a GString
       def searchKey = prefix + key
 
       if (appConfigMap.containsKey(searchKey)) {
-
-        configValues[key.replace('.[', '[').trim()] = $/"${Helm.escapeSpecialChars(appConfigMap[searchKey])}"/$
+        configValues[key] = $/"${Helm.escapeSpecialChars(appConfigMap[searchKey])}"/$
       }
     }
 
@@ -163,12 +165,14 @@ class Helm implements Serializable {
             ctx.sh("helm chart export $helmChartName --destination .")
 
             def extraCommands = Helm.getExtraCommands(chartVersion)
-            def configKeys = Helm.getConfigKeysFromFile(ctx, "$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
-            def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+
+            def helmValuesKeys = getHelmValuesKeys(ctx, "$chartName/values.yaml")
+            def defaultConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/')))
+            def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/')))
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
             ctx.echo('Running helm upgrade, console output suppressed')
-            ctx.sh("$suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues --set namespace=$namespace $extraCommands")
+            ctx.sh("$suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues $defaultConfigValuesChart --set namespace=$namespace $extraCommands")
 
             ctx.deleteDir()
           }
