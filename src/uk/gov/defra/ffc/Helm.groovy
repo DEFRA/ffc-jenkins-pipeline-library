@@ -34,6 +34,10 @@ class Helm implements Serializable {
     return configItems.size() > 0 ? ("--set " + configItems.collect { "$it.key=$it.value" }.join(',')) : ''
   }
 
+  static def getHelmValuesKeys(ctx, helmValuesFileLocation) {
+    def helmValuesKeys = ctx.sh(returnStdout: true, script:"yq r $helmValuesFileLocation --printMode p \"**\"").trim()
+  }
+
   static def getConfigValues(ctx, helmKeys, label, prefix) {
     // The jq command in the follow assumes there is only one value per key
     // This is true ONLY if you specify a label in the az appconfig kv command
@@ -59,21 +63,17 @@ class Helm implements Serializable {
       def extraCommands = Helm.getExtraCommands(tag)
       def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
+      def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
 
+      def defaultConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, '\\\\0', (environment + '/')))
+      def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, chartName, (environment + '/')))
+      def prConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, '\\\\0', (environment + '/pr/')))
+      def prConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, chartName, (environment + '/pr/')))
 
-      def helmValuesKeys = ctx.sh(returnStdout: true, script:"yq r helm/$chartName/values.yaml --printMode p \"**\"")
-
-      ctx.echo("$helmValuesKeys")
-
-      // def defaultConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, '\\\\0', (environment + '/')))
-      // def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, chartName, (environment + '/')))
-      // def prConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, '\\\\0', (environment + '/pr/')))
-      // def prConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, chartName, (environment + '/pr/')))
-
-      // ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-      // ctx.echo('Running helm upgrade, console output suppressed')
-      // ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
-      // Helm.writeUrlIfIngress(ctx, deploymentName)
+      ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
+      ctx.echo('Running helm upgrade, console output suppressed')
+      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
+      Helm.writeUrlIfIngress(ctx, deploymentName)
     }
   }
 
