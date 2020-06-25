@@ -65,10 +65,10 @@ class Helm implements Serializable {
 
       def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
 
-      def defaultConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, '\\\\0', (environment + '/')))
-      def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, chartName, (environment + '/')))
-      def prConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, '\\\\0', (environment + '/pr/')))
-      def prConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, configKeys, chartName, (environment + '/pr/')))
+      def defaultConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/')))
+      def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/')))
+      def prConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/pr/')))
+      def prConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/pr/')))
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       ctx.echo('Running helm upgrade, console output suppressed')
