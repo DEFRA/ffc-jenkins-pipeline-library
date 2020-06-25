@@ -77,6 +77,7 @@ class Build implements Serializable {
 
   static def snykTest(ctx, failOnIssues, organisation, severity) {
     failOnIssues = failOnIssues ?: true
+    ctx.echo("FAIL ON ISSUES: $failOnIssues")
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
     ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token', failOnIssues: failOnIssues, organisation: organisation, severity: severity)
