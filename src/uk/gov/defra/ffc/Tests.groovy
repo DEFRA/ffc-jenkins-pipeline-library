@@ -45,8 +45,7 @@ class Tests implements Serializable {
     def params = [
     'sonar.organization': 'defra',
     'sonar.projectKey': projectName,
-    'sonar.sources': '.',
-    'sonar.language': 'js'
+    'sonar.sources': '.'
     ];
 
     if(pr != '') {
