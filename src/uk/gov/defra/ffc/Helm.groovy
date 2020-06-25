@@ -55,6 +55,10 @@ class Helm implements Serializable {
       }
     }
 
+    if (configValues.size() > 0) {
+      ctx.echo("Following keys found with prefix=$prefix and label=$label: ${configValues.keySet()}")
+    }
+
     return configValues
   }
 
