@@ -53,7 +53,8 @@ class Helm implements Serializable {
 
       if (appConfigMap.containsKey(searchKey)) {
         if (key.contains('.[')) {
-          ctx.echo("FOUND ARRAY VALUE: $key")
+          def qqq = $key.replace('.[', '[')
+          ctx.echo("FOUND ARRAY VALUE: $key $qqq")
         }
 
         configValues[key.trim()] = $/"${Helm.escapeSpecialChars(appConfigMap[searchKey])}"/$
