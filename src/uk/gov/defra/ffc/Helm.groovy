@@ -155,48 +155,44 @@ class Helm implements Serializable {
   }
 
   static def deployRemoteChart(ctx, environment, namespace, chartName, chartVersion) {
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
-      ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
-        ctx.withCredentials([
-          ctx.file(credentialsId: "$chartName-$environment-values", variable: 'values')
-        ]) {
-          def extraCommands = getExtraCommands(chartVersion)
-          addHelmRepo(ctx, 'ffc', "${ctx.ARTIFACTORY_REPO_URL}ffc-helm-virtual")
-          ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
-          ctx.sh("helm upgrade --namespace=$namespace $chartName -f $ctx.values --set namespace=$namespace ffc/$chartName $extraCommands")
-        }
+    ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+      ctx.withCredentials([
+        ctx.file(credentialsId: "$chartName-$environment-values", variable: 'values')
+      ]) {
+        def extraCommands = getExtraCommands(chartVersion)
+        addHelmRepo(ctx, 'ffc', "${ctx.ARTIFACTORY_REPO_URL}ffc-helm-virtual")
+        ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
+        ctx.sh("helm upgrade --namespace=$namespace $chartName -f $ctx.values --set namespace=$namespace ffc/$chartName $extraCommands")
       }
     }
   }
 
   static def deployRemoteChartFromACR(ctx, environment, namespace, chartName, chartVersion) {
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
-      ctx.withEnv(['HELM_EXPERIMENTAL_OCI=1']) {
-        ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
-          ctx.withCredentials([
-            ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
-          ]) {
-            // jenkins doesn't tidy up folder, remove old charts before running
-            ctx.sh('rm -rf helm-install')
-            ctx.dir('helm-install') {
-              def helmChartName = "$ctx.DOCKER_REGISTRY/$chartName:helm-$chartVersion"
-              ctx.sh("helm registry login $ctx.DOCKER_REGISTRY --username $ctx.username --password $ctx.password")
-              ctx.sh("helm chart pull $helmChartName")
-              ctx.sh("helm chart export $helmChartName --destination .")
+    ctx.withEnv(['HELM_EXPERIMENTAL_OCI=1']) {
+      ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+        ctx.withCredentials([
+          ctx.usernamePassword(credentialsId: ctx.DOCKER_REGISTRY_CREDENTIALS_ID, usernameVariable: 'username', passwordVariable: 'password')
+        ]) {
+          // jenkins doesn't tidy up folder, remove old charts before running
+          ctx.sh('rm -rf helm-install')
+          ctx.dir('helm-install') {
+            def helmChartName = "$ctx.DOCKER_REGISTRY/$chartName:helm-$chartVersion"
+            ctx.sh("helm registry login $ctx.DOCKER_REGISTRY --username $ctx.username --password $ctx.password")
+            ctx.sh("helm chart pull $helmChartName")
+            ctx.sh("helm chart export $helmChartName --destination .")
 
-              def extraCommands = getExtraCommands(chartVersion)
+            def extraCommands = getExtraCommands(chartVersion)
 
-              def helmValuesKeys = getHelmValuesKeys(ctx, "$chartName/values.yaml")
-              def appConfigPrefix = environment + '/'
-              def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
-              def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
+            def helmValuesKeys = getHelmValuesKeys(ctx, "$chartName/values.yaml")
+            def appConfigPrefix = environment + '/'
+            def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
+            def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
 
-              ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
-              ctx.echo('Running helm upgrade, console output suppressed')
-              ctx.sh("$suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues $defaultConfigValuesChart --set namespace=$namespace $extraCommands")
+            ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
+            ctx.echo('Running helm upgrade, console output suppressed')
+            ctx.sh("$suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues $defaultConfigValuesChart --set namespace=$namespace $extraCommands")
 
-              ctx.deleteDir()
-            }
+            ctx.deleteDir()
           }
         }
       }
