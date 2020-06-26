@@ -1,5 +1,8 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.GitHubStatus
+import uk.gov.defra.ffc.Utils
+
 class Version implements Serializable {
   /**
    * Returns the project version from the `[projectName].csproj` file in the master
@@ -46,10 +49,14 @@ class Version implements Serializable {
   static def errorOnNoVersionIncrement(ctx, previousVersion, currentVersion){
     def cleanPreviousVersion = Version.extractSemVerVersion(previousVersion)
     def cleanCurrentVersion = Version.extractSemVerVersion(currentVersion)
-    if (Version.hasIncremented(cleanPreviousVersion, cleanCurrentVersion)) {
-      ctx.echo("Version increment valid '$previousVersion' -> '$currentVersion'.")
-    } else {
-      ctx.error("Version increment invalid '$previousVersion' -> '$currentVersion'.")
+    def repoName = Utils.getRepoName(ctx)
+    def commitSha = Utils.getCommitSha(ctx)
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: commitSha, repo: repoName, gitHubContext: GitHubStatus.VerifyVersion.Context, description: GitHubStatus.VerifyVersion.Description) {
+      if (Version.hasIncremented(cleanPreviousVersion, cleanCurrentVersion)) {
+        ctx.echo("Version increment valid '$previousVersion' -> '$currentVersion'.")
+      } else {
+        ctx.error("Version increment invalid '$previousVersion' -> '$currentVersion'.")
+      }
     }
   }
 

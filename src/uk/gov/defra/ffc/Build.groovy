@@ -1,5 +1,6 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.GitHubStatus
 import uk.gov.defra.ffc.Utils
 
 class Build implements Serializable {
@@ -22,8 +23,12 @@ class Build implements Serializable {
   }
 
   static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
-    ctx.docker.withRegistry("https://$registry", credentialsId) {
-      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache")
+    def commitSha = Utils.getCommitSha(ctx)
+    def repoName = Utils.getRepoName(ctx)
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: commitSha, repo: repoName, gitHubContext: GitHubStatus.BuildTestImage.Context, description: GitHubStatus.BuildTestImage.Description) {
+      ctx.docker.withRegistry("https://$registry", credentialsId) {
+        ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build --no-cache")
+      }
     }
   }
 
@@ -56,6 +61,7 @@ class Build implements Serializable {
     ctx.step([
       $class: 'GitHubCommitStatusSetter',
       reposSource: [$class: 'ManuallyEnteredRepositorySource', url: repoUrl],
+      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: GitHubStatus.Build.Context],
       commitShaSource: [$class: 'ManuallyEnteredShaSource', sha: commitSha],
       errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
       statusResultSource: [ $class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: message, state: state]] ]
@@ -63,6 +69,8 @@ class Build implements Serializable {
   }
 
   static def npmAudit(ctx, auditLevel, logType, failOnIssues, containerImage, containerWorkDir) {
+    def commitSha = Utils.getCommitSha(ctx)
+    def repoName = Utils.getRepoName(ctx)
     auditLevel = auditLevel ?: 'moderate'
     logType = logType ?: 'parseable'
     failOnIssues = failOnIssues == false ? false : true
@@ -72,13 +80,19 @@ class Build implements Serializable {
     "--mount type=bind,source='$ctx.WORKSPACE/package.json',target=$containerWorkDir/package.json " +
     "--mount type=bind,source='$ctx.WORKSPACE/package-lock.json',target=$containerWorkDir/package-lock.json " +
     "$containerImage npm audit --audit-level=$auditLevel --$logType"
-    ctx.sh(returnStatus: !failOnIssues, script: script)
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: commitSha, repo: repoName, gitHubContext: GitHubStatus.NpmAudit.Context, description: GitHubStatus.NpmAudit.Description) {
+      ctx.sh(returnStatus: !failOnIssues, script: script)
+    }
   }
 
   static def snykTest(ctx, failOnIssues, organisation, severity) {
+    def commitSha = Utils.getCommitSha(ctx)
+    def repoName = Utils.getRepoName(ctx)
     failOnIssues = failOnIssues == false ? false : true
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
-    ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token', failOnIssues: failOnIssues, organisation: organisation, severity: severity)
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: commitSha, repo: repoName, gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
+      ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token', failOnIssues: failOnIssues, organisation: organisation, severity: severity)
+    }
   }
 }

@@ -62,7 +62,7 @@ def call(Map config=[:]) {
       }
 
       stage('SonarCloud analysis') {
-        test.analyseCode(SONARCLOUD_ENV, SONAR_SCANNER, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))        
+        test.analyseCode(SONARCLOUD_ENV, SONAR_SCANNER, test.buildCodeAnalysisDefaultParams(repoName, BRANCH_NAME, pr))
       }
 
       if (config.containsKey('testClosure')) {
