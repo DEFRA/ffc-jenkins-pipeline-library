@@ -1,5 +1,8 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.GitHubStatus
+import uk.gov.defra.ffc.Utils
+
 class Helm implements Serializable {
   static String suppressConsoleOutput = '#!/bin/bash +x\n'
 
@@ -79,22 +82,24 @@ class Helm implements Serializable {
   }
 
   static def deployChart(ctx, environment, registry, chartName, tag) {
-    ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
-      def deploymentName = "$chartName-$tag"
-      def extraCommands = getExtraCommands(tag)
-      def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
+      ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+        def deploymentName = "$chartName-$tag"
+        def extraCommands = getExtraCommands(tag)
+        def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-      def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
-      def appConfigPrefix = environment + '/'
-      def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
-      def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
-      def prConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
-      def prConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
+        def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
+        def appConfigPrefix = environment + '/'
+        def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
+        def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
+        def prConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
+        def prConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
 
-      ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-      ctx.echo('Running helm upgrade, console output suppressed')
-      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
-      writeUrlIfIngress(ctx, deploymentName)
+        ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
+        ctx.echo('Running helm upgrade, console output suppressed')
+        ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
+        writeUrlIfIngress(ctx, deploymentName)
+      }
     }
   }
 
