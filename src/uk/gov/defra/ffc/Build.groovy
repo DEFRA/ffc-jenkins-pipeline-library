@@ -54,10 +54,9 @@ class Build implements Serializable {
   }
 
   static def updateGithubCommitStatus(ctx, message, state) {
-    def repoUrl = Utils.getRepoUrl(ctx)
     ctx.step([
       $class: 'GitHubCommitStatusSetter',
-      reposSource: [$class: 'ManuallyEnteredRepositorySource', url: repoUrl],
+      reposSource: [$class: 'ManuallyEnteredRepositorySource', url: Utils.getRepoUrl(ctx)],
       contextSource: [$class: "ManuallyEnteredCommitContextSource", context: GitHubStatus.Build.Context],
       commitShaSource: [$class: 'ManuallyEnteredShaSource', sha: Utils.getCommitSha(ctx)],
       errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
