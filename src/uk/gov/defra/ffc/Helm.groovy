@@ -36,7 +36,8 @@ class Helm implements Serializable {
 
   static def getHelmValuesKeys(ctx, helmValuesFileLocation) {
     def helmValuesKeys = ctx.sh(returnStdout: true, script:"yq r $helmValuesFileLocation --printMode p \"**\"").trim()
-    return helmValuesKeys.tokenize('\n')
+    // yq outputs arrays elements as .[ but the --set syntax for the helm command doesn't use the dot so remove it
+    return helmValuesKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
   }
 
   /**
@@ -58,13 +59,10 @@ class Helm implements Serializable {
     // The jq command in the follow assumes there is only one value per key
     // This is true ONLY if you specify a label in the az appconfig kv command
     def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$appConfigLabel --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
-    def appConfigMap = ctx.readJSON([text: appConfigResults, returnPojo: true])
+    def appConfigMap = ctx.readJSON([text: appConfigResults, returnPojo: true]) ?: [:]
     def configValues = [:]
 
     searchKeys.each { key ->
-      // yq outputs arrays elements as .[ but the --set syntax for the helm command doesn't use the dot so remove it
-      key = key.replace('.[', '[').trim()
-
       // We can't use a GString here as the map keys are plain Java strings, so the containsKey won't match a GString
       def searchKey = appConfigPrefix + key
 
