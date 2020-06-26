@@ -54,7 +54,7 @@ class Helm implements Serializable {
       def searchKey = prefix + key
 
       if (appConfigMap.containsKey(searchKey)) {
-        configValues[key] = $/"${Helm.escapeSpecialChars(appConfigMap[searchKey])}"/$
+        configValues[key] = $/"${escapeSpecialChars(appConfigMap[searchKey])}"/$
       }
     }
 
@@ -68,20 +68,20 @@ class Helm implements Serializable {
   static def deployChart(ctx, environment, registry, chartName, tag) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       def deploymentName = "$chartName-$tag"
-      def extraCommands = Helm.getExtraCommands(tag)
-      def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
+      def extraCommands = getExtraCommands(tag)
+      def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
       def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
 
-      def defaultConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/')))
-      def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/')))
-      def prConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/pr/')))
-      def prConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/pr/')))
+      def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/')))
+      def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/')))
+      def prConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/pr/')))
+      def prConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/pr/')))
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       ctx.echo('Running helm upgrade, console output suppressed')
       ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
-      Helm.writeUrlIfIngress(ctx, deploymentName)
+      writeUrlIfIngress(ctx, deploymentName)
     }
   }
 
@@ -102,7 +102,7 @@ class Helm implements Serializable {
       ctx.sh('rm -rf helm-charts')
       ctx.dir('helm-charts') {
         ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
-        Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
+        addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
         ctx.sh("helm package ../helm/$chartName --version $tag --dependency-update")
         ctx.sh("curl -u $ctx.username:$ctx.password -X PUT ${ctx.ARTIFACTORY_REPO_URL}ffc-helm-local/$chartName-${tag}.tgz -T $chartName-${tag}.tgz")
       }
@@ -123,7 +123,7 @@ class Helm implements Serializable {
             ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
           }
 
-          Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
+          addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
           ctx.sh("helm package ../helm/$chartName --version $tag --dependency-update")
 
           ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
@@ -141,8 +141,8 @@ class Helm implements Serializable {
       ctx.withCredentials([
         ctx.file(credentialsId: "$chartName-$environment-values", variable: 'values')
       ]) {
-        def extraCommands = Helm.getExtraCommands(chartVersion)
-        Helm.addHelmRepo(ctx, 'ffc', "${ctx.ARTIFACTORY_REPO_URL}ffc-helm-virtual")
+        def extraCommands = getExtraCommands(chartVersion)
+        addHelmRepo(ctx, 'ffc', "${ctx.ARTIFACTORY_REPO_URL}ffc-helm-virtual")
         ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
         ctx.sh("helm upgrade --namespace=$namespace $chartName -f $ctx.values --set namespace=$namespace ffc/$chartName $extraCommands")
       }
@@ -163,11 +163,11 @@ class Helm implements Serializable {
             ctx.sh("helm chart pull $helmChartName")
             ctx.sh("helm chart export $helmChartName --destination .")
 
-            def extraCommands = Helm.getExtraCommands(chartVersion)
+            def extraCommands = getExtraCommands(chartVersion)
 
             def helmValuesKeys = getHelmValuesKeys(ctx, "$chartName/values.yaml")
-            def defaultConfigValues = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/')))
-            def defaultConfigValuesChart = Helm.configItemsToSetString(Helm.getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/')))
+            def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/')))
+            def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/')))
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
             ctx.echo('Running helm upgrade, console output suppressed')
