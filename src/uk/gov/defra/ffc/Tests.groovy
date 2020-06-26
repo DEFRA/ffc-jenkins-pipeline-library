@@ -41,17 +41,27 @@ class Tests implements Serializable {
     }
   }
 
-  static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
-    return [
+  static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {    
+    def params = [
     'sonar.organization': 'defra',
     'sonar.projectKey': projectName,
-    'sonar.sources': '.',
+    'sonar.sources': '.'
+    ];
+
+    if(pr != '') {
+      params = params + buildCodeAnalysisPRParams(projectName, branch, pr)
+    }
+
+    return params
+  }
+
+  static def buildCodeAnalysisPRParams(projectName, branch, pr) {
+    return [
     'sonar.pullrequest.base': 'master',
     'sonar.pullrequest.branch': branch,
     'sonar.pullrequest.key': pr,
     'sonar.pullrequest.provider': 'GitHub',
-    'sonar.pullrequest.github.repository': "defra/${projectName}",
-    'sonar.language': 'js'
+    'sonar.pullrequest.github.repository': "defra/${projectName}"
     ];
   }  
 }
