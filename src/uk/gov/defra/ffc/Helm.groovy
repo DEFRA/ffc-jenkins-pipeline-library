@@ -30,47 +30,73 @@ class Helm implements Serializable {
     return str.replace('\\', '\\\\\\\\').replace(/,/, /\,/).replace(/"/, /\"/).replace(/`/, /\`/)
   }
 
-  static def getValuesFromAppConfig(ctx, configKeys, prefix, label='\\\\0', failIfNotFound=true, delimiter='/') {
-    def configItems = [:]
-
-    configKeys.each { key ->
-      def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key $prefix$delimiter$key --label $label --resolve-keyvault | jq -r '.[] | .value'").trim()
-      def numResults = appConfigResults.tokenize('\n').size()
-
-      if (numResults == 1) {
-          configItems[key.trim()] = $/"${Helm.escapeSpecialChars(appConfigResults)}"/$
-      }
-      else if (numResults == 0 && !failIfNotFound) { }
-      else {
-          throw new Exception("Unexpected number of results from App Configuration when retrieving $prefix$delimiter$key: $numResults")
-      }
-    }
-
-    return configItems
-  }
-
   static def configItemsToSetString(configItems) {
     return configItems.size() > 0 ? ("--set " + configItems.collect { "$it.key=$it.value" }.join(',')) : ''
   }
 
-  static def getConfigKeysFromFile(ctx, filename) {
-    return ctx.readFile(filename).tokenize('\n')
+  static def getHelmValuesKeys(ctx, helmValuesFileLocation) {
+    def helmValuesKeys = ctx.sh(returnStdout: true, script:"yq r $helmValuesFileLocation --printMode p \"**\"").trim()
+    return helmValuesKeys.tokenize('\n')
+  }
+
+  /**
+   * Retrieves configuration values and secrets from Azure App Configuration.
+   * It is intend for retrieving values that are to be used when installing
+   * or updating a Helm chart. Given a list of search keys, it will generate
+   * and return a map containing the values for keys found in App Configuation
+   * that match the given prefix+key and label
+   *
+   * It takes four parameters:
+   * - the Jenkins context class
+   * - a list of keys to find values for
+   * - any key prefix used in App Configuration
+   * - the label to get values for in App Configuration, by default this is
+   *   set to the default null label
+   */
+
+  static def getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel='\\\\0') {
+    // The jq command in the follow assumes there is only one value per key
+    // This is true ONLY if you specify a label in the az appconfig kv command
+    def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$appConfigLabel --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
+    def appConfigMap = ctx.readJSON([text: appConfigResults, returnPojo: true])
+    def configValues = [:]
+
+    searchKeys.each { key ->
+      // yq outputs arrays elements as .[ but the --set syntax for the helm command doesn't use the dot so remove it
+      key = key.replace('.[', '[').trim()
+
+      // We can't use a GString here as the map keys are plain Java strings, so the containsKey won't match a GString
+      def searchKey = appConfigPrefix + key
+
+      if (appConfigMap.containsKey(searchKey)) {
+        configValues[key] = $/"${escapeSpecialChars(appConfigMap[searchKey])}"/$
+      }
+    }
+
+    if (configValues.size() > 0) {
+      ctx.echo("Following keys found with prefix=$appConfigPrefix and label=$appConfigLabel: ${configValues.keySet()}")
+    }
+
+    return configValues
   }
 
   static def deployChart(ctx, environment, registry, chartName, tag) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
       def deploymentName = "$chartName-$tag"
-      def extraCommands = Helm.getExtraCommands(tag)
-      def prCommands = Helm.getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
+      def extraCommands = getExtraCommands(tag)
+      def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-      def configKeys = Helm.getConfigKeysFromFile(ctx, "helm/$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
-      def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
-      def prConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment, 'pr', false))
+      def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
+      def appConfigPrefix = environment + '/'
+      def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
+      def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
+      def prConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
+      def prConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       ctx.echo('Running helm upgrade, console output suppressed')
-      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $prConfigValues $prCommands $extraCommands")
-      Helm.writeUrlIfIngress(ctx, deploymentName)
+      ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
+      writeUrlIfIngress(ctx, deploymentName)
     }
   }
 
@@ -91,7 +117,7 @@ class Helm implements Serializable {
       ctx.sh('rm -rf helm-charts')
       ctx.dir('helm-charts') {
         ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
-        Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
+        addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
         ctx.sh("helm package ../helm/$chartName --version $tag --dependency-update")
         ctx.sh("curl -u $ctx.username:$ctx.password -X PUT ${ctx.ARTIFACTORY_REPO_URL}ffc-helm-local/$chartName-${tag}.tgz -T $chartName-${tag}.tgz")
       }
@@ -112,7 +138,7 @@ class Helm implements Serializable {
             ctx.sh("sed -i -e 's/image: .*/image: $registry\\/$chartName:$tag/' ../helm/$chartName/values.yaml")
           }
 
-          Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
+          addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
           ctx.sh("helm package ../helm/$chartName --version $tag --dependency-update")
 
           ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
@@ -130,8 +156,8 @@ class Helm implements Serializable {
       ctx.withCredentials([
         ctx.file(credentialsId: "$chartName-$environment-values", variable: 'values')
       ]) {
-        def extraCommands = Helm.getExtraCommands(chartVersion)
-        Helm.addHelmRepo(ctx, 'ffc', "${ctx.ARTIFACTORY_REPO_URL}ffc-helm-virtual")
+        def extraCommands = getExtraCommands(chartVersion)
+        addHelmRepo(ctx, 'ffc', "${ctx.ARTIFACTORY_REPO_URL}ffc-helm-virtual")
         ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
         ctx.sh("helm upgrade --namespace=$namespace $chartName -f $ctx.values --set namespace=$namespace ffc/$chartName $extraCommands")
       }
@@ -152,13 +178,16 @@ class Helm implements Serializable {
             ctx.sh("helm chart pull $helmChartName")
             ctx.sh("helm chart export $helmChartName --destination .")
 
-            def extraCommands = Helm.getExtraCommands(chartVersion)
-            def configKeys = Helm.getConfigKeysFromFile(ctx, "$chartName/$ctx.HELM_DEPLOYMENT_KEYS_FILENAME")
-            def defaultConfigValues = Helm.configItemsToSetString(Helm.getValuesFromAppConfig(ctx, configKeys, environment))
+            def extraCommands = getExtraCommands(chartVersion)
+
+            def helmValuesKeys = getHelmValuesKeys(ctx, "$chartName/values.yaml")
+            def appConfigPrefix = environment + '/'
+            def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
+            def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
             ctx.echo('Running helm upgrade, console output suppressed')
-            ctx.sh("$suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues --set namespace=$namespace $extraCommands")
+            ctx.sh("$suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues $defaultConfigValuesChart --set namespace=$namespace $extraCommands")
 
             ctx.deleteDir()
           }
