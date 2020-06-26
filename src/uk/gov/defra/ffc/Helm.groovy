@@ -39,10 +39,10 @@ class Helm implements Serializable {
     return helmValuesKeys.tokenize('\n')
   }
 
-  static def getConfigValues(ctx, helmKeys, label, prefix) {
+  static def getConfigValues(ctx, helmKeys, appConfigPrefix, appConfigLabel='\\\\0') {
     // The jq command in the follow assumes there is only one value per key
     // This is true ONLY if you specify a label in the az appconfig kv command
-    def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$label --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
+    def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$appConfigLabel --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
     def appConfigMap = ctx.readJSON([text: appConfigResults, returnPojo: true])
     def configValues = [:]
 
@@ -51,7 +51,7 @@ class Helm implements Serializable {
       key = key.replace('.[', '[').trim()
 
       // We can't use a GString here as the map keys are plain Java strings, so the containsKey won't match a GString
-      def searchKey = prefix + key
+      def searchKey = appConfigPrefix + key
 
       if (appConfigMap.containsKey(searchKey)) {
         configValues[key] = $/"${escapeSpecialChars(appConfigMap[searchKey])}"/$
@@ -59,7 +59,7 @@ class Helm implements Serializable {
     }
 
     if (configValues.size() > 0) {
-      ctx.echo("Following keys found with prefix=$prefix and label=$label: ${configValues.keySet()}")
+      ctx.echo("Following keys found with prefix=$appConfigPrefix and label=$appConfigLabel: ${configValues.keySet()}")
     }
 
     return configValues
@@ -72,11 +72,11 @@ class Helm implements Serializable {
       def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
       def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
-
-      def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/')))
-      def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/')))
-      def prConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/pr/')))
-      def prConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/pr/')))
+      def appConfigPrefix = environment + '/'
+      def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
+      def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
+      def prConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
+      def prConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
 
       ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
       ctx.echo('Running helm upgrade, console output suppressed')
@@ -166,8 +166,9 @@ class Helm implements Serializable {
             def extraCommands = getExtraCommands(chartVersion)
 
             def helmValuesKeys = getHelmValuesKeys(ctx, "$chartName/values.yaml")
-            def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, '\\\\0', (environment + '/')))
-            def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, chartName, (environment + '/')))
+            def appConfigPrefix = environment + '/'
+            def defaultConfigValues = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
+            def defaultConfigValuesChart = configItemsToSetString(getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
             ctx.echo('Running helm upgrade, console output suppressed')
