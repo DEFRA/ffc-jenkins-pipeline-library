@@ -49,9 +49,7 @@ class Version implements Serializable {
   static def errorOnNoVersionIncrement(ctx, previousVersion, currentVersion){
     def cleanPreviousVersion = Version.extractSemVerVersion(previousVersion)
     def cleanCurrentVersion = Version.extractSemVerVersion(currentVersion)
-    def repoName = Utils.getRepoName(ctx)
-    def commitSha = Utils.getCommitSha(ctx)
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: commitSha, repo: repoName, gitHubContext: GitHubStatus.VerifyVersion.Context, description: GitHubStatus.VerifyVersion.Description) {
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.VerifyVersion.Context, description: GitHubStatus.VerifyVersion.Description) {
       if (Version.hasIncremented(cleanPreviousVersion, cleanCurrentVersion)) {
         ctx.echo("Version increment valid '$previousVersion' -> '$currentVersion'.")
       } else {

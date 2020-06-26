@@ -82,9 +82,7 @@ class Helm implements Serializable {
   }
 
   static def deployChart(ctx, environment, registry, chartName, tag) {
-    def repoName = Utils.getRepoName(ctx)
-    def commitSha = Utils.getCommitSha(ctx)
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: commitSha, repo: repoName, gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
         def deploymentName = "$chartName-$tag"
         def extraCommands = getExtraCommands(tag)
@@ -157,9 +155,7 @@ class Helm implements Serializable {
   }
 
   static def deployRemoteChart(ctx, environment, namespace, chartName, chartVersion) {
-    def repoName = Utils.getRepoName(ctx)
-    def commitSha = Utils.getCommitSha(ctx)
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: commitSha, repo: repoName, gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
         ctx.withCredentials([
           ctx.file(credentialsId: "$chartName-$environment-values", variable: 'values')
@@ -174,9 +170,7 @@ class Helm implements Serializable {
   }
 
   static def deployRemoteChartFromACR(ctx, environment, namespace, chartName, chartVersion) {
-    def repoName = Utils.getRepoName(ctx)
-    def commitSha = Utils.getCommitSha(ctx)
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: commitSha, repo: repoName, gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
       ctx.withEnv(['HELM_EXPERIMENTAL_OCI=1']) {
         ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
           ctx.withCredentials([
