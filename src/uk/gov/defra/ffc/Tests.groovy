@@ -41,6 +41,19 @@ class Tests implements Serializable {
     }
   }
 
+  static def analyseDotNetCode(ctx, params) {
+    ctx.withCredentials([
+      ctx.string(credentialsId: 'sonarcloud-token', variable: 'token'),
+    ]) {
+      def args = ''
+      params.each { param ->
+        args = args + " -e $param.key=$param.value"
+      }
+
+      ctx.sh("docker run -v ./:/home/dotnet/project -e SONAR_TOKEN=$token $args")
+    }
+  }
+
   static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {    
     def params = [
     'sonar.organization': 'defra',
@@ -62,6 +75,29 @@ class Tests implements Serializable {
     'sonar.pullrequest.key': pr,
     'sonar.pullrequest.provider': 'GitHub',
     'sonar.pullrequest.github.repository': "defra/${projectName}"
+    ];
+  }
+
+  static def buildCodeAnalysisDotNetParams(projectName, branch, pr) {    
+    def params = [
+    'SONAR_ORGANIZATION': 'defra',
+    'SONAR_PROJECT_KEY': projectName
+    ];
+
+    if(pr != '') {
+      params = params + buildCodeAnalysisDotNetPRParams(projectName, branch, pr)
+    }
+
+    return params
+  }
+
+  static def buildCodeAnalysisDotNetPRParams(projectName, branch, pr) {
+    return [
+    'SONAR_PR_BASE': 'master',
+    'SONAR_PR_BRANCH': branch,
+    'SONAR_PR_KEY': pr,
+    'SONAR_PR_PROVIDER': 'GitHub',
+    'SONAR_PR_REPOSITORY': "defra/${projectName}"
     ];
   }  
 }
