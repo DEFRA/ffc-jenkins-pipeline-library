@@ -24,6 +24,6 @@ def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
   return Tests.buildCodeAnalysisDefaultParams(projectName, branch, pr)
 }
 
-def buildCodeAnalysisDotNetParams(token, projectName, branch, pr) {
+def buildCodeAnalysisDotNetParams(projectName, branch, pr) {
   return Tests.buildCodeAnalysisDotNetParams(projectName, branch, pr)
 }
