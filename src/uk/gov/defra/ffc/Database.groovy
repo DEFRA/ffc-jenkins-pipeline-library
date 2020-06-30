@@ -1,6 +1,6 @@
 package uk.gov.defra.ffc
 
-import src.uk.gov.defra.ffc.Utils
+import uk.gov.defra.ffc.Utils
 
 class Database implements Serializable {
   private static def runPsqlCommand(ctx, dbHost, dbUser, dbName, sqlCmd) {
