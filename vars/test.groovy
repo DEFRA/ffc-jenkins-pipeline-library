@@ -17,7 +17,7 @@ def analyseCode(sonarQubeEnv, sonarScanner, params) {
 }
 
 def analyseDotNetCode(params) {
-  Tests.analyseCode(this, params)
+  Tests.analyseDotNetCode(this, params)
 }
 
 def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
