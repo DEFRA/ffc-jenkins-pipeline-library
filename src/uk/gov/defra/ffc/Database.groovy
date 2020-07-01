@@ -42,6 +42,8 @@ class Database implements Serializable {
 
       def setSearchPathCmd = "ALTER ROLE $prUser SET search_path TO $prSchema"
       Database.runPsqlCommand(ctx, ctx.dbHost, ctx.dbUser, dbName, setSearchPathCmd)
+
+      return [prSchema, prUser]
     }
   }
 
