@@ -57,7 +57,7 @@ class Tests implements Serializable {
 
   static def waitForQualityGateResult(ctx, timeoutInMinutes) {
     ctx.timeout(time: timeoutInMinutes, unit: 'MINUTES') {
-      def qualityGateResult = ctx.waitForQualityGate()
+      def qualityGateResult = ctx.waitForQualityGate webhookSecretId: 'sonarcloud-webhook-secret'
       if (qualityGateResult.status != 'OK') {
         ctx.error("Pipeline aborted due to quality gate failure: ${qualityGateResult.status}")
       }
