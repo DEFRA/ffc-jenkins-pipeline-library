@@ -45,6 +45,9 @@ class Tests implements Serializable {
     ctx.withCredentials([
       ctx.string(credentialsId: 'sonarcloud-token', variable: 'token'),
     ]) {
+      
+      createSonarDirectory()
+
       def args = ''
       params.each { param ->
         args = args + " -e $param.key=$param.value"
@@ -52,6 +55,11 @@ class Tests implements Serializable {
 
       ctx.sh("docker run -v \$(pwd)/$project/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar")
     }
+  }
+
+  static def createSonarDirectory() {
+    ctx.sh('mkdir -p \$(pwd)/.sonarqube')
+    ctx.sh('chmod 777 \$(pwd)/.sonarqube')
   }
 
   static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {    
