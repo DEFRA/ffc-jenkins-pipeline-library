@@ -1,6 +1,6 @@
 package uk.gov.defra.ffc
 
-import src.uk.gov.defra.ffc.Utils
+import uk.gov.defra.ffc.Utils
 
 class Database implements Serializable {
   private static def runPsqlCommand(ctx, dbHost, dbUser, dbName, sqlCmd) {
@@ -37,13 +37,14 @@ class Database implements Serializable {
       def createSchemaSqlCmd = "CREATE SCHEMA $ifNotExistsStr $prSchema"
       Database.runPsqlCommand(ctx, ctx.dbHost, ctx.dbUser, dbName, createSchemaSqlCmd)
 
-    def grantPrivilegesSqlCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
-    Database.runPsqlCommand(ctx, ctx.dbHost, ctx.dbUser, dbName, grantPrivilegesSqlCmd)
+      def grantPrivilegesSqlCmd = "GRANT ALL PRIVILEGES ON SCHEMA $prSchema TO $prUser"
+      Database.runPsqlCommand(ctx, ctx.dbHost, ctx.dbUser, dbName, grantPrivilegesSqlCmd)
 
-    def setSearchPathCmd = "ALTER ROLE $prUser SET search_path TO $prSchema"
-    Database.runPsqlCommand(ctx, ctx.dbHost, ctx.dbUser, dbName, setSearchPathCmd)
-  }
-    return [prSchema, prUser]
+      def setSearchPathCmd = "ALTER ROLE $prUser SET search_path TO $prSchema"
+      Database.runPsqlCommand(ctx, ctx.dbHost, ctx.dbUser, dbName, setSearchPathCmd)
+
+      return [prSchema, prUser]
+    }
   }
 
   // The design rationale for the behaviour of this function is documented here:
