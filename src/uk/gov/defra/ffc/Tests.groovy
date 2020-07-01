@@ -46,7 +46,7 @@ class Tests implements Serializable {
       ctx.string(credentialsId: 'sonarcloud-token', variable: 'token'),
     ]) {
       
-      createSonarDirectory()
+      createSonarDirectory(ctx)
 
       def args = ''
       params.each { param ->
@@ -57,7 +57,7 @@ class Tests implements Serializable {
     }
   }
 
-  static def createSonarDirectory() {
+  static def createSonarDirectory(ctx) {
     ctx.sh("mkdir -p \$(pwd)/.sonarqube")
     ctx.sh("chmod 777 \$(pwd)/.sonarqube")
   }
