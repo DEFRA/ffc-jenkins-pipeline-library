@@ -58,8 +58,8 @@ class Tests implements Serializable {
   }
 
   static def createSonarDirectory() {
-    ctx.sh('mkdir -p \$(pwd)/.sonarqube')
-    ctx.sh('chmod 777 \$(pwd)/.sonarqube')
+    ctx.sh("mkdir -p \$(pwd)/.sonarqube")
+    ctx.sh("chmod 777 \$(pwd)/.sonarqube")
   }
 
   static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {    
