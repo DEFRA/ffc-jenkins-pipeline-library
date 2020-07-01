@@ -45,9 +45,6 @@ class Tests implements Serializable {
     ctx.withCredentials([
       ctx.string(credentialsId: 'sonarcloud-token', variable: 'token'),
     ]) {
-      
-      createSonarDirectory(ctx)
-
       def args = ''
       params.each { param ->
         args = args + " -e $param.key=$param.value"
