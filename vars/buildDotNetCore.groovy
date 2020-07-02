@@ -18,8 +18,8 @@ def call(Map config=[:]) {
           version.verifyCSProjIncremented(config.project)
         }
       }
-
       stage('Snyk test') {
+        sh "docker-compose -f docker-compose.snyk.yaml up --build"
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
       }
       
