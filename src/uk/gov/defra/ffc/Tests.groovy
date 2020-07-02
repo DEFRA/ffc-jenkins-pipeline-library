@@ -49,7 +49,6 @@ class Tests implements Serializable {
       params.each { param ->
         args = args + " -e $param.key=$param.value"
       }
-      ctx.("chmod 777 $(pwd)")
       ctx.sh("docker run -v \$(pwd)/$project/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar")
     }
   }
