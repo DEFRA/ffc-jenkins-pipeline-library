@@ -53,12 +53,7 @@ class Tests implements Serializable {
     }
   }
 
-  static def createSonarDirectory(ctx) {
-    ctx.sh("mkdir -p \$(pwd)/.sonarqube")
-    ctx.sh("chmod 777 \$(pwd)/.sonarqube")
-  }
-
-  static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {    
+  static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
     def params = [
     'sonar.organization': 'defra',
     'sonar.projectKey': projectName,
