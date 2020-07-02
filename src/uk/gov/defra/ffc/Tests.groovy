@@ -41,7 +41,7 @@ class Tests implements Serializable {
     }
   }
 
-  static def analyseDotNetCode(ctx, project, params) {
+  static def analyseDotNetCode(ctx, params) {
     ctx.withCredentials([
       ctx.string(credentialsId: 'sonarcloud-token', variable: 'token'),
     ]) {
@@ -49,7 +49,7 @@ class Tests implements Serializable {
       params.each { param ->
         args = args + " -e $param.key=$param.value"
       }
-      ctx.sh("docker run -v \$(pwd)/$project/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar")
+      ctx.sh("docker run -v \$(pwd)/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar")
     }
   }
 
