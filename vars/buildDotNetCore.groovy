@@ -19,7 +19,10 @@ def call(Map config=[:]) {
         }
       }
       stage('Snyk test') {
-        sh "docker-compose -f docker-compose.snyk.yaml up --build"
+        sh "mkdir -m 777 ${config.project}/obj"
+        sh "mkdir -m 777 ${config.project}.Tests/obj"
+
+        sh 'docker-compose -f docker-compose.snyk.yaml up --build'
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
       }
       
