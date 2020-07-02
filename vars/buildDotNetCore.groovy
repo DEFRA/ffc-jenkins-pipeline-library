@@ -23,7 +23,7 @@ def call(Map config=[:]) {
         sh "mkdir -m 777 ${config.project}.Tests/obj"
 
         sh 'docker-compose -f docker-compose.snyk.yaml up --build'
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
       }
       
       if (config.containsKey('validateClosure')) {
