@@ -19,6 +19,10 @@ def call(Map config=[:]) {
         }
       }
 
+      stage('Snyk test') {
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
+      }
+      
       if (config.containsKey('validateClosure')) {
         config['validateClosure']()
       }
