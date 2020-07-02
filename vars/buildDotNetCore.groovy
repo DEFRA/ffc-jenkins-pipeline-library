@@ -21,10 +21,11 @@ def call(Map config=[:]) {
       stage('Snyk test') {
         sh "mkdir -p -m 777 ${config.project}/obj"
         sh "mkdir -p -m 777 ${config.project}.Tests/obj"
-        sh "ls -la ${config.project}/obj"
 
         sh 'docker-compose -f docker-compose.snyk.yaml up --build'
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
+        sh "echo list obj files"
+        sh "ls -la ${config.project}/obj"
       }
       
       if (config.containsKey('validateClosure')) {
