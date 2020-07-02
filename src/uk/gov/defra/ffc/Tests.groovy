@@ -56,6 +56,7 @@ class Tests implements Serializable {
   }
 
   static def waitForQualityGateResult(ctx, timeoutInMinutes) {
+    sleep(10)
     ctx.timeout(time: timeoutInMinutes, unit: 'MINUTES') {
       def qualityGateResult = ctx.waitForQualityGate webhookSecretId: 'sonarcloud-webhook-secret'
       if (qualityGateResult.status != 'OK') {
