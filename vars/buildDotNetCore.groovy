@@ -36,8 +36,7 @@ def call(Map config=[:]) {
       }
 
       stage('Snyk test') {
-        sh "mkdir -p -m 777 ${config.project}/obj"
-        sh 'docker-compose -f docker-compose.snyk.yaml up'
+        build.extractContainerObjFiles(config.project)
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
       }
 

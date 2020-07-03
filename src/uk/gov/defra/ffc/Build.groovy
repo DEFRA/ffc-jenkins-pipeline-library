@@ -79,6 +79,11 @@ class Build implements Serializable {
     }
   }
 
+  static def extractContainerObjFiles(ctx, projectName) {
+    ctx.sh("mkdir -p -m 777 ${projectName}/obj")
+    ctx.sh('docker-compose -f docker-compose.snyk.yaml up')
+  }
+
   static def snykTest(ctx, failOnIssues, organisation, severity, targetFile) {
     failOnIssues = failOnIssues == false ? false : true
     organisation = organisation ?: ctx.SNYK_ORG
