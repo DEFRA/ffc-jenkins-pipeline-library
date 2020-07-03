@@ -18,16 +18,7 @@ def call(Map config=[:]) {
           version.verifyCSProjIncremented(config.project)
         }
       }
-      stage('Snyk test') {
-        sh "mkdir -p -m 777 ${config.project}/obj"
-        sh "mkdir -p -m 777 ${config.project}.Tests/obj"
-
-        sh 'docker-compose -f docker-compose.snyk.yaml up --build'
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
-        sh "echo list obj files"
-        sh "ls -la ${config.project}/obj"
-      }
-      
+          
       if (config.containsKey('validateClosure')) {
         config['validateClosure']()
       }
@@ -42,6 +33,14 @@ def call(Map config=[:]) {
 
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+      }
+
+      stage('Snyk test') {
+        sh "mkdir -p -m 777 ${config.project}/obj"
+        sh "mkdir -p -m 777 ${config.project}.Tests/obj"
+
+        sh 'docker-compose -f docker-compose.snyk.yaml up'
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
       }
 
       stage('Run tests') {
