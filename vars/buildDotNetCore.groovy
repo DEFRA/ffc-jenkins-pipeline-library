@@ -1,4 +1,8 @@
 def call(Map config=[:]) {
+  def containerSrcFolder = '\\/home\\/dotnet'
+  def localSrcFolder = '\\/home\\/dotnet\\/working/project'
+  def coverageFile = './test-output/coverage.opencover.xml'
+  def developmentImage = 'defradigital/dotnetcore-development'
   def tag = ''
   def mergedPrNo = ''
   def pr = ''
@@ -37,6 +41,10 @@ def call(Map config=[:]) {
 
       stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER, tag)
+      }
+
+      stage('Fix coverage report') {
+        utils.replaceInFile(localSrcFolder, containerSrcFolder, coverageFile)
       }
 
       stage('SonarCloud analysis') {
@@ -99,6 +107,10 @@ def call(Map config=[:]) {
 
       throw e
     } finally {
+      stage('Clean up test output') {
+        test.deleteOutput(developmentImage, containerSrcFolder)
+      }
+
       if (config.containsKey('finallyClosure')) {
         config['finallyClosure']()
       }
