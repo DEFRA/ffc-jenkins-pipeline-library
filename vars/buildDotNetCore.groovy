@@ -36,7 +36,6 @@ def call(Map config=[:]) {
       }
 
       stage('Snyk test') {
-        sh "rm -rf FFCDemoPaymentService/obj/*"
         build.extractContainerObjFiles(config.project)
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
       }
