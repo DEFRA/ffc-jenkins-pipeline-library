@@ -68,7 +68,7 @@ class Tests implements Serializable {
     ];
 
     if(pr != '') {
-      params = params + buildCodeAnalysisPRParams(projectName, branch, pr)
+      params = params + buildCodeAnalysisNodeJsPRParams(projectName, branch, pr)
     }
 
     return params
