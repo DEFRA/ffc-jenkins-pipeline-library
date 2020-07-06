@@ -1,5 +1,4 @@
 def call(Map config=[:]) {
-  def containerSrcFolder = '\\/home\\/dotnet'
   def tag = ''
   def mergedPrNo = ''
   def pr = ''
