@@ -8,7 +8,7 @@ For the details of what happens please review the
 [buildDotNetCore](buildDotNetCore.groovy) script.
 
 ```
-@Library('defra-library@8') _
+@Library('defra-library@v-8') _
 
 buildDotNetCore environment: 'dev', project: 'FFCDemoDotNetCoreProjectName'
 ```
