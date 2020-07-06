@@ -37,7 +37,7 @@ def call(Map config=[:]) {
 
       if (fileExists('./docker-compose.snyk.yaml')){
         stage('Snyk test') {
-            build.extractSynkFiles(config.project)
+          build.extractSynkFiles(config.project)
           build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
         }
       }

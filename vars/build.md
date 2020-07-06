@@ -171,6 +171,18 @@ Example usage:
 build.npmAudit('critical', null, false)
 ```
 
+## Extract snyk files
+
+A utility method to run a docker-compose file to move files required by Snyk from a built container
+image to the local file system.
+
+This is currently used in the [buildDotNetCore](buildDotNetCore.groovy) script to copy assets from the container
+so Snyk may analyse the project.
+
+The method expects a file named `docker-compose.snyk.yaml` to be present in the project to extract any required
+files to the correct location. As well as extract the required file they should be made writable by the Jenkins
+use to enable cleanup.
+
 ## snykTest
 
 Runs
@@ -184,13 +196,15 @@ Details of how to resolve issues are covered within the (internal)
 confluence page. If the page is not accessible, see the documentation on
 [snyk.io](https://support.snyk.io/hc/en-us/articles/360003891038-Fix-your-vulnerabilities).
 
-Takes three parameters:
+Takes four parameters, the last one being optional:
 - `failOnIssues` - should the job fail when issues are detected. Default is
   `true`
 - `organisation` - against which the report should be recorded. Default is the
   env var `SNYK_ORG`
 - `severity` - of issues to be reported. Default is `medium`
+- `targetFile` - name of file to analyse
 
 ```
 build.snykTest(true, 'my-org-name', 'low')
+build.snykTest(true, 'my-org-name', 'low', 'my-project.sln')
 ```
