@@ -34,7 +34,7 @@ class Tests implements Serializable {
     ctx.sh("[ -d \"$ctx.WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$ctx.WORKSPACE/test-output',target=/$containerWorkDir/test-output $containerImage rm -rf test-output/*")
   }
 
-  static def analyseCode(ctx, sonarQubeEnv, sonarScanner, params) {
+  static def analyseNodeJsCode(ctx, sonarQubeEnv, sonarScanner, params) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.CodeAnalysis.Context, description: GitHubStatus.CodeAnalysis.Description) {
       def scannerHome = ctx.tool sonarScanner
       ctx.withSonarQubeEnv(sonarQubeEnv) {
@@ -60,7 +60,7 @@ class Tests implements Serializable {
     }
   }
 
-  static def buildCodeAnalysisDefaultParams(projectName, branch, pr) {
+  static def buildCodeAnalysisNodeJsParams(projectName, branch, pr) {
     def params = [
     'sonar.organization': 'defra',
     'sonar.projectKey': projectName,
@@ -74,7 +74,7 @@ class Tests implements Serializable {
     return params
   }
 
-  static def buildCodeAnalysisPRParams(projectName, branch, pr) {
+  static def buildCodeAnalysisNodeJsPRParams(projectName, branch, pr) {
     return [
     'sonar.pullrequest.base': 'master',
     'sonar.pullrequest.branch': branch,
