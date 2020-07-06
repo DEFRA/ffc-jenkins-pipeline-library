@@ -36,7 +36,7 @@ def call(Map config=[:]) {
       }
 
       stage('Snyk test') {
-        build.extractContainerObjFiles(config.project)
+        build.extractSynkFiles(config.project)
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
       }
 

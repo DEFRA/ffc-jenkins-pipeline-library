@@ -79,7 +79,7 @@ class Build implements Serializable {
     }
   }
 
-  static def extractContainerObjFiles(ctx, projectName) {
+  static def extractSynkFiles(ctx, projectName) {
     ctx.sh('docker-compose -f docker-compose.snyk.yaml up')
   }
 
