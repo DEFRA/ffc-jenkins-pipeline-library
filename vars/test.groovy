@@ -12,12 +12,12 @@ def deleteOutput(containerImage, containerWorkDir) {
   Tests.deleteOutput(this, containerImage, containerWorkDir)
 }
 
-def analyseCode(sonarQubeEnv, sonarScanner, params) {
-  Tests.analyseCode(this, sonarQubeEnv, sonarScanner, params)
+def analyseCode(sonarQubeEnv, sonarScanner, repoName, branch, pr) {
+  Tests.analyseCode(this, sonarQubeEnv, sonarScanner, buildCodeAnalysisDefaultParams(repoName, branch, pr))
 }
 
-def analyseDotNetCode(params) {
-  Tests.analyseDotNetCode(this, params)
+def analyseDotNetCode(repoName, branch, pr) {
+  Tests.analyseDotNetCode(this, buildCodeAnalysisDotNetParams(repoName, branch, pr))
 }
 
 def buildCodeAnalysisDefaultParams(projectName, branch, pr) {

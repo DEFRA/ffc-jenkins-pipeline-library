@@ -40,7 +40,7 @@ def call(Map config=[:]) {
       }
 
       stage('SonarCloud analysis') {
-        test.analyseDotNetCode(test.buildCodeAnalysisDotNetParams(repoName, BRANCH_NAME, pr))        
+        test.analyseDotNetCode(repoName, BRANCH_NAME, pr)
       }
 
       if (config.containsKey('testClosure')) {
