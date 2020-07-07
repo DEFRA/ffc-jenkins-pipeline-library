@@ -18,7 +18,7 @@ def call(Map config=[:]) {
           version.verifyCSProjIncremented(config.project)
         }
       }
-
+      
       if (config.containsKey('validateClosure')) {
         config['validateClosure']()
       }
@@ -33,6 +33,13 @@ def call(Map config=[:]) {
 
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+      }
+
+      if (fileExists('./docker-compose.snyk.yaml')){
+        stage('Snyk test') {
+          build.extractSynkFiles(config.project)
+          build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
+        }
       }
 
       stage('Run tests') {

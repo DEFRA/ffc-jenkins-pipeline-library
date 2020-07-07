@@ -79,12 +79,16 @@ class Build implements Serializable {
     }
   }
 
-  static def snykTest(ctx, failOnIssues, organisation, severity) {
+  static def extractSynkFiles(ctx, projectName) {
+    ctx.sh('docker-compose -f docker-compose.snyk.yaml up')
+  }
+
+  static def snykTest(ctx, failOnIssues, organisation, severity, targetFile) {
     failOnIssues = failOnIssues == false ? false : true
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
-      ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token', failOnIssues: failOnIssues, organisation: organisation, severity: severity)
+      ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token', failOnIssues: failOnIssues, organisation: organisation, severity: severity, targetFile: targetFile)
     }
   }
 }

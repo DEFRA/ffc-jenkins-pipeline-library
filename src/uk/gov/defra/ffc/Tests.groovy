@@ -8,8 +8,7 @@ class Tests implements Serializable {
   static def runTests(ctx, projectName, serviceName, buildNumber, tag) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunTests.Context, description: GitHubStatus.RunTests.Description) {
       try {
-        ctx.sh('mkdir -p test-output')
-        ctx.sh('chmod 777 test-output')
+        ctx.sh('mkdir -p -m 777 test-output')
         ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
       } finally {
         ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
