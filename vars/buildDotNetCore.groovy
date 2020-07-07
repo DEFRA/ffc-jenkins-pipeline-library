@@ -18,7 +18,7 @@ def call(Map config=[:]) {
           version.verifyCSProjIncremented(config.project)
         }
       }
-          
+      
       if (config.containsKey('validateClosure')) {
         config['validateClosure']()
       }
