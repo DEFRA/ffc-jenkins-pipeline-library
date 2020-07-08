@@ -13,6 +13,9 @@ For the details of what happens please review the
 buildDotNetCore environment: 'dev', project: 'FFCDemoDotNetCoreProjectName'
 ```
 
-If Snyk analysis is required, a file named `docker-compose.snyk.yaml` must be present in the project root.
+If Snyk analysis is required a file named `docker-compose.snyk.yaml` must be present in the project root.
+The `docker-compose.snyk.yaml` script should move files required by Snyk from the built image to the `obj` folder.
 
 An example can be seen in [ffc-demo-payment-service-core](https://github.com/DEFRA/ffc-demo-payment-service-core)
+
+The `Snyk test` stage will ensure the `obj` folder is writable by Docker to allow file extraction.

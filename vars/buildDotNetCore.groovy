@@ -37,6 +37,8 @@ def call(Map config=[:]) {
 
       if (fileExists('./docker-compose.snyk.yaml')){
         stage('Snyk test') {
+          // ensure obj folder exists and is writable by all
+          sh("chmod 777 ${config.project}/obj || mkdir -p -m 777 ${config.project}/obj")
           build.extractSynkFiles(config.project)
           build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
         }
