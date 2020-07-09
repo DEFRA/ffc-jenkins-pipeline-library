@@ -6,6 +6,10 @@ def getVariables(version) {
   return Build.getVariables(this, version)
 }
 
+def checkoutSourceCode() {
+  return Build.checkoutSourceCode(this)
+}
+
 def setGithubStatusSuccess(message = 'Build successful') {
   Build.updateGithubCommitStatus(this, message, 'SUCCESS')
 }

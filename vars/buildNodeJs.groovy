@@ -9,9 +9,7 @@ def call(Map config=[:]) {
   def mergedPrNo = ''
 
   node {
-    checkout scm
-    sh("git remote set-branches --add origin master")
-    sh("git fetch")
+    build.checkoutSourceCode()
     try {
       stage('Set GitHub status as pending') {
         build.setGithubStatusPending()
