@@ -10,6 +10,8 @@ def call(Map config=[:]) {
 
   node {
     checkout scm
+    sh("git remote set-branches --add origin master")
+    sh("git fetch")
     try {
       stage('Set GitHub status as pending') {
         build.setGithubStatusPending()
