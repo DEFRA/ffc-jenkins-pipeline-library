@@ -5,8 +5,10 @@ def call(Map config=[:]) {
   def repoName = ''
 
   node {
-    checkout scm
     try {
+      stage('checkout source code') {
+        build.checkoutSourceCode()
+      }      
       stage('Set GitHub status as pending') {
         build.setGithubStatusPending()
       }

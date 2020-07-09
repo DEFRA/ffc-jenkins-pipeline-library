@@ -9,8 +9,10 @@ def call(Map config=[:]) {
   def mergedPrNo = ''
 
   node {
-    build.checkoutSourceCode()
     try {
+      stage('checkout source code') {
+        build.checkoutSourceCode()
+      }
       stage('Set GitHub status as pending') {
         build.setGithubStatusPending()
       }
