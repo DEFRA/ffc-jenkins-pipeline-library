@@ -23,7 +23,7 @@ class Build implements Serializable {
   }
 
   static def checkoutSourceCode(ctx) {
-    ctx.checkout(scm)
+    ctx.checkout(ctx.scm)
     ctx.sh("git remote set-branches --add origin master")
     ctx.sh("git fetch")
   }
