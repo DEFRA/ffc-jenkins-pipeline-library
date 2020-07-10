@@ -6,7 +6,7 @@ def call(Map config=[:]) {
 
   node {
     try {
-      stage('checkout source code') {
+      stage('Checkout source code') {
         build.checkoutSourceCode()
       }      
       stage('Set GitHub status as pending') {

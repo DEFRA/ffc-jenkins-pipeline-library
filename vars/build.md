@@ -5,6 +5,12 @@
 Below are the methods available on the script. They can be executed by calling
 `<script>.<method>` e.g. `build.getVariables()`
 
+## checkoutSourceCode
+
+Checks out the source code for the current repository branch.
+As the repository version is validated against the `master` branch, the remote `master` branch
+will also be fetched to ensure it is available for comparison.
+
 ## getVariables
 
 Supplied with the version of the repo being built, an array containing the
