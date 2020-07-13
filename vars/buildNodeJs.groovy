@@ -13,9 +13,6 @@ def call(Map config=[:]) {
       stage('Checkout source code') {
         build.checkoutSourceCode()
       }
-      stage('Set GitHub status as pending') {
-        build.setGithubStatusPending()
-      }
 
       stage('Set PR, and tag variables') {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
@@ -105,17 +102,9 @@ def call(Map config=[:]) {
       if (config.containsKey('deployClosure')) {
         config['deployClosure']()
       }
-
-      stage('Set GitHub status as success'){
-        build.setGithubStatusSuccess()
-      }
     } catch(e) {
       def errMsg = utils.getErrorMessage(e)
       echo("Build failed with message: $errMsg")
-
-      stage('Set GitHub status as fail') {
-        build.setGithubStatusFailure(errMsg)
-      }
 
       stage('Send build failure slack notification') {
         notifySlack.buildFailure(errMsg, '#generalbuildfailures')
