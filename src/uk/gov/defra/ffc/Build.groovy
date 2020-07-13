@@ -22,6 +22,12 @@ class Build implements Serializable {
     }
   }
 
+  static def checkoutSourceCode(ctx) {
+    ctx.checkout(ctx.scm)
+    ctx.sh("git remote set-branches --add origin master")
+    ctx.sh("git fetch")
+  }
+
   static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.BuildTestImage.Context, description: GitHubStatus.BuildTestImage.Description) {
       ctx.docker.withRegistry("https://$registry", credentialsId) {
