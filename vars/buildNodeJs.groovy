@@ -8,6 +8,7 @@ def call(Map config=[:]) {
   def tag = ''
   def mergedPrNo = ''
 
+// Scripted Pipeline syntax see https://www.jenkins.io/doc/book/pipeline/syntax/#scripted-pipeline
   node {
     try {
       stage('Checkout source code') {
