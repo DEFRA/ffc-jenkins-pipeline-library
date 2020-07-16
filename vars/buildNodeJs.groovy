@@ -33,69 +33,72 @@ def call(Map config=[:]) {
         test.lintHelm(repoName)
       }
 
-      stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder)
-      }
-
-      stage('Snyk test') {
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
-      }
-
-      stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-      }
-
-      if (config.containsKey('buildClosure')) {
-        config['buildClosure']()
-      }
-
-      stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER, tag)
-      }
-
-      stage('Create JUnit report') {
-        test.createJUnitReport()
-      }
-
-      stage('Fix lcov report') {
-        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      }
-
-      stage('SonarCloud analysis') {
-        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
-      }
-
-      if (config.containsKey('testClosure')) {
-        config['testClosure']()
-      }
-
-      stage('Push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
-      }
-
-      if (pr != '') {
-        stage('Helm install') {
-          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag)
-        }
-      }
-      else {
-        stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
+      parallel stream1: {
+        stage('npm audit') {
+          build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder)
         }
 
-        stage('Trigger GitHub release') {
-          withCredentials([
-            string(credentialsId: 'github-auth-token', variable: 'gitToken')
-          ]) {
-            release.trigger(tag, repoName, tag, gitToken)
+        stage('Snyk test') {
+          build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
+        }
+
+        stage('Build test image') {
+          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+        }
+
+        if (config.containsKey('buildClosure')) {
+          config['buildClosure']()
+        }
+
+        stage('Run tests') {
+          build.runTests(repoName, repoName, BUILD_NUMBER, tag)
+        }
+
+        stage('Create JUnit report') {
+          test.createJUnitReport()
+        }
+
+        stage('Fix lcov report') {
+          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+        }
+
+        stage('SonarCloud analysis') {
+          test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
+        }
+
+        if (config.containsKey('testClosure')) {
+          config['testClosure']()
+        }
+        
+      }, stream2: {
+        stage('Push container image') {
+          build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
+        }
+
+        if (pr != '') {
+          stage('Helm install') {
+            helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag)
           }
         }
+        else {
+          stage('Publish chart') {
+            helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
+          }
 
-        stage('Trigger Deployment') {
-          withCredentials([
-            string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
-          ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': config.environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+          stage('Trigger GitHub release') {
+            withCredentials([
+              string(credentialsId: 'github-auth-token', variable: 'gitToken')
+            ]) {
+              release.trigger(tag, repoName, tag, gitToken)
+            }
+          }
+
+          stage('Trigger Deployment') {
+            withCredentials([
+              string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
+            ]) {
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': config.environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+            }
           }
         }
       }
