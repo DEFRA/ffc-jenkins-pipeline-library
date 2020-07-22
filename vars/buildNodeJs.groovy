@@ -68,7 +68,7 @@ def call(Map config=[:]) {
         config['testClosure']()
       }
 
-      stage('Push container image') {
+      stage('Build & push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
