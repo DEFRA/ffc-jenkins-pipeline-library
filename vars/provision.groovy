@@ -9,6 +9,14 @@ def readManifest() {
   return manifest
 }
 
+def listQueues(resourceGroup, namespace, prefix) {
+  def resGroupAndNamespace = "--resource-group $resourceGroup --namespace-name $nameSpace"
+  def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name')"
+  def script = "az servicebus queue list $resGroupAndNamespace | $jqCommand"
+  def queueNames = sh(returnStdout: true, script: script).trim()
+  return queueNames.tokenize('\n')
+}
+
 def deletePrResources(repoName, pr) {
   deleteQueues(repoName, pr)
 }
