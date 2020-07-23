@@ -40,10 +40,11 @@ def createAllResources(filePath, repoName, pr) {
 
 def createQueues(queues, repoName, pr) {
   queues.each { key ->
-    if(pr != '') {
-      createQueue("$repoName-pr$pr-$key")
-    }
-    createQueue("$repoName-$BUILD_NUMBER-$pr-$key")
+    echo key
+    // if(pr != '') {
+    //   createQueue("$repoName-pr$pr-$key")
+    // }
+    // createQueue("$repoName-$BUILD_NUMBER-$pr-$key")
   }
 }
 
