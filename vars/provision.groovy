@@ -1,14 +1,16 @@
 
 def createResources(repoName, pr) {
   def filePath = 'provision.azure.yaml'
-  if(fileExists(filePath)) {
+  exists = fileExists(filePath)
+  echo exists
+  if(exists) {
     //deletePrResources(repoName, pr)   
     createAllResources(filePath, repoName, pr)
   }
 }
 
 def fileExists(filePath){
-  return sh("test -f $filePath && echo true || echo false")
+  return sh(returnStdout: true, script: "test -f $filePath && echo true || echo false")
 }
 
 def readManifest(filePath, resource) {
