@@ -9,7 +9,12 @@ def readManifest() {
   return manifest
 }
 
+def validateQueueName(name) {
+  assert name ==~ /^[A-Za-z0-9]$|^[A-Za-z0-9][\w-\.\/\~]*[A-Za-z0-9]$/ : "Invalid queue name: '$name'"
+}
+
 def listQueues(resourceGroup, namespace, prefix) {
+  validateQueueName(prefix)
   def resGroupAndNamespace = "--resource-group $resourceGroup --namespace-name $namespace"
   def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
   def script = "az servicebus queue list $resGroupAndNamespace | $jqCommand"
