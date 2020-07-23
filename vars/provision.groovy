@@ -12,7 +12,8 @@ def fileExists(filePath){
 }
 
 def readManifest(filePath, resource) {
- return sh(returnStdout: true, script: "yq r $filePath resources.$resource.**").trim()
+ def resources = sh(returnStdout: true, script: "yq r $filePath resources.$resource.**").trim()
+ return resources.tokenize('\n')
 }
 
 // def deletePrResources(repoName, pr) {
