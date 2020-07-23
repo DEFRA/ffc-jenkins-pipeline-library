@@ -11,7 +11,7 @@ def readManifest() {
 
 def listQueues(resourceGroup, namespace, prefix) {
   def resGroupAndNamespace = "--resource-group $resourceGroup --namespace-name $namespace"
-  def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name')"
+  def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
   def script = "az servicebus queue list $resGroupAndNamespace | $jqCommand"
   def queueNames = sh(returnStdout: true, script: script).trim()
   return queueNames.tokenize('\n')
