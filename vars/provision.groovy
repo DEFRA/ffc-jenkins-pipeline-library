@@ -1,9 +1,7 @@
 
 def createResources(repoName, pr) {
   def filePath = 'provision.azure.yaml'
-  exists = fileExists(filePath)
-  echo exists
-  if(exists) {
+  if(fileExists(filePath)) {
     //deletePrResources(repoName, pr)   
     createAllResources(filePath, repoName, pr)
   }
@@ -26,7 +24,11 @@ def readManifest(filePath, resource) {
 // }
 
 def createAllResources(filePath, repoName, pr) {
-  createQueues(readManifest(filePath, 'queues'), repoName, pr)
+  def queues = readManifest(filePath, 'queues')
+  echo queues
+  if(queues != '') {
+    createQueues(queues, repoName, pr)
+  }
 }
 
 // def deleteQueues(repoName, pr) {
