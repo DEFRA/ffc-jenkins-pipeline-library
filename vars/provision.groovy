@@ -39,11 +39,10 @@ def createAllResources(pr) {
 
 def deleteQueues(repoName, pr) {
   def resourceGroup = AZURE_SERVICE_BUS_RESOURCE_GROUP
-  def namespace = AZURE_SERVICE_BUS_NAMESPACE
-  def queues = sh("az servicebus queue list --resource-group $resourceGroup --namespace-name $namespace | jq. // TODO get PR queues that match convention")
-  // az servicebus queue list --resource-group SNDFFCINFRG1001 --namespace-name SNDFFCINFSB1001  | jq -r '.[]| select(.name | startswith("mh")) | .name'
-  foreach(queues in queues) {
-    sh('az servicebus queue delete')
+  def resourceGroup = AZURE_SERVICE_BUS_NAMESPACE
+  def queues = listQueues(resourceGroup, resourceGroup, 'sp')
+  foreach(queue in queues) {
+    sh("az servicebus queue delete --resource-group $resourceGroup --namespace-name $namespace --name $queue")
   }
 }
 
