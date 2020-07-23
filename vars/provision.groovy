@@ -12,7 +12,7 @@ def fileExists(filePath){
 }
 
 def readManifest(filePath, resource) {
- return sh(returnStdout: true, script: "yq r $filePath resources.$resource.**")
+ return sh(returnStdout: true, script: "yq r $filePath resources.$resource.**").trim()
 }
 
 // def deletePrResources(repoName, pr) {
@@ -25,10 +25,7 @@ def readManifest(filePath, resource) {
 
 def createAllResources(filePath, repoName, pr) {
   def queues = readManifest(filePath, 'queues')
-  echo queues
-  if(queues != '') {
-    createQueues(queues, repoName, pr)
-  }
+  createQueues(queues, repoName, pr)
 }
 
 // def deleteQueues(repoName, pr) {
