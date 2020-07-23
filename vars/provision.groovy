@@ -12,7 +12,7 @@ def fileExists(filePath){
 }
 
 def readManifest(filePath, resource) {
- return sh("yq r $filePath resources.$resource.**")
+ return sh(returnStdout: true, script: "yq r $filePath resources.$resource.**")
 }
 
 // def deletePrResources(repoName, pr) {
