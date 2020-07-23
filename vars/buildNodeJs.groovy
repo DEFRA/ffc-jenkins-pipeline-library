@@ -124,9 +124,9 @@ def call(Map config=[:]) {
         test.deleteOutput(nodeDevelopmentImage, containerSrcFolder)
       }
 
-      stage('Clean up resources') {
-        provision.deleteBuildQueues(repoName, pr)
-      }
+      // stage('Clean up resources') {
+      //   provision.deleteBuildQueues(repoName, pr)
+      // }
 
       if (config.containsKey('finallyClosure')) {
         config['finallyClosure']()

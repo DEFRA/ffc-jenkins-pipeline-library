@@ -1,9 +1,9 @@
-provisionFilePath = 'provision.azure.yaml'
 
 def createResources(repoName, pr) {
-  if(fileExists(provisionFilePath)) {
+  def filePath = 'provision.azure.yaml'
+  if(fileExists(filePath)) {
     //deletePrResources(repoName, pr)   
-    createAllResources(repoName, pr)
+    createAllResources(filePath, repoName, pr)
   }
 }
 
@@ -11,8 +11,8 @@ def fileExists(filePath){
   return sh("test -f $filePath && echo true || echo false")
 }
 
-def readManifest(resource) {
- return sh("yq r $provisionFilePath resources.$resource.**")
+def readManifest(filePath, resource) {
+ return sh("yq r $filePath resources.$resource.**")
 }
 
 // def deletePrResources(repoName, pr) {
@@ -23,8 +23,8 @@ def readManifest(resource) {
 //   deleteQueues(repoName, pr)
 // }
 
-def createAllResources(repoName, pr) {
-  createQueues(readManifest('queues'), repoName, pr)
+def createAllResources(filePath, repoName, pr) {
+  createQueues(readManifest(filePath, 'queues'), repoName, pr)
 }
 
 // def deleteQueues(repoName, pr) {
