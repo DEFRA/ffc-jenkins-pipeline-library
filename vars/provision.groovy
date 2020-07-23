@@ -42,7 +42,7 @@ def deleteQueues(repoName, pr) {
   }
 }
 
-def createQueues(queues, pr) {
+/* def createQueues(queues, pr) {
   foreach(queue in queues) {
     if(pr) {
       createQueue(pr queue name)
@@ -50,7 +50,7 @@ def createQueues(queues, pr) {
     createQueue(build queue name)
   }
 }
-
+ */
 def createQueue(queue) {
   sh("az servicebus queue create --name $queue")
 }
