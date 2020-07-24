@@ -3,7 +3,7 @@ package uk.gov.defra.ffc
 class Provision implements Serializable {
   static def createResources(ctx, repoName, pr) {
     def filePath = 'provision.azure.yaml'
-    if(fileExists(filePath)) {
+    if(ctx.fileExists(filePath)) {
       deletePrResources(ctx, repoName, pr)   
       createAllResources(ctx, filePath, repoName, pr)
     }
