@@ -31,7 +31,7 @@ def listQueues(prefix) {
 }
 
 def readManifest(filePath, resource) {
- def resources = sh(returnStdout: true, script: "yq r $filePath resources.$resource.*.name").trim()
+ def resources = sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*.name").trim()
  return resources.tokenize('\n')
 }
 
