@@ -46,5 +46,6 @@ def createQueues(queues, repoName, pr) {
 }
 
 def createQueue(queueName) {
+  validateQueueName(queueName)
   sh("az servicebus queue create --resource-group $AZURE_SERVICE_BUS_RESOURCE_GROUP --namespace-name $AZURE_SERVICE_BUS_NAMESPACE --name $queueName --max-size 1024")
 }
