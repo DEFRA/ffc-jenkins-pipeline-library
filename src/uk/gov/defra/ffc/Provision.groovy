@@ -10,7 +10,7 @@ class Provision implements Serializable {
   }
 
   static def deleteBuildResources(ctx, repoName, pr) {
-    deleteQueues(ctx, getBuildQueuePrefix(repoName, pr))
+    deleteQueues(ctx, getBuildQueuePrefix(ctx, repoName, pr))
   }
 
   private static def createAllResources(ctx, filePath, repoName, pr) {
@@ -33,7 +33,7 @@ class Provision implements Serializable {
 
   private static def createBuildQueues(ctx, queues, repoName, pr) {
     queues.each {
-      createQueue(ctx, "${getBuildQueuePrefix(repoName, pr)}$it")
+      createQueue(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it")
     }
   }
 
