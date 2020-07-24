@@ -7,7 +7,7 @@ def createResources(repoName, pr) {
 }
 
 def deleteBuildResources(repoName, pr) {
-  deleteQueues("$repoName-build$BUILD_NUMBER-$pr-")
+  deleteQueues(getBuildQueuePrefix(repoName, pr))
 }
 
 def createAllResources(filePath, repoName, pr) {
@@ -30,7 +30,7 @@ def createPrQueues(repoName, pr) {
 
 def createBuildQueues(repoName, pr) {
   queues.each {
-    createQueue("$repoName-build$BUILD_NUMBER-$pr-$it")
+    createQueue("${getBuildQueuePrefix(repoName, pr)}$it")
   }
 }
 
@@ -64,9 +64,14 @@ def getResGroupAndNamespace () {
   return "--resource-group $AZURE_SERVICE_BUS_RESOURCE_GROUP --namespace-name $AZURE_SERVICE_BUS_NAMESPACE"
 }
 
+def getBuildQueuePrefix (repoName, pr) {
+  return "$repoName-build$BUILD_NUMBER-$pr-"
+}
+
 def listQueues(prefix) {
   def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
   def script = "az servicebus queue list ${getResGroupAndNamespace()} | $jqCommand"
   def queueNames = sh(returnStdout: true, script: script).trim()
   return queueNames.tokenize('\n')
 }
+
