@@ -125,7 +125,7 @@ def call(Map config=[:]) {
       }
 
       stage('Clean up resources') {
-        provision.deleteQueues("$repoName-build$BUILD_NUMBER-$pr-")
+        provision.deleteBuildResources(repoName, pr)
       }
 
       if (config.containsKey('finallyClosure')) {
