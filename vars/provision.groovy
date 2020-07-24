@@ -7,10 +7,6 @@ def createResources(repoName, pr) {
   }
 }
 
-def fileExists(filePath){
-  return sh(returnStdout: true, script: "test -f $filePath && echo true || echo false")
-}
-
 def readManifest(filePath, resource) {
  def resources = sh(returnStdout: true, script: "yq r $filePath resources.$resource.**").trim()
  return resources.tokenize('\n')
