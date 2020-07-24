@@ -23,11 +23,11 @@ def listQueues(prefix) {
 }
 
 def deletePrResources(repoName, pr) {
-  deleteQueues(repoName, pr)
+  deleteQueues(repoName + pr)
 }
 
 def deleteBuildQueues(repoName, pr) {
-  deleteQueues(repoName, pr)
+  deleteQueues(repoName + pr)
 }
 
 def createAllResources(pr) {
@@ -37,8 +37,8 @@ def createAllResources(pr) {
   }
 }
 
-def deleteQueues(repoName, pr) {
-  def queues = listQueues('sp')
+def deleteQueues(prefix) {
+  def queues = listQueues(prefix)
   queues.each {
     sh("az servicebus queue delete --resource-group $AZURE_SERVICE_BUS_RESOURCE_GROUP --namespace-name $AZURE_SERVICE_BUS_NAMESPACE --name $it")
   }
