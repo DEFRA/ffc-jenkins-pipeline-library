@@ -42,10 +42,10 @@ def createQueues(queues, repoName, pr) {
     if(pr != '') {
       createQueue("$repoName-pr$pr-$key")
     }
-    createQueue("$repoName-$BUILD_NUMBER-$pr-$key")
+    createQueue("$repoName-build$BUILD_NUMBER-$pr-$key")
   }
 }
 
 def createQueue(queueName) {
-  sh(returnStdout: true, script:"az servicebus queue create --resource-group $AZURE_SERVICE_BUS_RESOURCE_GROUP --namespace-name $AZURE_SERVICE_BUS_NAMESPACE --name $queueName")
+  sh("az servicebus queue create --resource-group $AZURE_SERVICE_BUS_RESOURCE_GROUP --namespace-name $AZURE_SERVICE_BUS_NAMESPACE --name $queueName --max-size 1024")
 }
