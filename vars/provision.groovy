@@ -2,9 +2,13 @@
 def createResources(repoName, pr) {
   def filePath = 'provision.azure.yaml'
   if(fileExists(filePath)) {
-    //deletePrResources(repoName, pr)   
+    deletePrResources(repoName, pr)   
     createAllResources(filePath, repoName, pr)
   }
+}
+
+def deletePrResources(repoName, pr) {
+  deleteQueues("$repoName-pr$pr-")
 }
 
 def deleteQueues(prefix) {
