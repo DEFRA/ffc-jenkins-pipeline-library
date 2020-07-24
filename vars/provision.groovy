@@ -16,19 +16,19 @@ def createAllResources(filePath, repoName, pr) {
 }
 
 def createQueues(queues, repoName, pr) {
-  createBuildQueues(repoName, pr, queues)
+  createBuildQueues(queues, repoName, pr)
   if(pr != '') {
-    createPrQueues(repoName, pr, queues)
+    createPrQueues(queues, repoName, pr)
   }
 }
 
-def createPrQueues(repoName, pr) {
+def createPrQueues(queues, repoName, pr) {
   queues.each {
     createQueue("$repoName-pr$pr-$it")
   }
 }
 
-def createBuildQueues(repoName, pr) {
+def createBuildQueues(queues, repoName, pr) {
   queues.each {
     createQueue("${getBuildQueuePrefix(repoName, pr)}$it")
   }
