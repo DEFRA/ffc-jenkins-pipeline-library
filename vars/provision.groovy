@@ -19,7 +19,6 @@ def validateQueueName(name) {
 }
 
 def listQueues(prefix) {
-  validateQueueName(prefix)
   def resGroupAndNamespace = "--resource-group $AZURE_SERVICE_BUS_RESOURCE_GROUP --namespace-name $AZURE_SERVICE_BUS_NAMESPACE"
   def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
   def script = "az servicebus queue list $resGroupAndNamespace | $jqCommand"
