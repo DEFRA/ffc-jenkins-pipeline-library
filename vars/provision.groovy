@@ -5,5 +5,5 @@ def createResources(repoName, pr) {
 }
 
 def deleteBuildResources(repoName, pr) {
-  Provision.deleteQueues(this, repoName, pr))
+  Provision.deleteQueues(this, repoName, pr)
 }
