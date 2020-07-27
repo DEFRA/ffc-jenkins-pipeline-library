@@ -7,11 +7,11 @@ For the details of what happens please review the
 
 ## Prerequisite
 For dynamic resources you will need a [provision.azure.yaml] file in your repo with the below format.
-[resources:
+resources:
   queues:
     - name: claim
     - name: payment
-    - name: schedule]
+    - name: schedule
 
 
 ```
