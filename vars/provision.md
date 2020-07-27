@@ -17,6 +17,7 @@ resources:
   queues:
     - name: claim
 ```
+`buildDotNetCore` and `buildNodeJs` both call the belowsignatures to allow the resources to be created and deleted at the correct times during building.
 
 `createResources` will create the dynamic resource queues passing in the `repoName` and `pr`
 
