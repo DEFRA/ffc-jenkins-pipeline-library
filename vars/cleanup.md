@@ -6,8 +6,8 @@ This can be used to clean up resources in conjunction with the Jenkins
 [MultiBranch Action Triggers](https://plugins.jenkins.io/multibranch-action-triggers/)
 plugin which allows other pipelines to be triggered on branch events.
 
-The Helm chart will be uninstalled and the PR namespace will be deleted upon
-branch deletion for a closed PR.
+ Upon branch deletion for a closed PR the 
+ Helm chart will be uninstalled, the PR namespace will be deleted, and queues that were created for the PR will be deleted.
 
 To enable cleanup the MultiBranch pipeline of a service requires a
 `Pipeline Delete Event` configuring.
