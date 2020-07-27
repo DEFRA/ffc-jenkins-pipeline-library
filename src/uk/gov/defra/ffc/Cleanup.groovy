@@ -1,9 +1,10 @@
 package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Helm
+import uk.gov.defra.ffc.Provision
 
 class Cleanup implements Serializable {
-  static def prResources(ctx, environment, repoName, branchName, provision) {
+  static def prResources(ctx, environment, repoName, branchName) {
     if (repoName == '' || branchName == '') {
       ctx.echo('Unable to determine repo name and branch name, cleanup cancelled')
     } else {
@@ -16,7 +17,7 @@ class Cleanup implements Serializable {
         ctx.echo("Tidying up kubernetes resources for PR $closedPrNo of $repoName after branch $branchName deleted")
         Helm.undeployChart(ctx, environment, repoName, "pr$closedPrNo")
         ctx.echo("Removing queues for PR $closedPrNo of $repoName after branch $branchName deleted")
-        provision.deletePrResources(repoName, closedPrNo)   
+        Provision.deletePrResources(ctx, repoName, closedPrNo)   
       }
     }
   }
