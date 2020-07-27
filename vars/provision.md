@@ -6,7 +6,7 @@ For the details of what happens please review the
 [provision](provision.groovy) script.
 
 ## Prerequisite
-For dynamic resources you will need a [provision.azure.yaml] file in your repo with the below format.
+For dynamic resources you will need a `provision.azure.yaml` file in your repo with the below format.
 ```
 resources:
   queues:
@@ -20,6 +20,6 @@ resources:
 
 provision environment: 'dev'
 ```
-'createResources' will create the dynamic resource queues passing in the 'repoName' and 'pr'
+`createResources` will create the dynamic resource queues passing in the `repoName` and `pr`
 
-'deleteBuildResources' will delete all build dynamic resource queues leaving the pr queues to allow tests to be able to run.
+`deleteBuildResources` will delete all build dynamic resource queues leaving the pr queues to allow tests to be able to run.
