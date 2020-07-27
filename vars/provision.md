@@ -20,6 +20,6 @@ resources:
 
 provision environment: 'dev'
 ```
-[createResources] will create the dynamic resource queues passing in the [repoName] and [pr]
+'createResources' will create the dynamic resource queues passing in the 'repoName' and 'pr'
 
-[deleteBuildResources] will delete all build dynamic resource queues leaving the pr queues to allow tests to be able to run.
+'deleteBuildResources' will delete all build dynamic resource queues leaving the pr queues to allow tests to be able to run.
