@@ -24,7 +24,7 @@ Creates dynamic resource queues.
 The resources are creating using a manifest in the root directory of the repo which dictates the name of the resources that need setting up.
 
 Takes two parameters:
-- repositry name
+- repository name
 - pull request number
 
 Example usage:
