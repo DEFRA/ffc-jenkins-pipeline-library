@@ -19,11 +19,34 @@ resources:
 ```
 ## createResources
 
-Creates dynamic resource queues 
+Creates dynamic resource queues.
 
-`createResources` will create the dynamic resource queues passing in the `repoName` and `pr`
+The resources are creating using a manifest in the root directory of the repo which dictates the name of the resources that need setting up.
+
+Takes two parameters:
+- repositry name
+- pull request number
+
+Example usage:
+```
+ stage('Provision resources') {
+        provision.createResources(repoName, pr)
+      }
+```
 
 ## deleteBuildResources
 
 Deletes dynamic resource queues
-`deleteBuildResources` will delete all build dynamic resource queues leaving the pr queues to allow tests to be able to run.
+
+This deletes all build dynamic resource queues leaving the pr queues to allow tests to be able to run.
+
+Takes two parameters:
+- repositry name
+- pull request number
+
+Example usage:
+```
+ stage('Clean up resources') {
+        provision.deleteBuildResources(repoName, pr)
+      }
+```
