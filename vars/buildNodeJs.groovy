@@ -43,6 +43,10 @@ def call(Map config=[:]) {
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }
+      
+      stage('Provision resources') {
+        provision.createResources(repoName, pr)
+      }
 
       if (config.containsKey('buildClosure')) {
         config['buildClosure']()
@@ -118,6 +122,10 @@ def call(Map config=[:]) {
     } finally {
       stage('Clean up test output') {
         test.deleteOutput(nodeDevelopmentImage, containerSrcFolder)
+      }
+
+      stage('Clean up resources') {
+        provision.deleteBuildResources(repoName, pr)
       }
 
       if (config.containsKey('finallyClosure')) {

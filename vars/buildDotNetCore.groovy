@@ -34,6 +34,10 @@ def call(Map config=[:]) {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }
 
+      stage('Provision resources') {
+        provision.createResources(repoName, pr)
+      }
+
       if (fileExists('./docker-compose.snyk.yaml')){
         stage('Snyk test') {
           // ensure obj folder exists and is writable by all
@@ -99,6 +103,11 @@ def call(Map config=[:]) {
 
       throw e
     } finally {
+      
+      stage('Clean up resources') {
+        provision.deleteBuildResources(repoName, pr)
+      }
+
       if (config.containsKey('finallyClosure')) {
         config['finallyClosure']()
       }
