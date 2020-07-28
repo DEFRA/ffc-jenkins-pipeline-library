@@ -41,7 +41,7 @@ Deletes dynamic resource queues
 This deletes all build dynamic resource queues leaving the pr queues to allow tests to be able to run.
 
 Takes two parameters:
-- repositry name
+- repository name
 - pull request number
 
 Example usage:
