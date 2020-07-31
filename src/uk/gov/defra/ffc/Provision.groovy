@@ -29,7 +29,7 @@ class Provision implements Serializable {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
       schemaName = repoName.replace('-','_') + pr
       schemaRole = repoName.replace('-','_') + pr + "role"
-       def envVars = "POSTGRES_HOST=$AZURE_DB_HOST " +
+      def envVars = "POSTGRES_HOST=$AZURE_DB_HOST " +
                      "POSTGRES_USER=$AZURE_DB_USER " +
                      "POSTGRES_PASSWORD=$AZURE_DB_PASSWORD " +
                      "SCHEMA_ROLE=$schemaRole " +
@@ -45,7 +45,7 @@ class Provision implements Serializable {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
       schemaName = repoName.replace('-','_') + pr
       schemaRole = repoName.replace('-','_') + pr + "role"
-       def envVars = "POSTGRES_HOST=$AZURE_DB_HOST " +
+      def envVars = "POSTGRES_HOST=$AZURE_DB_HOST " +
                      "POSTGRES_USER=$AZURE_DB_USER " +
                      "POSTGRES_PASSWORD=$AZURE_DB_PASSWORD " +
                      "SCHEMA_ROLE=$schemaRole " +
