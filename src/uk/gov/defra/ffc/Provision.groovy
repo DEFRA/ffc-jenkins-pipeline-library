@@ -4,7 +4,7 @@ class Provision implements Serializable {
   static def createResources(ctx, repoName, pr) {
     def filePath = 'provision.azure.yaml'
     if(ctx.fileExists(filePath)) {
-      deletePrResources(ctx, repoName, pr)   
+      deletePrResources(ctx, repoName, pr)
       createAllResources(ctx, filePath, repoName, pr)
     }
   }
@@ -22,6 +22,38 @@ class Provision implements Serializable {
     createBuildQueues(ctx, queues, repoName, pr)
     if(pr != '') {
       createPrQueues(ctx, queues, repoName, pr)
+    }
+  }
+
+  private static def createPrDatabase(ctx, repoName, pr) {
+    if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
+      schemaName = repoName.replace('-','_') + pr
+      schemaRole = repoName.replace('-','_') + pr + "role"
+       def envVars = "POSTGRES_HOST=$AZURE_DB_HOST " +
+                     "POSTGRES_USER=$AZURE_DB_USER " +
+                     "POSTGRES_PASSWORD=$AZURE_DB_USER" +
+                     "SCHEMA_ROLE=$schemaRole" +
+                     "SCHEMA_PASSWORD=$AZURE_PR_PASSWORD" +
+                     "SCHEMA_NAME=$schemaName" 
+
+       ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
+       ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
+    }
+  }
+
+  private static def deletePrDatabase(ctx, repoName, pr) {
+    if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
+      schemaName = repoName.replace('-','_') + pr
+      schemaRole = repoName.replace('-','_') + pr + "role"
+       def envVars = "POSTGRES_HOST=$AZURE_DB_HOST " +
+                     "POSTGRES_USER=$AZURE_DB_USER " +
+                     "POSTGRES_PASSWORD=$AZURE_DB_USER" +
+                     "SCHEMA_ROLE=$schemaRole" +
+                     "SCHEMA_PASSWORD=$AZURE_PR_PASSWORD" +
+                     "SCHEMA_NAME=$schemaName" 
+
+       ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-down"
+       ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down"
     }
   }
 
