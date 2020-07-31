@@ -31,10 +31,10 @@ class Provision implements Serializable {
       schemaRole = repoName.replace('-','_') + pr + "role"
        def envVars = "POSTGRES_HOST=$AZURE_DB_HOST " +
                      "POSTGRES_USER=$AZURE_DB_USER " +
-                     "POSTGRES_PASSWORD=$AZURE_DB_USER" +
-                     "SCHEMA_ROLE=$schemaRole" +
-                     "SCHEMA_PASSWORD=$AZURE_PR_PASSWORD" +
-                     "SCHEMA_NAME=$schemaName" 
+                     "POSTGRES_PASSWORD=$AZURE_DB_PASSWORD " +
+                     "SCHEMA_ROLE=$schemaRole " +
+                     "SCHEMA_PASSWORD=$AZURE_PR_PASSWORD " +
+                     "SCHEMA_NAME=$schemaName"
 
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
@@ -47,9 +47,9 @@ class Provision implements Serializable {
       schemaRole = repoName.replace('-','_') + pr + "role"
        def envVars = "POSTGRES_HOST=$AZURE_DB_HOST " +
                      "POSTGRES_USER=$AZURE_DB_USER " +
-                     "POSTGRES_PASSWORD=$AZURE_DB_USER" +
-                     "SCHEMA_ROLE=$schemaRole" +
-                     "SCHEMA_PASSWORD=$AZURE_PR_PASSWORD" +
+                     "POSTGRES_PASSWORD=$AZURE_DB_PASSWORD " +
+                     "SCHEMA_ROLE=$schemaRole " +
+                     "SCHEMA_PASSWORD=$AZURE_PR_PASSWORD " +
                      "SCHEMA_NAME=$schemaName" 
 
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-down"
