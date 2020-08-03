@@ -50,7 +50,7 @@ class Provision implements Serializable {
     ]
     // def appConfigPrefix = environment + '/'
     def appConfigPrefix ='dev/'
-    def values = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel='\\\\0')
+    def values = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
     return values
   }
 /*
