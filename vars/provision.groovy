@@ -10,5 +10,5 @@ def deleteBuildResources(repoName, pr) {
 
 
 def getDatabaseEnvVars(){
-  return getDatabaseEnvVars(this)
+  return Provision.getDatabaseEnvVars(this)
 }
