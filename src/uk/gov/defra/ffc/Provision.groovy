@@ -1,5 +1,7 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.Helm
+
 class Provision implements Serializable {
   static def createResources(ctx, repoName, pr) {
     def filePath = 'provision.azure.yaml'
@@ -39,6 +41,17 @@ class Provision implements Serializable {
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
     }
+  }
+
+  private static def getDatabaseEnvVars(ctx) {
+    def searchKeys = [
+      "postgresAdminUser",
+      "postgresAdminPassword",
+    ]
+    // def appConfigPrefix = environment + '/'
+    def appConfigPrefix ='dev/'
+    def values = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel='\\\\0')
+    return values
   }
 
   private static def deletePrDatabase(ctx, repoName, pr) {

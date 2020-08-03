@@ -7,3 +7,8 @@ def createResources(repoName, pr) {
 def deleteBuildResources(repoName, pr) {
   Provision.deleteBuildResources(this, repoName, pr)
 }
+
+
+def getDatabaseEnvVars(){
+  return getDatabaseEnvVars(this)
+}
