@@ -29,13 +29,13 @@ class Provision implements Serializable {
 
   private static def createPrDatabase(ctx, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
-      schemaName = repoName.replace('-','_') + pr
-      schemaRole = repoName.replace('-','_') + pr + "role"
-      def envVars = "POSTGRES_HOST=$AZURE_DB_HOST " +
-                     "POSTGRES_USER=$AZURE_DB_USER " +
-                     "POSTGRES_PASSWORD=$AZURE_DB_PASSWORD " +
+      def schemaName = repoName.replace('-','_') + pr
+      def schemaRole = repoName.replace('-','_') + pr + "role"
+      def envVars = "POSTGRES_HOST=${AZURE_DB_HOST} " +
+                     "POSTGRES_USER=${AZURE_DB_USER} " +
+                     "POSTGRES_PASSWORD=${AZURE_DB_PASSWORD} " +
                      "SCHEMA_ROLE=$schemaRole " +
-                     "SCHEMA_PASSWORD=$AZURE_PR_PASSWORD " +
+                     "SCHEMA_PASSWORD=${AZURE_PR_PASSWORD} " +
                      "SCHEMA_NAME=$schemaName"
 
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
@@ -63,7 +63,7 @@ class Provision implements Serializable {
                      "POSTGRES_PASSWORD=${AZURE_DB_PASSWORD} " +
                      "SCHEMA_ROLE=$schemaRole " +
                      "SCHEMA_PASSWORD=${AZURE_PR_PASSWORD} " +
-                     "SCHEMA_NAME=$schemaName" 
+                     "SCHEMA_NAME=$schemaName"
 
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-down"
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down"
