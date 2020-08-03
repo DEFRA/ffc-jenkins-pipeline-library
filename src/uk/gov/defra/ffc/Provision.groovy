@@ -26,7 +26,7 @@ class Provision implements Serializable {
       createPrQueues(ctx, queues, repoName, pr)
     }
   }
-
+/*
   private static def createPrDatabase(ctx, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
       def schemaName = repoName.replace('-','_') + pr
@@ -41,7 +41,7 @@ class Provision implements Serializable {
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
     }
-  }
+  }*/
 
   private static def getDatabaseEnvVars(ctx) {
     def searchKeys = [
@@ -53,7 +53,7 @@ class Provision implements Serializable {
     def values = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel='\\\\0')
     return values
   }
-
+/*
   private static def deletePrDatabase(ctx, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
       def schemaName = repoName.replace('-','_') + pr
@@ -69,7 +69,7 @@ class Provision implements Serializable {
        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down"
     }
   }
-
+*/
   private static def createPrQueues(ctx, queues, repoName, pr) {
     queues.each {
       createQueue(ctx, "$repoName-pr$pr-$it")
