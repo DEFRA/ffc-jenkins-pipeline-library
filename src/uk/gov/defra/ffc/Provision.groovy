@@ -45,13 +45,20 @@ class Provision implements Serializable {
 
   private static def getDatabaseEnvVars(ctx) {
     def searchKeys = [
-      "postgresAdminUser",
-      "postgresAdminPassword",
+      'postgresAdminUser',
+      'postgresHost',
+      'postgresAdminPassword',
+      'postgresSchemaPassword'
     ]
     // def appConfigPrefix = environment + '/'
     def appConfigPrefix ='dev/'
     def values = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
-    return values
+    ef envs = values.collect { "$it.key=$it.value" }.join(' ')
+    envs = envs.replace('postgresHost', 'POSTGRES_HOST')
+    envs = envs.replace('postgresAdminUser', 'POSTGRES_USER')
+    envs = envs.replace('postgresAdminPassword', 'POSTGRES_PASSWORD')
+    envs = envs.replace('postgresSchemaPassword', 'SCHEMA_PASSWORD')
+    return envs
   }
 /*
   private static def deletePrDatabase(ctx, repoName, pr) {
