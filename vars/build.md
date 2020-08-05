@@ -29,33 +29,10 @@ Example usage:
 (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getCSProjVersion())
 ```
 
-## updateGithubCommitStatus
-
-Updates the build status for the current commit in the GitHub repository. The
-Jenkins server requires `repo:status` permissions for the repository.
-
-The method takes two parameters:
-- a message
-- the state which can be `PENDING`, `SUCCESS`, or `FAILURE`
-
-Example usage:
-
-```
-build.updateGithubCommitStatus('Build started', 'PENDING')
-```
-
-Note: the method requires member variables `repoUrl` and `commitSha` to be set
-prior to running `getVariables`. Without these variables being set
-`updateGithubCommitStatus` method will fail to work correctly.
-
-There are 3 shortcut methods in the library for setting pending, failure and
-success. You should use these instead of calling this method directly.
 
 ## setGithubStatusPending
 
-Updates the build status for the current commit to "Pending". See
-`updateGithubCommitStatus` for further information, as that method is called by
-this one.
+Updates the build status for the current commit to "Pending".
 
 The method takes a single optional parameter
 - a message. This defaults to `Build started` if nothing is passed
@@ -64,36 +41,6 @@ Example usage:
 
 ```
 build.setGithubStatusPending()
-```
-
-## setGithubStatusSuccess
-
-Updates the build status for the current commit to "Success". See
-`updateGithubCommitStatus` for further information, as that method is called by
-this one.
-
-The method takes a single optional parameter
-- a message. This defaults to `Build successful` if nothing is passed
-
-Example usage:
-
-```
-build.setGithubStatusSuccess()
-```
-
-## setGithubStatusFailure
-
-Updates the build status for the current commit to "Failed". See
-`updateGithubCommitStatus` for further information, as that method is called by
-this one.
-
-The method takes a single parameter
-- a message.
-
-Example usage:
-
-```
-build.setGithubStatusFailure(error.message)
 ```
 
 ## buildAndPushContainerImage

@@ -10,18 +10,6 @@ def checkoutSourceCode() {
   return Build.checkoutSourceCode(this)
 }
 
-def setGithubStatusSuccess(message = 'Build successful') {
-  Build.updateGithubCommitStatus(this, message, 'SUCCESS')
-}
-
-def setGithubStatusPending(message = 'Build started') {
-  Build.updateGithubCommitStatus(this, message, 'PENDING')
-}
-
-def setGithubStatusFailure(message = '') {
-  Build.updateGithubCommitStatus(this, message, 'FAILURE')
-}
-
 def buildTestImage(credentialsId, registry, projectName, buildNumber, tag) {
   Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, tag)
 }
