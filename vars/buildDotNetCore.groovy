@@ -93,6 +93,10 @@ def call(Map config=[:]) {
     } catch(e) {
       echo("Build failed with message: $e.message")
 
+      stage('Send build failure slack notification') {
+        notifySlack.buildFailure(e.message, '#generalbuildfailures')
+      }
+      
       if (config.containsKey('failureClosure')) {
         config['failureClosure']()
       }

@@ -8,9 +8,6 @@ node {
   checkout scm
 
   try {
-    stage('Set GitHub status as pending'){
-      build.setGithubStatusPending()
-    }
     stage('Set PR and version variables') {
       (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName))
     }
@@ -31,11 +28,7 @@ node {
         }
       }
     }
-    stage('Set GitHub status as success'){
-      build.setGithubStatusSuccess()
-    }
   } catch(e) {
-    build.setGithubStatusFailure(e.message)
     notifySlack.buildFailure(e.message, '#generalbuildfailures')
     throw e
   }
