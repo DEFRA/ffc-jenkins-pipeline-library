@@ -29,20 +29,6 @@ Example usage:
 (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getCSProjVersion())
 ```
 
-
-## setGithubStatusPending
-
-Updates the build status for the current commit to "Pending".
-
-The method takes a single optional parameter
-- a message. This defaults to `Build started` if nothing is passed
-
-Example usage:
-
-```
-build.setGithubStatusPending()
-```
-
 ## buildAndPushContainerImage
 
 Builds the image from the docker-compose file and pushes it to a repository.
