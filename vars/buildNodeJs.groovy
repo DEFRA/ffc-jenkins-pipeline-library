@@ -110,10 +110,6 @@ def call(Map config=[:]) {
       def errMsg = utils.getErrorMessage(e)
       echo("Build failed with message: $errMsg")
 
-      stage('Send build failure slack notification') {
-        notifySlack.buildFailure(errMsg, '#generalbuildfailures')
-      }
-
       if (config.containsKey('failureClosure')) {
         config['failureClosure']()
       }
