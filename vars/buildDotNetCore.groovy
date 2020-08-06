@@ -8,7 +8,7 @@ def call(Map config=[:]) {
     try {
       stage('Checkout source code') {
         build.checkoutSourceCode()
-      }      
+      }
       stage('Set PR, and tag variables') {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getCSProjVersion(config.project))
       }
@@ -17,7 +17,7 @@ def call(Map config=[:]) {
           version.verifyCSProjIncremented(config.project)
         }
       }
-      
+
       if (config.containsKey('validateClosure')) {
         config['validateClosure']()
       }

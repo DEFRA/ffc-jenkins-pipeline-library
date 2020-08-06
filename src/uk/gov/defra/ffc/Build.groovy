@@ -59,16 +59,6 @@ class Build implements Serializable {
     return [repoName, pr, tag, mergedPrNo]
   }
 
-  static def updateGithubCommitStatus(ctx, message, state) {
-    ctx.step([
-      $class: 'GitHubCommitStatusSetter',
-      reposSource: [$class: 'ManuallyEnteredRepositorySource', url: Utils.getRepoUrl(ctx)],
-      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: GitHubStatus.Build.Context],
-      commitShaSource: [$class: 'ManuallyEnteredShaSource', sha: Utils.getCommitSha(ctx)],
-      errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
-      statusResultSource: [ $class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: message, state: state]] ]
-    ])
-  }
 
   static def npmAudit(ctx, auditLevel, logType, failOnIssues, containerImage, containerWorkDir) {
     auditLevel = auditLevel ?: 'moderate'
