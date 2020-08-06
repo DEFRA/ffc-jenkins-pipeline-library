@@ -8,7 +8,7 @@ def call(Map config=[:]) {
     try {
       stage('Checkout source code') {
         build.checkoutSourceCode()
-      }      
+      }
       stage('Set PR, and tag variables') {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getCSProjVersion(config.project))
       }
@@ -17,7 +17,7 @@ def call(Map config=[:]) {
           version.verifyCSProjIncremented(config.project)
         }
       }
-      
+
       if (config.containsKey('validateClosure')) {
         config['validateClosure']()
       }
@@ -96,7 +96,7 @@ def call(Map config=[:]) {
       stage('Send build failure slack notification') {
         notifySlack.buildFailure(e.message, '#generalbuildfailures')
       }
-      
+
       if (config.containsKey('failureClosure')) {
         config['failureClosure']()
       }
