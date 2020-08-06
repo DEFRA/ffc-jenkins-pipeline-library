@@ -9,9 +9,15 @@ class Tests implements Serializable {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunTests.Context, description: GitHubStatus.RunTests.Description) {
       try {
         ctx.sh('mkdir -p -m 777 test-output')
+        if (ctx.fileExists('./docker-compose.migrate.yaml')) {
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml run database-up")
+        }
         ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
       } finally {
         ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
+        if (ctx.fileExists('./docker-compose.migrate.yaml')) {
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml down -v")
+        }
       }
     }
   }
