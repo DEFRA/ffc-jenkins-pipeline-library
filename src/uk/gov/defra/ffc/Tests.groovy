@@ -16,6 +16,19 @@ class Tests implements Serializable {
     }
   }
 
+  static def runAcceptanceTests(ctx, projectName, serviceName, buildNumber, tag) {
+    if(repoName =  'ffc-demo-web') {
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunTests.Context, description: GitHubStatus.RunTests.Description) {
+        try {
+          ctx.sh('mkdir -p -m 777 test-output')
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
+        } finally {
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
+        }
+      }
+    }
+  }
+
   static def lintHelm(ctx, chartName) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.HelmLint.Context, description: GitHubStatus.HelmLint.Description) {
       Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
