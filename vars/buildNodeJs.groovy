@@ -32,41 +32,41 @@ def call(Map config=[:]) {
         test.lintHelm(repoName)
       }
 
-      stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder)
-      }
+      // stage('npm audit') {
+      //   build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder)
+      // }
 
-      stage('Snyk test') {
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
-      }
+      // stage('Snyk test') {
+      //   build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity)
+      // }
 
-      stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-      }
+      // stage('Build test image') {
+      //   build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+      // }
       
-      stage('Provision resources') {
-        provision.createResources(repoName, pr)
-      }
+      // stage('Provision resources') {
+      //   provision.createResources(repoName, pr)
+      // }
 
-      if (config.containsKey('buildClosure')) {
-        config['buildClosure']()
-      }
+      // if (config.containsKey('buildClosure')) {
+      //   config['buildClosure']()
+      // }
 
-      stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER, tag)
-      }
+      // stage('Run tests') {
+      //   build.runTests(repoName, repoName, BUILD_NUMBER, tag)
+      // }
 
-      stage('Create JUnit report') {
-        test.createJUnitReport()
-      }
+      // stage('Create JUnit report') {
+      //   test.createJUnitReport()
+      // }
 
-      stage('Fix lcov report') {
-        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      }
+      // stage('Fix lcov report') {
+      //   utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      // }
 
-      stage('SonarCloud analysis') {
-        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
-      }
+      // stage('SonarCloud analysis') {
+      //   test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
+      // }
 
       if (config.containsKey('testClosure')) {
         config['testClosure']()
