@@ -136,5 +136,4 @@ class Tests implements Serializable {
       ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
     }
   }
-
 }
