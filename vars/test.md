@@ -96,7 +96,7 @@ test.runAcceptanceTests(74)
 ## runZapScan
 
 Checks for the existence of `docker-compose.zap.yaml` file in the root of the
-repository. If the file exists, the `zap-baseline` service will be run. The
+repository. If the file exists, the `zap-baseline-scan` service will be run. The
 command _could_ be anything but it is likely to be running a
 [Baseline Scan](https://www.zaproxy.org/docs/docker/baseline-scan/) against the
 target of the local web server.
