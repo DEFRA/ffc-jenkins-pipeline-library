@@ -43,7 +43,7 @@ def call(Map config=[:]) {
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }
-      
+
       stage('Provision resources') {
         provision.createResources(repoName, pr)
       }

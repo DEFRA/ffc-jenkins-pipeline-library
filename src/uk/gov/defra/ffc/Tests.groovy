@@ -89,7 +89,7 @@ class Tests implements Serializable {
     ];
   }
 
-  static def buildCodeAnalysisDotNetParams(projectName, branch, pr) {    
+  static def buildCodeAnalysisDotNetParams(projectName, branch, pr) {
     def params = [
     'SONAR_ORGANIZATION': 'defra',
     'SONAR_PROJECT_KEY': projectName
@@ -110,9 +110,9 @@ class Tests implements Serializable {
     'SONAR_PR_PROVIDER': 'GitHub',
     'SONAR_PR_REPOSITORY': "defra/${projectName}"
     ];
-  }  
+  }
 
-  static def runAcceptanceTests(ctx, pr) {    
+  static def runAcceptanceTests(ctx, pr) {
     if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
@@ -122,7 +122,7 @@ class Tests implements Serializable {
               ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=http://ffc-demo-pr${pr}.ffc.snd.azure.defra.cloud"]) {
                 ctx.sh('docker-compose run wdio-cucumber')
               }
-            } else { 
+            } else {
               ctx.withEnv(['TEST_ENVIRONMENT_ROOT_URL=http://ffc-demo.ffc.snd.azure.defra.cloud']) {
                 ctx.sh('docker-compose run wdio-cucumber')
               }
@@ -136,5 +136,4 @@ class Tests implements Serializable {
       ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
     }
   }
-  
 }
