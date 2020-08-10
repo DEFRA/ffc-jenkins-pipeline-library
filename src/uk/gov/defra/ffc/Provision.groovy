@@ -53,7 +53,7 @@ class Provision implements Serializable {
     // def appConfigPrefix = environment + '/'
     def appConfigPrefix ='dev/'
     def values = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
-    ef envs = values.collect { "$it.key=$it.value" }.join(' ')
+    def envs = values.collect { "$it.key=$it.value" }.join(' ')
     envs = envs.replace('postgresHost', 'POSTGRES_HOST')
     envs = envs.replace('postgresAdminUser', 'POSTGRES_USER')
     envs = envs.replace('postgresAdminPassword', 'POSTGRES_PASSWORD')
