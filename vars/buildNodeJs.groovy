@@ -68,10 +68,14 @@ def call(Map config=[:]) {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
       }
 
-        stage('Publish pact broker') {
-          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
-       }
-      
+      stage('Run Zap Scan') {
+        test.runZapScan(repoName, BUILD_NUMBER, tag)
+      }
+
+      stage('Publish pact broker') {
+        pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
+      }
+
       if (config.containsKey('testClosure')) {
         config['testClosure']()
       }
