@@ -28,7 +28,7 @@ class Tests implements Serializable {
         // test-output exists if stage is run after 'runTests', take no risks and create it
         ctx.sh('mkdir -p -m 777 test-output')
         if (ctx.fileExists('./docker-compose.zap.yaml')) {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.zap.yaml run zap-baseline")
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.zap.yaml run zap-baseline-scan")
         }
       } finally {
         if (ctx.fileExists('./docker-compose.zap.yaml')) {
