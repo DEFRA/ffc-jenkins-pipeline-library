@@ -22,6 +22,22 @@ class Tests implements Serializable {
     }
   }
 
+  static def runZapScan(ctx, projectName, buildNumber, tag) {
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.ZapScan.Context, description: GitHubStatus.ZapScan.Description) {
+      try {
+        // test-output exists if stage is run after 'runTests', take no risks and create it
+        ctx.sh('mkdir -p -m 777 test-output')
+        if (ctx.fileExists('./docker-compose.zap.yaml')) {
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.zap.yaml run zap-baseline")
+        }
+      } finally {
+        if (ctx.fileExists('./docker-compose.zap.yaml')) {
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.zap.yaml down -v")
+        }
+      }
+    }
+  }
+
   static def lintHelm(ctx, chartName) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.HelmLint.Context, description: GitHubStatus.HelmLint.Description) {
       Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)

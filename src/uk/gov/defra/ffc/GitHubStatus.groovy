@@ -51,4 +51,9 @@ class GitHubStatus implements Serializable {
     static final Context = "${BASECTX}verify-version"
     static final Description = 'Verify version incremented'
   }
+
+  class ZapScan {
+    static final Context = "${BASECTX}zap-version"
+    static final Description = 'Zap scan'
+  }
 }

@@ -72,6 +72,10 @@ def call(Map config=[:]) {
         test.runAcceptanceTests(pr)
       }
 
+      stage('Run Zap Scan') {
+        test.runZapScan(repoName, BUILD_NUMBER, tag)
+      }
+
       if (config.containsKey('testClosure')) {
         config['testClosure']()
       }
