@@ -45,8 +45,8 @@ class Provision implements Serializable {
 
   private static def getDatabaseEnvVars(ctx) {
     def searchKeys = [
+      'postgresService.postgresExternalName',
       'postgresAdminUser',
-      'postgresHost',
       'postgresAdminPassword',
       'postgresSchemaPassword'
     ]
