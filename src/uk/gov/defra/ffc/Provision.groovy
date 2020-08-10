@@ -9,6 +9,7 @@ class Provision implements Serializable {
       deletePrResources(ctx, repoName, pr)
       createAllResources(ctx, filePath, repoName, pr)
     }
+    createPrDatabase(ctx, environment, repoName, pr)
   }
 
   static def deleteBuildResources(ctx, environment, repoName, pr) {
@@ -26,22 +27,18 @@ class Provision implements Serializable {
       createPrQueues(ctx, queues, repoName, pr)
     }
   }
-/*
-  private static def createPrDatabase(ctx, repoName, pr) {
+
+  private static def createPrDatabase(ctx, environment, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
+      def dbEnvVars = getDatabaseEnvVars(ctx, environment)
       def schemaName = repoName.replace('-','_') + pr
       def schemaRole = repoName.replace('-','_') + pr + "role"
-      def envVars = "POSTGRES_HOST=${AZURE_DB_HOST} " +
-                     "POSTGRES_USER=${AZURE_DB_USER} " +
-                     "POSTGRES_PASSWORD=${AZURE_DB_PASSWORD} " +
-                     "SCHEMA_ROLE=$schemaRole " +
-                     "SCHEMA_PASSWORD=${AZURE_PR_PASSWORD} " +
-                     "SCHEMA_NAME=$schemaName"
+      def envVars =  "$dbEnvVars SCHEMA_ROLE=$schemaRole SCHEMA_NAME=$schemaName"
 
-       ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
-       ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
+      ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
+      ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
     }
-  }*/
+  }
 
   private static def getDatabaseEnvVars(ctx, environment) {
     def searchKeys = [
