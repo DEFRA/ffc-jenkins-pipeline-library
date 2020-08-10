@@ -35,7 +35,7 @@ def call(Map config=[:]) {
       }
 
       stage('Provision resources') {
-        provision.createResources(repoName, pr)
+        provision.createResources(config.environment, repoName, pr)
       }
 
       if (fileExists('./docker-compose.snyk.yaml')){
@@ -105,7 +105,7 @@ def call(Map config=[:]) {
     } finally {
       
       stage('Clean up resources') {
-        provision.deleteBuildResources(repoName, pr)
+        provision.deleteBuildResources(config.environment, repoName, pr)
       }
 
       if (config.containsKey('finallyClosure')) {

@@ -3,7 +3,7 @@ package uk.gov.defra.ffc
 import uk.gov.defra.ffc.Helm
 
 class Provision implements Serializable {
-  static def createResources(ctx, repoName, pr) {
+  static def createResources(ctx, environment, repoName, pr) {
     def filePath = 'provision.azure.yaml'
     if(ctx.fileExists(filePath)) {
       deletePrResources(ctx, repoName, pr)
@@ -11,7 +11,7 @@ class Provision implements Serializable {
     }
   }
 
-  static def deleteBuildResources(ctx, repoName, pr) {
+  static def deleteBuildResources(ctx, environment, repoName, pr) {
     deleteQueues(ctx, getBuildQueuePrefix(ctx, repoName, pr))
   }
 
@@ -43,18 +43,17 @@ class Provision implements Serializable {
     }
   }*/
 
-  private static def getDatabaseEnvVars(ctx) {
+  private static def getDatabaseEnvVars(ctx, environment) {
     def searchKeys = [
       'postgresService.postgresExternalName',
       'postgresAdminUser',
       'postgresAdminPassword',
       'postgresSchemaPassword'
     ]
-    // def appConfigPrefix = environment + '/'
-    def appConfigPrefix ='dev/'
+    def appConfigPrefix = environment + '/'
     def values = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
     def envs = values.collect { "$it.key=$it.value" }.join(' ')
-    envs = envs.replace('postgresHost', 'POSTGRES_HOST')
+    envs = envs.replace('postgresService.postgresExternalName', 'POSTGRES_HOST')
     envs = envs.replace('postgresAdminUser', 'POSTGRES_USER')
     envs = envs.replace('postgresAdminPassword', 'POSTGRES_PASSWORD')
     envs = envs.replace('postgresSchemaPassword', 'SCHEMA_PASSWORD')

@@ -1,14 +1,14 @@
 import uk.gov.defra.ffc.Provision
 
-def createResources(repoName, pr) {
-  Provision.createResources(this, repoName, pr)
+def createResources(environment, repoName, pr) {
+  Provision.createResources(this, environment, repoName, pr)
 }
 
-def deleteBuildResources(repoName, pr) {
-  Provision.deleteBuildResources(this, repoName, pr)
+def deleteBuildResources(environment, repoName, pr) {
+  Provision.deleteBuildResources(this, environment, repoName, pr)
 }
 
 
-def getDatabaseEnvVars(){
-  return Provision.getDatabaseEnvVars(this)
+def getDatabaseEnvVars(environment){
+  return Provision.getDatabaseEnvVars(this, environment)
 }

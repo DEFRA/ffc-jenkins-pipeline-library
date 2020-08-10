@@ -45,7 +45,7 @@ def call(Map config=[:]) {
       }
       
       stage('Provision resources') {
-        provision.createResources(repoName, pr)
+        provision.createResources(config.environment, repoName, pr)
       }
 
       if (config.containsKey('buildClosure')) {
@@ -129,7 +129,7 @@ def call(Map config=[:]) {
       }
 
       stage('Clean up resources') {
-        provision.deleteBuildResources(repoName, pr)
+        provision.deleteBuildResources(config.environment, repoName, pr)
       }
 
       if (config.containsKey('finallyClosure')) {
