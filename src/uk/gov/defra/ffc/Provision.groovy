@@ -42,15 +42,16 @@ class Provision implements Serializable {
 
   private static def getMigrationFiles(ctx){
     def resourcePath = 'uk/gov/defra/ffc/migration/'
-    def schemaUp = ctx.libraryResource "$resourcePath/schema-up"
     getFile(ctx, resourcePath, 'schema-up', 'migrations')
-    //def schemaDown = ctx.libraryResource "$resourcePath/schema-down"
-    // def migrate = ctx.libraryResource "$resourcePath/docker-compose.migrate.yaml"
+    getFile(ctx, resourcePath, 'schema-down', 'migrations')
+    getFile(ctx, resourcePath, 'docker-compose.migrate.yaml', 'migrations')
+    getFile(ctx, resourcePath, 'schema.changelog.xml', 'migrations/changelogs')
   }
 
   private static def getFile(ctx, resourcePath, filename, destinationFolder){
     def fileContent = ctx.libraryResource "$resourcePath/$filename"
     ctx.writeFile(file: "$destinationFolder/$filename", text: fileContent, encoding: "UTF-8")
+    ctx.sh("chmod 777 ./$destinationFolder/$filename")
     ctx.echo "written $filename to $destinationFolder"
   }
 
