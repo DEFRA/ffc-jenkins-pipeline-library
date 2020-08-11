@@ -14,5 +14,5 @@ def getDatabaseEnvVars(environment){
 }
 
 def getMigrationFiles(ctx){
-  echo Provision.getMigrationFiles(ctx)
+  echo Provision.getMigrationFiles(this)
 }
