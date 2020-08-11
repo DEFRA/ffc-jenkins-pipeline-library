@@ -50,7 +50,7 @@ node {
       }
     }
   }
-  
+  }  
 
   } catch(e) {
     notifySlack.buildFailure(e.message, '#generalbuildfailures')
