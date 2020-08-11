@@ -13,6 +13,6 @@ def getDatabaseEnvVars(environment){
   return Provision.getDatabaseEnvVars(this, environment)
 }
 
-def getMigrationFiles(ctx){
+def getMigrationFiles(){
   echo Provision.getMigrationFiles(this)
 }
