@@ -42,17 +42,22 @@ class Provision implements Serializable {
 
   private static def getMigrationFiles(ctx){
     def resourcePath = 'uk/gov/defra/ffc/migration/'
-    getFile(ctx, resourcePath, 'schema-up', 'migrations')
-    getFile(ctx, resourcePath, 'schema-down', 'migrations')
+    getScript(ctx, resourcePath, 'schema-up', 'migrations')
+    getScript(ctx, resourcePath, 'schema-down', 'migrations')
     getFile(ctx, resourcePath, 'docker-compose.migrate.yaml', 'migrations')
     getFile(ctx, resourcePath, 'schema.changelog.xml', 'migrations/changelogs')
   }
 
-  private static def getFile(ctx, resourcePath, filename, destinationFolder){
+  private static def getFile(ctx, resourcePath, filename, destinationFolder, makeExecutable = false){
     def fileContent = ctx.libraryResource "$resourcePath/$filename"
     ctx.writeFile(file: "$destinationFolder/$filename", text: fileContent, encoding: "UTF-8")
-    ctx.sh("chmod 777 ./$destinationFolder/$filename")
+    if (makeExecutable) {
+      ctx.sh("chmod 777 ./$destinationFolder/$filename")
+    }
     ctx.echo "written $filename to $destinationFolder"
+  }
+    private static def getScript(ctx, resourcePath, filename, destinationFolder){
+    getFile(ctx, resourcePath, filename, destinationFolder, true)
   }
 
   private static def getDatabaseEnvVars(ctx, environment) {
