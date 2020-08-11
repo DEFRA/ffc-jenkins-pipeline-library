@@ -1,8 +1,0 @@
-#!/bin/bash
-echo "schema down on $POSTGRES_HOST"
-/scripts/postgres-wait && /liquibase/liquibase \
---driver=org.postgresql.Driver \
---changeLogFile=/changelog/schema.changelog.xml \
---url=jdbc:postgresql://$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB \
---username=$POSTGRES_USERNAME --password=$POSTGRES_PASSWORD --defaultSchemaName=public \
- rollbackCount 1 -DroleName=$SCHEMA_ROLE -DrolePassword=$SCHEMA_PASSWORD -DschemaName=$SCHEMA_NAME

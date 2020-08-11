@@ -40,9 +40,10 @@ class Provision implements Serializable {
     }
   }
 
-  private static def getMigrationFiles(){
-    def schemaUp = Provision.class.getResource('/schema-up').text
-    return schemaUp
+  private static def getMigrationFiles(ctx){
+    def resourcePath = 'uk/gov/defra/ffc/migration/'
+    def schemaUp = ctx.libraryResource "$resourcePath/schema-up"
+    echo schemaUp
   }
 
   private static def getDatabaseEnvVars(ctx, environment) {
