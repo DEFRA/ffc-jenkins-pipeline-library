@@ -34,21 +34,24 @@ class Provision implements Serializable {
       def schemaName = repoName.replace('-','_') + pr
       def schemaRole = repoName.replace('-','_') + pr + "role"
       def envVars =  "$dbEnvVars SCHEMA_ROLE=$schemaRole SCHEMA_NAME=$schemaName"
-
-      ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
-      ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
+      def migrationFolder = 'migrations'
+      getMigrationFiles(ctx, migrationFolder)
+      ctx.dir(migrationFolder) {
+        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
+      }
+      // ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
     }
   }
 
-  private static def getMigrationFiles(ctx){
+  private static def getMigrationFiles(ctx, destinationFolder){
     def resourcePath = 'uk/gov/defra/ffc/migration/'
-    getScript(ctx, resourcePath, 'schema-up', 'migrations')
-    getScript(ctx, resourcePath, 'schema-down', 'migrations')
-    getFile(ctx, resourcePath, 'docker-compose.migrate.yaml', 'migrations')
-    getFile(ctx, resourcePath, 'schema.changelog.xml', 'migrations/changelogs')
+    getResourceScript(ctx, resourcePath, 'schema-up', "$destinationFolder/scripts")
+    getResourceScript(ctx, resourcePath, 'schema-down', "$destinationFolder/scripts")
+    getResourceFile(ctx, resourcePath, 'docker-compose.migrate.yaml', destinationFolder)
+    getResourceFile(ctx, resourcePath, 'schema.changelog.xml', "$destinationFolder/changelogs")
   }
 
-  private static def getFile(ctx, resourcePath, filename, destinationFolder, makeExecutable = false){
+  private static def getResourceFile(ctx, resourcePath, filename, destinationFolder, makeExecutable = false){
     def fileContent = ctx.libraryResource "$resourcePath/$filename"
     ctx.writeFile(file: "$destinationFolder/$filename", text: fileContent, encoding: "UTF-8")
     if (makeExecutable) {
@@ -56,8 +59,9 @@ class Provision implements Serializable {
     }
     ctx.echo "written $filename to $destinationFolder"
   }
-    private static def getScript(ctx, resourcePath, filename, destinationFolder){
-    getFile(ctx, resourcePath, filename, destinationFolder, true)
+
+  private static def getResourceScript(ctx, resourcePath, filename, destinationFolder){
+    getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
   }
 
   private static def getDatabaseEnvVars(ctx, environment) {
