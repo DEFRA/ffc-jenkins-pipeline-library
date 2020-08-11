@@ -44,7 +44,8 @@ class Provision implements Serializable {
   }
 
   private static def getMigrationFiles(ctx, destinationFolder){
-    def resourcePath = 'uk/gov/defra/ffc/migration/'
+    def resourcePath = 'uk/gov/defra/ffc/migration'
+    ctx.sh(" rm -rf ./$destinationFolder")
     getResourceScript(ctx, resourcePath, 'schema-up', "$destinationFolder/scripts")
     getResourceScript(ctx, resourcePath, 'schema-down', "$destinationFolder/scripts")
     getResourceFile(ctx, resourcePath, 'docker-compose.migrate.yaml', destinationFolder)
