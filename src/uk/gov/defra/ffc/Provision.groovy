@@ -30,7 +30,7 @@ class Provision implements Serializable {
 
   private static def createPrDatabase(ctx, environment, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
-      def envVars = getDatabaseEnvVars(ctx, environment)
+      def envVars = getDatabaseEnvVars(ctx, environment, repoName, pr)
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
       ctx.dir(migrationFolder) {
@@ -40,9 +40,9 @@ class Provision implements Serializable {
     }
   }
 
-  private static def deletePrDatabase(ctx, repoName, pr) {
+  private static def deletePrDatabase(ctx, environment, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
-      def envVars = getDatabaseEnvVars(ctx, environment)
+      def envVars = getDatabaseEnvVars(ctx, environment, repoName, pr)
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
       // removing the schema removes the database migrations within that schema, so is unneccessary
