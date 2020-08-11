@@ -91,7 +91,7 @@ class Provision implements Serializable {
     
     def schemaName = repoName.replace('-','_') + pr
     def schemaRole = repoName.replace('-','_') + pr + "role"
-    def databaseName = repoName..replace('-','_').replace('_service', '')
+    def databaseName = repoName.replace('-','_').replace('_service', '')
     
     return "$envs SCHEMA_ROLE=$schemaRole SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
   }
