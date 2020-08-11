@@ -91,7 +91,7 @@ class Provision implements Serializable {
     
     def schemaName = repoName.replace('-','_') + pr
     def schemaRole = repoName.replace('-','_') + pr + "role"
-    def dbServer = appConfigValues['postgresService.postgresExternalName']
+    def dbServer = appConfigValues['postgresService.postgresExternalName'].toString()
     def schemaUserName = getSchemaUserName(schemaRole, dbServer)
     def databaseName = repoName.replace('-','_').replace('_service', '')
     
