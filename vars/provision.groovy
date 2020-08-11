@@ -16,4 +16,5 @@ def getDatabaseEnvVars(environment){
 def getMigrationFiles(){
   def schemaUp = libraryResource 'migration/schema-up'
   echo schemaUp
+  echo Provision.getMigrationFiles()
 }
