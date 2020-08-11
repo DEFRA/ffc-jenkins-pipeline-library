@@ -12,3 +12,8 @@ def deleteBuildResources(environment, repoName, pr) {
 def getDatabaseEnvVars(environment){
   return Provision.getDatabaseEnvVars(this, environment)
 }
+
+def getMigrationFiles(){
+  def schemaUp = libraryResource 'migration/schema-up'
+  echo schemaUp
+}
