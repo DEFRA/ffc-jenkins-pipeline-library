@@ -19,7 +19,7 @@ services:
       << : *common-migration
       << : *common-postgres
     entrypoint: >
-      sh -c "/scripts/migration/schema-up"
+      sh -c "/scripts/schema-up"
     volumes:
       - ./changelog/:/liquibase/changelog/
       - ./scripts/:/scripts/
@@ -30,7 +30,7 @@ services:
       << : *common-migration
       << : *common-postgres
     entrypoint: >
-      sh -c "/scripts/migration/schema-down"
+      sh -c "/scripts/schema-down"
     volumes:
       - ./changelog/:/liquibase/changelog/
       - ./scripts/:/scripts/

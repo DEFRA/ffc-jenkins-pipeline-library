@@ -39,7 +39,7 @@ class Provision implements Serializable {
       ctx.dir(migrationFolder) {
         ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
       }
-      // ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
+      ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
     }
   }
 
