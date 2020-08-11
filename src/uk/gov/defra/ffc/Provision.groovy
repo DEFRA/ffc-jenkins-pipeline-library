@@ -48,7 +48,7 @@ class Provision implements Serializable {
     getResourceScript(ctx, resourcePath, 'schema-up', "$destinationFolder/scripts")
     getResourceScript(ctx, resourcePath, 'schema-down', "$destinationFolder/scripts")
     getResourceFile(ctx, resourcePath, 'docker-compose.migrate.yaml', destinationFolder)
-    getResourceFile(ctx, resourcePath, 'schema.changelog.xml', "$destinationFolder/changelogs")
+    getResourceFile(ctx, resourcePath, 'schema.changelog.xml', "$destinationFolder/changelog")
   }
 
   private static def getResourceFile(ctx, resourcePath, filename, destinationFolder, makeExecutable = false){
