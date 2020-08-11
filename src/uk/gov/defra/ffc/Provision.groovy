@@ -51,7 +51,7 @@ class Provision implements Serializable {
   private static def getFile(ctx, resourcePath, filename, destinationFolder){
     def fileContent = ctx.libraryResource "$resourcePath/$filename"
     ctx.writeFile(file: filename, text: fileContent, encoding: "UTF-8")
-    ctx.echo schemaUp
+    ctx.echo "written $filename to $destinationFolder"
   }
 
   private static def getDatabaseEnvVars(ctx, environment) {
