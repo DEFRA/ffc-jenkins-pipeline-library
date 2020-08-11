@@ -30,10 +30,7 @@ class Provision implements Serializable {
 
   private static def createPrDatabase(ctx, environment, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
-      def dbEnvVars = getDatabaseEnvVars(ctx, environment)
-      def schemaName = repoName.replace('-','_') + pr
-      def schemaRole = repoName.replace('-','_') + pr + "role"
-      def envVars =  "$dbEnvVars SCHEMA_ROLE=$schemaRole SCHEMA_NAME=$schemaName"
+      def envVars = getDatabaseEnvVars(ctx, environment)
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
       ctx.dir(migrationFolder) {
@@ -43,9 +40,21 @@ class Provision implements Serializable {
     }
   }
 
+  private static def deletePrDatabase(ctx, repoName, pr) {
+    if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
+      def envVars = getDatabaseEnvVars(ctx, environment)
+      def migrationFolder = 'migrations'
+      getMigrationFiles(ctx, migrationFolder)
+      // removing the schema removes the database migrations within that schema, so is unneccessary
+      ctx.dir(migrationFolder) {
+        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down"
+      }
+    }
+  }
+
   private static def getMigrationFiles(ctx, destinationFolder){
     def resourcePath = 'uk/gov/defra/ffc/migration'
-    ctx.sh(" rm -rf ./$destinationFolder")
+    ctx.sh(" rm -rf $destinationFolder")
     getResourceScript(ctx, resourcePath, 'schema-up', "$destinationFolder/scripts")
     getResourceScript(ctx, resourcePath, 'schema-down', "$destinationFolder/scripts")
     getResourceFile(ctx, resourcePath, 'docker-compose.migrate.yaml', destinationFolder)
@@ -65,7 +74,7 @@ class Provision implements Serializable {
     getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
   }
 
-  private static def getDatabaseEnvVars(ctx, environment) {
+  private static def getDatabaseEnvVars(ctx, environment, repoName, pr) {
     def searchKeys = [
       'postgresService.postgresExternalName',
       'postgresAdminUser',
@@ -73,31 +82,20 @@ class Provision implements Serializable {
       'postgresSchemaPassword'
     ]
     def appConfigPrefix = environment + '/'
-    def values = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
-    def envs = values.collect { "$it.key=$it.value" }.join(' ')
+    def appConfigValues = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
+    def envs = appConfigValues.collect { "$it.key=$it.value" }.join(' ')
     envs = envs.replace('postgresService.postgresExternalName', 'POSTGRES_HOST')
-    envs = envs.replace('postgresAdminUser', 'POSTGRES_USER')
+    envs = envs.replace('postgresAdminUser', 'POSTGRES_USERNAME')
     envs = envs.replace('postgresAdminPassword', 'POSTGRES_PASSWORD')
     envs = envs.replace('postgresSchemaPassword', 'SCHEMA_PASSWORD')
-    return envs
+    
+    def schemaName = repoName.replace('-','_') + pr
+    def schemaRole = repoName.replace('-','_') + pr + "role"
+    def databaseName = repoName..replace('-','_').replace('_service', '')
+    
+    return "$envs SCHEMA_ROLE=$schemaRole SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
   }
-/*
-  private static def deletePrDatabase(ctx, repoName, pr) {
-    if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
-      def schemaName = repoName.replace('-','_') + pr
-      def schemaRole = repoName.replace('-','_') + pr + "role"
-      def envVars = "POSTGRES_HOST=${AZURE_DB_HOST} " +
-                     "POSTGRES_USER=${AZURE_DB_USER} " +
-                     "POSTGRES_PASSWORD=${AZURE_DB_PASSWORD} " +
-                     "SCHEMA_ROLE=$schemaRole " +
-                     "SCHEMA_PASSWORD=${AZURE_PR_PASSWORD} " +
-                     "SCHEMA_NAME=$schemaName"
 
-       ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-down"
-       ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down"
-    }
-  }
-*/
   private static def createPrQueues(ctx, queues, repoName, pr) {
     queues.each {
       createQueue(ctx, "$repoName-pr$pr-$it")

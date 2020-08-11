@@ -1,23 +1,21 @@
 version: '3.7'
 
 x-common-migration: &common-migration
-  POSTGRES_HOST: ffc-demo-payment-postgres
+  POSTGRES_HOST: ${POSTGRES_HOST}
   SCHEMA_ROLE: ${SCHEMA_ROLE:-postgres}
-  SCHEMA_PASSWORD: ${SCHEMA_PASSWORD:-ppp}
-  SCHEMA_NAME: ${SCHEMA_NAME:-public}
-
-x-common-postgres: &common-postgres
+  SCHEMA_PASSWORD: ${SCHEMA_PASSWORD}
+  SCHEMA_NAME: ${SCHEMA_NAME}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  POSTGRES_USERNAME:  ${POSTGRES_USERNAME}
   POSTGRES_PORT: 5432
-  POSTGRES_DB: ffc_demo_payments
-  POSTGRES_PASSWORD: ppp
-  POSTGRES_USERNAME: postgres
+  POSTGRES_DB: ${POSTGRES_DB}
+
 
 services:  
   schema-up:
     image: liquibase/liquibase:3.10.x
     environment:
       << : *common-migration
-      << : *common-postgres
     entrypoint: >
       sh -c "/scripts/schema-up"
     volumes:
@@ -28,7 +26,6 @@ services:
     image: liquibase/liquibase:3.10.x
     environment:
       << : *common-migration
-      << : *common-postgres
     entrypoint: >
       sh -c "/scripts/schema-down"
     volumes:
