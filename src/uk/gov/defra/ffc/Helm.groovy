@@ -4,7 +4,6 @@ import uk.gov.defra.ffc.GitHubStatus
 import uk.gov.defra.ffc.Utils
 
 class Helm implements Serializable {
-  static String suppressConsoleOutput = '#!/bin/bash +x\n'
 
   static def writeUrlIfIngress(ctx, deploymentName) {
     ctx.sh("kubectl get ingress -n $deploymentName -o json --ignore-not-found | jq '.items[0].spec.rules[0].host // empty' | xargs --no-run-if-empty printf 'Build available for review at https://%s\n'")
@@ -61,7 +60,7 @@ class Helm implements Serializable {
   static def getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel='\\\\0') {
     // The jq command in the follow assumes there is only one value per key
     // This is true ONLY if you specify a label in the az appconfig kv command
-    def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$appConfigLabel --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
+    def appConfigResults = ctx.sh(returnStdout: true, script:"$$Utils.suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$appConfigLabel --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
     def appConfigMap = ctx.readJSON([text: appConfigResults, returnPojo: true]) ?: [:]
     def configValues = [:]
 
@@ -97,7 +96,7 @@ class Helm implements Serializable {
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.echo('Running helm upgrade, console output suppressed')
-        ctx.sh("$suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
+        ctx.sh("$$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
         writeUrlIfIngress(ctx, deploymentName)
       }
     }
@@ -190,7 +189,7 @@ class Helm implements Serializable {
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
             ctx.echo('Running helm upgrade, console output suppressed')
-            ctx.sh("$suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues $defaultConfigValuesChart --set namespace=$namespace $extraCommands")
+            ctx.sh("$$Utils.suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues $defaultConfigValuesChart --set namespace=$namespace $extraCommands")
 
             ctx.deleteDir()
           }
