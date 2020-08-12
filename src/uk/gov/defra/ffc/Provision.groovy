@@ -94,16 +94,15 @@ class Provision implements Serializable {
     def dbServer = appConfigValues['postgresService.postgresExternalName']
     ctx.echo "db server: $dbServer"
     // escape full stop as split takes a regular expression
-    def dbServerSplit = dbServer.replace("\"","").split('\\.')
-    def schemaUserName = dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
-    // def schemaUserName = getSchemaUserName(schemaRole, dbServer)
+    // def dbServerSplit = dbServer.replace("\"","").split('\\.')
+    // def schemaUserName = dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
+    def schemaUserName = getSchemaUserName(schemaRole, dbServer)
     def databaseName = repoName.replace('-','_').replace('_service', '')
-    def suppressConsoleOutput = '#!/bin/bash +x\n'
-    return "$suppressConsoleOutput $envs SCHEMA_ROLE=$schemaRole SCHEMA_USERNAME=$schemaUserName SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
+    return "$envs SCHEMA_ROLE=$schemaRole SCHEMA_USERNAME=$schemaUserName SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
   }
 
-  private getSchemaUserName(schemaRole, dbServer ) {
-    def dbServerSplit = dbServer.split('.')
+  private getSchemaUserName(schemaRole, dbServer) {
+    def dbServerSplit = dbServer.replace("\"","").split('\\.')
     return dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
   }
 
