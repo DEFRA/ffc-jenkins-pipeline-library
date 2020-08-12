@@ -96,7 +96,7 @@ class Provision implements Serializable {
     // escape full stop as split takes a regular expression
     // def dbServerSplit = dbServer.replace("\"","").split('\\.')
     // def schemaUserName = dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
-    def schemaUserName = getSchemaUserName(schemaRole, dbServer)
+    def schemaUserName = getSchemaUserName(schemaRole, dbServer.toString())
     def databaseName = repoName.replace('-','_').replace('_service', '')
     return "$envs SCHEMA_ROLE=$schemaRole SCHEMA_USERNAME=$schemaUserName SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
   }
