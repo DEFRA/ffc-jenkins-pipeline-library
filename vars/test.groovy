@@ -27,3 +27,7 @@ def buildCodeAnalysisNodeJsParams(projectName, branch, pr) {
 def buildCodeAnalysisDotNetParams(projectName, branch, pr) {
   return Tests.buildCodeAnalysisDotNetParams(projectName, branch, pr)
 }
+
+def runAcceptanceTests(pr) {
+  Tests.runAcceptanceTests(this, pr)
+}
