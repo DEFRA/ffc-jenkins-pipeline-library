@@ -1,7 +1,5 @@
 package uk.gov.defra.ffc
 
-import uk.gov.defra.ffc.Helm
-
 class Provision implements Serializable {
   static def createResources(ctx, environment, repoName, pr) {
     def filePath = 'provision.azure.yaml'
