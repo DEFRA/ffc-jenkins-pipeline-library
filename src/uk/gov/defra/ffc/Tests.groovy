@@ -113,25 +113,27 @@ class Tests implements Serializable {
   }  
 
   static def runAcceptanceTests(ctx, pr) {
-    if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
-      try {
-        ctx.dir('./test/acceptance') {
-        ctx.sh('mkdir -p -m 777 html-reports')
-          if (pr != '') {
-            ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=http://ffc-demo-pr${pr}.ffc.snd.azure.defra.cloud"]) {
-              ctx.sh('docker-compose run wdio-cucumber')
-            }
-          } else { 
-            ctx.withEnv(['TEST_ENVIRONMENT_ROOT_URL=http://ffc-demo.ffc.snd.azure.defra.cloud']) {
-              ctx.sh('docker-compose run wdio-cucumber')
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
+      if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
+        try {
+          ctx.dir('./test/acceptance') {
+          ctx.sh('mkdir -p -m 777 html-reports')
+            if (pr != '') {
+              ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=http://ffc-demo-pr${pr}.ffc.snd.azure.defra.cloud"]) {
+                ctx.sh('docker-compose run wdio-cucumber')
+              }
+            } else { 
+              ctx.withEnv(['TEST_ENVIRONMENT_ROOT_URL=http://ffc-demo.ffc.snd.azure.defra.cloud']) {
+                ctx.sh('docker-compose run wdio-cucumber')
+              }
             }
           }
+        } finally {
+          ctx.sh('docker-compose down -v')
         }
-      } finally {
-        ctx.sh('docker-compose down -v')
+      } else {
+        ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
       }
-    } else {
-      ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
     }
   }
 }

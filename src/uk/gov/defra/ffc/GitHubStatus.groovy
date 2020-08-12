@@ -37,6 +37,11 @@ class GitHubStatus implements Serializable {
     static final Description = 'Run tests'
   }
 
+  class RunAcceptanceTests {
+    static final Context = "${BASECTX}run-acceptance-tests"
+    static final Description = 'Run acceptance tests'
+  }
+
   class SnykTest {
     static final Context = "${BASECTX}snyk-test"
     static final Description = 'Snyk test'
