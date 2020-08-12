@@ -94,7 +94,7 @@ class Provision implements Serializable {
     def dbServer = appConfigValues['postgresService.postgresExternalName']
     ctx.echo "db server: $dbServer"
     // escape full stop as split takes a regular expression
-    def dbServerSplit = dbServer..replace("\"","").split('\\.')
+    def dbServerSplit = dbServer.replace("\"","").split('\\.')
     def schemaUserName = dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
     // def schemaUserName = getSchemaUserName(schemaRole, dbServer)
     def databaseName = repoName.replace('-','_').replace('_service', '')
