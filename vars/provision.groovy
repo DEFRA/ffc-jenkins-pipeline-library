@@ -9,8 +9,8 @@ def deleteBuildResources(environment, repoName, pr) {
 }
 
 
-def getDatabaseEnvVars(environment, repoName, pr){
-  return Provision.getDatabaseEnvVars(this, environment, repoName, pr)
+def getMigrationEnvVars(environment, repoName, pr){
+  return Provision.getMigrationEnvVars(this, environment, repoName, pr)
 }
 
 def getMigrationFiles(destinationFolder){
