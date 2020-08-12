@@ -101,7 +101,7 @@ class Provision implements Serializable {
     return "$envs SCHEMA_ROLE=$schemaRole SCHEMA_USERNAME=$schemaUserName SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
   }
 
-  private getSchemaUserName(schemaRole, dbServer) {
+  private getSchemaUserName(String schemaRole, String dbServer) {
     def dbServerSplit = dbServer.replace("\"","").split('\\.')
     return dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
   }
