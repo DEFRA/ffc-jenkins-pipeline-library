@@ -30,24 +30,24 @@ class Provision implements Serializable {
 
   private static def createPrDatabase(ctx, environment, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
-      def envVars = getDatabaseEnvVars(ctx, environment, repoName, pr)
+      def envVars = getMigrationEnvVars(ctx, environment, repoName, pr)
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
       ctx.dir(migrationFolder) {
-        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up"
+        ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
       }
-      ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up"
+      ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up")
     }
   }
 
   private static def deletePrDatabase(ctx, environment, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
-      def envVars = getDatabaseEnvVars(ctx, environment, repoName, pr)
+      def envVars = getMigrationEnvVars(ctx, environment, repoName, pr)
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
       // removing the schema removes the database migrations within that schema, so is unneccessary
       ctx.dir(migrationFolder) {
-        ctx.sh "$envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down"
+        ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
       }
     }
   }
@@ -74,7 +74,7 @@ class Provision implements Serializable {
     getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
   }
 
-  private static def getDatabaseEnvVars(ctx, environment, repoName, pr) {
+  private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
     def searchKeys = [
       'postgresService.postgresExternalName',
       'postgresAdminUser',
@@ -83,25 +83,24 @@ class Provision implements Serializable {
     ]
     def appConfigPrefix = environment + '/'
     def appConfigValues = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
-    def envs = appConfigValues.collect { "$it.key=$it.value" }.join(' ')
-    envs = envs.replace('postgresService.postgresExternalName', 'POSTGRES_HOST')
-    envs = envs.replace('postgresAdminUser', 'POSTGRES_USERNAME')
-    envs = envs.replace('postgresAdminPassword', 'POSTGRES_PASSWORD')
-    envs = envs.replace('postgresSchemaPassword', 'SCHEMA_PASSWORD')
+
+    def appConfigEnvs = appConfigValues.collect { "$it.key=$it.value" }.join(' ')
+    appConfigEnvs = appConfigEnvs.replace('postgresService.postgresExternalName', 'POSTGRES_HOST')
+    appConfigEnvs = appConfigEnvs.replace('postgresAdminUser', 'POSTGRES_USERNAME')
+    appConfigEnvs = appConfigEnvs.replace('postgresAdminPassword', 'POSTGRES_PASSWORD')
+    appConfigEnvs = appConfigEnvs.replace('postgresSchemaPassword', 'SCHEMA_PASSWORD')
     
     def schemaName = repoName.replace('-','_') + pr
     def schemaRole = repoName.replace('-','_') + pr + "role"
-    def dbServer = appConfigValues['postgresService.postgresExternalName']
-    ctx.echo "db server: $dbServer"
-    // escape full stop as split takes a regular expression
-    // def dbServerSplit = dbServer.replace("\"","").split('\\.')
-    // def schemaUserName = dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
-    def schemaUserName = getSchemaUserName(schemaRole, dbServer)
+    def schemaUser = getSchemaUserWithHostname(schemaRole, appConfigValues['postgresService.postgresExternalName'])
     def databaseName = repoName.replace('-','_').replace('_service', '')
-    return "$envs SCHEMA_ROLE=$schemaRole SCHEMA_USERNAME=$schemaUserName SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
+
+    def prEnvs = "SCHEMA_ROLE=$schemaRole SCHEMA_USERNAME=$schemaUser SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
+    return "$appConfigEnvs $prEnvs"
   }
 
-  private static getSchemaUserName(String schemaRole, String dbServer) {
+  private static getSchemaUserWithHostname(schemaRole, dbServer) {
+    // string includes quotes, so remove them and escape '.' as split takes a regex
     def dbServerSplit = dbServer.replace("\"","").split('\\.')
     return dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
   }

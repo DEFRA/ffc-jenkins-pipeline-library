@@ -1,6 +1,8 @@
 package uk.gov.defra.ffc
 
 class Utils implements Serializable {
+  static String suppressConsoleOutput = '#!/bin/bash +x\n'
+  
   static def replaceInFile(ctx, from, to, file) {
     ctx.sh("sed -i -e 's/$from/$to/g' $file")
   }
