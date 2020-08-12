@@ -19,7 +19,3 @@ def getRepoName() {
 def getErrorMessage(e) {
   return Utils.getErrorMessage(e)
 }
-
-def getMergedPrNo() {
-  return Utils.getMergedPrNo(this)
-}
