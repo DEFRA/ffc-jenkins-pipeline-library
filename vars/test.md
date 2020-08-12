@@ -69,7 +69,7 @@ Dependent on integration between Jenkins and SonarQube being configured.
 This step should run after `analyseCode` as it is dependent on the SonarQube
 run ID generated from that task to know which result to wait for.
 
-Takes one parameters:
+Takes one parameter:
 - timeout in minutes pipeline should wait for webhook response before aborting.
 
 Example usage:
@@ -77,3 +77,18 @@ Example usage:
 ```
 test.waitForQualityGateResult(5)
 ```
+
+## runAcceptanceTests
+
+Executes the acceptance tests if an acceptance folder is found within the repo.
+
+Takes one parameter:
+- PR number (used for determining which deployment URL to execute the tests against)
+
+Example usage:
+
+```
+test.runAcceptanceTests(74)
+```
+
+Report output is written to the workspace under test/acceptance/html-reports/acceptance-test-suite-report.html
