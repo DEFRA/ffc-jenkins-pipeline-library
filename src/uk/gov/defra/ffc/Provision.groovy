@@ -98,8 +98,8 @@ class Provision implements Serializable {
     def schemaUserName = dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
     // def schemaUserName = getSchemaUserName(schemaRole, dbServer)
     def databaseName = repoName.replace('-','_').replace('_service', '')
-    
-    return "$envs SCHEMA_ROLE=$schemaRole SCHEMA_USERNAME=$schemaUserName SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
+    def suppressConsoleOutput = '#!/bin/bash +x\n'
+    return "$suppressConsoleOutput $envs SCHEMA_ROLE=$schemaRole SCHEMA_USERNAME=$schemaUserName SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
   }
 
   private getSchemaUserName(schemaRole, dbServer ) {
