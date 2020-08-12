@@ -23,18 +23,19 @@ class Tests implements Serializable {
   }
 
   static def runZapScan(ctx, projectName, buildNumber, tag) {
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.ZapScan.Context, description: GitHubStatus.ZapScan.Description) {
-      try {
-        // test-output exists if stage is run after 'runTests', take no risks and create it
-        ctx.sh('mkdir -p -m 777 test-output')
-        if (ctx.fileExists('./docker-compose.zap.yaml')) {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.zap.yaml run zap-baseline-scan")
-        }
-      } finally {
-        if (ctx.fileExists('./docker-compose.zap.yaml')) {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.zap.yaml down -v")
+    def zapDockerComposeFile = 'docker-compose.zap.yaml'
+    if (ctx.fileExists("./$zapDockerComposeFile")) {
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.ZapScan.Context, description: GitHubStatus.ZapScan.Description) {
+        try {
+          // test-output exists if stage is run after 'runTests', take no risks and create it
+          ctx.sh('mkdir -p -m 666 test-output')
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile run zap-baseline-scan")
+        } finally {
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile down -v")
         }
       }
+    } else {
+      ctx.echo("Did not find $zapDockerComposeFile so did not run ZAP scan.")
     }
   }
 
