@@ -130,6 +130,8 @@ class Tests implements Serializable {
       } finally {
         ctx.sh('docker-compose down -v')
       }
+    } else {
+      ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
     }
   }
 }
