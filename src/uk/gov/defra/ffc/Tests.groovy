@@ -112,9 +112,9 @@ class Tests implements Serializable {
     ];
   }  
 
-  static def runAcceptanceTests(ctx, pr) {
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
-      if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
+  static def runAcceptanceTests(ctx, pr) {    
+    if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
           ctx.dir('./test/acceptance') {
           ctx.sh('mkdir -p -m 777 html-reports')
@@ -131,9 +131,10 @@ class Tests implements Serializable {
         } finally {
           ctx.sh('docker-compose down -v')
         }
-      } else {
-        ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
       }
+    } else {
+      ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
     }
   }
+  
 }
