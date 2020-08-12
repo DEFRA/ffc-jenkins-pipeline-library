@@ -60,7 +60,7 @@ class Provision implements Serializable {
   }
 
   private static def getResourceFile(ctx, resourcePath, filename, destinationFolder, makeExecutable = false){
-    def fileContent = ctx.libraryResource "$resourcePath/$filename"
+    def fileContent = ctx.libraryResource("$resourcePath/$filename")
     ctx.writeFile(file: "$destinationFolder/$filename", text: fileContent, encoding: "UTF-8")
     if (makeExecutable) {
       ctx.sh("chmod 777 ./$destinationFolder/$filename")
