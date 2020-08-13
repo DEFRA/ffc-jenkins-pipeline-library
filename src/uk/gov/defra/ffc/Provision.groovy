@@ -78,7 +78,7 @@ class Provision implements Serializable {
       'POSTGRES_HOST',
       'POSTGRES_ADMIN_USERNAME',
       'POSTGRES_ADMIN_PASSWORD',
-      'POSTGRE_SCHEMA_PASSWORD'
+      'POSTGRES_SCHEMA_PASSWORD'
     ]
     def appConfigPrefix = environment + '/'
     def appConfigValues = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
