@@ -88,6 +88,8 @@ class Provision implements Serializable {
     ]
     def appConfigPrefix = environment + '/'
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
+    appConfigValues['POSTGRES_ADMIN_PASSWORD'] = escapeQuotes(appConfigValues['POSTGRES_ADMIN_PASSWORD'])
+    appConfigValues['POSTGRES_SCHEMA_PASSWORD'] = escapeQuotes(appConfigValues['POSTGRES_SCHEMA_PASSWORD'])
 
     def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
 
@@ -102,6 +104,10 @@ class Provision implements Serializable {
     migrationEnvVars.add("POSTGRES_DB=$databaseName")
 
     return migrationEnvVars
+  }
+
+  private static def escapeQuotes(value) {
+    return value.replace("\"", "\\\"")
   }
 
   private static getSchemaUserWithHostname(schemaRole, dbServer) {
