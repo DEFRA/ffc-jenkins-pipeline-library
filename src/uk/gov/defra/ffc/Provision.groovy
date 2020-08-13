@@ -32,6 +32,7 @@ class Provision implements Serializable {
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
       ctx.dir(migrationFolder) {
+        ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
         ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
       }
       ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up")
