@@ -12,7 +12,6 @@ class Provision implements Serializable {
 
   static def deleteBuildResources(ctx, environment, repoName, pr) {
     deleteQueues(ctx, getBuildQueuePrefix(ctx, repoName, pr))
-    deletePrDatabase(ctx, environment, repoName, pr)
   }
 
   private static def createAllResources(ctx, filePath, repoName, pr) {
@@ -51,7 +50,7 @@ class Provision implements Serializable {
       ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
         ctx.dir(migrationFolder) {
            // removing the schema removes the database migrations within that schema, so is unneccessary
-           ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run --no-deps schema-down")
+           ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
         }
       }
     }
@@ -134,8 +133,9 @@ class Provision implements Serializable {
     ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
   }
 
-  private static def deletePrResources(ctx, repoName, pr) {
+  private static def deletePrResources(ctx, environment, repoName, pr) {
     deleteQueues(ctx, "$repoName-pr$pr-")
+    deletePrDatabase(ctx, environment, repoName, pr)
   }
 
   private static def deleteQueues(ctx, prefix) {
