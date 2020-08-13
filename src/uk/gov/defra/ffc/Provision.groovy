@@ -89,7 +89,7 @@ class Provision implements Serializable {
       'POSTGRES_SCHEMA_PASSWORD'
     ]
     def appConfigPrefix = environment + '/'
-    def appConfigValues = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
+    def appConfigValues = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix, false)
 
     def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
 

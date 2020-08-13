@@ -54,7 +54,7 @@ class Helm implements Serializable {
    *   set to the default null label
    */
 
-  static def getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel='\\\\0') {
+  static def getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel='\\\\0', escapeSpecialChars=true) {
     // The jq command in the follow assumes there is only one value per key
     // This is true ONLY if you specify a label in the az appconfig kv command
     def appConfigResults = ctx.sh(returnStdout: true, script:"$Utils.suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$appConfigLabel --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
@@ -66,7 +66,7 @@ class Helm implements Serializable {
       def searchKey = appConfigPrefix + key
 
       if (appConfigMap.containsKey(searchKey)) {
-        configValues[key] = $/"${escapeSpecialChars(appConfigMap[searchKey])}"/$
+        configValues[key] = escapeSpecialChars ? $/"${escapeSpecialChars(appConfigMap[searchKey])}"/$ : appConfigMap[searchKey]
       }
     }
 
