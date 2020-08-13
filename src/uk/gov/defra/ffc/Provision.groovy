@@ -12,6 +12,7 @@ class Provision implements Serializable {
 
   static def deleteBuildResources(ctx, environment, repoName, pr) {
     deleteQueues(ctx, getBuildQueuePrefix(ctx, repoName, pr))
+    deletePrDatabase(ctx, environment, repoName, pr)
   }
 
   private static def createAllResources(ctx, filePath, repoName, pr) {
@@ -28,7 +29,6 @@ class Provision implements Serializable {
 
   private static def createPrDatabase(ctx, environment, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
-
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
       
@@ -45,7 +45,6 @@ class Provision implements Serializable {
 
   private static def deletePrDatabase(ctx, environment, repoName, pr) {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
-
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
       
@@ -101,6 +100,7 @@ class Provision implements Serializable {
     migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$schemaUser")
     migrationEnvVars.add("POSTGRES_SCHEMA_NAME=$schemaName")
     migrationEnvVars.add("POSTGRES_DB=$databaseName")
+
     return migrationEnvVars
   }
 
