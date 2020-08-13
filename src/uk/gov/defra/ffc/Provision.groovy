@@ -74,20 +74,16 @@ class Provision implements Serializable {
 
   private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
     def searchKeys = [
-      'postgresService.postgresExternalName',
-      'postgresAdminUser',
-      'postgresAdminPassword',
-      'postgresSchemaPassword'
+      'POSTGRES_HOST',
+      'POSTGRES_ADMIN_USERNAME',
+      'POSTGRES_ADMIN_PASSWORD',
+      'POSTGRE_SCHEMA_PASSWORD'
     ]
     def appConfigPrefix = environment + '/'
     def appConfigValues = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
 
     def appConfigEnvs = appConfigValues.collect { "$it.key=$it.value" }.join(' ')
-    appConfigEnvs = appConfigEnvs.replace('postgresService.postgresExternalName', 'POSTGRES_HOST')
-    appConfigEnvs = appConfigEnvs.replace('postgresAdminUser', 'POSTGRES_USERNAME')
-    appConfigEnvs = appConfigEnvs.replace('postgresAdminPassword', 'POSTGRES_PASSWORD')
-    appConfigEnvs = appConfigEnvs.replace('postgresSchemaPassword', 'SCHEMA_PASSWORD')
-    
+
     def schemaName = repoName.replace('-','_') + pr
     def schemaRole = repoName.replace('-','_') + pr + "role"
     def schemaUser = getSchemaUserWithHostname(schemaRole, appConfigValues['postgresService.postgresExternalName'])
