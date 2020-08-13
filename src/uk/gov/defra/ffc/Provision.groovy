@@ -31,11 +31,13 @@ class Provision implements Serializable {
       def envVars = getMigrationEnvVars(ctx, environment, repoName, pr)
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
-      ctx.dir(migrationFolder) {
-        ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
-        ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
+      ctx.withEnv(envVars) {
+        ctx.dir(migrationFolder) {
+          ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
+          ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
+        }
+        ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up")
       }
-      ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up")
     }
   }
 
@@ -44,9 +46,12 @@ class Provision implements Serializable {
       def envVars = getMigrationEnvVars(ctx, environment, repoName, pr)
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
-      // removing the schema removes the database migrations within that schema, so is unneccessary
-      ctx.dir(migrationFolder) {
-        ctx.sh("$Utils.suppressConsoleOutput $envVars docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
+      
+      ctx.withEnv(envVars) {
+        // removing the schema removes the database migrations within that schema, so is unneccessary
+        ctx.dir(migrationFolder) {
+          ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
+        }
       }
     }
   }
@@ -83,15 +88,18 @@ class Provision implements Serializable {
     def appConfigPrefix = environment + '/'
     def appConfigValues = Helm.getConfigValues(ctx, searchKeys, appConfigPrefix)
 
-    def appConfigEnvs = appConfigValues.collect { "$it.key=$it.value" }.join(' ')
+    def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
 
     def schemaName = repoName.replace('-','_') + pr
     def schemaRole = repoName.replace('-','_') + pr + "role"
     def schemaUser = getSchemaUserWithHostname(schemaRole, appConfigValues['POSTGRES_HOST'])
     def databaseName = repoName.replace('-','_').replace('_service', '')
 
-    def prEnvs = "SCHEMA_ROLE=$schemaRole SCHEMA_USERNAME=$schemaUser SCHEMA_NAME=$schemaName POSTGRES_DB=$databaseName"
-    return "$appConfigEnvs $prEnvs"
+    migrationEnvVars.add("SCHEMA_ROLE=$schemaRole")
+    migrationEnvVars.add("SCHEMA_USERNAME=$schemaUser")
+    migrationEnvVars.add("SCHEMA_NAME=$schemaName")
+    migrationEnvVars.add("POSTGRES_DB=$databaseName")
+    return migrationEnvVars
   }
 
   private static getSchemaUserWithHostname(schemaRole, dbServer) {
