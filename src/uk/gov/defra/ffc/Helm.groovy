@@ -66,7 +66,12 @@ class Helm implements Serializable {
       def searchKey = appConfigPrefix + key
 
       if (appConfigMap.containsKey(searchKey)) {
-        configValues[key] = escapeSpecialChars ? $/"${escapeSpecialChars(appConfigMap[searchKey])}"/$ : appConfigMap[searchKey]
+        if (escapeSpecialChars) {
+          configValues[key] = $/"${escapeSpecialChars(appConfigMap[searchKey])}"/$
+        } else {
+          ctx.echo("appConfigMap[searchKey]")
+          configValues[key] = appConfigMap[searchKey]
+        }
       }
     }
 
