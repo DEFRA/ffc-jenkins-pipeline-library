@@ -34,7 +34,6 @@ class Provision implements Serializable {
       
       ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
         ctx.dir(migrationFolder) {
-          ctx.sh "env"
           // migrations may change in different builds of a PR, refresh schema to avoid errors
           ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
           ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
