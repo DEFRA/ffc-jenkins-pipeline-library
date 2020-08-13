@@ -25,10 +25,6 @@ class Helm implements Serializable {
     return "--set $flags"
   }
 
-  static def escapeSpecialChars(str) {
-    return str.replace('\\', '\\\\\\\\').replace(/,/, /\,/).replace(/"/, /\"/).replace(/`/, /\`/)
-  }
-
   static def configItemsToSetString(configItems) {
     return configItems.size() > 0 ? ("--set " + configItems.collect { "$it.key=$it.value" }.join(',')) : ''
   }
