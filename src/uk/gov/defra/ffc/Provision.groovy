@@ -88,7 +88,7 @@ class Provision implements Serializable {
       'POSTGRES_SCHEMA_PASSWORD'
     ]
     def appConfigPrefix = environment + '/'
-    def appConfigValues = Utils.getConfigValuesRaw(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel)
+    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
 
     def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
 
