@@ -35,10 +35,10 @@ class Provision implements Serializable {
       ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
         ctx.dir(migrationFolder) {
           // migrations may change in different builds of a PR, refresh schema to avoid errors
-          ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
-          ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
+          ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
+          ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
         }
-        ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run --no-deps database-up")
+        ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run --no-deps database-up")
       }
     }
   }
@@ -51,7 +51,7 @@ class Provision implements Serializable {
       ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
         ctx.dir(migrationFolder) {
            // removing the schema removes the database migrations within that schema, so is unneccessary
-           ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
+           ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run --no-deps schema-down")
         }
       }
     }

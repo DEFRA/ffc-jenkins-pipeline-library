@@ -4,5 +4,5 @@ echo "schema up on $POSTGRES_HOST"
 --driver=org.postgresql.Driver \
 --changeLogFile=/changelog/schema.changelog.xml \
 --url=jdbc:postgresql://$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB \
---username=$POSTGRES_USERNAME --password=$POSTGRES_PASSWORD --defaultSchemaName=public \
-update -DroleName=$SCHEMA_ROLE -DrolePassword=$SCHEMA_PASSWORD -DschemaName=$SCHEMA_NAME
+--username=$POSTGRES_USERNAME --password="$POSTGRES_PASSWORD" --defaultSchemaName=public \
+update -DroleName=$SCHEMA_ROLE -DrolePassword="$SCHEMA_PASSWORD" -DschemaName=$SCHEMA_NAME
