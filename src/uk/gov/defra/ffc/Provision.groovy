@@ -39,7 +39,7 @@ class Provision implements Serializable {
           ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
           ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
         }
-        // ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up")
+        ctx.sh("$Utils.suppressConsoleOutput docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run database-up")
       }
     }
   }
