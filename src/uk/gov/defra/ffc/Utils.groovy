@@ -112,4 +112,8 @@ class Utils implements Serializable {
     return configValues
   }
 
+  static def getUrlStatusCode(ctx, url) {
+    return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
+  }
+
 }
