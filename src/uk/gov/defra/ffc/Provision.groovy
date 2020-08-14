@@ -97,7 +97,7 @@ class Provision implements Serializable {
     def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
 
     def schemaName = repoName.replace('-','_') + pr
-    def schemaRole = "{$schemaName}_role"
+    def schemaRole = "${schemaName}_role"
     def schemaUser = getSchemaUserWithHostname(schemaRole, appConfigValues['POSTGRES_HOST'])
     def databaseName = repoName.replace('-','_').replace('_service', '')
 
