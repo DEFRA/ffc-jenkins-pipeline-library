@@ -2,12 +2,16 @@ package uk.gov.defra.ffc
 
 class Provision implements Serializable {
   static def createResources(ctx, environment, repoName, pr) {
+    createAzureResources(ctx, repoName, pr)
+    createPrDatabase(ctx, environment, repoName, pr)
+  }
+
+  static def createAzureResources(ctx, repoName, pr) {
     def filePath = 'provision.azure.yaml'
     if(ctx.fileExists(filePath)) {
       deletePrResources(ctx, repoName, pr)
       createAllResources(ctx, filePath, repoName, pr)
     }
-    createPrDatabase(ctx, environment, repoName, pr)
   }
 
   static def deleteBuildResources(ctx, repoName, pr) {
@@ -58,7 +62,7 @@ class Provision implements Serializable {
 
   private static def getMigrationFiles(ctx, destinationFolder){
     def resourcePath = 'uk/gov/defra/ffc/migration'
-    ctx.sh(" rm -rf $destinationFolder")
+    ctx.sh("rm -rf $destinationFolder")
     getResourceScript(ctx, "$resourcePath/scripts", 'schema-up', "$destinationFolder/scripts")
     getResourceScript(ctx, "$resourcePath/scripts", 'schema-down', "$destinationFolder/scripts")
     getResourceFile(ctx, resourcePath, 'docker-compose.migrate.yaml', destinationFolder)
@@ -80,9 +84,9 @@ class Provision implements Serializable {
 
   private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
     def searchKeys = [
-      'POSTGRES_HOST',
       'POSTGRES_ADMIN_USERNAME',
       'POSTGRES_ADMIN_PASSWORD',
+      'POSTGRES_HOST',
       'POSTGRES_SCHEMA_PASSWORD'
     ]
     def appConfigPrefix = environment + '/'
@@ -93,7 +97,7 @@ class Provision implements Serializable {
     def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
 
     def schemaName = repoName.replace('-','_') + pr
-    def schemaRole = repoName.replace('-','_') + pr + "role"
+    def schemaRole = "{$schemaName}_role"
     def schemaUser = getSchemaUserWithHostname(schemaRole, appConfigValues['POSTGRES_HOST'])
     def databaseName = repoName.replace('-','_').replace('_service', '')
 
