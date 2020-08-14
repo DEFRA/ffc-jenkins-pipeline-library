@@ -35,7 +35,7 @@ def call(Map config=[:]) {
       }
 
       stage('Provision resources') {
-        provision.createResources(repoName, pr)
+        provision.createResources(config.environment, repoName, pr)
       }
 
       if (fileExists('./docker-compose.snyk.yaml')){

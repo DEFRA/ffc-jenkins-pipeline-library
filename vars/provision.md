@@ -23,14 +23,15 @@ Creates dynamic resource queues.
 
 The resources are creating using a manifest in the root directory of the repo which dictates the name of the resources that need setting up.
 
-Takes two parameters:
+Takes three parameters:
+- the environment to provision resources in
 - repository name
 - pull request number
 
 Example usage:
 ```
  stage('Provision resources') {
-        provision.createResources(repoName, pr)
+        provision.createResources(environment, repoName, pr)
       }
 ```
 
