@@ -129,7 +129,7 @@ def call(Map config=[:]) {
       }
 
       stage('Clean up resources') {
-        provision.deleteBuildResources(config.environment, repoName, pr)
+        provision.deleteBuildResources(repoName, pr)
       }
 
       if (config.containsKey('finallyClosure')) {

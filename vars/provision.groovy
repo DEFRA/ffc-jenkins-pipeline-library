@@ -4,6 +4,6 @@ def createResources(environment, repoName, pr) {
   Provision.createResources(this, environment, repoName, pr)
 }
 
-def deleteBuildResources(environment, repoName, pr) {
-  Provision.deleteBuildResources(this, environment, repoName, pr)
+def deleteBuildResources(repoName, pr) {
+  Provision.deleteBuildResources(this, repoName, pr)
 }

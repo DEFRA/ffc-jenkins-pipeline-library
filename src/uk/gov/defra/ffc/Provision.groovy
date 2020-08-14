@@ -10,7 +10,7 @@ class Provision implements Serializable {
     createPrDatabase(ctx, environment, repoName, pr)
   }
 
-  static def deleteBuildResources(ctx, environment, repoName, pr) {
+  static def deleteBuildResources(ctx, repoName, pr) {
     deleteQueues(ctx, getBuildQueuePrefix(ctx, repoName, pr))
   }
 
@@ -30,7 +30,7 @@ class Provision implements Serializable {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
-      
+
       ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
         ctx.dir(migrationFolder) {
           // migrations may change in different builds of a PR, refresh schema to avoid errors
@@ -46,7 +46,7 @@ class Provision implements Serializable {
     if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
-      
+
       ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
         ctx.dir(migrationFolder) {
            // removing the schema removes the database migrations within that schema, so is unneccessary
