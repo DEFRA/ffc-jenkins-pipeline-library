@@ -47,7 +47,7 @@ class Provision implements Serializable {
   }
 
   private static def deletePrDatabase(ctx, environment, repoName, pr) {
-    if (pr != '' && ctx.fileExists('./docker-compose.migrate.yaml')) {
+    if (pr != '' && repoHasMigration(ctx, repoName)) {
       def migrationFolder = 'migrations'
       getMigrationFiles(ctx, migrationFolder)
 
@@ -59,6 +59,12 @@ class Provision implements Serializable {
       }
     }
   }
+
+  private static def repoHasMigration(ctx, repoName) {
+    def apiUrl = "https://api.github.com/repos/defra/$repoName/contents/docker-compose.migrate.yaml"
+    return Utils.getUrlStatusCode(ctx,apiUrl) == "200"
+  }
+
 
   private static def getMigrationFiles(ctx, destinationFolder){
     def resourcePath = 'uk/gov/defra/ffc/migration'
