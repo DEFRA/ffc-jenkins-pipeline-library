@@ -58,11 +58,6 @@ def call(Map config=[:]) {
         build.runTests(repoName, repoName, BUILD_NUMBER, tag)
       }
 
-      stage('Publish pact broker') {
-        pact.pacts(repoName, pact.string, pact.usernamePassword)
-      }
- 
-
       stage('Create JUnit report') {
         test.createJUnitReport()
       }
@@ -75,6 +70,10 @@ def call(Map config=[:]) {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
       }
 
+      //  stage('Publish pact broker') {
+      //   pact.pacts(repoName, pact.string, pact.usernamePassword)
+      // }
+      
       if (config.containsKey('testClosure')) {
         config['testClosure']()
       }
