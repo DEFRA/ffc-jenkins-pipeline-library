@@ -7,6 +7,8 @@ def call(Map config=[:]) {
   def pr = ''
   def tag = ''
   def mergedPrNo = ''
+  def version = version.getPackageJsonVersion()
+  def commitSha = utils.getCommitSha()
 
   node {
     try {
@@ -55,6 +57,11 @@ def call(Map config=[:]) {
       stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER, tag)
       }
+
+      stage('Publish pact broker') {
+        pact.pacts(repoName, pact.string, pact.usernamePassword)
+      }
+ 
 
       stage('Create JUnit report') {
         test.createJUnitReport()
