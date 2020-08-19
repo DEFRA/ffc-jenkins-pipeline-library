@@ -10,7 +10,7 @@
         <rollback>
         <sql dbms="postgresql" endDelimiter=";">
             DROP SCHEMA IF EXISTS ${schemaName} CASCADE;
-            DROP ROLE IF EXISTS  ${roleName};
+            DROP ROLE IF EXISTS ${roleName};
             </sql>
         </rollback>
     </changeSet>
