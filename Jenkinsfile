@@ -3,7 +3,6 @@ library("defra-library@$BRANCH_NAME")
 def pr = ''
 def repoName = ''
 def versionFileName = 'VERSION'
-def postTestTasks = {
 
 node {
   checkout scm

@@ -7,8 +7,6 @@ def call(Map config=[:]) {
   def pr = ''
   def tag = ''
   def mergedPrNo = ''
-  def version = version.getPackageJsonVersion()
-  def commitSha = utils.getCommitSha()
 
   node {
     try {
@@ -70,9 +68,9 @@ def call(Map config=[:]) {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
       }
 
-      //  stage('Publish pact broker') {
-      //   pact.pacts(repoName, pact.string, pact.usernamePassword)
-      // }
+        stage('Publish pact broker') {
+          pact.pacts(repoName)
+       }
       
       if (config.containsKey('testClosure')) {
         config['testClosure']()

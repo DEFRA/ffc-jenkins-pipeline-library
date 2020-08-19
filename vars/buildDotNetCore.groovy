@@ -3,8 +3,6 @@ def call(Map config=[:]) {
   def mergedPrNo = ''
   def pr = ''
   def repoName = ''
-  def version = version.getPackageJsonVersion()
-  def commitSha = utils.getCommitSha()
 
   node {
     try {
@@ -55,7 +53,7 @@ def call(Map config=[:]) {
       }
 
      stage('Publish pact broker') {
-        pact.pacts(repoName, pact.string, pact.usernamePassword)
+        pact.pacts(repoName)
       }
 
       stage('SonarCloud analysis') {
