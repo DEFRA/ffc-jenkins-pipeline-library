@@ -3,11 +3,11 @@ package uk.gov.defra.ffc
 class Provision implements Serializable {
 
 def string(credentialsId,variable){
-  Pact.string(this, credentialsId, variable)
+  credentialsId: 'pact-broker-url', variable: 'pactBrokerURL'
 }
 
 def usernamePassword(credentialsId, usernameVariable, passwordVariable){
-  Pact.usernamePassword(this, credentialsId, usernameVariable, passwordVariable)
+  credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword'
 }
 
 def publishPacts(repoName, string, usernamePassword){
