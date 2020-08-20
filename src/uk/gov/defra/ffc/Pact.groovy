@@ -7,7 +7,9 @@ def string(credentialsId,variable){
 }
 
 def usernamePassword(credentialsId, usernameVariable, passwordVariable){
-  credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword'
+  credentialsId= 'pact-broker-credentials'
+  usernameVariable= 'pactUsername'
+  passwordVariable= 'pactPassword'
 }
 
 def publishPacts(repoName, string, usernamePassword){
