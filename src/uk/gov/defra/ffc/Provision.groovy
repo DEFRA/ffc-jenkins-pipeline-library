@@ -61,8 +61,10 @@ class Provision implements Serializable {
   }
 
   private static def repoHasMigration(ctx, repoName) {
-    def apiUrl = "https://api.github.com/repos/defra/$repoName/contents/docker-compose.migrate.yaml"
-    return Utils.getUrlStatusCode(ctx,apiUrl) == "200"
+    def migrationFile = "docker-compose.migrate.yaml"
+    def apiUrl = "https://api.github.com/repos/defra/$repoName/contents/$migrationFile"
+    // if local file not present, check the master branch - support both PR and cleanup
+    return  ctx.fileExists("./$migrationFile") || Utils.getUrlStatusCode(ctx,apiUrl) == "200"
   }
 
 
