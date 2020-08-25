@@ -49,8 +49,8 @@ class Utils implements Serializable {
 
   static def getFolder(ctx, repoName) {
     def folderArray = repoName.split('-')
-    // return "${folderArray[0]}-${folderArray[1]}"
-    return ctx.WORKSPACE
+    def workspaceArray = ctx.WORKSPACE.replace('/var/lib/jenkins/jobs','').split('/')
+    return workspaceArray[0]
   }
 
   static def getErrorMessage(e) {
