@@ -3,7 +3,6 @@ package uk.gov.defra.ffc
 class Provision implements Serializable {
   static def publishContractsToPactBroker(ctx, repoName, version, commitSha)
     ctx.withCredentials([
-      
       usernamePassword(credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword')
     ]) {
       ctx.dir('test-output') {
