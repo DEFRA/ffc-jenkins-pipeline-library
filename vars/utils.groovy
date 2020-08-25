@@ -19,3 +19,7 @@ def getRepoName() {
 def getErrorMessage(e) {
   return Utils.getErrorMessage(e)
 }
+
+def getFolderName(repoName) {
+  return Utils.getFolderName(repoName)
+}
