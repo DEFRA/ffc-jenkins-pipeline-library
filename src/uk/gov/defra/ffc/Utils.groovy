@@ -47,7 +47,7 @@ class Utils implements Serializable {
     return ctx.sh(returnStdout: true, script: 'git config --get remote.origin.url').trim()
   }
 
-  static def getFolder(ctx, repoName) {
+  static def getFolder(ctx) {
     def workspaceArray = ctx.WORKSPACE.split('/')
     return workspaceArray[5]
   }
