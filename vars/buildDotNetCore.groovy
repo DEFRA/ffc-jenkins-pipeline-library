@@ -53,7 +53,7 @@ def call(Map config=[:]) {
       }
 
      stage('Publish pact broker') {
-        pact.pacts(repoName)
+        pact.publishContractsToPactBroker(repoName, getCSProjVersion(config.project), utils.getCommitSha())
       }
 
       stage('SonarCloud analysis') {

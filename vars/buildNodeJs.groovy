@@ -69,7 +69,7 @@ def call(Map config=[:]) {
       }
 
         stage('Publish pact broker') {
-          pact.pacts(repoName)
+          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
        }
       
       if (config.containsKey('testClosure')) {
