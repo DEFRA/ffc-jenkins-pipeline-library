@@ -21,5 +21,5 @@ def getErrorMessage(e) {
 }
 
 def getFolder(repoName) {
-  return Utils.getFolder(repoName)
+  return Utils.getFolder(this, repoName)
 }

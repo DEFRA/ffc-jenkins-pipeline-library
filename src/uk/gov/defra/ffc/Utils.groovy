@@ -47,9 +47,10 @@ class Utils implements Serializable {
     return ctx.sh(returnStdout: true, script: 'git config --get remote.origin.url').trim()
   }
 
-  static def getFolder(repoName) {
+  static def getFolder(ctx, repoName) {
     def folderArray = repoName.split('-')
-    return "${folderArray[0]}-${folderArray[1]}"
+    // return "${folderArray[0]}-${folderArray[1]}"
+    return ctx.WORKSPACE
   }
 
   static def getErrorMessage(e) {
