@@ -49,7 +49,7 @@ class Utils implements Serializable {
 
   static def getFolder(ctx, repoName) {
     def workspaceArray = ctx.WORKSPACE.split('/')
-    return workspaceArray[4]
+    return workspaceArray[5]
   }
 
   static def getErrorMessage(e) {
