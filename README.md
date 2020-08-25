@@ -146,6 +146,9 @@ and Jenkins setup:
 7. The application's Docker Compose files must be structured to support running
    tests with the command
    `docker-compose -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName`
+8. If the application contains liquibase migrations a compose file must be available
+   that can be run with the command
+   `docker-compose -f docker-compose.migrate.yaml database-up/database-down`
 
 ### Full bespoke build configuration
 

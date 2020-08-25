@@ -43,9 +43,9 @@ def call(Map config=[:]) {
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
       }
-      
+
       stage('Provision resources') {
-        provision.createResources(repoName, pr)
+        provision.createResources(config.environment, repoName, pr)
       }
 
       if (config.containsKey('buildClosure')) {
@@ -84,8 +84,7 @@ def call(Map config=[:]) {
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag)
         }
-      }
-      else {
+      } else {
         stage('Publish chart') {
           helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
         }
@@ -109,6 +108,10 @@ def call(Map config=[:]) {
 
       if (config.containsKey('deployClosure')) {
         config['deployClosure']()
+      }
+
+      stage('Run Acceptance Tests') {
+        test.runAcceptanceTests(pr)
       }
     } catch(e) {
       def errMsg = utils.getErrorMessage(e)

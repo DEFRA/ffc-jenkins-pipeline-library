@@ -1,6 +1,9 @@
 package uk.gov.defra.ffc
 
 class Utils implements Serializable {
+  static String suppressConsoleOutput = '#!/bin/bash +x\n'
+  static String defaultNullLabel = '\\\\0'
+  
   static def replaceInFile(ctx, from, to, file) {
     ctx.sh("sed -i -e 's/$from/$to/g' $file")
   }
@@ -66,4 +69,51 @@ class Utils implements Serializable {
     }
     return errMessage
   }
+
+  static def escapeSpecialChars(str) {
+    return str.replace('\\', '\\\\\\\\').replace(/,/, /\,/).replace(/"/, /\"/).replace(/`/, /\`/)
+  }
+
+  /**
+   * Retrieves configuration values and secrets from Azure App Configuration.
+   * It is intend for retrieving values that are to be used when installing
+   * or updating a Helm chart. Given a list of search keys, it will generate
+   * and return a map containing the values for keys found in App Configuation
+   * that match the given prefix+key and label
+   *
+   * It takes four parameters:
+   * - the Jenkins context class
+   * - a list of keys to find values for
+   * - any key prefix used in App Configuration
+   * - the label to get values for in App Configuration, by default this is
+   *   set to the default null label
+   */
+
+  static def getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel=defaultNullLabel, escapeChars = true) {
+    // The jq command in the follow assumes there is only one value per key
+    // This is true ONLY if you specify a label in the az appconfig kv command
+    def appConfigResults = ctx.sh(returnStdout: true, script:"$Utils.suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$appConfigLabel --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
+    def appConfigMap = ctx.readJSON([text: appConfigResults, returnPojo: true]) ?: [:]
+    def configValues = [:]
+
+    searchKeys.each { key ->
+      // We can't use a GString here as the map keys are plain Java strings, so the containsKey won't match a GString
+      def searchKey = appConfigPrefix + key
+
+      if (appConfigMap.containsKey(searchKey)) {
+        configValues[key] = escapeChars ? $/"${escapeSpecialChars(appConfigMap[searchKey])}"/$ : appConfigMap[searchKey]
+      }
+    }
+
+    if (configValues.size() > 0) {
+      ctx.echo("Following keys found with prefix=$appConfigPrefix and label=$appConfigLabel: ${configValues.keySet()}")
+    }
+
+    return configValues
+  }
+
+  static def getUrlStatusCode(ctx, url) {
+    return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
+  }
+
 }

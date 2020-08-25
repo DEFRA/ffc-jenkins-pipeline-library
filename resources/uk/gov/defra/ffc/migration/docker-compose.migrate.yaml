@@ -1,0 +1,31 @@
+version: '3.7'
+
+x-common-migration: &common-migration
+  POSTGRES_DB: ${POSTGRES_DB}
+  POSTGRES_HOST: ${POSTGRES_HOST}
+  POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+  POSTGRES_PORT: 5432
+  POSTGRES_USERNAME: ${POSTGRES_ADMIN_USERNAME}
+  SCHEMA_NAME: ${POSTGRES_SCHEMA_NAME}
+  SCHEMA_PASSWORD: ${POSTGRES_SCHEMA_PASSWORD}
+  SCHEMA_ROLE: ${POSTGRES_SCHEMA_ROLE}
+
+services:
+  schema-up:
+    image: liquibase/liquibase:3.10.x
+    environment:
+      << : *common-migration
+    entrypoint: >
+      sh -c "/scripts/schema-up"
+    volumes:
+      - ./changelog/:/liquibase/changelog/
+      - ./scripts/:/scripts/
+  schema-down:
+    image: liquibase/liquibase:3.10.x
+    environment:
+      << : *common-migration
+    entrypoint: >
+      sh -c "/scripts/schema-down"
+    volumes:
+      - ./changelog/:/liquibase/changelog/
+      - ./scripts/:/scripts/
