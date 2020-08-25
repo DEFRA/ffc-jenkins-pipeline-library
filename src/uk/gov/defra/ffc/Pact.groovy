@@ -3,7 +3,7 @@ package uk.gov.defra.ffc
 class Pact implements Serializable {
   static def publishContractsToPactBroker(ctx, repoName, version, commitSha) {
     ctx.withCredentials([
-      usernamePassword(credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword')
+      ctx.usernamePassword(credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword')
     ]) {
       ctx.dir('test-output') {
         ctx.echo "Publish pacts to broker"
