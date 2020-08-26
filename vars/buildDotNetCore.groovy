@@ -22,6 +22,7 @@ def call(Map config=[:]) {
         config['validateClosure']()
       }
 
+
       stage('Helm lint') {
         test.lintHelm(repoName)
       }
@@ -49,6 +50,10 @@ def call(Map config=[:]) {
 
       stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER, tag)
+      }
+
+     stage('Publish pact broker') {
+        pact.publishContractsToPactBroker(repoName, getCSProjVersion(config.project), utils.getCommitSha())
       }
 
       stage('SonarCloud analysis') {
