@@ -47,9 +47,11 @@ class Utils implements Serializable {
     return ctx.sh(returnStdout: true, script: 'git config --get remote.origin.url').trim()
   }
 
-  static def getFolder(repoName) {
-    def folderArray = repoName.split('-')
-    return "${folderArray[0]}-${folderArray[1]}"
+  static def getFolder(ctx) {
+    // WORKSPACE returns working directory which is /var/lib/jenkins/jobs/FOLDER/...
+    // hence we want the fifth element in array when split by `/`
+    def workspaceArray = ctx.WORKSPACE.split('/')
+    return workspaceArray[5]
   }
 
   static def getErrorMessage(e) {
