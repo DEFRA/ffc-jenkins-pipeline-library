@@ -49,3 +49,7 @@ file `./lcov.info`:
 ```
 utils.replaceInFile('\\/usr\\/src\\/app', '.\\/app', './lcov.info')
 ```
+
+## getFolder
+
+Return top level folder where current pipeline is saved.
