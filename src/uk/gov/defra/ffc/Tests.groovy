@@ -119,11 +119,11 @@ class Tests implements Serializable {
           ctx.dir('./test/acceptance') {
           ctx.sh('mkdir -p -m 777 html-reports')
             if (pr != '') {
-              ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=http://ffc-demo-pr${pr}.ffc.snd.azure.defra.cloud"]) {
+              ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://ffc-demo-pr${pr}.ffc.snd.azure.defra.cloud"]) {
                 ctx.sh('docker-compose run wdio-cucumber')
               }
             } else {
-              ctx.withEnv(['TEST_ENVIRONMENT_ROOT_URL=http://ffc-demo.ffc.snd.azure.defra.cloud']) {
+              ctx.withEnv(['TEST_ENVIRONMENT_ROOT_URL=https://ffc-demo.ffc.snd.azure.defra.cloud']) {
                 ctx.sh('docker-compose run wdio-cucumber')
               }
             }
