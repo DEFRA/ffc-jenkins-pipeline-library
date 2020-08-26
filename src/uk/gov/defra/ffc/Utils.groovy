@@ -48,6 +48,8 @@ class Utils implements Serializable {
   }
 
   static def getFolder(ctx) {
+    // WORKSPACE returns working directory which is /var/lib/jenkins/jobs/FOLDER/...
+    // hence we want the fifth element in array when split by `/`
     def workspaceArray = ctx.WORKSPACE.split('/')
     return workspaceArray[5]
   }
