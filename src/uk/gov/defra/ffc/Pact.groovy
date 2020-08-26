@@ -7,7 +7,7 @@ class Pact implements Serializable {
     ]) {
       ctx.dir('test-output') {
         ctx.echo "Publish pacts to broker"
-        def pacts = ctx.findFiles glob: "*.json"
+        def pacts = ctx.findFiles glob: "$repoName-*.json"
         ctx.echo "Found ${pacts.size()} pact file(s) to publish"
         for (pact in pacts) {
           def provider = pact.name.substring("$repoName-".length(), pact.name.indexOf(".json"))
