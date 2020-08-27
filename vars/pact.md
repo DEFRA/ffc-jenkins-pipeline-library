@@ -18,7 +18,5 @@ Takes three parameters:
 
 Example usage:
 ```
-  stage('Publish pact broker') {
-          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
-       }
+pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
 ```
