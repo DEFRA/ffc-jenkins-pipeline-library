@@ -3,6 +3,7 @@ def call(Map config=[:]) {
   def mergedPrNo = ''
   def pr = ''
   def repoName = ''
+  def csProjVersion = ''
 
   node {
     try {
@@ -10,7 +11,8 @@ def call(Map config=[:]) {
         build.checkoutSourceCode()
       }
       stage('Set PR, and tag variables') {
-        (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getCSProjVersion(config.project))
+        csProjVersion = version.getCSProjVersion(config.project)
+        (repoName, pr, tag, mergedPrNo) = build.getVariables(csProjVersion)
       }
       if (pr != '') {
         stage('Verify version incremented') {
@@ -53,7 +55,7 @@ def call(Map config=[:]) {
       }
 
      stage('Publish pact broker') {
-        pact.publishContractsToPactBroker(repoName, getCSProjVersion(config.project), utils.getCommitSha())
+        pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
       }
 
       stage('SonarCloud analysis') {
@@ -108,7 +110,7 @@ def call(Map config=[:]) {
 
       throw e
     } finally {
-      
+
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)
       }
