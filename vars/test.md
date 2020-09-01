@@ -81,6 +81,8 @@ test.waitForQualityGateResult(5)
 ## runAcceptanceTests
 
 Executes the acceptance tests if an acceptance folder is found within the repo.
+Report output is written to the workspace under
+test/acceptance/html-reports/acceptance-test-suite-report.html
 
 Takes one parameter:
 - PR number (used for determining which deployment URL to execute the tests against)
@@ -91,4 +93,23 @@ Example usage:
 test.runAcceptanceTests(74)
 ```
 
-Report output is written to the workspace under test/acceptance/html-reports/acceptance-test-suite-report.html
+## runZapScan
+
+Checks for the existence of `docker-compose.zap.yaml` file in the root of the
+repository. If the file exists, the `zap-baseline-scan` service will be run. The
+command _could_ be anything but it is likely to be running a
+[Baseline Scan](https://www.zaproxy.org/docs/docker/baseline-scan/) against the
+target of the local web server.
+There are a number of options available to configure the scan appropriately for
+the service under test, the linked page includes details.
+
+Takes three parameters:
+- project name, e.g. `ffc-demo-web`
+- build number
+- container image tag
+
+Example usage:
+
+```
+test.runZapScan('ffc-demo-web', BUILD_NUMBER, 'pr99')
+```

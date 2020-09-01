@@ -32,14 +32,14 @@ class GitHubStatus implements Serializable {
     static final Description = 'npm audit'
   }
 
-  class RunTests {
-    static final Context = "${BASECTX}run-tests"
-    static final Description = 'Run tests'
-  }
-
   class RunAcceptanceTests {
     static final Context = "${BASECTX}run-acceptance-tests"
     static final Description = 'Run acceptance tests'
+  }
+
+  class RunTests {
+    static final Context = "${BASECTX}run-tests"
+    static final Description = 'Run tests'
   }
 
   class SnykTest {
@@ -50,5 +50,10 @@ class GitHubStatus implements Serializable {
   class VerifyVersion {
     static final Context = "${BASECTX}verify-version"
     static final Description = 'Verify version incremented'
+  }
+
+  class ZapScan {
+    static final Context = "${BASECTX}zap-version"
+    static final Description = 'Zap scan'
   }
 }

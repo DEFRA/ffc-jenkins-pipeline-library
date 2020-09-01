@@ -31,3 +31,7 @@ def buildCodeAnalysisDotNetParams(projectName, branch, pr) {
 def runAcceptanceTests(pr) {
   Tests.runAcceptanceTests(this, pr)
 }
+
+def runZapScan(projectName, buildNumber, tag) {
+  Tests.runZapScan(this, projectName, buildNumber, tag)
+}
