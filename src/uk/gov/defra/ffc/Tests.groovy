@@ -140,8 +140,9 @@ class Tests implements Serializable {
           ctx.sh('docker-compose run wdio-cucumber')
           }          
         }
-        ctx.sh('docker-compose down -v')         
-        }
+    } finally {
+          ctx.sh('docker-compose down -v')
+        }         
       }
     } else {
       ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
