@@ -90,6 +90,20 @@ class Provision implements Serializable {
     getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
   }
 
+  private static def getSchemaUserDetails(ctx, environment, repoName) {
+    def appConfigPrefix = environment + '/'
+    def postgresUserKey = 'postgresService.postgresUser'
+    def appConfigValuesRepo = Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, repoName, false)
+    def schemaRole = appConfigValuesRepo[postgresUserKey]
+    def schemaUser = schemaRole.split('@')[0]
+    return [user: schemaUser, role: schemaRole]
+  }
+
+  private static def getSchemaToken(ctx, clientId) {
+    ctx.sh("curl 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true")
+    ctx.sh("curl -s 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true | jq -r .access_token")
+
+  }
   private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
     def searchKeys = [
       'POSTGRES_ADMIN_USERNAME',
@@ -105,12 +119,11 @@ class Provision implements Serializable {
     def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
 
     def schemaName = repoName.replace('-','_') + pr
-    def schemaRole = "${schemaName}_role"
-    def schemaUser = getSchemaUserWithHostname(schemaRole, appConfigValues['POSTGRES_HOST'])
+    def schemaUserDetails = getSchemaUserDetails(ctx, environment, repoName)
     def databaseName = repoName.replace('-','_').replace('_service', '')
 
-    migrationEnvVars.add("POSTGRES_SCHEMA_ROLE=$schemaRole")
-    migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$schemaUser")
+    migrationEnvVars.add("POSTGRES_SCHEMA_ROLE=$schemaUserDetails.role")
+    migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$schemaUserDetails.user")
     migrationEnvVars.add("POSTGRES_SCHEMA_NAME=$schemaName")
     migrationEnvVars.add("POSTGRES_DB=$databaseName")
 
