@@ -100,7 +100,6 @@ class Provision implements Serializable {
   }
 
   private static def getSchemaToken(ctx, clientId) {
-    ctx.sh("curl 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true")
     ctx.sh("curl -s 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true | jq -r .access_token")
 
   }
