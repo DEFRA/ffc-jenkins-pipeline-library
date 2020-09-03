@@ -144,7 +144,7 @@ class Tests implements Serializable {
         try {
           ctx.dir('./test/acceptance') {
           ctx.sh('mkdir -p -m 777 html-reports')
-          def hostname = pr != '' ? appConfigLabel : '${appConfigLabel}-pr${pr}
+          def hostname = pr != '' ? appConfigLabel : "${appConfigLabel}-pr${pr}"
           ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.ffc.snd.azure.defra.cloud"]) {
           ctx.sh('docker-compose run wdio-cucumber')
           }
