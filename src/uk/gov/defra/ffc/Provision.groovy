@@ -95,6 +95,9 @@ class Provision implements Serializable {
     def postgresUserKey = 'postgresService.postgresUser'
     def appConfigValuesRepo = Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, repoName, false)
     def schemaUser = appConfigValuesRepo[postgresUserKey]
+    if (!schemaUser) {
+      throw new Exception("No postgres details for $repoName in $environment environment")
+    }
     def schemaRole = schemaUser.split('@')[0]
     def token = getSchemaToken(ctx, schemaRole)
     return [user: schemaUser, role: schemaRole, token: token]
