@@ -126,8 +126,7 @@ class Provision implements Serializable {
     appConfigValues['POSTGRES_ADMIN_PASSWORD'] = escapeQuotes(appConfigValues['POSTGRES_ADMIN_PASSWORD'])
 
     def schemaUserDetails = getSchemaUserDetails(ctx, environment, repoName)
-    // def schemaName = schemaUserDetails.database + pr
-    def schemaName = repoName.replace('-','_') + pr
+    def schemaName = schemaUserDetails.database + pr
     
     def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
     migrationEnvVars.add("POSTGRES_DB=$schemaUserDetails.database")
