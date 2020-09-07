@@ -93,14 +93,21 @@ class Provision implements Serializable {
   private static def getSchemaUserDetails(ctx, environment, repoName) {
     def appConfigPrefix = environment + '/'
     def postgresUserKey = 'postgresService.postgresUser'
-    def appConfigValuesRepo = Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, repoName, false)
+    def postgresDbKey = 'postgresService.postgresDb'
+    
+    def appConfigValuesRepo = Utils.getConfigValues(ctx, [postgresUserKey, postgresDbKey], appConfigPrefix, repoName, false)
     def schemaUser = appConfigValuesRepo[postgresUserKey]
     if (!schemaUser) {
-      throw new Exception("No postgres details for $repoName in $environment environment")
+      throw new Exception("No $postgresUserKey AppConfig for $repoName in $environment environment")
+    }
+    def database = appConfigValuesRepo[postgresDbKey]
+    if (!database) {
+      throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
     }
     def schemaRole = schemaUser.split('@')[0]
     def token = getSchemaToken(ctx, schemaRole)
-    return [user: schemaUser, role: schemaRole, token: token]
+ 
+    return [schemaUser: schemaUser, schemaRole: schemaRole, token: token, database: database]
   }
 
   private static def getSchemaToken(ctx, roleName) {
@@ -118,16 +125,16 @@ class Provision implements Serializable {
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
     appConfigValues['POSTGRES_ADMIN_PASSWORD'] = escapeQuotes(appConfigValues['POSTGRES_ADMIN_PASSWORD'])
 
-    def schemaName = repoName.replace('-','_') + pr
     def schemaUserDetails = getSchemaUserDetails(ctx, environment, repoName)
-    def databaseName = repoName.replace('-','_').replace('_service', '')
-
+    // def schemaName = schemaUserDetails.database + pr
+    def schemaName = repoName.replace('-','_') + pr
+    
     def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
+    migrationEnvVars.add("POSTGRES_DB=$schemaUserDetails.database")
+    migrationEnvVars.add("POSTGRES_SCHEMA_NAME=$schemaName")
     migrationEnvVars.add("POSTGRES_SCHEMA_ROLE=$schemaUserDetails.role")
     migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$schemaUserDetails.user")
     migrationEnvVars.add("POSTGRES_SCHEMA_PASSWORD=$schemaUserDetails.token")
-    migrationEnvVars.add("POSTGRES_SCHEMA_NAME=$schemaName")
-    migrationEnvVars.add("POSTGRES_DB=$databaseName")
 
     return migrationEnvVars
   }
