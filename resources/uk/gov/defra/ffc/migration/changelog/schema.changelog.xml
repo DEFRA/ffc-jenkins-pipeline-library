@@ -3,7 +3,7 @@
     <changeSet author="Mark Harrop" id="${schemaName}-1">
         <sql dbms="postgresql" endDelimiter=";">
             CREATE SCHEMA IF NOT EXISTS ${schemaName};
-            GRANT ALL PRIVILEGES ON SCHEMA ${schemaName} TO ${roleName};
+            GRANT ALL PRIVILEGES ON SCHEMA ${schemaName} TO "${roleName}";
             ALTER ROLE ${roleName} SET search_path TO ${schemaName};
         </sql>
         <rollback>
