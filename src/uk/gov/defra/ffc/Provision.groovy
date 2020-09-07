@@ -107,6 +107,7 @@ class Provision implements Serializable {
     def clientId = ctx.sh(returnStdout: true, script: "az identity show --resource-group $ctx.AZURE_POSTGRES_RESOURCE_GROUP --name $roleName --query clientId --output tsv").trim()
     return ctx.sh(returnStdout: true, script: "curl -s 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true | jq -r .access_token").trim()
   }
+
   private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
     def searchKeys = [
       'POSTGRES_ADMIN_USERNAME',
@@ -116,13 +117,12 @@ class Provision implements Serializable {
     def appConfigPrefix = environment + '/'
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
     appConfigValues['POSTGRES_ADMIN_PASSWORD'] = escapeQuotes(appConfigValues['POSTGRES_ADMIN_PASSWORD'])
-  
-    def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
 
     def schemaName = repoName.replace('-','_') + pr
     def schemaUserDetails = getSchemaUserDetails(ctx, environment, repoName)
     def databaseName = repoName.replace('-','_').replace('_service', '')
 
+    def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
     migrationEnvVars.add("POSTGRES_SCHEMA_ROLE=$schemaUserDetails.role")
     migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$schemaUserDetails.user")
     migrationEnvVars.add("POSTGRES_SCHEMA_PASSWORD=$schemaUserDetails.token")
@@ -134,12 +134,6 @@ class Provision implements Serializable {
 
   private static def escapeQuotes(value) {
     return value.replace("\"", "\\\"")
-  }
-
-  private static getSchemaUserWithHostname(schemaRole, dbServer) {
-    // string includes quotes, so remove them and escape '.' as split takes a regex
-    def dbServerSplit = dbServer.replace("\"","").split('\\.')
-    return dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
   }
 
   private static def createPrQueues(ctx, queues, repoName, pr) {
