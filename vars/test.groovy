@@ -33,7 +33,7 @@ def buildCodeAnalysisDotNetParams(projectName, branch, pr) {
 }
 
 def runAcceptanceTests(pr, appConfigLabel) {
-  Tests.runAcceptanceTests(this, pr)
+  Tests.runAcceptanceTests(this, pr, appConfigLabel)
   return Utils.getConfigValues(appConfigLabel)
 }
 
