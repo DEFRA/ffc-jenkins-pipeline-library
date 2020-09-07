@@ -90,7 +90,7 @@ class Provision implements Serializable {
     getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
   }
 
-  private static def getPostgresDetails(ctx, environment, repoName) {
+  private static def getRepoPostgresDetails(ctx, environment, repoName, pr) {
     def appConfigPrefix = environment + '/'
     def postgresUserKey = 'postgresService.postgresUser'
     def postgresDbKey = 'postgresService.postgresDb'
@@ -105,9 +105,10 @@ class Provision implements Serializable {
       throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
     }
     def schemaRole = schemaUser.split('@')[0]
+    def schemaName = repoName.replace('-','_') + pr
     def token = getSchemaToken(ctx, schemaRole)
  
-    return [schemaUser: schemaUser, schemaRole: schemaRole, token: token, database: database]
+    return [schemaUser: schemaUser, schemaRole: schemaRole, schemaName: schemaName, token: token, database: database]
   }
 
   private static def getSchemaToken(ctx, roleName) {
@@ -115,22 +116,25 @@ class Provision implements Serializable {
     return ctx.sh(returnStdout: true, script: "curl -s 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true | jq -r .access_token").trim()
   }
 
-  private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
+  private static def getCommonPostgresEnvVars(ctx, environment) {
+    def adminPasswordKey = 'POSTGRES_ADMIN_PASSWORD'
     def searchKeys = [
+      adminPasswordKey,
       'POSTGRES_ADMIN_USERNAME',
-      'POSTGRES_ADMIN_PASSWORD',
       'POSTGRES_HOST'
     ]
     def appConfigPrefix = environment + '/'
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
-    appConfigValues['POSTGRES_ADMIN_PASSWORD'] = escapeQuotes(appConfigValues['POSTGRES_ADMIN_PASSWORD'])
+    appConfigValues[adminPasswordKey] = escapeQuotes(appConfigValues[adminPasswordKey])
+    return appConfigValues.collect { "$it.key=$it.value" }
+  }
 
-    def postgresDetails = getPostgresDetails(ctx, environment, repoName)
-    def schemaName = repoName.replace('-','_') + pr
-    
-    def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
+  private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
+    def migrationEnvVars = getCommonPostgresEnvVars(ctx, environment)
+
+    def postgresDetails = getRepoPostgresDetails(ctx, environment, repoName, pr)
     migrationEnvVars.add("POSTGRES_DB=$postgresDetails.database")
-    migrationEnvVars.add("POSTGRES_SCHEMA_NAME=$schemaName")
+    migrationEnvVars.add("POSTGRES_SCHEMA_NAME=$postgresDetails.schemaName")
     migrationEnvVars.add("POSTGRES_SCHEMA_ROLE=$postgresDetails.schemaRole")
     migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$postgresDetails.schemaUser")
     migrationEnvVars.add("POSTGRES_SCHEMA_PASSWORD=$postgresDetails.token")
