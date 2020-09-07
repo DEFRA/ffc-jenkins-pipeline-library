@@ -90,7 +90,7 @@ class Provision implements Serializable {
     getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
   }
 
-  private static def getSchemaUserDetails(ctx, environment, repoName) {
+  private static def getPostgresDetails(ctx, environment, repoName) {
     def appConfigPrefix = environment + '/'
     def postgresUserKey = 'postgresService.postgresUser'
     def postgresDbKey = 'postgresService.postgresDb'
@@ -125,15 +125,15 @@ class Provision implements Serializable {
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
     appConfigValues['POSTGRES_ADMIN_PASSWORD'] = escapeQuotes(appConfigValues['POSTGRES_ADMIN_PASSWORD'])
 
-    def schemaUserDetails = getSchemaUserDetails(ctx, environment, repoName)
-    def schemaName = schemaUserDetails.database + pr
+    def postgresDetails = getPostgresDetails(ctx, environment, repoName)
+    def schemaName = repoName.replace('-','_') + pr
     
     def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
-    migrationEnvVars.add("POSTGRES_DB=$schemaUserDetails.database")
+    migrationEnvVars.add("POSTGRES_DB=$postgresDetails.database")
     migrationEnvVars.add("POSTGRES_SCHEMA_NAME=$schemaName")
-    migrationEnvVars.add("POSTGRES_SCHEMA_ROLE=$schemaUserDetails.role")
-    migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$schemaUserDetails.user")
-    migrationEnvVars.add("POSTGRES_SCHEMA_PASSWORD=$schemaUserDetails.token")
+    migrationEnvVars.add("POSTGRES_SCHEMA_ROLE=$postgresDetails.schemaRole")
+    migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$postgresDetails.schemaUser")
+    migrationEnvVars.add("POSTGRES_SCHEMA_PASSWORD=$postgresDetails.token")
 
     return migrationEnvVars
   }
