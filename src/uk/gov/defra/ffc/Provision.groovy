@@ -126,8 +126,8 @@ class Provision implements Serializable {
   }
 
   private static def getCommonPostgresEnvVars(ctx, environment) {
-    def adminUserKey = 'POSTGRES_ADMIN_USERNAME'
-    def adminPasswordKey = 'POSTGRES_ADMIN_PASSWORD'
+    def adminUserKey = 'postgresService.ffcDemoAdminUser'
+    def adminPasswordKey = 'postgresService.ffcDemoAdminPassword'
     def postgresHostKey = 'postgresService.postgresExternalName'
     def searchKeys = [
       adminUserKey,
