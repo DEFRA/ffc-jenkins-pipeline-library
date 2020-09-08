@@ -37,8 +37,6 @@ class Provision implements Serializable {
 
       ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
         ctx.dir(migrationFolder) {
-          // migrations may change in different builds of a PR, refresh schema to avoid errors
-          ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
           ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
         }
         ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run --no-deps database-up")
@@ -142,7 +140,7 @@ class Provision implements Serializable {
       "POSTGRES_HOST=${appConfigValues[postgresHostKey]}"
     ]
   }
-  
+
   private static def getCommonPostgresEnvVars(ctx, environment) {
     def adminPasswordKey = 'POSTGRES_ADMIN_PASSWORD'
     def searchKeys = [
