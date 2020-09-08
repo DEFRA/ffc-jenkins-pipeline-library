@@ -129,13 +129,14 @@ class Tests implements Serializable {
     ];
   }
 
-  static def runAcceptanceTests(ctx, pr, appConfigLabel) {
+  static def runAcceptanceTests(ctx, pr) {
     if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
           ctx.dir('./test/acceptance') {
           ctx.sh('mkdir -p -m 777 html-reports')
-          def hostname = pr != '' ? appConfigLabel : "${appConfigLabel}-pr${pr}"
+          def hostPrefix = Utils.getConfigValues(this, ['ingress.endpoint'], environment, repoName)
+          def hostname = pr != '' ? hostPrefix : "${hostPrefix}-pr${pr}"
           ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.ffc.snd.azure.defra.cloud"]) {
           ctx.sh('docker-compose run wdio-cucumber')
           }          
