@@ -129,7 +129,7 @@ class Tests implements Serializable {
     ];
   }
 
-  static def runAcceptanceTests(ctx, pr) {
+  static def runAcceptanceTests(ctx, pr,  environment, repoName) {
     if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
