@@ -37,8 +37,6 @@ class Provision implements Serializable {
 
       ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
         ctx.dir(migrationFolder) {
-          // migrations may change in different builds of a PR, refresh schema to avoid errors
-          ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
           ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
         }
         ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run --no-deps database-up")
@@ -90,41 +88,67 @@ class Provision implements Serializable {
     getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
   }
 
-  private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
+  private static def getRepoPostgresEnvVars(ctx, environment, repoName, pr) {
+    def appConfigPrefix = environment + '/'
+    def postgresUserKey = 'postgresService.postgresUser'
+    def postgresDbKey = 'postgresService.postgresDb'
+    
+    def appConfigValuesRepo = Utils.getConfigValues(ctx, [postgresUserKey, postgresDbKey], appConfigPrefix, repoName, false)
+
+    def schemaUser = appConfigValuesRepo[postgresUserKey]
+    if (!schemaUser) {
+      throw new Exception("No $postgresUserKey AppConfig for $repoName in $environment environment")
+    }
+
+    def database = appConfigValuesRepo[postgresDbKey]
+    if (!database) {
+      throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
+    }
+
+    def schemaRole = schemaUser.split('@')[0]
+    def schemaName = repoName.replace('-','_') + pr
+    def token = getSchemaToken(ctx, schemaRole)
+
+    return [
+      "POSTGRES_DB=$database",
+      "POSTGRES_SCHEMA_NAME=$schemaName",
+      "POSTGRES_SCHEMA_ROLE=$schemaRole",
+      "POSTGRES_SCHEMA_USERNAME=$schemaUser",
+      "POSTGRES_SCHEMA_PASSWORD=$token"
+    ]
+  }
+
+  private static def getSchemaToken(ctx, roleName) {
+    def clientId = ctx.sh(returnStdout: true, script: "az identity show --resource-group $ctx.AZURE_POSTGRES_RESOURCE_GROUP --name $roleName --query clientId --output tsv").trim()
+    return ctx.sh(returnStdout: true, script: "curl -s 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true | jq -r .access_token").trim()
+  }
+
+  private static def getCommonPostgresEnvVars(ctx, environment) {
+    def adminUserKey = 'postgresService.ffcDemoAdminUser'
+    def adminPasswordKey = 'postgresService.ffcDemoAdminPassword'
+    def postgresHostKey = 'postgresService.postgresExternalName'
     def searchKeys = [
-      'POSTGRES_ADMIN_USERNAME',
-      'POSTGRES_ADMIN_PASSWORD',
-      'POSTGRES_HOST',
-      'POSTGRES_SCHEMA_PASSWORD'
+      adminUserKey,
+      adminPasswordKey,
+      postgresHostKey
     ]
     def appConfigPrefix = environment + '/'
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
-    appConfigValues['POSTGRES_ADMIN_PASSWORD'] = escapeQuotes(appConfigValues['POSTGRES_ADMIN_PASSWORD'])
-    appConfigValues['POSTGRES_SCHEMA_PASSWORD'] = escapeQuotes(appConfigValues['POSTGRES_SCHEMA_PASSWORD'])
+      return [
+      "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
+      "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
+      "POSTGRES_HOST=${appConfigValues[postgresHostKey]}"
+    ]
+  }
 
-    def migrationEnvVars = appConfigValues.collect { "$it.key=$it.value" }
-
-    def schemaName = repoName.replace('-','_') + pr
-    def schemaRole = "${schemaName}_role"
-    def schemaUser = getSchemaUserWithHostname(schemaRole, appConfigValues['POSTGRES_HOST'])
-    def databaseName = repoName.replace('-','_').replace('_service', '')
-
-    migrationEnvVars.add("POSTGRES_SCHEMA_ROLE=$schemaRole")
-    migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$schemaUser")
-    migrationEnvVars.add("POSTGRES_SCHEMA_NAME=$schemaName")
-    migrationEnvVars.add("POSTGRES_DB=$databaseName")
-
-    return migrationEnvVars
+  private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
+    def envVars = getCommonPostgresEnvVars(ctx, environment)
+    def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
+    return envVars + repoEnvVars
   }
 
   private static def escapeQuotes(value) {
     return value.replace("\"", "\\\"")
-  }
-
-  private static getSchemaUserWithHostname(schemaRole, dbServer) {
-    // string includes quotes, so remove them and escape '.' as split takes a regex
-    def dbServerSplit = dbServer.replace("\"","").split('\\.')
-    return dbServerSplit.length > 1 ? "${schemaRole}@${dbServerSplit[0]}" : schemaRole
   }
 
   private static def createPrQueues(ctx, queues, repoName, pr) {
