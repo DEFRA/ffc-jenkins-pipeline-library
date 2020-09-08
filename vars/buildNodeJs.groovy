@@ -115,8 +115,9 @@ def call(Map config=[:]) {
       }
 
       stage('Run Acceptance Tests') {
-        test.runAcceptanceTests(pr)
+        test.runAcceptanceTests(pr, config.environment, repoName)
       }
+
     } catch(e) {
       def errMsg = utils.getErrorMessage(e)
       echo("Build failed with message: $errMsg")
