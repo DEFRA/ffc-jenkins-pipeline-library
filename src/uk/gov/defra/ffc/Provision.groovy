@@ -90,25 +90,34 @@ class Provision implements Serializable {
     getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
   }
 
-  private static def getRepoPostgresDetails(ctx, environment, repoName, pr) {
+  private static def getRepoPostgresEnvVars(ctx, environment, repoName, pr) {
     def appConfigPrefix = environment + '/'
     def postgresUserKey = 'postgresService.postgresUser'
     def postgresDbKey = 'postgresService.postgresDb'
     
     def appConfigValuesRepo = Utils.getConfigValues(ctx, [postgresUserKey, postgresDbKey], appConfigPrefix, repoName, false)
+
     def schemaUser = appConfigValuesRepo[postgresUserKey]
     if (!schemaUser) {
       throw new Exception("No $postgresUserKey AppConfig for $repoName in $environment environment")
     }
+
     def database = appConfigValuesRepo[postgresDbKey]
     if (!database) {
       throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
     }
+
     def schemaRole = schemaUser.split('@')[0]
     def schemaName = repoName.replace('-','_') + pr
     def token = getSchemaToken(ctx, schemaRole)
- 
-    return [schemaUser: schemaUser, schemaRole: schemaRole, schemaName: schemaName, token: token, database: database]
+
+    return [
+      "POSTGRES_DB=$database",
+      "POSTGRES_SCHEMA_NAME=$schemaName",
+      "POSTGRES_SCHEMA_ROLE=$schemaRole",
+      "POSTGRES_SCHEMA_USERNAME=$schemaUser",
+      "POSTGRES_SCHEMA_PASSWORD=$token"
+    ]
   }
 
   private static def getSchemaToken(ctx, roleName) {
@@ -130,16 +139,9 @@ class Provision implements Serializable {
   }
 
   private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
-    def migrationEnvVars = getCommonPostgresEnvVars(ctx, environment)
-
-    def postgresDetails = getRepoPostgresDetails(ctx, environment, repoName, pr)
-    migrationEnvVars.add("POSTGRES_DB=$postgresDetails.database")
-    migrationEnvVars.add("POSTGRES_SCHEMA_NAME=$postgresDetails.schemaName")
-    migrationEnvVars.add("POSTGRES_SCHEMA_ROLE=$postgresDetails.schemaRole")
-    migrationEnvVars.add("POSTGRES_SCHEMA_USERNAME=$postgresDetails.schemaUser")
-    migrationEnvVars.add("POSTGRES_SCHEMA_PASSWORD=$postgresDetails.token")
-
-    return migrationEnvVars
+    def envVars = getCommonPostgresEnvVars(ctx, environment)
+    def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
+    return envVars + repoEnvVars
   }
 
   private static def escapeQuotes(value) {
