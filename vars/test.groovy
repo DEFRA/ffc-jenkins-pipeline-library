@@ -28,8 +28,8 @@ def buildCodeAnalysisDotNetParams(projectName, branch, pr) {
   return Tests.buildCodeAnalysisDotNetParams(projectName, branch, pr)
 }
 
-def runAcceptanceTests(pr, config.environment, repoName) {
-  Tests.runAcceptanceTests(this, pr, config.environment, repoName)
+def runAcceptanceTests(pr, environment, repoName) {
+  Tests.runAcceptanceTests(this, pr, environment, repoName)
 }
 
 def runZapScan(projectName, buildNumber, tag) {
