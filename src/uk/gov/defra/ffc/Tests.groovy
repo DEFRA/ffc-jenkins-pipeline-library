@@ -144,7 +144,8 @@ class Tests implements Serializable {
         try {
           ctx.dir('./test/acceptance') {
           ctx.sh('mkdir -p -m 777 html-reports')
-          def hostPrefix = Utils.getConfigValues(this, ['ingress.endpoint', 'ingress.server'], environment, repoName)
+          def configValues =  Utils.getConfigValues(this, ['ingress.endpoint', 'ingress.server'], environment, repoName)
+          def hostPrefix = configValues['ingress.endpoint']
           def domain = configValues['ingress.server']
           def hostname = pr != '' ? hostPrefix : "${hostPrefix}-pr${pr}"
           ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}"]) {
