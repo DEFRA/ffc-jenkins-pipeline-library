@@ -125,7 +125,7 @@ class Provision implements Serializable {
     return ctx.sh(returnStdout: true, script: "curl -s 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true | jq -r .access_token").trim()
   }
 
-  private static def getCommonPostgresEnvVars(ctx, environment) {
+  private static def getCommonPostgresEnvVars2(ctx, environment) {
     def adminUserKey = 'postgresService.ffcDemoAdminUser'
     def adminPasswordKey = 'postgresService.ffcDemoAdminPassword'
     def postgresHostKey = 'postgresService.postgresExternalName'
@@ -141,6 +141,19 @@ class Provision implements Serializable {
       "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
       "POSTGRES_HOST=${appConfigValues[postgresHostKey]}"
     ]
+  }
+  
+  private static def getCommonPostgresEnvVars(ctx, environment) {
+    def adminPasswordKey = 'POSTGRES_ADMIN_PASSWORD'
+    def searchKeys = [
+      adminPasswordKey,
+      'POSTGRES_ADMIN_USERNAME',
+      'POSTGRES_HOST'
+    ]
+    def appConfigPrefix = environment + '/'
+    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
+    appConfigValues[adminPasswordKey] = escapeQuotes(appConfigValues[adminPasswordKey])
+    return appConfigValues.collect { "$it.key=$it.value" }
   }
 
   private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
