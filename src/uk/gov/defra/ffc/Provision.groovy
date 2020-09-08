@@ -126,16 +126,21 @@ class Provision implements Serializable {
   }
 
   private static def getCommonPostgresEnvVars(ctx, environment) {
+    def adminUserKey = 'POSTGRES_ADMIN_USERNAME'
     def adminPasswordKey = 'POSTGRES_ADMIN_PASSWORD'
+    def postgresHostKey = 'postgresService.postgresExternalName'
     def searchKeys = [
+      adminUserKey,
       adminPasswordKey,
-      'POSTGRES_ADMIN_USERNAME',
-      'POSTGRES_HOST'
+      postgresHostKey
     ]
     def appConfigPrefix = environment + '/'
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
-    appConfigValues[adminPasswordKey] = escapeQuotes(appConfigValues[adminPasswordKey])
-    return appConfigValues.collect { "$it.key=$it.value" }
+      return [
+      "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
+      "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
+      "POSTGRES_HOST=${appConfigValues[postgresHostKey]}"
+    ]
   }
 
   private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
