@@ -135,7 +135,7 @@ class Tests implements Serializable {
         try {
           ctx.dir('./test/acceptance') {
           ctx.sh('mkdir -p -m 777 html-reports')
-          def hostPrefix = Utils.getConfigValues(this, ['ingress.endpoint'], environment, repoName)
+          def hostPrefix = configValues['ingress.endpoint']
           def hostname = pr != '' ? hostPrefix : "${hostPrefix}-pr${pr}"
           ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.ffc.snd.azure.defra.cloud"]) {
           ctx.sh('docker-compose run wdio-cucumber')
