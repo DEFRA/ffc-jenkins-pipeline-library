@@ -45,7 +45,11 @@ class Helm implements Serializable {
         def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
         def appConfigPrefix = environment + '/'
         def defaultConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
-        def defaultConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
+        def chartValues = Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName)
+        if (chartValues['postgresService.postgresDb']) {
+          ctx.echo("** is a PR with a database **")
+        }
+        def defaultConfigValuesChart = configItemsToSetString(chartValues)
         def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
         def prConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
 
