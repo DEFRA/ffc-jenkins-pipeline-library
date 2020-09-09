@@ -48,7 +48,7 @@ class Helm implements Serializable {
         def chartValues = Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName)
         if (pr != '' && chartValues['postgresService.postgresDb']) {
           ctx.echo("** is a PR with a database **")
-          chartValues['postgresService.postgresSchema'] = Provision.getSchemaName(repoName, pr)
+          chartValues['postgresService.postgresSchema'] = Provision.getSchemaName(chartName, pr)
         }
         def defaultConfigValuesChart = configItemsToSetString(chartValues)
         def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
