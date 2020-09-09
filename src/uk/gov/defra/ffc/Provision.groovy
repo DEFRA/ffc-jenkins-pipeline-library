@@ -128,7 +128,7 @@ class Provision implements Serializable {
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
     def schemaUser = appConfigValuesRepo[postgresUserKey]
     if (!schemaUser) {
-      throw new Exception("No $postgresUserKey AppConfig for $repoName in $environment environment")
+      throw new Exception("No $postgresUserKey AppConfig in $environment environment")
     }
     def schemaRole = schemaUser.split('@')[0]
     def token = getSchemaToken(ctx, schemaRole)
