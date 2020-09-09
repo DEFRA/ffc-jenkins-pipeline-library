@@ -35,7 +35,7 @@ class Helm implements Serializable {
     return helmValuesKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
   }
 
-  static def deployChart(ctx, environment, registry, chartName, tag) {
+  static def deployChart(ctx, environment, registry, chartName, tag, pr = '') {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
         def deploymentName = "$chartName-$tag"
@@ -46,8 +46,9 @@ class Helm implements Serializable {
         def appConfigPrefix = environment + '/'
         def defaultConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
         def chartValues = Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName)
-        if (chartValues['postgresService.postgresDb']) {
+        if (pr != '' && chartValues['postgresService.postgresDb']) {
           ctx.echo("** is a PR with a database **")
+          chartValues['postgresService.postgresSchema'] = Provision.getSchemaName(repoName, pr)
         }
         def defaultConfigValuesChart = configItemsToSetString(chartValues)
         def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
