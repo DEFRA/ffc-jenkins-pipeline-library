@@ -92,9 +92,9 @@ class Provision implements Serializable {
     def appConfigPrefix = environment + '/'
     def postgresDbKey = 'postgresService.postgresDb'
 
-    def appConfigValuesRepo = Utils.getConfigValues(ctx, [postgresDbKey], appConfigPrefix, repoName, false)
+    def appConfigValues = Utils.getConfigValues(ctx, [postgresDbKey], appConfigPrefix, repoName, false)
 
-    def database = appConfigValuesRepo[postgresDbKey]
+    def database = appConfigValues[postgresDbKey]
     if (!database) {
       throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
     }
@@ -126,7 +126,7 @@ class Provision implements Serializable {
     ]
 
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
-    def schemaUser = appConfigValuesRepo[postgresUserKey]
+    def schemaUser = appConfigValues[postgresUserKey]
     if (!schemaUser) {
       throw new Exception("No $postgresUserKey AppConfig in $environment environment")
     }
