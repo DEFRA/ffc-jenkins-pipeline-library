@@ -90,9 +90,9 @@ class Provision implements Serializable {
 
   private static def getRepoPostgresEnvVars(ctx, environment, repoName, pr) {
     def appConfigPrefix = environment + '/'
-    def postgresUserKey = 'postgresService.postgresUser'
+    def postgresUserKey = 'pr/postgresService.postgresUser'
     def postgresDbKey = 'postgresService.postgresDb'
-    
+
     def appConfigValuesRepo = Utils.getConfigValues(ctx, [postgresUserKey, postgresDbKey], appConfigPrefix, repoName, false)
 
     def schemaUser = appConfigValuesRepo[postgresUserKey]
