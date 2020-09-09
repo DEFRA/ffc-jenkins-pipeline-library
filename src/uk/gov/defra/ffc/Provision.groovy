@@ -90,31 +90,20 @@ class Provision implements Serializable {
 
   private static def getRepoPostgresEnvVars(ctx, environment, repoName, pr) {
     def appConfigPrefix = environment + '/'
-    def postgresUserKey = 'postgresService.postgresUser'
     def postgresDbKey = 'postgresService.postgresDb'
-    
-    def appConfigValuesRepo = Utils.getConfigValues(ctx, [postgresUserKey, postgresDbKey], appConfigPrefix, repoName, false)
 
-    def schemaUser = appConfigValuesRepo[postgresUserKey]
-    if (!schemaUser) {
-      throw new Exception("No $postgresUserKey AppConfig for $repoName in $environment environment")
-    }
+    def appConfigValues = Utils.getConfigValues(ctx, [postgresDbKey], appConfigPrefix, repoName, false)
 
-    def database = appConfigValuesRepo[postgresDbKey]
+    def database = appConfigValues[postgresDbKey]
     if (!database) {
       throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
     }
 
-    def schemaRole = schemaUser.split('@')[0]
     def schemaName = repoName.replace('-','_') + pr
-    def token = getSchemaToken(ctx, schemaRole)
 
     return [
       "POSTGRES_DB=$database",
       "POSTGRES_SCHEMA_NAME=$schemaName",
-      "POSTGRES_SCHEMA_ROLE=$schemaRole",
-      "POSTGRES_SCHEMA_USERNAME=$schemaUser",
-      "POSTGRES_SCHEMA_PASSWORD=$token"
     ]
   }
 
@@ -124,20 +113,33 @@ class Provision implements Serializable {
   }
 
   private static def getCommonPostgresEnvVars(ctx, environment) {
+    def appConfigPrefix = environment + '/'
     def adminUserKey = 'postgresService.ffcDemoAdminUser'
     def adminPasswordKey = 'postgresService.ffcDemoAdminPassword'
     def postgresHostKey = 'postgresService.postgresExternalName'
+    def postgresUserKey = 'pr/postgresService.postgresUser'
     def searchKeys = [
       adminUserKey,
       adminPasswordKey,
-      postgresHostKey
+      postgresHostKey,
+      postgresUserKey
     ]
-    def appConfigPrefix = environment + '/'
+
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
-      return [
+    def schemaUser = appConfigValues[postgresUserKey]
+    if (!schemaUser) {
+      throw new Exception("No $postgresUserKey AppConfig in $environment environment")
+    }
+    def schemaRole = schemaUser.split('@')[0]
+    def token = getSchemaToken(ctx, schemaRole)
+
+    return [
       "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
       "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
-      "POSTGRES_HOST=${appConfigValues[postgresHostKey]}"
+      "POSTGRES_HOST=${appConfigValues[postgresHostKey]}",
+      "POSTGRES_SCHEMA_USERNAME=$schemaUser",
+      "POSTGRES_SCHEMA_PASSWORD=$token",
+      "POSTGRES_SCHEMA_ROLE=$schemaRole"
     ]
   }
 
@@ -164,7 +166,7 @@ class Provision implements Serializable {
   }
 
   private static def createQueue(ctx, queueName) {
-    validateQueueName(queueName)  
+    validateQueueName(queueName)
     def azCommand = 'az servicebus queue create'
     ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
   }
