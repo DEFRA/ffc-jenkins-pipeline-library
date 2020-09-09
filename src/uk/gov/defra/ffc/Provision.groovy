@@ -164,7 +164,7 @@ class Provision implements Serializable {
   }
 
   private static def createQueue(ctx, queueName) {
-    validateQueueName(queueName)  
+    validateQueueName(queueName)
     def azCommand = 'az servicebus queue create'
     ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
   }
