@@ -8,8 +8,8 @@ def getPrCommands(registry, chartName, tag) {
   return Helm.getPrCommands(registry, chartName, tag, BUILD_NUMBER)
 }
 
-def deployChart(environment, registry, chartName, tag) {
-  Helm.deployChart(this, environment, registry, chartName, tag)
+def deployChart(environment, registry, chartName, tag, pr) {
+  Helm.deployChart(this, environment, registry, chartName, tag, pr)
 }
 
 def undeployChart(environment, chartName, tag) {

@@ -35,7 +35,7 @@ class Helm implements Serializable {
     return helmValuesKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
   }
 
-  static def deployChart(ctx, environment, registry, chartName, tag, pr = '') {
+  static def deployChart(ctx, environment, registry, chartName, tag, pr) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
         def deploymentName = "$chartName-$tag"
