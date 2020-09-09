@@ -154,7 +154,6 @@ class Tests implements Serializable {
           def hostPrefix = configValuesPrefix['ingress.endpoint']
           def domain = configValuesRepo['ingress.server']
           def hostname = pr = '' ? hostPrefix : "${hostPrefix}-pr${pr}"
-          ctx.echo("TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}")
           ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}"]) {
           ctx.sh('docker-compose run wdio-cucumber')
           }          
