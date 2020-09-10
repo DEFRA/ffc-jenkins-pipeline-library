@@ -125,7 +125,7 @@ class Utils implements Serializable {
       def queues = Provision.readManifest(ctx, filePath, 'queues')
 
       queues.each {
-        configValues["container.${it}QueueAddress"] = "${Provision.getPrQueueName(repoName, pr, it)}"
+        configValues["container.${it}QueueAddress"] = Provision.getPrQueueName(repoName, pr, it)
       }
     }
     return configValues
