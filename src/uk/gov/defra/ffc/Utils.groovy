@@ -127,6 +127,8 @@ class Utils implements Serializable {
       queues.each {
         configValues["container.${it}QueueAddress"] = Provision.getPrQueueName(repoName, pr, it)
       }
+      return configValues
     }
+    return ''
   }
 }
