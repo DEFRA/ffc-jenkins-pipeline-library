@@ -195,7 +195,7 @@ class Provision implements Serializable {
     assert name ==~ /^[A-Za-z0-9]$|^[A-Za-z0-9][\w-\.\/\~]*[A-Za-z0-9]$/ : "Invalid queue name: '$name'"
   }
 
-  private static def readManifest(ctx, filePath, resource) {
+  static def readManifest(ctx, filePath, resource) {
     def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*.name").trim()
     return resources.tokenize('\n')
   }
