@@ -131,4 +131,12 @@ class Utils implements Serializable {
     }
     return ''
   }
+
+  static def getProvisionedDbSchemaConfigValues(ctx, repoName, pr) {
+    def configValues = [:]
+    if (ctx.fileExists( './docker-compose.migrate.yaml')) {
+       configValues['postgresService.postgresSchema'] = Provision.getSchemaName(repoName, pr)
+    }
+    return configValues
+  }
 }

@@ -103,12 +103,16 @@ class Provision implements Serializable {
       throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
     }
 
-    def schemaName = repoName.replace('-','_') + pr
+    def schemaName = getSchemaName(repoName, pr)
 
     return [
       "POSTGRES_DB=$database",
       "POSTGRES_SCHEMA_NAME=$schemaName",
     ]
+  }
+
+  public static def getSchemaName(repoName, pr) {
+    return repoName.replace('-','_') + pr
   }
 
   private static def getSchemaToken(ctx, roleName) {
