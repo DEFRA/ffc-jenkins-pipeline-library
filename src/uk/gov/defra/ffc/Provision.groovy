@@ -6,9 +6,13 @@ class Provision implements Serializable {
     createPrDatabase(ctx, environment, repoName, pr)
   }
 
+  static def hasResourcesToProvision(ctx, filePath) {
+    return ctx.fileExists(filePath)
+  }
+
   static def createAzureResources(ctx, environment, repoName, pr) {
     def filePath = 'provision.azure.yaml'
-    if(ctx.fileExists(filePath)) {
+    if(hasResourcesToProvision(ctx, filePath)) {
       deletePrResources(ctx, environment, repoName, pr)
       createAllResources(ctx, filePath, repoName, pr)
     }
@@ -153,11 +157,14 @@ class Provision implements Serializable {
     return value.replace("\"", "\\\"")
   }
 
-  // TODO: extract the queue name into a function
   private static def createPrQueues(ctx, queues, repoName, pr) {
     queues.each {
-      createQueue(ctx, "$repoName-pr$pr-$it")
+      createQueue(ctx, getPrQueueName(repoName, pr, it))
     }
+  }
+
+  static def getPrQueueName(repoName, pr, queueName) {
+    return "$repoName-pr$pr-$queueName"
   }
 
   private static def createBuildQueues(ctx, queues, repoName, pr) {

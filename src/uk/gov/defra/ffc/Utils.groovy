@@ -118,4 +118,15 @@ class Utils implements Serializable {
     return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
   }
 
+  static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
+    def filePath = 'provision.azure.yaml'
+    if (Provision.hasResourcesToProvision(ctx, filePath)) {
+      def queues = readManifest(ctx, filePath, 'queues')
+      def configValues = [:]
+
+      queues.each {
+        configValues["container.${it}QueueAddress"] = Provision.getPrQueueName(repoName, pr, it)
+      }
+    }
+  }
 }

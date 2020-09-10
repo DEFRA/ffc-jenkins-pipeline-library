@@ -51,8 +51,10 @@ class Helm implements Serializable {
         ctx.echo("PRCONFIGVALUES: $prConfigValues")
 
         // TODO: Set PR specific provisioned resources
-        def prProvisionedValues = configItemsToSetString([ 'container.claimQueueAddress': 'ffc-demo-claim-service-pr136-claim',  'container.scheduleQueueAddress': 'ffc-demo-claim-service-pr136-schedule', 'container.calculationQueueAddress': 'ffc-demo-claim-service-pr136-calculation' ])
-        ctx.echo("PRPOVISIONEDVALUES: $prProvisionedValues")
+        def hardcodedTestValues = configItemsToSetString([ 'container.claimQueueAddress': 'ffc-demo-claim-service-pr136-claim',  'container.scheduleQueueAddress': 'ffc-demo-claim-service-pr136-schedule', 'container.calculationQueueAddress': 'ffc-demo-claim-service-pr136-calculation' ])
+        ctx.echo("TEST VALUES: $hardcodedTestValues")
+        def prProvisionedValues = configItemsToSetString(Utils.getProvisionedQueueConfigValues(ctx, chartName, tag))
+        ctx.echo("PR VALUES: $prProvisionedValues")
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.echo('Running helm upgrade, console output suppressed')
