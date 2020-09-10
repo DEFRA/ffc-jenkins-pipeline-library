@@ -139,17 +139,9 @@ class Tests implements Serializable {
             'ingress.endpoint',
             'ingress.server'
           ]
-          def appConfigPrefix = environment + '/'
-      
-          def configValuesRepo =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)
-          ctx.echo("configValues keys ${configValuesRepo.keySet()}")
-          ctx.echo('ingress endpoint ' + configValuesRepo['ingress.endpoint'])
-          def configValuesPrefix = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)
-          ctx.echo("configValuesPrefix keys ${configValuesPrefix.keySet()}")
-          ctx.echo('ingress server ' + configValuesPrefix['ingress.server'])
-
-
-
+          def appConfigPrefix = environment + '/'      
+          def configValuesRepo =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)          
+          def configValuesPrefix = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)      
           def hostPrefix = configValuesPrefix['ingress.endpoint']
           def domain = configValuesRepo['ingress.server']
           def hostname = pr = '' ? hostPrefix : "${hostPrefix}-pr${pr}"
