@@ -153,6 +153,7 @@ class Provision implements Serializable {
     return value.replace("\"", "\\\"")
   }
 
+  // TODO: extract the queue name into a function
   private static def createPrQueues(ctx, queues, repoName, pr) {
     queues.each {
       createQueue(ctx, "$repoName-pr$pr-$it")

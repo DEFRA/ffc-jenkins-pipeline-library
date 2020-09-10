@@ -48,10 +48,15 @@ class Helm implements Serializable {
         def defaultConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
         def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
         def prConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
+        ctx.echo("PRCONFIGVALUES: $prConfigValues")
+
+        // TODO: Set PR specific provisioned resources
+        def prProvisionedValues = [ 'container.claimQueueAddress': 'ffc-demo-claim-service-pr136-claim',  'container.scheduleQueueAddress': 'ffc-demo-claim-service-pr136-schedule', 'container.calculationQueueAddress': 'ffc-demo-claim-service-pr136-calculation' ]
+        ctx.echo("PRPOVISIONEDVALUES: $prProvisionedValues")
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.echo('Running helm upgrade, console output suppressed')
-        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
+        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $prCommands $extraCommands")
         writeUrlIfIngress(ctx, deploymentName)
       }
     }
