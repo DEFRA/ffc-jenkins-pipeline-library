@@ -54,6 +54,7 @@ class Helm implements Serializable {
         def hardcodedTestValues = configItemsToSetString([ 'container.claimQueueAddress': 'ffc-demo-claim-service-pr136-claim',  'container.scheduleQueueAddress': 'ffc-demo-claim-service-pr136-schedule', 'container.calculationQueueAddress': 'ffc-demo-claim-service-pr136-calculation' ])
         ctx.echo("TEST VALUES: $hardcodedTestValues")
         def prProvisionedValues = configItemsToSetString(Utils.getProvisionedQueueConfigValues(ctx, chartName, pr))
+        prProvisionedValues += configItemsToSetString(Utils.getProvisionedDbSchemaConfigValues(ctx, chartName, pr))
         ctx.echo("PR VALUES: $prProvisionedValues")
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
