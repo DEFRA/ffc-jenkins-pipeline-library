@@ -6,9 +6,13 @@ class Provision implements Serializable {
     createPrDatabase(ctx, environment, repoName, pr)
   }
 
+  static def hasResourcesToProvision(ctx, filePath) {
+    return ctx.fileExists(filePath)
+  }
+
   static def createAzureResources(ctx, environment, repoName, pr) {
     def filePath = 'provision.azure.yaml'
-    if(ctx.fileExists(filePath)) {
+    if(hasResourcesToProvision(ctx, filePath)) {
       deletePrResources(ctx, environment, repoName, pr)
       createAllResources(ctx, filePath, repoName, pr)
     }
@@ -99,12 +103,16 @@ class Provision implements Serializable {
       throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
     }
 
-    def schemaName = repoName.replace('-','_') + pr
+    def schemaName = getSchemaName(repoName, pr)
 
     return [
       "POSTGRES_DB=$database",
       "POSTGRES_SCHEMA_NAME=$schemaName",
     ]
+  }
+
+  public static def getSchemaName(repoName, pr) {
+    return repoName.replace('-','_') + pr
   }
 
   private static def getSchemaToken(ctx, roleName) {
@@ -155,8 +163,12 @@ class Provision implements Serializable {
 
   private static def createPrQueues(ctx, queues, repoName, pr) {
     queues.each {
-      createQueue(ctx, "$repoName-pr$pr-$it")
+      createQueue(ctx, getPrQueueName(repoName, pr, it))
     }
+  }
+
+  static def getPrQueueName(repoName, pr, queueName) {
+    return "$repoName-pr$pr-$queueName"
   }
 
   private static def createBuildQueues(ctx, queues, repoName, pr) {
@@ -187,7 +199,7 @@ class Provision implements Serializable {
     assert name ==~ /^[A-Za-z0-9]$|^[A-Za-z0-9][\w-\.\/\~]*[A-Za-z0-9]$/ : "Invalid queue name: '$name'"
   }
 
-  private static def readManifest(ctx, filePath, resource) {
+  static def readManifest(ctx, filePath, resource) {
     def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*.name").trim()
     return resources.tokenize('\n')
   }

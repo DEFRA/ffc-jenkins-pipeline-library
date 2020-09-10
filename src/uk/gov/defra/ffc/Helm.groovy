@@ -35,7 +35,7 @@ class Helm implements Serializable {
     return helmValuesKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
   }
 
-  static def deployChart(ctx, environment, registry, chartName, tag) {
+  static def deployChart(ctx, environment, registry, chartName, tag, pr) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
         def deploymentName = "$chartName-$tag"
@@ -48,10 +48,14 @@ class Helm implements Serializable {
         def defaultConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
         def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
         def prConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
+        def prProvisionedValues = configItemsToSetString(
+          Utils.getProvisionedQueueConfigValues(ctx, chartName, pr) +
+          Utils.getProvisionedDbSchemaConfigValues(ctx, chartName, pr)
+        )
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.echo('Running helm upgrade, console output suppressed')
-        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
+        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $prCommands $extraCommands")
         writeUrlIfIngress(ctx, deploymentName)
       }
     }

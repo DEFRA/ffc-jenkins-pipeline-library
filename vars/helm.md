@@ -14,17 +14,18 @@ same name as the image, service, and repository.
 Development Helm charts are deployed with the name and namespace set to a
 combination of the image name and tag, i.e. `ffc-demo-web-pr53`
 
-Takes four parameters:
+Takes five parameters:
 - environment to deploy to (this is used to determine which K8s credentials to
   use)
 - the registry where the chart's image is stored
 - the name of the chart (note this must also be the name of the image to deploy)
 - container image tag to deploy
+- the pr number
 
 Example usage:
 
 ```
-helm.deployChart('dev', 'myregistry.mydockerhub.com', 'ffc-demo-web', 'pr53')
+helm.deployChart('dev', 'myregistry.mydockerhub.com', 'ffc-demo-web', 'pr53', '53')
 ```
 
 ## undeployChart
