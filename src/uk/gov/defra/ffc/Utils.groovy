@@ -125,7 +125,7 @@ class Utils implements Serializable {
       def configValues = [:]
 
       queues.each {
-        configValues["container.${it}QueueAddress"] = Provision.getPrQueueName(repoName, pr, it)
+        configValues["container.${it}QueueAddress"] = "${Provision.getPrQueueName(repoName, pr, it)}"
       }
       return configValues
     }
