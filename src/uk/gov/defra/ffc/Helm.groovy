@@ -18,7 +18,7 @@ class Helm implements Serializable {
   static def getHelmValuesKeys(ctx, helmValuesFileLocation) {
     def helmValuesKeys = ctx.sh(returnStdout: true, script:"yq r $helmValuesFileLocation --printMode p \"**\"").trim()
     // yq outputs arrays elements as .[ but the --set syntax for the helm command doesn't use the dot so remove it
-    ctx.echo("total keys: ${helmValuesKeys.size()}")
+    ctx.echo("total keys: ${helmValuesKeys.tokenize('\n').size()}")
     return helmValuesKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
   }
 
