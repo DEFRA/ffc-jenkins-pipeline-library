@@ -35,7 +35,7 @@ class Helm implements Serializable {
     return helmValuesKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
   }
 
-  static def deployChart(ctx, environment, registry, chartName, tag) {
+  static def deployChart(ctx, environment, registry, chartName, tag, pr) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
         def deploymentName = "$chartName-$tag"
@@ -53,7 +53,7 @@ class Helm implements Serializable {
         // TODO: Set PR specific provisioned resources
         def hardcodedTestValues = configItemsToSetString([ 'container.claimQueueAddress': 'ffc-demo-claim-service-pr136-claim',  'container.scheduleQueueAddress': 'ffc-demo-claim-service-pr136-schedule', 'container.calculationQueueAddress': 'ffc-demo-claim-service-pr136-calculation' ])
         ctx.echo("TEST VALUES: $hardcodedTestValues")
-        def prProvisionedValues = configItemsToSetString(Utils.getProvisionedQueueConfigValues(ctx, chartName, tag))
+        def prProvisionedValues = configItemsToSetString(Utils.getProvisionedQueueConfigValues(ctx, chartName, pr))
         ctx.echo("PR VALUES: $prProvisionedValues")
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
