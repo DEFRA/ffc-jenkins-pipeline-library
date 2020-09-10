@@ -11,20 +11,6 @@ class Helm implements Serializable {
     ctx.sh('helm repo update')
   }
 
-  static def getExtraCommands(tag) {
-    return "--set labels.version=$tag --install --atomic --version=$tag"
-  }
-
-  static def getPrCommands(registry, chartName, tag, buildNumber) {
-    def flags = [
-      /image=$registry\/$chartName:$tag/,
-      /namespace=$chartName-$tag/,
-      /pr=$tag/,
-      /deployment.redeployOnChange=$tag-$buildNumber/
-      ].join(',')
-    return "--set $flags"
-  }
-
   static def configItemsToSetString(configItems) {
     return configItems.size() > 0 ? ("--set " + configItems.collect { "$it.key=$it.value" }.join(',')) : ''
   }
@@ -32,34 +18,8 @@ class Helm implements Serializable {
   static def getHelmValuesKeys(ctx, helmValuesFileLocation) {
     def helmValuesKeys = ctx.sh(returnStdout: true, script:"yq r $helmValuesFileLocation --printMode p \"**\"").trim()
     // yq outputs arrays elements as .[ but the --set syntax for the helm command doesn't use the dot so remove it
+    ctx.echo("total keys: ${helmValuesKeys.size()}")
     return helmValuesKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
-  }
-
-  static def deployChart(ctx, environment, registry, chartName, tag, pr) {
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
-      ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
-        def deploymentName = "$chartName-$tag"
-        def extraCommands = getExtraCommands(tag)
-        def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
-
-        def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
-        def appConfigPrefix = environment + '/'
-        def defaultConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
-        def chartValues = Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName)
-        if (pr != '' && chartValues['postgresService.postgresDb']) {
-          ctx.echo("** is a PR with a database **")
-          chartValues['postgresService.postgresSchema'] = Provision.getSchemaName(chartName, pr)
-        }
-        def defaultConfigValuesChart = configItemsToSetString(chartValues)
-        def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
-        def prConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
-
-        ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-        ctx.echo('Running helm upgrade, console output suppressed')
-        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
-        writeUrlIfIngress(ctx, deploymentName)
-      }
-    }
   }
 
   static def undeployChart(ctx, environment, chartName, tag) {
@@ -112,6 +72,53 @@ class Helm implements Serializable {
       }
     }
   }
+
+  static def getExtraCommands(tag) {
+    return "--set labels.version=$tag --install --atomic --version=$tag"
+  }
+
+  static def getPrCommands(registry, chartName, tag, buildNumber) {
+    def flags = [
+      /image=$registry\/$chartName:$tag/,
+      /namespace=$chartName-$tag/,
+      /pr=$tag/,
+      /deployment.redeployOnChange=$tag-$buildNumber/
+      ].join(',')
+    return "--set $flags"
+  }
+
+  static def deployChart(ctx, environment, registry, chartName, tag, pr) {
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
+      ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+        def deploymentName = "$chartName-$tag"
+        def extraCommands = getExtraCommands(tag)
+        def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
+
+        def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
+        def appConfigPrefix = environment + '/'
+        def defaultConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
+        def chartValues = Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName)
+        if (pr != '' && chartValues['postgresService.postgresDb']) {
+          ctx.echo("** is a PR with a database **")
+          chartValues['postgresService.postgresSchema'] = Provision.getSchemaName(chartName, pr)
+        }
+        def defaultConfigValuesChart = configItemsToSetString(chartValues)
+        def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
+        def prConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
+
+        ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
+        ctx.echo('Running helm upgrade, console output suppressed')
+        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prCommands $extraCommands")
+        writeUrlIfIngress(ctx, deploymentName)
+      }
+    }
+  }
+
+// helm upgrade --install --atomic
+// --version=$tag --namespace=$deploymentName
+// --set labels.version=$tag
+// 
+// $deploymentName ./helm/$chartName
 
   static def deployRemoteChart(ctx, environment, namespace, chartName, chartVersion) {
     ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
