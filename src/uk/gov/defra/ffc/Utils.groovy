@@ -119,17 +119,16 @@ class Utils implements Serializable {
   }
 
   static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
+    def configValues = [:]
     def filePath = 'provision.azure.yaml'
     if (Provision.hasResourcesToProvision(ctx, filePath)) {
       def queues = Provision.readManifest(ctx, filePath, 'queues')
-      def configValues = [:]
 
       queues.each {
         configValues["container.${it}QueueAddress"] = "${Provision.getPrQueueName(repoName, pr, it)}"
       }
-      return configValues
     }
-    return ''
+    return configValues
   }
 
   static def getProvisionedDbSchemaConfigValues(ctx, repoName, pr) {
