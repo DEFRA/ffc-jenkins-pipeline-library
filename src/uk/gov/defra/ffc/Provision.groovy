@@ -177,7 +177,21 @@ class Provision implements Serializable {
     }
   }
 
-  static def getBuildQueueEnvVars(ctx, repoName, pr) {
+  static def getBuildQueueEnvVars(ctx, repoName, pr, environment) {
+    // There is a single set of keys for the message queue host (as there is
+    // only one). The keys are set to the `dev` env. If the PR env was to use a
+    // different message queue host it would be checked here and
+    // `appConfigPrefix` updated accordingly.
+    def appConfigPrefix = environment + '/'
+    def messageQueueHost = 'container.messageQueueHost'
+    def messageQueuePassword = 'container.messageQueuePassword'
+    def messageQueueUser = 'container.messageQueueUser'
+    def searchKeys = [
+      messageQueueHost,
+      messageQueuePassword,
+      messageQueueUser
+    ]
+    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
     def envVars = []
     def filePath = './provision.azure.yaml'
 
@@ -187,6 +201,9 @@ class Provision implements Serializable {
         envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
       }
     }
+    envVars.push("MESSAGE_QUEUE_HOST=${appConfigValues[messageQueueHost]}")
+    envVars.push("MESSAGE_QUEUE_PASSWORD=${appConfigValues[messageQueuePassword]}")
+    envVars.push("MESSAGE_QUEUE_USER=${appConfigValues[messageQueueUser]}")
     ctx.echo("buildQueueEnvVars: ${envVars}")
     return envVars
   }

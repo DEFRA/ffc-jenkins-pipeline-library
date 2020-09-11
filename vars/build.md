@@ -52,18 +52,19 @@ By convention tests write results out to the folder `test-output`.
 JUnit tests are published to Jenkins from the file `test-output/junit.xml`, and
 the contents of `test-output` are removed after tests are published.
 
-Takes five parameters:
+Takes six parameters:
 - project name, e.g. `ffc-demo-web`
 - service name to run from the project's docker-compose configuration e.g.
   `app`
 - build number
 - tag
 - pr
+- environment
 
 Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
-build.runTests('ffc-demo-web', 'app', BUILD_NUMBER, tag, pr)
+build.runTests('ffc-demo-web', 'app', BUILD_NUMBER, tag, pr, environment)
 ```
 
 ## buildTestImage
