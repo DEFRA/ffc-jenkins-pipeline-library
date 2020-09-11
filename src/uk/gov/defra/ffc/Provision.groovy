@@ -177,6 +177,20 @@ class Provision implements Serializable {
     }
   }
 
+  static def getBuildQueueEnvVars(ctx, repoName, pr) {
+    def envVars = []
+    def filePath = './provision.azure.yaml'
+
+    if(hasResourcesToProvision(ctx, filePath)) {
+      def queues = readManifest(ctx, filePath, 'queues')
+      queues.each {
+        envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+      }
+    }
+    ctx.echo("buildQueueEnvVars: ${envVars}")
+    return envVars
+  }
+
   private static def createQueue(ctx, queueName) {
     validateQueueName(queueName)
     def azCommand = 'az servicebus queue create'

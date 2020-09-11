@@ -12,7 +12,9 @@ class Tests implements Serializable {
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml run database-up")
         }
-        ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
+        ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr)) {
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
+        }
       } finally {
         ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
