@@ -1,6 +1,8 @@
 package uk.gov.defra.ffc
 
 class Provision implements Serializable {
+  static String azureProvisionConfigFile = './provision.azure.yaml'
+
   static def createResources(ctx, environment, repoName, pr) {
     createAzureResources(ctx, environment, repoName, pr)
     createPrDatabase(ctx, environment, repoName, pr)
@@ -11,7 +13,7 @@ class Provision implements Serializable {
   }
 
   static def createAzureResources(ctx, environment, repoName, pr) {
-    def filePath = './provision.azure.yaml'
+    def filePath = azureProvisionConfigFile
     if(hasResourcesToProvision(ctx, filePath)) {
       deletePrResources(ctx, environment, repoName, pr)
       createAllResources(ctx, filePath, repoName, pr)
@@ -193,7 +195,7 @@ class Provision implements Serializable {
     ]
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
     def envVars = []
-    def filePath = './provision.azure.yaml'
+    def filePath = azureProvisionConfigFile
 
     if(hasResourcesToProvision(ctx, filePath)) {
       def queues = readManifest(ctx, filePath, 'queues')
