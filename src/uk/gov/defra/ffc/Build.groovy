@@ -79,7 +79,7 @@ class Build implements Serializable {
     try {
       ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.snyk.yaml up")
     } finally {
-      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber  -f docker-compose.snyk.yaml down -v")
+      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.snyk.yaml down -v")
     }
   }
 
