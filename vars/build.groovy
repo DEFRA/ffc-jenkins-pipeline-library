@@ -26,8 +26,8 @@ def npmAudit(auditLevel, logType, failOnIssues, containerImage, containerWorkDir
   Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir)
 }
 
-def extractSynkFiles(projectName) {
-  Build.extractSynkFiles(this, projectName)
+def extractSynkFiles(projectName, buildNumber, tag) {
+  Build.extractSynkFiles(this, projectName, buildNumber, tag)
 }
 
 def snykTest(failOnIssues, organisation, severity, targetFile = '') {

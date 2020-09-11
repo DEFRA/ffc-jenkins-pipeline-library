@@ -52,16 +52,17 @@ By convention tests write results out to the folder `test-output`.
 JUnit tests are published to Jenkins from the file `test-output/junit.xml`, and
 the contents of `test-output` are removed after tests are published.
 
-Takes three parameters:
+Takes four parameters:
 - project name, e.g. `ffc-demo-web`
 - service name to run from the project's docker-compose configuration e.g.
   `app`
 - build number
+- tag
 
 Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
-build.runTests('ffc-demo-web', 'app', BUILD_NUMBER)
+build.runTests('ffc-demo-web', 'app', BUILD_NUMBER, tag)
 ```
 
 ## buildTestImage
@@ -69,16 +70,17 @@ build.runTests('ffc-demo-web', 'app', BUILD_NUMBER)
 Builds the test image using the docker-compose files in the repository. By
 convention the services are named the same as the image.
 
-Takes four parameters:
+Takes five parameters:
 - the ID of the docker registry credentials previously set up in Jenkins
 - registry URL without the protocol
 - project name, e.g. `ffc-demo-web`
 - build number
+- tag
 
 Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
-build.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', BUILD_NUMBER)
+build.buildTestImage('myRegCreds', 'myregistry.mydockerhub.com', 'ffc-demo-web', BUILD_NUMBER, tag)
 ```
 
 ## npmAudit
@@ -115,12 +117,29 @@ build.npmAudit('critical', null, false)
 A utility method to run a docker-compose file to move files required by Snyk from a built container
 image to the local file system.
 
+
+Takes three parameters:
+- project name, e.g. `ffc-demo-payment-service-core`
+- build number
+- tag
+
 This is currently used in the [buildDotNetCore](buildDotNetCore.groovy) script to copy assets from the container
 so Snyk may analyse the project.
 
 The method expects a file named `docker-compose.snyk.yaml` to be present in the project to extract any required
-files to the correct location. As well as extract the required file they should be made writable by the Jenkins
-use to enable cleanup.
+files to the correct location. 
+
+As well as extracting the required files the `docker-compose.snyk.yaml` should ensure the files writable by the Jenkins user to enable cleanup. 
+
+Depending on the files extracted, and the location they are written too, the target folders may need
+their permissions changing.
+
+Example usage:
+
+```
+sh("chmod 777 ${config.project}/obj || mkdir -p -m 777 ${config.project}/obj")
+build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
+```
 
 ## snykTest
 
