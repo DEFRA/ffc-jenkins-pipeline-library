@@ -52,17 +52,18 @@ By convention tests write results out to the folder `test-output`.
 JUnit tests are published to Jenkins from the file `test-output/junit.xml`, and
 the contents of `test-output` are removed after tests are published.
 
-Takes four parameters:
+Takes five parameters:
 - project name, e.g. `ffc-demo-web`
 - service name to run from the project's docker-compose configuration e.g.
   `app`
 - build number
 - tag
+- pr
 
 Example usage, using the Jenkins global variable `BUILD_NUMBER` as the suffix:
 
 ```
-build.runTests('ffc-demo-web', 'app', BUILD_NUMBER, tag)
+build.runTests('ffc-demo-web', 'app', BUILD_NUMBER, tag, pr)
 ```
 
 ## buildTestImage
@@ -127,9 +128,9 @@ This is currently used in the [buildDotNetCore](buildDotNetCore.groovy) script t
 so Snyk may analyse the project.
 
 The method expects a file named `docker-compose.snyk.yaml` to be present in the project to extract any required
-files to the correct location. 
+files to the correct location.
 
-As well as extracting the required files the `docker-compose.snyk.yaml` should ensure the files writable by the Jenkins user to enable cleanup. 
+As well as extracting the required files the `docker-compose.snyk.yaml` should ensure the files writable by the Jenkins user to enable cleanup.
 
 Depending on the files extracted, and the location they are written too, the target folders may need
 their permissions changing.

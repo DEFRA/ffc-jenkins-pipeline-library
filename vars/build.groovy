@@ -14,8 +14,8 @@ def buildTestImage(credentialsId, registry, projectName, buildNumber, tag) {
   Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, tag)
 }
 
-def runTests(projectName, serviceName, buildNumber, tag) {
-  Tests.runTests(this, projectName, serviceName, buildNumber, tag)
+def runTests(projectName, serviceName, buildNumber, tag, pr) {
+  Tests.runTests(this, projectName, serviceName, buildNumber, tag, pr)
 }
 
 def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
