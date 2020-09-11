@@ -204,7 +204,6 @@ class Provision implements Serializable {
     envVars.push("MESSAGE_QUEUE_HOST=${appConfigValues[messageQueueHost]}")
     envVars.push("MESSAGE_QUEUE_PASSWORD=${appConfigValues[messageQueuePassword]}")
     envVars.push("MESSAGE_QUEUE_USER=${appConfigValues[messageQueueUser]}")
-    ctx.echo("buildQueueEnvVars: ${envVars}")
     return envVars
   }
 
