@@ -1,7 +1,5 @@
 package uk.gov.defra.ffc
 
-import uk.gov.defra.ffc.Utils
-
 class Deploy implements Serializable {
   static def trigger(ctx, jenkinsUrl, repoName, token, params) {
     def folder = Utils.getFolder(ctx)

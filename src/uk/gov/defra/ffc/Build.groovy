@@ -1,8 +1,5 @@
 package uk.gov.defra.ffc
 
-import uk.gov.defra.ffc.GitHubStatus
-import uk.gov.defra.ffc.Utils
-
 class Build implements Serializable {
   /**
    * If the build is a branch with a Pull Request (PR), or the master branch a

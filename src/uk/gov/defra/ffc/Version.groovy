@@ -1,8 +1,5 @@
 package uk.gov.defra.ffc
 
-import uk.gov.defra.ffc.GitHubStatus
-import uk.gov.defra.ffc.Utils
-
 class Version implements Serializable {
   /**
    * Returns the project version from the `[projectName].csproj` file in the master

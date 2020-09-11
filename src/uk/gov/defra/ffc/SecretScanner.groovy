@@ -1,7 +1,5 @@
 package uk.gov.defra.ffc
 
-import uk.gov.defra.ffc.Notifications
-
 class SecretScanner implements Serializable {
   private static def runTruffleHog(ctx, dockerImgName, repoName, excludeStrings, commitShas=null) {
     // truffleHog seems to alway exit with code 1 even though it appears to run fine

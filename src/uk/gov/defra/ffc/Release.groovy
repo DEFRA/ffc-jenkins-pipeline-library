@@ -1,8 +1,5 @@
 package uk.gov.defra.ffc
 
-import uk.gov.defra.ffc.Release
-import uk.gov.defra.ffc.Utils
-
 class Release implements Serializable {
   /**
    * Checks GitHub to determine if a given Release Tag already exists for that repo.
