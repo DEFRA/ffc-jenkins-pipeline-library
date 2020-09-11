@@ -11,7 +11,7 @@ class Provision implements Serializable {
   }
 
   static def createAzureResources(ctx, environment, repoName, pr) {
-    def filePath = 'provision.azure.yaml'
+    def filePath = './provision.azure.yaml'
     if(hasResourcesToProvision(ctx, filePath)) {
       deletePrResources(ctx, environment, repoName, pr)
       createAllResources(ctx, filePath, repoName, pr)
