@@ -75,8 +75,12 @@ class Build implements Serializable {
     }
   }
 
-  static def extractSynkFiles(ctx, projectName) {
-    ctx.sh('docker-compose -f docker-compose.snyk.yaml up')
+  static def extractSynkFiles(ctx, projectName, buildNumber, tag) {
+    try {
+      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.snyk.yaml up")
+    } finally {
+      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.snyk.yaml down -v")
+    }
   }
 
   static def snykTest(ctx, failOnIssues, organisation, severity, targetFile) {
