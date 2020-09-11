@@ -195,10 +195,9 @@ class Provision implements Serializable {
     ]
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
     def envVars = []
-    def filePath = azureProvisionConfigFile
 
-    if(hasResourcesToProvision(ctx, filePath)) {
-      def queues = readManifest(ctx, filePath, 'queues')
+    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
       queues.each {
         envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
       }

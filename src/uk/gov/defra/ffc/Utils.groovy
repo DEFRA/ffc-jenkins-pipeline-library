@@ -120,7 +120,7 @@ class Utils implements Serializable {
 
   static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
     def configValues = [:]
-    def filePath = Utils.azureProvisionConfigFile
+    def filePath = Provision.azureProvisionConfigFile
     if (Provision.hasResourcesToProvision(ctx, filePath)) {
       def queues = Provision.readManifest(ctx, filePath, 'queues')
 
