@@ -1,7 +1,5 @@
 package uk.gov.defra.ffc
 
-import uk.gov.defra.ffc.Utils
-
 class Database implements Serializable {
   private static def runPsqlCommand(ctx, dbHost, dbUser, dbName, sqlCmd) {
     ctx.sh(returnStdout: true, script: "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\"")

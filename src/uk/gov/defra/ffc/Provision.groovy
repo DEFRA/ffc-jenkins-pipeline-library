@@ -1,6 +1,8 @@
 package uk.gov.defra.ffc
 
 class Provision implements Serializable {
+  static String azureProvisionConfigFile = './provision.azure.yaml'
+
   static def createResources(ctx, environment, repoName, pr) {
     createAzureResources(ctx, environment, repoName, pr)
     createPrDatabase(ctx, environment, repoName, pr)
@@ -11,10 +13,9 @@ class Provision implements Serializable {
   }
 
   static def createAzureResources(ctx, environment, repoName, pr) {
-    def filePath = 'provision.azure.yaml'
-    if(hasResourcesToProvision(ctx, filePath)) {
+    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       deletePrResources(ctx, environment, repoName, pr)
-      createAllResources(ctx, filePath, repoName, pr)
+      createAllResources(ctx, azureProvisionConfigFile, repoName, pr)
     }
   }
 
@@ -151,6 +152,14 @@ class Provision implements Serializable {
     ]
   }
 
+  static def getProvisionedDbSchemaConfigValues(ctx, repoName, pr) {
+    def configValues = [:]
+    if (ctx.fileExists( './docker-compose.migrate.yaml')) {
+       configValues['postgresService.postgresSchema'] = getSchemaName(repoName, pr)
+    }
+    return configValues
+  }
+
   private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
     def envVars = getCommonPostgresEnvVars(ctx, environment)
     def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
@@ -177,10 +186,52 @@ class Provision implements Serializable {
     }
   }
 
+  static def getBuildQueueEnvVars(ctx, repoName, pr, environment) {
+    // There is a single set of keys for the message queue host (as there is
+    // only one). The keys are set to the `dev` env. If the PR env was to use a
+    // different message queue host it would be checked here and
+    // `appConfigPrefix` updated accordingly.
+    def appConfigPrefix = environment + '/'
+    def messageQueueHost = 'container.messageQueueHost'
+    def messageQueuePassword = 'container.messageQueuePassword'
+    def messageQueueUser = 'container.messageQueueUser'
+    def searchKeys = [
+      messageQueueHost,
+      messageQueuePassword,
+      messageQueueUser
+    ]
+    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
+    def envVars = []
+
+    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
+      queues.each {
+        envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+      }
+    }
+    envVars.push("MESSAGE_QUEUE_HOST=${appConfigValues[messageQueueHost]}")
+    envVars.push("MESSAGE_QUEUE_PASSWORD=${escapeQuotes(appConfigValues[messageQueuePassword])}")
+    envVars.push("MESSAGE_QUEUE_USER=${appConfigValues[messageQueueUser]}")
+    return envVars
+  }
+
   private static def createQueue(ctx, queueName) {
     validateQueueName(queueName)
     def azCommand = 'az servicebus queue create'
     ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
+  }
+
+  static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
+    def configValues = [:]
+
+    if (hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
+
+      queues.each {
+        configValues["container.${it}QueueAddress"] = getPrQueueName(repoName, pr, it)
+      }
+    }
+    return configValues
   }
 
   private static def deletePrResources(ctx, environment, repoName, pr) {

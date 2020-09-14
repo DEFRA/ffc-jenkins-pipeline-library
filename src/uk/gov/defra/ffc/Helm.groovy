@@ -49,8 +49,8 @@ class Helm implements Serializable {
         def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
         def prConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
         def prProvisionedValues = configItemsToSetString(
-          Utils.getProvisionedQueueConfigValues(ctx, chartName, pr) +
-          Utils.getProvisionedDbSchemaConfigValues(ctx, chartName, pr)
+          Provision.getProvisionedQueueConfigValues(ctx, chartName, pr) +
+          Provision.getProvisionedDbSchemaConfigValues(ctx, chartName, pr)
         )
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")

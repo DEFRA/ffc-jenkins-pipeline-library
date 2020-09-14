@@ -1,7 +1,5 @@
 package uk.gov.defra.ffc
 
-import uk.gov.defra.ffc.Utils
-
 class Docker implements Serializable {
   static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
     ctx.docker.withRegistry("https://$registry", credentialsId) {

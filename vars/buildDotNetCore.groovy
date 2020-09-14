@@ -51,7 +51,7 @@ def call(Map config=[:]) {
       }
 
       stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER, tag)
+        build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
       }
 
      stage('Publish pact broker') {
