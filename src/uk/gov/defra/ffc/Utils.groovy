@@ -117,25 +117,4 @@ class Utils implements Serializable {
   static def getUrlStatusCode(ctx, url) {
     return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
   }
-
-  static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
-    def configValues = [:]
-    def filePath = Provision.azureProvisionConfigFile
-    if (Provision.hasResourcesToProvision(ctx, filePath)) {
-      def queues = Provision.readManifest(ctx, filePath, 'queues')
-
-      queues.each {
-        configValues["container.${it}QueueAddress"] = Provision.getPrQueueName(repoName, pr, it)
-      }
-    }
-    return configValues
-  }
-
-  static def getProvisionedDbSchemaConfigValues(ctx, repoName, pr) {
-    def configValues = [:]
-    if (ctx.fileExists( './docker-compose.migrate.yaml')) {
-       configValues['postgresService.postgresSchema'] = Provision.getSchemaName(repoName, pr)
-    }
-    return configValues
-  }
 }

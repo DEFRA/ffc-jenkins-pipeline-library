@@ -153,6 +153,14 @@ class Provision implements Serializable {
     ]
   }
 
+  static def getProvisionedDbSchemaConfigValues(ctx, repoName, pr) {
+    def configValues = [:]
+    if (ctx.fileExists( './docker-compose.migrate.yaml')) {
+       configValues['postgresService.postgresSchema'] = getSchemaName(repoName, pr)
+    }
+    return configValues
+  }
+
   private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
     def envVars = getCommonPostgresEnvVars(ctx, environment)
     def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
@@ -212,6 +220,19 @@ class Provision implements Serializable {
     validateQueueName(queueName)
     def azCommand = 'az servicebus queue create'
     ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
+  }
+
+  static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
+    def configValues = [:]
+
+    if (hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
+
+      queues.each {
+        configValues["container.${it}QueueAddress"] = getPrQueueName(repoName, pr, it)
+      }
+    }
+    return configValues
   }
 
   private static def deletePrResources(ctx, environment, repoName, pr) {
