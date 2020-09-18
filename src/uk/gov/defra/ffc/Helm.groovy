@@ -7,7 +7,10 @@ class Helm implements Serializable {
   }
 
   static def addHelmRepo(ctx, repoName, url) {
-    ctx.sh("helm repo add $repoName $url")
+    // not backwards compatible:
+    ctx.sh("helm repo add --force-update $repoName $url")
+    // backwards compatible implementation:
+    // ctx.sh("helm repo add $repoName $url || echo repo may already exist")
     ctx.sh('helm repo update')
   }
 
