@@ -7,7 +7,7 @@ class Helm implements Serializable {
   }
 
   static def addHelmRepo(ctx, repoName, url) {
-    ctx.sh("helm repo add $repoName $url")
+    ctx.sh("helm repo add --force-update $repoName $url")
     ctx.sh('helm repo update')
   }
 
