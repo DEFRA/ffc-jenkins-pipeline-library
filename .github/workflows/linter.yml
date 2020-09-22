@@ -21,3 +21,8 @@ jobs:
         VALIDATE_ALL_CODEBASE: true
         VALIDATE_BASH: false
         VALIDATE_MD: false
+    - name: Archive report
+      uses: actions/upload-artifact@v2
+      with:
+        name: super-linter-report
+        path: super-linter.report
