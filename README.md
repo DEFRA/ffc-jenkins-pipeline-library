@@ -1,5 +1,7 @@
 # Jenkins pipeline library
 
+[![GitHub Super-Linter](https://github.com/defra/ffc-jenkins-pipeline-library/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+
 ## Overview
 
 Common scripts for use in Jenkins pipelines used in build and deployment.
@@ -235,5 +237,3 @@ includes the list of variables that need to be setup as global properties.
 | `JENKINS_DEPLOY_SITE_ROOT`       | FQDN of Jenkins instance                                                                             | :see_no_evil:                                                       |
 | `SNYK_ORG`                       | Name of Snyk organisation                                                                            | `defra-ffc`                                                         |
 | `HELM_DEPLOYMENT_KEYS_FILENAME`  | Filename in Helm chart directory where deployment keys to pull from Azure App Config are listed      | `deployment-config-keys.txt`                                        |
-
-
