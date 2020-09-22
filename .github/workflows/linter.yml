@@ -18,11 +18,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         OUTPUT_FORMAT: tap
-        VALIDATE_ALL_CODEBASE: true
-        VALIDATE_BASH: false
-        VALIDATE_MD: false
-    - name: Archive report
+        VALIDATE_GROOVY: true
+    - name: Archive report and log
       uses: actions/upload-artifact@v2
       with:
-        name: super-linter-report
-        path: ./super-linter.report
+        name: super-linter-report-and-log
+        path: ./super-linter.*
