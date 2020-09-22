@@ -17,6 +17,7 @@ jobs:
       uses: github/super-linter@v3
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        OUTPUT_FORMAT: tap
         VALIDATE_ALL_CODEBASE: true
         VALIDATE_BASH: false
         VALIDATE_MD: false
