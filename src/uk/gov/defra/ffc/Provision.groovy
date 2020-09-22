@@ -1,5 +1,7 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.Utils
+
 class Provision implements Serializable {
   static String azureProvisionConfigFile = './provision.azure.yaml'
 

@@ -1,5 +1,8 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.GitHubStatus
+import uk.gov.defra.ffc.Utils
+
 class Helm implements Serializable {
 
   static def writeUrlIfIngress(ctx, deploymentName) {
