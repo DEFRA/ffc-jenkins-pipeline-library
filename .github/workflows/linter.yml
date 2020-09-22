@@ -25,4 +25,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: super-linter-report
-        path: super-linter.report
+        path: ./super-linter.report
