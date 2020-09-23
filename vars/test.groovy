@@ -4,8 +4,8 @@ def lintHelm(chartName) {
   Tests.lintHelm(this, chartName)
 }
 
-def runGitHubSuperLinter() {
-  Tests.runGitHubSuperLinter(this)
+def runGitHubSuperLinter(disableErrors) {
+  Tests.runGitHubSuperLinter(this, disableErrors)
 }
 
 def createJUnitReport() {
