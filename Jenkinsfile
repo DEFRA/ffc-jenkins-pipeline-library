@@ -19,7 +19,7 @@ node {
     }
 
     stage('Run GitHub Super-Linter') {
-      test.runGitHubSuperLinter()
+      test.runGitHubSuperLinter(true)
     }
 
     if (pr == '') {
