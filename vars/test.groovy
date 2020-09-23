@@ -4,8 +4,8 @@ def lintHelm(chartName) {
   Tests.lintHelm(this, chartName)
 }
 
-def lintLibrary() {
-  Tests.lintLibrary(this)
+def lintJenkinsLibrary() {
+  Tests.lintJenkinsLibrary(this)
 }
 
 def createJUnitReport() {

@@ -18,8 +18,8 @@ node {
       }
     }
 
-    stage('GitHub Super-Linter') {
-      test.lintLibrary()
+    stage('Run GitHub Super-Linter') {
+      test.lintJenkinsLibrary()
     }
 
     if (pr == '') {

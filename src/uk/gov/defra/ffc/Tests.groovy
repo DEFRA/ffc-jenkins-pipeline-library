@@ -48,7 +48,7 @@ class Tests implements Serializable {
     }
   }
 
-  static def lintLibrary(ctx) {
+  static def lintJenkinsLibrary(ctx) {
     ctx.sh('docker run -e RUN_LOCAL=true -e VALIDATE_GROOVY=true -v $(pwd)/:/tmp/lint github/super-linter')
   }
 
