@@ -4,7 +4,7 @@ def lintHelm(chartName) {
   Tests.lintHelm(this, chartName)
 }
 
-def runGitHubSuperLinter(disableErrors) {
+def runGitHubSuperLinter(disableErrors=false) {
   Tests.runGitHubSuperLinter(this, disableErrors)
 }
 
