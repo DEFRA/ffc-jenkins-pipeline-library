@@ -1,7 +1,5 @@
 # Jenkins pipeline library
 
-[![GitHub Super-Linter](https://github.com/defra/ffc-jenkins-pipeline-library/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/DEFRA/ffc-jenkins-pipeline-library/actions?workflow=Linter)
-
 ## Overview
 
 Common scripts for use in Jenkins pipelines used in build and deployment.
