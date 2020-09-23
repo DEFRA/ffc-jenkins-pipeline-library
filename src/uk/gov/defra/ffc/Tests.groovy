@@ -48,7 +48,7 @@ class Tests implements Serializable {
     }
   }
 
-  static def runGitHubSuperLinter(ctx, disableErrors) {
+  static def runGitHubSuperLinter(ctx, disableErrors=false) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.GitHubSuperLinter.Context, description: GitHubStatus.GitHubSuperLinter.Description) {
       ctx.sh("\$(pwd)/scripts/run-github-super-linter -e DISABLE_ERRORS=$disableErrors")
     }
