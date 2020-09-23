@@ -52,6 +52,15 @@ versions. Therefore in order to fully support multiple versions new branches
 will be required in order for those versions to co-exist. Currently this can be
 achieved manually but will be automated at some point.
 
+## Linting
+
+The library code will be linted using
+[github/super-linter](https://github.com/github/super-linter) when it is
+checked in. It is advisable to run the linter locally prior to checking code
+in, so that the feedback time can be reduced to a minimum. Running the linter
+locally is achieved by executing
+[`run-github-super-linter`](./scripts/run-github-super-linter).
+
 ## Usage
 
 ### Default build configurations
