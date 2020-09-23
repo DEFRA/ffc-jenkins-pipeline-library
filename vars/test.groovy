@@ -4,6 +4,10 @@ def lintHelm(chartName) {
   Tests.lintHelm(this, chartName)
 }
 
+def lintLibrary() {
+  Tests.lintLibrary(this)
+}
+
 def createJUnitReport() {
   Tests.createJUnitReport(this)
 }

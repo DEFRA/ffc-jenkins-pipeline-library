@@ -11,11 +11,18 @@ node {
     stage('Set PR and version variables') {
       (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName))
     }
+
     if (pr != '') {
       stage('Verify version incremented') {
         version.verifyFileIncremented(versionFileName)
       }
-    } else {
+    }
+
+    stage('GitHub Super-Linter') {
+      test.lintLibrary()
+    }
+
+    if (pr == '') {
       stage('Trigger GitHub release') {
         withCredentials([
           string(credentialsId: 'github-auth-token', variable: 'gitToken')
@@ -28,9 +35,6 @@ node {
         }
       }
     }
-    
- 
-
   } catch(e) {
     notifySlack.buildFailure(e.message, '#generalbuildfailures')
     throw e

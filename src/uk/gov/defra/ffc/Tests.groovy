@@ -48,6 +48,10 @@ class Tests implements Serializable {
     }
   }
 
+  static def lintLibrary(ctx) {
+    ctx.sh('docker run -e RUN_LOCAL=true -v \$(pwd)/src/:/tmp/lint github/super-linter')
+  }
+
   static def createJUnitReport(ctx) {
     ctx.junit('test-output/junit.xml')
   }
