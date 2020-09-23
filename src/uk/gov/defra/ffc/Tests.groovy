@@ -49,7 +49,9 @@ class Tests implements Serializable {
   }
 
   static def runGitHubSuperLinter(ctx) {
-    ctx.sh('$(pwd)/scripts/run-github-super-linter.sh')
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.GitHubSuperLinter.Context, description: GitHubStatus.GitHubSuperLinter.Description) {
+      ctx.sh('$(pwd)/scripts/run-github-super-linter.sh')
+    }
   }
 
   static def createJUnitReport(ctx) {
