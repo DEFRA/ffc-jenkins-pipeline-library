@@ -21,6 +21,36 @@ Example usage:
 test.lintHelm('ffc-demo-web')
 ```
 
+## runGitHubSuperLinter
+
+Executes `./scripts/run-github-super-linter` which _should_ be a repository
+specific `docker run` of
+[github/super-linter](https://github.com/github/super-linter). See this repo's
+[`run-github-super-linter`](../scripts/run-github-super-linter) version for an
+example.
+There are several reasons why the script is executed in this way as opposed
+to having the shell command embedded within the Groovy code:
+* There are a lot of configuration options for running Super-Linter and each
+  repo which may want to run it is likely going to have a unique context.
+  Therefore, rather than trying to encapsulate the complexity within the task,
+  the configuration options should be set within the script and each repository
+  can set those independently
+* The same script can be run locally, allowing feedback prior to check-in
+* As the repository changes and adheres to or differs from the linting rules,
+  those changes will be recorded within the repository
+* Few library changes will be required resulting in less maintenance
+
+Takes one parameter:
+- a boolean to determine if errors should be disabled. By default errors are
+  enabled and will return a non-zero exit code, however, if it is desirable for
+  errors to return an exit code of 0 the argument should be set to `true`
+
+Example usage:
+
+```
+test.runGitHubSuperLinter(true)
+```
+
 ## createJUnitReport
 
 Creates a test report using JUnit.

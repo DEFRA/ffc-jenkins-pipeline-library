@@ -52,6 +52,15 @@ versions. Therefore in order to fully support multiple versions new branches
 will be required in order for those versions to co-exist. Currently this can be
 achieved manually but will be automated at some point.
 
+## Linting
+
+The library code will be linted using
+[github/super-linter](https://github.com/github/super-linter) when it is
+checked in. It is advisable to run the linter locally prior to checking code
+in, so that the feedback time can be reduced to a minimum. Running the linter
+locally is achieved by executing
+[`run-github-super-linter`](./scripts/run-github-super-linter).
+
 ## Usage
 
 ### Default build configurations
@@ -235,5 +244,3 @@ includes the list of variables that need to be setup as global properties.
 | `JENKINS_DEPLOY_SITE_ROOT`       | FQDN of Jenkins instance                                                                             | :see_no_evil:                                                       |
 | `SNYK_ORG`                       | Name of Snyk organisation                                                                            | `defra-ffc`                                                         |
 | `HELM_DEPLOYMENT_KEYS_FILENAME`  | Filename in Helm chart directory where deployment keys to pull from Azure App Config are listed      | `deployment-config-keys.txt`                                        |
-
-

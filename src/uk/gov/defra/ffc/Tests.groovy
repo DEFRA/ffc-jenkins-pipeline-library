@@ -1,5 +1,8 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.GitHubStatus
+import uk.gov.defra.ffc.Utils
+
 class Tests implements Serializable {
   static def runTests(ctx, projectName, serviceName, buildNumber, tag, pr, environment) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunTests.Context, description: GitHubStatus.RunTests.Description) {
@@ -42,6 +45,12 @@ class Tests implements Serializable {
       Helm.addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
       ctx.sh("helm dependency update ./helm/$chartName")
       ctx.sh("helm lint ./helm/$chartName")
+    }
+  }
+
+  static def runGitHubSuperLinter(ctx, disableErrors) {
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.GitHubSuperLinter.Context, description: GitHubStatus.GitHubSuperLinter.Description) {
+      ctx.sh("\$(pwd)/scripts/run-github-super-linter -e DISABLE_ERRORS=$disableErrors")
     }
   }
 

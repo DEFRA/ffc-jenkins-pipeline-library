@@ -1,5 +1,7 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.Utils
+
 class Terraform implements Serializable {
   static def String generateTerraformInputVariables(serviceCode, serviceName, serviceType, prCode, queuePurpose, repoName) {
     def Map inputs = [service: [code: serviceCode, name: serviceName, type: serviceType], pr_code: prCode, queue_purpose: queuePurpose, repo_name: repoName];

@@ -22,6 +22,11 @@ class GitHubStatus implements Serializable {
     static final Description = 'Deploy chart'
   }
 
+  class GitHubSuperLinter {
+    static final Context = "${BASECTX}github-super-linter"
+    static final Description = 'Run GitHub Super-Linter'
+  }
+
   class HelmLint {
     static final Context = "${BASECTX}helm-lint"
     static final Description = 'Lint Helm chart'
