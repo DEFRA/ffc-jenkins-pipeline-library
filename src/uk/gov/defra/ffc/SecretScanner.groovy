@@ -4,7 +4,7 @@ class SecretScanner implements Serializable {
   private static def runTruffleHog(ctx, dockerImgName, repoName, excludeStrings, commitShas=null) {
     // truffleHog seems to alway exit with code 1 even though it appears to run fine
     // which fails the build so we need the || true to ignore the exit code and carry on
-    def truffleHogCmd = "docker -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ run $dockerImgName --json https://github.com/${repoName}.git || true"
+    def truffleHogCmd = "docker run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ $dockerImgName --json https://github.com/${repoName}.git || true"
     def truffleHogResults = ctx.sh(returnStdout: true, script: truffleHogCmd)
     def secretMessages = []
 
