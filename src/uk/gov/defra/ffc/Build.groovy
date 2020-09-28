@@ -65,11 +65,9 @@ class Build implements Serializable {
     // setting `returnStatus` means the sh cmd can return non-zero exit codes
     // without affecting the build status
     def script = "docker run --rm -u node " +
-    "--mount type=bind,source=/etc/ssl/certs/,target=/etc/ssl/certs/ " +
-    "--mount type=bind,source=/usr/local/share/ca-certificates/,target=/usr/local/share/ca-certificates/ " +
     "--mount type=bind,source='$ctx.WORKSPACE/package.json',target=$containerWorkDir/package.json " +
     "--mount type=bind,source='$ctx.WORKSPACE/package-lock.json',target=$containerWorkDir/package-lock.json " +
-    "$containerImage npm audit --audit-level=$auditLevel --$logType"
+    "st3v3nhunt/node-dev npm audit --audit-level=$auditLevel --$logType"
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.NpmAudit.Context, description: GitHubStatus.NpmAudit.Description) {
       ctx.sh(returnStatus: !failOnIssues, script: script)
     }
