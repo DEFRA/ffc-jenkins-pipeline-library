@@ -148,7 +148,10 @@ class Tests implements Serializable {
             'ingress.endpoint',
             'ingress.server'
           ]
-          def appConfigPrefix = environment + '/'      
+          def appConfigPrefix = environment + '/'
+          ctx.echo("PREFIX IS: ${appConfigPrefix}")
+          ctx.echo("ENVIRONMENT IS: ${environment}")
+          ctx.echo("REPO IS: ${repoName}")
           def configValuesRepo =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)          
           def configValuesPrefix = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)      
           def hostPrefix = configValuesPrefix['ingress.endpoint']
