@@ -58,7 +58,6 @@ class Build implements Serializable {
     return [repoName, pr, tag, mergedPrNo]
   }
 
-
   static def npmAudit(ctx, auditLevel, logType, failOnIssues, containerImage, containerWorkDir) {
     auditLevel = auditLevel ?: 'moderate'
     logType = logType ?: 'parseable'
@@ -66,6 +65,8 @@ class Build implements Serializable {
     // setting `returnStatus` means the sh cmd can return non-zero exit codes
     // without affecting the build status
     def script = "docker run --rm -u node " +
+    "--mount type=bind,source=/etc/ssl/certs/,target=/etc/ssl/certs/ " +
+    "--mount type=bind,source=/usr/local/share/ca-certificates/,target=/usr/local/share/ca-certificates/ " +
     "--mount type=bind,source='$ctx.WORKSPACE/package.json',target=$containerWorkDir/package.json " +
     "--mount type=bind,source='$ctx.WORKSPACE/package-lock.json',target=$containerWorkDir/package-lock.json " +
     "$containerImage npm audit --audit-level=$auditLevel --$logType"
