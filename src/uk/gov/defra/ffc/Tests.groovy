@@ -85,7 +85,7 @@ class Tests implements Serializable {
       params.each { param ->
         args = args + " -e $param.key=$param.value"
       }
-      def sonarImage = 'defradigital/ffc-dotnet-core-sonar'
+      def sonarImage = 'defradigital/ffc-dotnet-core-sonar:latest'
       ctx.sh("docker rmi --force $sonarImage")
       ctx.sh("docker run -v \$(pwd)/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args $sonarImage")
     }
