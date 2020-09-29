@@ -157,6 +157,7 @@ class Tests implements Serializable {
           ctx.echo("ENDPOINT: ${endpoint}")
           ctx.echo("DOMAIN: ${domain}")
           ctx.echo("HOSTNAME: ${hostname}")
+          ctx.echo("TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}")
           ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}"]) {
           ctx.sh('docker-compose run wdio-cucumber')
           }          
