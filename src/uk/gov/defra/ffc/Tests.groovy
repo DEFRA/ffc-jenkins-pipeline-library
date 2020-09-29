@@ -30,7 +30,7 @@ class Tests implements Serializable {
         try {
           // test-output exists if stage is run after 'runTests', take no risks and create it
           ctx.sh('mkdir -p -m 666 test-output')
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile run zap-baseline-scan")
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ zap-baseline-scan")
         } finally {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile down -v")
         }
@@ -85,9 +85,7 @@ class Tests implements Serializable {
       params.each { param ->
         args = args + " -e $param.key=$param.value"
       }
-      def sonarImage = 'defradigital/ffc-dotnet-core-sonar:latest'
-      ctx.sh("docker rmi --force $sonarImage")
-      ctx.sh("docker run -v \$(pwd)/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args $sonarImage")
+      ctx.sh("docker run -v \$(pwd)/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar:latest")
     }
   }
 
