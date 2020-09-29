@@ -149,11 +149,14 @@ class Tests implements Serializable {
             'ingress.server'
           ]
           def appConfigPrefix = environment + '/'
-          def configValuesRepo =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)
-          def configValuesPrefix = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)
-          def hostPrefix = configValuesRepo['ingress.endpoint']
-          def domain = configValuesPrefix['ingress.server']
-          def hostname = pr == '' ? hostPrefix : "${hostPrefix}-pr${pr}"
+          def endpointConfig =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)
+          def serverConfig = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)
+          def endpoint = endpointConfig['ingress.endpoint']
+          def domain = serverConfig['ingress.server']
+          def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
+          ctx.echo("ENDPOINT: ${endpoint}")
+          ctx.echo("DOMAIN: ${domain}")
+          ctx.echo("HOSTNAME: ${hostname}")
           ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}"]) {
           ctx.sh('docker-compose run wdio-cucumber')
           }          
