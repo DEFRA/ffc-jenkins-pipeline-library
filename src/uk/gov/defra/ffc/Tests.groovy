@@ -136,25 +136,29 @@ class Tests implements Serializable {
     ];
   }
 
-  static def runAcceptanceTests(ctx, pr) {
+  static def runAcceptanceTests(ctx, pr,  environment, repoName) {
     if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
           ctx.dir('./test/acceptance') {
           ctx.sh('mkdir -p -m 777 html-reports')
-            if (pr != '') {
-              ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://ffc-demo-pr${pr}.ffc.snd.azure.defra.cloud"]) {
-                ctx.sh('docker-compose run wdio-cucumber')
-              }
-            } else {
-              ctx.withEnv(['TEST_ENVIRONMENT_ROOT_URL=https://ffc-demo.ffc.snd.azure.defra.cloud']) {
-                ctx.sh('docker-compose run wdio-cucumber')
-              }
-            }
-          }
-        } finally {
-          ctx.sh('docker-compose down -v')
+          def searchKeys = [
+            'ingress.endpoint',
+            'ingress.server'
+          ]
+          def appConfigPrefix = environment + '/'
+          def endpointConfig =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)
+          def serverConfig = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)
+          def endpoint = endpointConfig['ingress.endpoint'].trim()
+          def domain = serverConfig['ingress.server'].trim()
+          def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
+          ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}"]) {
+          ctx.sh('docker-compose run wdio-cucumber')
+          }          
         }
+    } finally {
+          ctx.sh('docker-compose down -v')
+        }         
       }
     } else {
       ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
