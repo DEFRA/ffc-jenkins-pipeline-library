@@ -22,14 +22,14 @@ def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
 
-def npmAudit(auditLevel, logType, failOnIssues, containerImage, containerWorkDir) {
-  Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir)
+def npmAudit(auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr) {
+  Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr)
 }
 
 def extractSynkFiles(projectName, buildNumber, tag) {
   Build.extractSynkFiles(this, projectName, buildNumber, tag)
 }
 
-def snykTest(failOnIssues, organisation, severity, targetFile = '') {
-  Build.snykTest(this, failOnIssues, organisation, severity, targetFile)
+def snykTest(failOnIssues, organisation, severity, targetFile = '', pr) {
+  Build.snykTest(this, failOnIssues, organisation, severity, targetFile, pr)
 }

@@ -95,7 +95,7 @@ or above the build will be failed.
 Issues can be resolved by running
 [`npm audit fix`](https://docs.npmjs.com/cli/audit).
 
-Takes five parameters:
+Takes six parameters:
 - `auditLevel` - level of vulnerabilities at which the audit will fail.
   Default is `moderate`. Suitable options are detailed in the
   [audit docs](https://docs.npmjs.com/cli/audit.html#synopsis)
@@ -107,6 +107,8 @@ Takes five parameters:
 - `containerImage` - name of the container image to use for the npm audit
 - `containerWorkDir` - path to the default working directory of the container
   image
+- `pr` - the pr number of the build or an empty string if the build is for the
+  main branch
 
 Example usage:
 
@@ -149,20 +151,25 @@ Runs
 [snyk test](https://support.snyk.io/hc/en-us/articles/360003812578-CLI-reference)
 against the project. If any issues are identified with a
 [severity](https://support.snyk.io/hc/en-us/articles/360001040078-How-is-a-vulnerability-s-severity-determined-)
-of `medium` or above, the build will be failed.
+of `medium` or above, the build will be failed when running for PR builds only.
+When the step runs on a build of the main branch, only warnings will be
+produced so main branch builds are not blocked, should vulnerabilities have
+been identified since the last changes were made to the main branch.
 
 Details of how to resolve issues are covered within the (internal)
 [Snyk](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1943897107/Snyk#Resolving-issues)
 confluence page. If the page is not accessible, see the documentation on
 [snyk.io](https://support.snyk.io/hc/en-us/articles/360003891038-Fix-your-vulnerabilities).
 
-Takes four parameters, the last one being optional:
+Takes five parameters, with `targetFile` being optional:
 - `failOnIssues` - should the job fail when issues are detected. Default is
   `true`
 - `organisation` - against which the report should be recorded. Default is the
   env var `SNYK_ORG`
 - `severity` - of issues to be reported. Default is `medium`
-- `targetFile` - name of file to analyse
+- `targetFile` - [optional] name of file to analyse
+- `pr` - the pr number of the build or an empty string if the build is for the
+  main branch
 
 ```
 build.snykTest(true, 'my-org-name', 'low')
