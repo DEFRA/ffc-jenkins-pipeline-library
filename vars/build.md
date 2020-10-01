@@ -107,7 +107,7 @@ Takes six parameters:
 - `containerImage` - name of the container image to use for the npm audit
 - `containerWorkDir` - path to the default working directory of the container
   image
-- `pr` - the pr number of the build or an empty string if the build for for the
+- `pr` - the pr number of the build or an empty string if the build is for the
   main branch
 
 Example usage:
@@ -152,9 +152,9 @@ Runs
 against the project. If any issues are identified with a
 [severity](https://support.snyk.io/hc/en-us/articles/360001040078-How-is-a-vulnerability-s-severity-determined-)
 of `medium` or above, the build will be failed when running for PR builds only.
-When the step runs on a build of the main branch only warnings will be produced
-so the main branch builds are not blocked, should vulnerabilities have been
-identified since the last changes were made to the main branch.
+When the step runs on a build of the main branch, only warnings will be
+produced so main branch builds are not blocked, should vulnerabilities have
+been identified since the last changes were made to the main branch.
 
 Details of how to resolve issues are covered within the (internal)
 [Snyk](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1943897107/Snyk#Resolving-issues)
@@ -168,7 +168,7 @@ Takes five parameters, with `targetFile` being optional:
   env var `SNYK_ORG`
 - `severity` - of issues to be reported. Default is `medium`
 - `targetFile` - [optional] name of file to analyse
-- `pr` - the pr number of the build or an empty string if the build for for the
+- `pr` - the pr number of the build or an empty string if the build is for the
   main branch
 
 ```
