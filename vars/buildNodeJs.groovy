@@ -33,7 +33,7 @@ def call(Map config=[:]) {
       }
 
       stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder)
+        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
       }
 
       stage('Snyk test') {

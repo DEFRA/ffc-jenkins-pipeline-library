@@ -22,8 +22,8 @@ def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
 
-def npmAudit(auditLevel, logType, failOnIssues, containerImage, containerWorkDir) {
-  Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir)
+def npmAudit(auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr) {
+  Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr)
 }
 
 def extractSynkFiles(projectName, buildNumber, tag) {

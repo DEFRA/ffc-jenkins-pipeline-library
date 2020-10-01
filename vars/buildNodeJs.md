@@ -15,7 +15,8 @@ buildNodeJs environment: 'dev'
 
 By default an [npm audit](https://docs.npmjs.com/cli/audit) will run for every
 build. If any issues are identified at a level of `moderate` or above the build
-will be marked as failed.
+will be marked as failed for PR builds only. When the step runs during a build
+of the main branch it will warn only.
 
 The job has been setup to allow several options to be configured, details of
 those options are available in [build](build.md). In order to override the
@@ -33,8 +34,8 @@ will run during the build. This is achieved through the use of the
 [snyk security scanner](https://plugins.jenkins.io/snyk-security-scanner/)
 plugin for Jenkins.
 The default settings will fail the build when an issue of `medium` or above is
-identified on PRs only. When step runs during a build of the main branch it
-will warn only.
+identified on PR builds only. When the step runs during a build of the main
+branch it will warn only.
 The job has been setup to allow several options to be configured, details of
 those options are available in [build](build.md). In order to override the
 options from the `buildNodeJs` pipeline the config object requires the keys

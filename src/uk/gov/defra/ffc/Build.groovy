@@ -58,11 +58,19 @@ class Build implements Serializable {
     return [repoName, pr, tag, mergedPrNo]
   }
 
+  static def shouldFailOnIssues(failOnIssues, pr) {
+    def shouldFail = failOnIssues == false ? false : true
+    // Override the flag if the build is a non-PR build
+    if (pr == '') {
+      shouldFail = false
+    }
+    return shouldFail
+  }
 
-  static def npmAudit(ctx, auditLevel, logType, failOnIssues, containerImage, containerWorkDir) {
+  static def npmAudit(ctx, auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr) {
     auditLevel = auditLevel ?: 'moderate'
     logType = logType ?: 'parseable'
-    failOnIssues = failOnIssues == false ? false : true
+    failOnIssues = shouldFailOnIssues(failOnIssues, pr)
     // setting `returnStatus` means the sh cmd can return non-zero exit codes
     // without affecting the build status
     def script = "docker run --rm -u node " +
@@ -83,11 +91,7 @@ class Build implements Serializable {
   }
 
   static def snykTest(ctx, failOnIssues, organisation, severity, targetFile, pr) {
-    failOnIssues = failOnIssues == false ? false : true
-    // do not fail on issues for non-PR builds
-    if (pr == '') {
-      failOnIssues = false
-    }
+    failOnIssues = shouldFailOnIssues(failOnIssues, pr)
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
