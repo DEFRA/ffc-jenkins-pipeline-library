@@ -149,7 +149,10 @@ Runs
 [snyk test](https://support.snyk.io/hc/en-us/articles/360003812578-CLI-reference)
 against the project. If any issues are identified with a
 [severity](https://support.snyk.io/hc/en-us/articles/360001040078-How-is-a-vulnerability-s-severity-determined-)
-of `medium` or above, the build will be failed.
+of `medium` or above, the build will be failed when running for PR builds only.
+When the step runs on a build of the main branch only warnings will be produced
+so the main branch builds are not blocked, should vulnerabilities have been
+identified since the last changes were made to the main branch.
 
 Details of how to resolve issues are covered within the (internal)
 [Snyk](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1943897107/Snyk#Resolving-issues)

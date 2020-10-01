@@ -30,6 +30,6 @@ def extractSynkFiles(projectName, buildNumber, tag) {
   Build.extractSynkFiles(this, projectName, buildNumber, tag)
 }
 
-def snykTest(failOnIssues, organisation, severity, targetFile = '') {
-  Build.snykTest(this, failOnIssues, organisation, severity, targetFile)
+def snykTest(failOnIssues, organisation, severity, targetFile = '', pr) {
+  Build.snykTest(this, failOnIssues, organisation, severity, targetFile, pr)
 }

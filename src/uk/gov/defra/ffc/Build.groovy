@@ -82,8 +82,12 @@ class Build implements Serializable {
     }
   }
 
-  static def snykTest(ctx, failOnIssues, organisation, severity, targetFile) {
+  static def snykTest(ctx, failOnIssues, organisation, severity, targetFile, pr) {
     failOnIssues = failOnIssues == false ? false : true
+    // do not fail on issues for non-PR builds
+    if (pr == '') {
+      failOnIssues = false
+    }
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {

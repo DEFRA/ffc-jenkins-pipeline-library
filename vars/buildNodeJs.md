@@ -33,7 +33,8 @@ will run during the build. This is achieved through the use of the
 [snyk security scanner](https://plugins.jenkins.io/snyk-security-scanner/)
 plugin for Jenkins.
 The default settings will fail the build when an issue of `medium` or above is
-identified.
+identified on PRs only. When step runs during a build of the main branch it
+will warn only.
 The job has been setup to allow several options to be configured, details of
 those options are available in [build](build.md). In order to override the
 options from the `buildNodeJs` pipeline the config object requires the keys
