@@ -6,7 +6,7 @@
             GRANT ALL PRIVILEGES ON SCHEMA ${schemaName} TO "${roleName}";
         </sql>
         <rollback>
-        <sql dbms="postgresql" endDelimiter=";">
+          <sql dbms="postgresql" endDelimiter=";">
             DROP SCHEMA IF EXISTS ${schemaName} CASCADE;
             </sql>
         </rollback>
