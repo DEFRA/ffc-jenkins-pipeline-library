@@ -46,7 +46,7 @@ def call(Map config=[:]) {
           // ensure obj folder exists and is writable by all
           sh("chmod 777 ${config.project}/obj || mkdir -p -m 777 ${config.project}/obj")
           build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
-          build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln")
+          build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln", pr)
         }
       }
 
