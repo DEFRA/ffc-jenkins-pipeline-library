@@ -6,26 +6,59 @@ class Provision implements Serializable {
   static String azureProvisionConfigFile = './provision.azure.yaml'
 
   static def createResources(ctx, environment, repoName, pr) {
-    createAzureResources(ctx, environment, repoName, pr)
+    deletePrResources(ctx, environment, repoName, pr)
+    createQueues(ctx, environment, repoName, pr)
     createPrDatabase(ctx, environment, repoName, pr)
+  }
+
+  private static def deletePrResources(ctx, environment, repoName, pr) {
+    deleteQueues(ctx, "$repoName-pr$pr-")
+    deletePrDatabase(ctx, environment, repoName, pr)
+  }
+
+  private static def deleteQueues(ctx, prefix) {
+    def queues = listExistingQueues(ctx, prefix)
+    queues.each {
+      ctx.sh("az servicebus queue delete ${getResGroupAndNamespace(ctx)} --name $it")
+    }
+  }
+
+  private static def deletePrDatabase(ctx, environment, repoName, pr) {
+    if (pr != '' && repoHasMigration(ctx, repoName)) {
+      def migrationFolder = 'migrations'
+      getMigrationFiles(ctx, migrationFolder)
+
+      ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
+        ctx.dir(migrationFolder) {
+           // removing the schema removes the database migrations within that schema, so is unneccessary to rollback migrations
+           ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
+        }
+      }
+    }
+  }
+
+  private static def listExistingQueues(ctx, prefix) {
+    def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
+    def script = "az servicebus queue list ${getResGroupAndNamespace(ctx)} | $jqCommand"
+    def queueNames = ctx.sh(returnStdout: true, script: script).trim()
+    return queueNames.tokenize('\n')
+  }
+
+  static def createQueues(ctx, environment, repoName, pr) {
+    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {      
+      createAllQueues(ctx, azureProvisionConfigFile, repoName, pr)
+    }
   }
 
   static def hasResourcesToProvision(ctx, filePath) {
     return ctx.fileExists(filePath)
-  }
-
-  static def createAzureResources(ctx, environment, repoName, pr) {
-    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
-      deletePrResources(ctx, environment, repoName, pr)
-      createAllResources(ctx, azureProvisionConfigFile, repoName, pr)
-    }
-  }
+  }  
 
   static def deleteBuildResources(ctx, repoName, pr) {
     deleteQueues(ctx, getBuildQueuePrefix(ctx, repoName, pr))
   }
 
-  private static def createAllResources(ctx, filePath, repoName, pr) {
+  private static def createAllQueues(ctx, filePath, repoName, pr) {
     def queues = readManifest(ctx, filePath, 'queues')
     createQueues(ctx, queues, repoName, pr)
   }
@@ -35,6 +68,91 @@ class Provision implements Serializable {
     if(pr != '') {
       createPrQueues(ctx, queues, repoName, pr)
     }
+  }
+
+  private static def createPrQueues(ctx, queues, repoName, pr) {
+    queues.each {
+      createQueue(ctx, getPrQueueName(repoName, pr, it))
+    }
+  }
+
+  static def getPrQueueName(repoName, pr, queueName) {
+    return "$repoName-pr$pr-$queueName"
+  }
+
+  private static def createBuildQueues(ctx, queues, repoName, pr) {
+    queues.each {
+      createQueue(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+    }
+  }
+
+  static def getBuildQueueEnvVars(ctx, repoName, pr, environment) {
+    // There is a single set of keys for the message queue host (as there is
+    // only one). The keys are set to the `dev` env. If the PR env was to use a
+    // different message queue host it would be checked here and
+    // `appConfigPrefix` updated accordingly.
+    def appConfigPrefix = environment + '/'
+    def messageQueueHost = 'container.messageQueueHost'
+    def messageQueuePassword = 'container.messageQueuePassword'
+    def messageQueueUser = 'container.messageQueueUser'
+    def searchKeys = [
+      messageQueueHost,
+      messageQueuePassword,
+      messageQueueUser
+    ]
+    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
+    def envVars = []
+
+    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
+      queues.each {
+        envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+      }
+    }
+    envVars.push("MESSAGE_QUEUE_HOST=${appConfigValues[messageQueueHost]}")
+    envVars.push("MESSAGE_QUEUE_PASSWORD=${escapeQuotes(appConfigValues[messageQueuePassword])}")
+    envVars.push("MESSAGE_QUEUE_USER=${appConfigValues[messageQueueUser]}")
+    return envVars
+  }
+
+  private static def createQueue(ctx, queueName) {
+    validateQueueName(queueName)
+    def azCommand = 'az servicebus queue create'
+    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
+  }
+
+  static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
+    def configValues = [:]
+
+    if (hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
+
+      queues.each {
+        configValues["container.${it}QueueAddress"] = getPrQueueName(repoName, pr, it)
+      }
+    }
+    return configValues
+  }  
+
+  private static def validateQueueName(name) {
+    assert name ==~ /^[A-Za-z0-9]$|^[A-Za-z0-9][\w-\.\/\~]*[A-Za-z0-9]$/ : "Invalid queue name: '$name'"
+  }
+
+  private static def escapeQuotes(value) {
+    return value.replace("\"", "\\\"")
+  }  
+
+  static def readManifest(ctx, filePath, resource) {
+    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*.name").trim()
+    return resources.tokenize('\n')
+  }
+
+  private static def getResGroupAndNamespace (ctx) {
+    return "--resource-group $ctx.AZURE_SERVICE_BUS_RESOURCE_GROUP --namespace-name $ctx.AZURE_SERVICE_BUS_NAMESPACE"
+  }
+
+  private static def getBuildQueuePrefix (ctx, repoName, pr) {
+    return "$repoName-build$ctx.BUILD_NUMBER-$pr-"
   }
 
   private static def createPrDatabase(ctx, environment, repoName, pr) {
@@ -49,29 +167,14 @@ class Provision implements Serializable {
         ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run --no-deps database-up")
       }
     }
-  }
-
-  private static def deletePrDatabase(ctx, environment, repoName, pr) {
-    if (pr != '' && repoHasMigration(ctx, repoName)) {
-      def migrationFolder = 'migrations'
-      getMigrationFiles(ctx, migrationFolder)
-
-      ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
-        ctx.dir(migrationFolder) {
-           // removing the schema removes the database migrations within that schema, so is unneccessary
-           ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-down")
-        }
-      }
-    }
-  }
+  }  
 
   private static def repoHasMigration(ctx, repoName) {
     def migrationFile = "docker-compose.migrate.yaml"
     def apiUrl = "https://api.github.com/repos/defra/$repoName/contents/$migrationFile"
     // if local file not present, check the master branch - support both PR and cleanup
-    return  ctx.fileExists("./$migrationFile") || Utils.getUrlStatusCode(ctx,apiUrl) == "200"
+    return  hasResourcesToProvision(ctx, "./$migrationFile") || Utils.getUrlStatusCode(ctx,apiUrl) == "200"
   }
-
 
   private static def getMigrationFiles(ctx, destinationFolder){
     def resourcePath = 'uk/gov/defra/ffc/migration'
@@ -166,109 +269,5 @@ class Provision implements Serializable {
     def envVars = getCommonPostgresEnvVars(ctx, environment)
     def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
     return envVars + repoEnvVars
-  }
-
-  private static def escapeQuotes(value) {
-    return value.replace("\"", "\\\"")
-  }
-
-  private static def createPrQueues(ctx, queues, repoName, pr) {
-    queues.each {
-      createQueue(ctx, getPrQueueName(repoName, pr, it))
-    }
-  }
-
-  static def getPrQueueName(repoName, pr, queueName) {
-    return "$repoName-pr$pr-$queueName"
-  }
-
-  private static def createBuildQueues(ctx, queues, repoName, pr) {
-    queues.each {
-      createQueue(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it")
-    }
-  }
-
-  static def getBuildQueueEnvVars(ctx, repoName, pr, environment) {
-    // There is a single set of keys for the message queue host (as there is
-    // only one). The keys are set to the `dev` env. If the PR env was to use a
-    // different message queue host it would be checked here and
-    // `appConfigPrefix` updated accordingly.
-    def appConfigPrefix = environment + '/'
-    def messageQueueHost = 'container.messageQueueHost'
-    def messageQueuePassword = 'container.messageQueuePassword'
-    def messageQueueUser = 'container.messageQueueUser'
-    def searchKeys = [
-      messageQueueHost,
-      messageQueuePassword,
-      messageQueueUser
-    ]
-    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
-    def envVars = []
-
-    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
-      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
-      queues.each {
-        envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
-      }
-    }
-    envVars.push("MESSAGE_QUEUE_HOST=${appConfigValues[messageQueueHost]}")
-    envVars.push("MESSAGE_QUEUE_PASSWORD=${escapeQuotes(appConfigValues[messageQueuePassword])}")
-    envVars.push("MESSAGE_QUEUE_USER=${appConfigValues[messageQueueUser]}")
-    return envVars
-  }
-
-  private static def createQueue(ctx, queueName) {
-    validateQueueName(queueName)
-    def azCommand = 'az servicebus queue create'
-    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
-  }
-
-  static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
-    def configValues = [:]
-
-    if (hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
-      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
-
-      queues.each {
-        configValues["container.${it}QueueAddress"] = getPrQueueName(repoName, pr, it)
-      }
-    }
-    return configValues
-  }
-
-  private static def deletePrResources(ctx, environment, repoName, pr) {
-    deleteQueues(ctx, "$repoName-pr$pr-")
-    deletePrDatabase(ctx, environment, repoName, pr)
-  }
-
-  private static def deleteQueues(ctx, prefix) {
-    def queues = listQueues(ctx, prefix)
-    queues.each {
-      ctx.sh("az servicebus queue delete ${getResGroupAndNamespace(ctx)} --name $it")
-    }
-  }
-
-  private static def validateQueueName(name) {
-    assert name ==~ /^[A-Za-z0-9]$|^[A-Za-z0-9][\w-\.\/\~]*[A-Za-z0-9]$/ : "Invalid queue name: '$name'"
-  }
-
-  static def readManifest(ctx, filePath, resource) {
-    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*.name").trim()
-    return resources.tokenize('\n')
-  }
-
-  private static def getResGroupAndNamespace (ctx) {
-    return "--resource-group $ctx.AZURE_SERVICE_BUS_RESOURCE_GROUP --namespace-name $ctx.AZURE_SERVICE_BUS_NAMESPACE"
-  }
-
-  private static def getBuildQueuePrefix (ctx, repoName, pr) {
-    return "$repoName-build$ctx.BUILD_NUMBER-$pr-"
-  }
-
-  private static def listQueues(ctx, prefix) {
-    def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
-    def script = "az servicebus queue list ${getResGroupAndNamespace(ctx)} | $jqCommand"
-    def queueNames = ctx.sh(returnStdout: true, script: script).trim()
-    return queueNames.tokenize('\n')
-  }
+  }  
 }
