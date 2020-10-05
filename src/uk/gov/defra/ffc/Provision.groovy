@@ -7,7 +7,7 @@ class Provision implements Serializable {
 
   static def createResources(ctx, environment, repoName, pr) {
     deletePrResources(ctx, environment, repoName, pr)
-    createQueues(ctx, environment, repoName, pr)
+    createBuildAndPrQueues(ctx, environment, repoName, pr)
     createPrDatabase(ctx, environment, repoName, pr)
   }
 
@@ -44,7 +44,7 @@ class Provision implements Serializable {
     return queueNames.tokenize('\n')
   }
 
-  static def createQueues(ctx, environment, repoName, pr) {
+  static def createBuildAndPrQueues(ctx, environment, repoName, pr) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {      
       createAllQueues(ctx, azureProvisionConfigFile, repoName, pr)
     }
