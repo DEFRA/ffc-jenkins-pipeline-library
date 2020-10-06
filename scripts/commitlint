@@ -1,0 +1,3 @@
+#!/bin/sh
+
+commitlint --edit --verbose --extends "$(npm config get prefix)/lib/node_modules/@commitlint/config-conventional" --config .commitlintrc.json
