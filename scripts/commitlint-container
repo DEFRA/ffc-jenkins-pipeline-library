@@ -3,4 +3,4 @@
 projectRoot=$(a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; cd "$a/.." || return; pwd)
 
 docker build --tag defra/ffc-jenkins-pipeline-library-commitlint --file commitlint.Dockerfile .
-docker run -it --rm -v "$projectRoot"/:/home/node/wrk defra/ffc-jenkins-pipeline-library-commitlint --edit --verbose --extends @commitlint/config-conventional --config .commitlintrc.json
+docker run -t --rm -v "$projectRoot"/:/home/node/wrk defra/ffc-jenkins-pipeline-library-commitlint --edit --verbose --extends @commitlint/config-conventional --config .commitlintrc.json
