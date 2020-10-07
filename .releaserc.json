@@ -1,0 +1,49 @@
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md"
+      }
+    ],
+    "@semantic-release/github",
+    [
+      "@google/semantic-release-replace-plugin",
+      {
+        "replacements": [
+          {
+            "files": ["VERSION"],
+            "from": "*",
+            "to": "${nextRelease.version}",
+            "results": [
+              {
+                "file": "VERSION",
+                "hasChanged": true,
+                "numMatches": 1,
+                "numReplacements": 1
+              }
+            ],
+            "countMatches": true
+          }
+        ]
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["VERSION"],
+        "message": "chore(release): update version from ${lastRelease.version} to ${nextRelease.version} [skip ci]"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["CHANGELOG.md"],
+        "message": "chore(release): update CHANGELOG for version ${nextRelease.version} [skip ci]"
+      }
+    ]
+  ],
+  "tagFormat": "v-${version}"
+}
