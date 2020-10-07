@@ -1,11 +1,11 @@
 import uk.gov.defra.ffc.Notifications
 
-def buildFailure(exception, channel) {
-  Notifications.buildFailure(this, exception, channel)
+def buildFailure(channel) {
+  Notifications.buildFailure(this, channel)
 }
 
-def deploymentFailure(exception) {
-  Notifications.deploymentFailure(this, exception)
+def deploymentFailure() {
+  Notifications.deploymentFailure(this)
 }
 
 def sendMessage(channel, message, useHere) {

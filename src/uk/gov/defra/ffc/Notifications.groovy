@@ -3,10 +3,9 @@ package uk.gov.defra.ffc
 class Notifications implements Serializable {
   private static String color = '#ff0000'
 
-  static def buildFailure(ctx, exception, channel) {
+  static def buildFailure(ctx, channel) {
     def msg = """BUILD FAILED
             ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
-            ${exception}
             (<${ctx.BUILD_URL}|Open>)"""
 
     if(ctx.BRANCH_NAME == 'master') {
@@ -19,10 +18,9 @@ class Notifications implements Serializable {
               message: msg.replace('  ', ''))
   }
 
-  static def deploymentFailure(ctx, exception) {
+  static def deploymentFailure(ctx) {
     def msg = """@here DEPLOYMENT FAILED
             ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
-            ${exception}
             (<${ctx.BUILD_URL}|Open>)"""
 
     ctx.slackSend(channel: '#masterbuildfailures',
