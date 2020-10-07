@@ -12,14 +12,21 @@ node {
       (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName))
     }
 
-    if (pr != '') {
-      stage('Verify version incremented') {
-        version.verifyFileIncremented(versionFileName)
-      }
+    stage('Run commitlint') {
+      sh('./scripts/commitlint')
     }
 
     stage('Run GitHub Super-Linter') {
-      test.runGitHubSuperLinter()
+      echo('Skipping step to save time during testing.')
+      /* test.runGitHubSuperLinter() */
+    }
+
+    stage('Run semantic-release') {
+      withCredentials([
+        string(credentialsId: 'github-auth-token', variable: 'gitToken')
+      ]) {
+        sh("GH_TOKEN=$gitToken ./scripts/semantic-release")
+      }
     }
 
     if (pr == '') {
