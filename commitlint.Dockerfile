@@ -11,3 +11,4 @@ RUN npm install \
 
 WORKDIR /home/node/wrk
 ENTRYPOINT [ "npx", "commitlint" ]
+CMD [ "--help" ]

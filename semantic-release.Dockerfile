@@ -13,3 +13,4 @@ RUN npm install \
 
 WORKDIR /home/node/wrk
 ENTRYPOINT [ "npx", "semantic-release" ]
+CMD [ "--help" ]
