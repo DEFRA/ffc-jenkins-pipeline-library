@@ -1,0 +1,6 @@
+#!/bin/sh
+
+projectRoot=$(a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; cd "$a/.." || return; pwd)
+
+docker build --tag defra/ffc-jenkins-pipeline-library .
+docker run -e GH_TOKEN="$GH_TOKEN" -it -v "$projectRoot"/:/home/node/wrk defra/ffc-jenkins-pipeline-library --debug
