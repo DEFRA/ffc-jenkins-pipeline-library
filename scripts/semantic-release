@@ -3,4 +3,4 @@
 projectRoot=$(a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; cd "$a/.." || return; pwd)
 
 docker build --tag defra/ffc-jenkins-pipeline-library-semantic-release --file semantic-release.Dockerfile .
-docker run -t --rm -e GH_TOKEN="$GH_TOKEN" -v "$projectRoot"/:/home/node/wrk defra/ffc-jenkins-pipeline-library-semantic-release --debug --dry-run
+docker run -t --rm -e GH_TOKEN="$GH_TOKEN" -v "$projectRoot"/:/home/node/wrk --entrypoint ls defra/ffc-jenkins-pipeline-library-semantic-release -lah
