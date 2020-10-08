@@ -12,6 +12,12 @@ RUN npm install \
     @google/semantic-release-replace-plugin
 
 WORKDIR /home/node/wrk
-COPY --chown=node:node .git .git
+
+# Copy in .git dir to ensure files are accessible
+COPY --chown=node:node .git/ .git/
+
+# ensure tags are up to date to avoid clobbering messages
+RUN git fetch --tags -f
+
 ENTRYPOINT [ "npx", "semantic-release" ]
 CMD [ "--help" ]
