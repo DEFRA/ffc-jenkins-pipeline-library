@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo '********************in container, entering'
+whoami
+ls -lah
+ls -lah .git
+cat .git/FETCH_HEAD
+echo '********************in container, leaving'
