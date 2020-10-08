@@ -12,6 +12,6 @@ RUN npm install \
     @google/semantic-release-replace-plugin
 
 WORKDIR /home/node/wrk
-USER root
+COPY --chown=node:node .git .git
 ENTRYPOINT [ "npx", "semantic-release" ]
 CMD [ "--help" ]
