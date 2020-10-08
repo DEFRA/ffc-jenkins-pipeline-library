@@ -11,6 +11,7 @@ RUN npm install \
     semantic-release @semantic-release/changelog @semantic-release/git \
     @google/semantic-release-replace-plugin
 
+RUN mkdir /home/node/wrk && chown node /home/node/wrk
 WORKDIR /home/node/wrk
 ENTRYPOINT [ "npx", "semantic-release" ]
 CMD [ "--help" ]
