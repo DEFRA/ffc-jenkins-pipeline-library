@@ -25,9 +25,9 @@ node {
 
     stage('Run semantic-release') {
       withCredentials([
-        string(credentialsId: 'github-auth-token', variable: 'gitToken')
+        string(credentialsId: 'github-pat-temp', variable: 'GH_TOKEN')
       ]) {
-        sh("GH_TOKEN=$gitToken ./scripts/semantic-release")
+        sh("GH_TOKEN=$GH_TOKEN ./scripts/semantic-release")
       }
     }
 
