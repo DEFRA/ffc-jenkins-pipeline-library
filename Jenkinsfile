@@ -36,7 +36,7 @@ node {
       }
     }
   } catch(e) {
-    notifySlack.buildFailure(e.message, '#generalbuildfailures')
+    notifySlack.buildFailure('#generalbuildfailures')
     throw e
   }
 }
