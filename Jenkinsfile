@@ -5,9 +5,11 @@ def repoName = ''
 def versionFileName = 'VERSION'
 
 node {
-  checkout scm
-
   try {
+    stage('Checkout source code') {
+      build.checkoutSourceCode()
+    }
+
     stage('Set PR and version variables') {
       (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName))
     }
