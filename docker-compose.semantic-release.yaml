@@ -11,4 +11,6 @@ services:
     image: ffc-jenkins-pipeline-library-semantic-release
     tty: true
     volumes:
-      - ./:/home/node/wrk/
+      - .git/:/home/node/wrk/.git
+      - ./scripts/:/home/node/wrk/scripts
+      # - ./:/home/node/wrk/
