@@ -7,8 +7,8 @@ FROM defradigital/node-development:${PARENT_VERSION}
 RUN npm init -y
 RUN npm install \
     @commitlint/cli@^11 @commitlint/config-conventional@^11 \
-    semantic-release@^ @semantic-release/changelog^@5 @semantic-release/git^@9 \
-    @google/semantic-release-replace-plugin^@1
+    semantic-release@^17 @semantic-release/changelog@^5 @semantic-release/git@^9 \
+    @google/semantic-release-replace-plugin@^1
 
 WORKDIR /home/node/wrk
 
