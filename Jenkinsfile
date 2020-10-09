@@ -14,6 +14,12 @@ node {
       (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName))
     }
 
+    if (pr != '') {
+      stage('Verify version incremented') {
+        version.verifyFileIncremented(versionFileName)
+      }
+    }
+
     stage('Run commitlint') {
       sh('./scripts/commitlint-branch')
     }
