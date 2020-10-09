@@ -9,5 +9,6 @@ RUN npm install \
     @commitlint/cli@^11 @commitlint/config-conventional@^11
 
 WORKDIR /home/node/wrk
+
 ENTRYPOINT [ "npx", "commitlint" ]
 CMD [ "--help" ]
