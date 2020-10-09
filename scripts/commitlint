@@ -1,3 +1,6 @@
 #!/bin/sh
 
-commitlint --edit --verbose --extends "$(npm config get prefix)/lib/node_modules/@commitlint/config-conventional" --config .commitlintrc.json
+# Uses globally installed `@commitlint/{cli,config-conventional}`.
+# Executed by `commit-msg` Git hook (if setup). Runs on .git/COMMIT_EDITMSG.
+commitlint --edit --verbose --config .commitlintrc.json \
+  --extends "$(npm config get prefix)/lib/node_modules/@commitlint/config-conventional"
