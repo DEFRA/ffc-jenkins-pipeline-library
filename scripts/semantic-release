@@ -6,5 +6,5 @@ imageName=defra/ffc-jenkins-pipeline-library-semantic-release
 
 docker build --tag $imageName --file semantic-release.Dockerfile .
 
-docker run -t --rm -v "$projectRoot"/scripts:/home/node/wrk/scripts \
+docker run -t --rm -v "$projectRoot":/home/node/wrk \
   -e GH_TOKEN="$GH_TOKEN" $imageName --debug --dry-run
