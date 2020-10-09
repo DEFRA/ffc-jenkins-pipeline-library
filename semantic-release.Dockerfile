@@ -2,14 +2,13 @@ ARG PARENT_VERSION=1.2.1-node12.18.3
 
 FROM defradigital/node-development:${PARENT_VERSION}
 
-# init new project and install dependencies for semantic-release
-# potentially this could be handled by copying in a pre-created `package.json`
-# consider versioning the deps, as in, it they need versioning!
+# Initialise a new project and install dependencies for semantic-release.
+# Potentially this could be handled by copying in a pre-created `package.json`.
 RUN npm init -y
 RUN npm install \
-    @commitlint/cli @commitlint/config-conventional \
-    semantic-release @semantic-release/changelog @semantic-release/git \
-    @google/semantic-release-replace-plugin
+    @commitlint/cli@^11 @commitlint/config-conventional@^11 \
+    semantic-release@^ @semantic-release/changelog^@5 @semantic-release/git^@9 \
+    @google/semantic-release-replace-plugin^@1
 
 WORKDIR /home/node/wrk
 
