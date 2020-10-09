@@ -15,5 +15,7 @@ WORKDIR /home/node/wrk
 # Copy in .git dir to ensure files are accessible
 COPY --chown=node:node .git/ .git/
 
+RUN git fetch --tags -f
+
 ENTRYPOINT [ "npx", "semantic-release" ]
 CMD [ "--help" ]
