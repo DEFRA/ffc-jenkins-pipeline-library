@@ -15,7 +15,7 @@ node {
     }
 
     stage('Run commitlint') {
-      sh('./scripts/commitlint-container')
+      sh('./scripts/commitlint-branch')
     }
 
     stage('Run GitHub Super-Linter') {
