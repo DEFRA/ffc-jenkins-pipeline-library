@@ -12,29 +12,8 @@
     [
       "@semantic-release/exec",
       {
-        "generateNotesCmd": "./verifySemVerTags ${nextRelease.gitTag} ${nextRelease.version} ${nextRelease.type}",
+        "prepareCmd": "./updateVersion ${nextRelease.version}",
         "publishCmd": "./addSemVerTags ${nextRelease.gitTag} ${nextRelease.gitHead}"
-      }
-    ],
-    [
-      "@google/semantic-release-replace-plugin",
-      {
-        "replacements": [
-          {
-            "files": ["VERSION"],
-            "from": "v-.*",
-            "to": "v-${nextRelease.version}",
-            "results": [
-              {
-                "file": "VERSION",
-                "hasChanged": true,
-                "numMatches": 1,
-                "numReplacements": 1
-              }
-            ],
-            "countMatches": true
-          }
-        ]
       }
     ],
     [
