@@ -13,7 +13,7 @@ RUN npm install \
 WORKDIR /home/node/wrk
 
 # Copy in .git dir to ensure files are accessible
-COPY --chown=node:node .git/ .releaserc.json CHANGELOG.md ./
+COPY --chown=node:node .git/ .releaserc*.json CHANGELOG*.md ./
 
 RUN git fetch --tags -f
 
