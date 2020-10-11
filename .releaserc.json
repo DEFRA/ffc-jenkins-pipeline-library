@@ -15,8 +15,8 @@
         "replacements": [
           {
             "files": ["VERSION"],
-            "from": "*",
-            "to": "${nextRelease.version}",
+            "from": "v-.*",
+            "to": "v-${nextRelease.version}",
             "results": [
               {
                 "file": "VERSION",
