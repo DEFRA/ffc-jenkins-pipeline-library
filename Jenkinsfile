@@ -39,11 +39,12 @@ node {
       }
     }
 
-    // This takes the place of the GitHub release below
+    // This takes the place of the GitHub release below. Here for testing.
     stage('Run semantic-release') {
       withCredentials([
         string(credentialsId: 'github-auth-token', variable: 'GH_TOKEN')
       ]) {
+        // will need to pass 'release' to script for a release to happen
         sh("GH_TOKEN=$GH_TOKEN ./scripts/semantic-release")
       }
     }
