@@ -10,6 +10,13 @@
     ],
     "@semantic-release/github",
     [
+      "@semantic-release/exec",
+      {
+        "generateNotesCmd": "./verifySemVerTags ${nextRelease.gitTag} ${nextRelease.gitHead} ${nextRelease.version} ${nextRelease.type}",
+        "publishCmd": "./addSemVerTags ${nextRelease.gitTag} ${nextRelease.gitHead}"
+      }
+    ],
+    [
       "@google/semantic-release-replace-plugin",
       {
         "replacements": [
