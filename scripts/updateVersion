@@ -3,5 +3,5 @@
 prev=$(cat VERSION)
 next="$1"
 
-echo "$next" > VERSION
+echo "v-$next" > VERSION
 echo "Updating file 'VERSION' from '$prev' to '$next'"
