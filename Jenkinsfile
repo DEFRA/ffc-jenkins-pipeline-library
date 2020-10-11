@@ -30,6 +30,15 @@ node {
       /* test.runGitHubSuperLinter() */
     }
 
+    stage('Get version') {
+      withCredentials([
+        string(credentialsId: 'github-auth-token', variable: 'GH_TOKEN')
+      ]) {
+        def nextVersion = sh(returnStdout: true, script: "GH_TOKEN=$GH_TOKEN ./scripts/semantic-release | grep 'Published release' | cut -d' ' -f9").trim()
+        echo("Next version: '$nextVersion'")
+      }
+    }
+
     // This takes the place of the GitHub release below
     stage('Run semantic-release') {
       withCredentials([
