@@ -8,4 +8,4 @@ docker build --tag $imageName --file semantic-release.Dockerfile .
 
 docker run -t --rm -v "$projectRoot"/scripts:/home/node/wrk/scripts \
   -v "$projectRoot"/docs:/home/node/wrk/docs \
-  -e GH_TOKEN="$GH_TOKEN" $imageName --debug --dry-run
+  -e GH_TOKEN="$GH_TOKEN" $imageName --debug --dry-run --branches "$(git branch --show-current)"
