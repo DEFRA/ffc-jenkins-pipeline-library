@@ -12,7 +12,7 @@
     [
       "@semantic-release/exec",
       {
-        "generateNotesCmd": "./verifySemVerTags ${nextRelease.gitTag} ${nextRelease.gitHead} ${nextRelease.version} ${nextRelease.type}",
+        "generateNotesCmd": "./verifySemVerTags ${nextRelease.gitTag} ${nextRelease.version} ${nextRelease.type}",
         "publishCmd": "./addSemVerTags ${nextRelease.gitTag} ${nextRelease.gitHead}"
       }
     ],

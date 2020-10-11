@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 
 tag=$1
-sha=$2
-version=$3
-type=$4
+version=$2
+type=$3
 
 major=$(echo "$tag" | cut -d. -f1)
 minor=$(echo "$tag" | cut -d. -f1,2)
 
 echo "Next release will be a '$type' version."
 echo "It will be tagged as 'v-$version', '$minor' & '$major'."
-echo "All tags will point to commit '$sha'."
