@@ -4,7 +4,6 @@ imageName=defra/ffc-jenkins-pipeline-library-semantic-release
 
 docker build --tag $imageName --file semantic-release.Dockerfile .
 
-echo "Current branch: $(git branch --show-current)"
-
+# '--branches' needs to be removed as does '--dry-run' for the release to happen
 docker run -t --rm -e GH_TOKEN="$GH_TOKEN" $imageName \
   --debug --dry-run --branches psd-1013-global-install-2

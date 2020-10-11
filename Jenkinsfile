@@ -14,6 +14,7 @@ node {
       (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName))
     }
 
+    // not needed when semantic-release is running
     if (pr != '') {
       stage('Verify version incremented') {
         version.verifyFileIncremented(versionFileName)
@@ -29,6 +30,7 @@ node {
       /* test.runGitHubSuperLinter() */
     }
 
+    // This takes the place of the GitHub release below
     stage('Run semantic-release') {
       withCredentials([
         string(credentialsId: 'github-auth-token', variable: 'GH_TOKEN')
