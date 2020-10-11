@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 prev=$(cat VERSION)
-next="$1"
+next="v-$1"
 
-echo "v-$next" > VERSION
+echo "$next" > VERSION
 echo "Updating file 'VERSION' from '$prev' to '$next'"
