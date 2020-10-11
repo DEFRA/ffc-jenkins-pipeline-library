@@ -6,6 +6,8 @@ imageName=defra/ffc-jenkins-pipeline-library-semantic-release
 
 docker build --tag $imageName --file semantic-release.Dockerfile .
 
+echo "Current branch: $(git branch --show-current)"
+
 docker run -t --rm -v "$projectRoot"/scripts:/home/node/wrk/scripts \
   -v "$projectRoot"/docs:/home/node/wrk/docs \
-  -e GH_TOKEN="$GH_TOKEN" $imageName --debug --dry-run --branches "$(git branch --show-current)"
+  -e GH_TOKEN="$GH_TOKEN" $imageName --debug --dry-run --branches psd-1013-global-install-2
