@@ -34,7 +34,7 @@ node {
       withCredentials([
         string(credentialsId: 'github-auth-token', variable: 'GH_TOKEN')
       ]) {
-        def nextVersion = sh(returnStdout: true, script: "GH_TOKEN=$GH_TOKEN ./scripts/semantic-release | grep 'Published release' | cut -d' ' -f9").trim()
+        def nextVersion = sh(returnStdout: true, script: "GH_TOKEN=$GH_TOKEN ./scripts/semantic-release | awk '/The next release version is / {print \$12}'").trim()
         echo("Next version: '$nextVersion'")
       }
     }
