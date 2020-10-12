@@ -78,9 +78,6 @@ class Database implements Serializable {
         ctx.withEnv(Provision.getMigrationEnvVars(ctx, environment, repoName, '')) {
           ctx.sh("docker-compose -p $repoName-${ctx.BUILD_NUMBER} -f docker-compose.migrate.yaml run --no-deps database-up")
         }
-      } else {
-        ctx.echo("release has no migrations")
-        ctx.sh("ls -la")
       }
     }
   }
