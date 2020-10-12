@@ -76,7 +76,5 @@ class Database implements Serializable {
         ctx.echo("has no migrations")
       }
     }
-    // get migration files
-    // run migrations
   }
 }
