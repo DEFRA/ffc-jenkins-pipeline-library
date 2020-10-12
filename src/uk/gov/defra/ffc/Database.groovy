@@ -66,7 +66,8 @@ class Database implements Serializable {
     }
   }
 
-  static runRemoteMigrations(ctx, environment, repoName, version) {    
+  static runRemoteMigrations(ctx, environment, repoName, version) {
+    ctx.sh("rm -rf DEFRA-${repoName}*")
     ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
     ctx.sh("tar -xvf release")
     def workingFolder = ctx.sh(returnStdout: true, script: "ls -d */ | grep DEFRA-${repoName}").trim()
