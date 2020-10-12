@@ -11,6 +11,10 @@ node {
     }
 
     stage('Set PR and version variables') {
+      // This function call should not be required when semantic-release is
+      // running as semantic-release will only when on a release branch so no
+      // need to check for pr. repoName and versionTag are only used in the
+      // release which will be done by semantic-release
       (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName))
     }
 
@@ -26,8 +30,8 @@ node {
     }
 
     stage('Run GitHub Super-Linter') {
-      echo('Skipping step to save time during testing.')
-      /* test.runGitHubSuperLinter() */
+      // turn this back on when testing is complete
+      // test.runGitHubSuperLinter()
     }
 
     stage('Get version') {
@@ -40,6 +44,7 @@ node {
     }
 
     // This takes the place of the GitHub release below. Here for testing.
+    // No need to check for 'pr' as it is done automatically
     stage('Run semantic-release') {
       withCredentials([
         string(credentialsId: 'github-auth-token', variable: 'GH_TOKEN')
