@@ -68,8 +68,9 @@ class Database implements Serializable {
     ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
     ctx.sh("tar -xvf release")
     def workingFolder = ctx.sh(returnStdout: true, script: "ls | grep DEFRA-${repoName}").trim()
+    ctx.echo(workingFolder)
     ctx.dir(workingFolder) {
-      ctx.sh("ls -la") {
+      ctx.sh("ls -la")
       if(ctx.fileExists("changelog")) {
         ctx.echo("has migrations")
       } else {
