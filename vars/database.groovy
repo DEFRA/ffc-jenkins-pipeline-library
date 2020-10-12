@@ -7,3 +7,7 @@ def provisionPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prUserCredId, pr
 def destroyPrDbRoleAndSchema(host, dbName, jenkinsUserCredId, prCode) {
   return Database.destroyPrDbRoleAndSchema(this, host, dbName, jenkinsUserCredId, prCode)
 }
+
+def runRemoteMigrations(environment, repoName, version) {
+  Database.runRemoteMigrations(this, environment, repoName, version)
+}
