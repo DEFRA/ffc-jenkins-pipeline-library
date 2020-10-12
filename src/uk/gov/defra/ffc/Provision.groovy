@@ -229,7 +229,7 @@ class Provision implements Serializable {
     return ctx.sh(returnStdout: true, script: "curl -s 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true | jq -r .access_token").trim()
   }
 
-  private static def getCommonPostgresEnvVars(ctx, environment) {
+  private static def getCommonPostgresEnvVars(ctx, environment, pr) {
     def appConfigPrefix = environment + '/'
     def adminUserKey = 'postgresService.ffcDemoAdminUser'
     def adminPasswordKey = 'postgresService.ffcDemoAdminPassword'
@@ -248,7 +248,17 @@ class Provision implements Serializable {
       throw new Exception("No $postgresUserKey AppConfig in $environment environment")
     }
     def schemaRole = schemaUser.split('@')[0]
-    def token = getSchemaToken(ctx, schemaRole)
+    def token = ''
+
+    // consuming repository migration scripts are used during deployment which use the schema env vars instead of admin
+    // if not pr then need to move admin values to schema
+    if(pr != '') {
+      token = getSchemaToken(ctx, schemaRole)
+    } else {
+      schemaUser = appConfigValues[adminUserKey]
+      token = escapeQuotes(appConfigValues[adminPasswordKey])
+    }
+    
     return [
       "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
       "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
@@ -268,7 +278,7 @@ class Provision implements Serializable {
   }
 
   static def getMigrationEnvVars(ctx, environment, repoName, pr) {
-    def envVars = getCommonPostgresEnvVars(ctx, environment)
+    def envVars = getCommonPostgresEnvVars(ctx, environment, pr)
     def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
     return envVars + repoEnvVars
   }  

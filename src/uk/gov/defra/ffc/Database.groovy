@@ -77,10 +77,6 @@ class Database implements Serializable {
         ctx.echo("release has migrations")
         def envVars = Provision.getMigrationEnvVars(ctx, environment, repoName, '')
         ctx.withEnv(Provision.getMigrationEnvVars(ctx, environment, repoName, '')) {
-          ctx.sh("export POSTGRES_SCHEMA_USERNAME=${POSTGRES_ADMIN_USERNAME}")
-          ctx.sh("export POSTGRES_SCHEMA_PASSWORD=${POSTGRES_ADMIN_PASSWORD}")
-          ctx.echo(POSTGRES_SCHEMA_USERNAME)
-          ctx.echo(POSTGRES_SCHEMA_PASSWORD)
           ctx.sh("docker-compose -p $repoName-${ctx.BUILD_NUMBER} -f docker-compose.migrate.yaml run --no-deps database-up")
         }
       }
