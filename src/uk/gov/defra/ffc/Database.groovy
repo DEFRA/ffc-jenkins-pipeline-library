@@ -65,7 +65,7 @@ class Database implements Serializable {
   }
 
   static runRemoteMigrations(ctx, environment, repoName, version) {
-    ctx.sh("mkdir -p -m 666 release-files")
+    ctx.sh("mkdir -p -m 777 release-files")
     ctx.dir("release-files") {
       ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
       ctx.sh("tar -xvf release")
