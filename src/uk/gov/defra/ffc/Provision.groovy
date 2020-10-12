@@ -221,7 +221,7 @@ class Provision implements Serializable {
     if(pr != '') {
       return repoName.replace('-','_') + pr
     }
-    return 'public'
+    return '"public"'
   }
 
   private static def getSchemaToken(ctx, roleName) {
@@ -249,7 +249,6 @@ class Provision implements Serializable {
     }
     def schemaRole = schemaUser.split('@')[0]
     def token = getSchemaToken(ctx, schemaRole)
-    ctx.echo("TOKEN: ${token}")
     return [
       "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
       "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
