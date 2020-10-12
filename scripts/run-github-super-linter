@@ -2,5 +2,7 @@
 
 projectRoot=$(a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; cd "$a/.." || return; pwd)
 
-docker run -e RUN_LOCAL=true -e VALIDATE_GROOVY=true -e VALIDATE_BASH=true "$@" \
+docker run -e RUN_LOCAL=true -e VALIDATE_BASH=true -e VALIDATE_BASH_EXEC=true \
+  -e VALIDATE_DOCKER=true -e VALIDATE_GROOVY=true -e VALIDATE_JSON=true \
+  -e VALIDATE_YAML=true "$@" \
   -v "$projectRoot"/:/tmp/lint github/super-linter
