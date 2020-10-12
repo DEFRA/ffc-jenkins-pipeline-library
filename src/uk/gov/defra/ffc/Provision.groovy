@@ -221,7 +221,7 @@ class Provision implements Serializable {
     if(pr != '') {
       return repoName.replace('-','_') + pr
     }
-    return '"public"'
+    return "public"
   }
 
   private static def getSchemaToken(ctx, roleName) {
