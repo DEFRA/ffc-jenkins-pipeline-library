@@ -23,7 +23,7 @@ Used by the `commit-msg` Git hook (if setup).
 
 ## [commitlint-branch](commitlint-branch)
 
-Builds a Docker image from [commitlint.Dockerfile](../commitlint.Dockerfile)
+Builds a Docker image from [Dockerfile.commitlint](../Dockerfile.commitlint)
 and runs it to run `commitlint` on all commits on the current branch.
 
 Used during the build to ensure all commit message are of the appropriate
@@ -40,7 +40,7 @@ Used during the build. Can be run locally.
 ## [semantic-release](semantic-release)
 
 Builds a Docker image from
-[semantic-release.Dockerfile](../semantic-release.Dockerfile)
+[Dockerfile.semantic-release](../Dockerfile.semantic-release)
 and runs it to run `semantic-release`.
 
 Used during the build to create a release. The details are available in

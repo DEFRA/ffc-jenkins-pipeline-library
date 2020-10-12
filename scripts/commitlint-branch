@@ -4,7 +4,7 @@ projectRoot=$(a="/$0"; a=${a%/*}; a=${a:-.}; a=${a#/}/; cd "$a/.." || return; pw
 
 imageName=defra/ffc-jenkins-pipeline-library-commitlint
 
-docker build --tag $imageName --file commitlint.Dockerfile .
+docker build --tag $imageName --file Dockerfile.commitlint .
 # Run `commitlint` for all commits on branch
 docker run -t --rm -v "$projectRoot"/:/home/node/wrk $imageName \
   --from origin/master --to HEAD --verbose --config .commitlintrc.json \

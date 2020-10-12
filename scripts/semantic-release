@@ -8,7 +8,7 @@ fi
 
 imageName=defra/ffc-jenkins-pipeline-library-semantic-release
 
-docker build --tag $imageName --file semantic-release.Dockerfile .
+docker build --tag $imageName --file Dockerfile.semantic-release .
 
 # '--branches' needs to be removed
 docker run -t --rm -e GH_TOKEN="$GH_TOKEN" $imageName \
