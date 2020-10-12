@@ -76,7 +76,6 @@ class Database implements Serializable {
       if(ctx.fileExists("changelog")) {
         ctx.echo("release has migrations")
         def envVars = Provision.getMigrationEnvVars(ctx, environment, repoName, '')
-        ctx.echo(envVars)
         ctx.withEnv(Provision.getMigrationEnvVars(ctx, environment, repoName, '')) {
           ctx.sh("export POSTGRES_SCHEMA_USERNAME=\$POSTGRES_ADMIN_USERNAME")
           ctx.sh("export POSTGRES_SCHEMA_PASSWORD=\$POSTGRES_ADMIN_PASSWORD")
