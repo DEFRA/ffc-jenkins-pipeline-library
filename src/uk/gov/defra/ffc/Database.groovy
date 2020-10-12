@@ -67,14 +67,10 @@ class Database implements Serializable {
   static runRemoteMigrations(ctx, environment, repoName, version) {    
     ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
     ctx.sh("tar -xvf release")
-    def workingFolder = ctx.sh(returnStdout: true, script: "ls | grep DEFRA-${repoName}").trim()
-    ctx.echo(workingFolder)
+    def workingFolder = ctx.sh(returnStdout: true, script: "ls | grep DEFRA-${repoName}").trim()    
     ctx.dir(workingFolder) {
-      ctx.sh("ls -la")
       if(ctx.fileExists("changelog")) {
-        ctx.echo("has migrations")
-      } else {
-        ctx.echo("has no migrations")
+        ctx.echo("release has migrations")
       }
     }
   }
