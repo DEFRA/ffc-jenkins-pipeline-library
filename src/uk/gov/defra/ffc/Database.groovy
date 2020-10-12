@@ -1,5 +1,7 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.Provision
+
 class Database implements Serializable {
   private static def runPsqlCommand(ctx, dbHost, dbUser, dbName, sqlCmd) {
     ctx.sh(returnStdout: true, script: "psql --host=$dbHost --username=$dbUser --dbname=$dbName --no-password --command=\"$sqlCmd;\"")
@@ -67,10 +69,13 @@ class Database implements Serializable {
   static runRemoteMigrations(ctx, environment, repoName, version) {    
     ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
     ctx.sh("tar -xvf release")
-    def workingFolder = ctx.sh(returnStdout: true, script: "ls | grep DEFRA-${repoName}").trim()    
+    def workingFolder = ctx.sh(returnStdout: true, script: "ls | grep DEFRA-${repoName}").trim()
     ctx.dir(workingFolder) {
       if(ctx.fileExists("changelog")) {
         ctx.echo("release has migrations")
+        ctx.withEnv(Provision.getMigrationEnvVars(ctx, environment, repoName, '')) {
+          ctx.sh("docker-compose -p $repoName-${ctx.BUILD_NUMBER} -f docker-compose.migrate.yaml run --no-deps database-up")
+        }
       }
     }
   }

@@ -218,7 +218,10 @@ class Provision implements Serializable {
   }
 
   public static def getSchemaName(repoName, pr) {
-    return repoName.replace('-','_') + pr
+    if(pr != '') {
+      return repoName.replace('-','_') + pr
+    }
+    return 'public'
   }
 
   private static def getSchemaToken(ctx, roleName) {
@@ -265,7 +268,7 @@ class Provision implements Serializable {
     return configValues
   }
 
-  private static def getMigrationEnvVars(ctx, environment, repoName, pr) {
+  static def getMigrationEnvVars(ctx, environment, repoName, pr) {
     def envVars = getCommonPostgresEnvVars(ctx, environment)
     def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
     return envVars + repoEnvVars
