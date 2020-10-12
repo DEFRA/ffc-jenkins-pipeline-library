@@ -64,18 +64,15 @@ class Database implements Serializable {
     }
   }
 
-  static runRemoteMigrations(ctx, environment, repoName, version) {
-    ctx.sh("mkdir -p -m 777 release-files")
+  static runRemoteMigrations(ctx, environment, repoName, version) {    
+    ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
+    ctx.sh("tar -xvf release")
+    ctx.sh("cd */")
     ctx.sh("ls -la")
-    ctx.dir("release-files") {
-      ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
-      ctx.sh("tar -xvf release")
-      ctx.sh("cd */")
-      if(ctx.fileExists("changelog")) {
-        ctx.echo("has migrations")
-      } else {
-        ctx.echo("has no migrations")
-      }
-    }
+    if(ctx.fileExists("changelog")) {
+      ctx.echo("has migrations")
+    } else {
+      ctx.echo("has no migrations")
+    }    
   }
 }
