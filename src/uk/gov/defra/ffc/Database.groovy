@@ -70,6 +70,7 @@ class Database implements Serializable {
     ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
     ctx.sh("tar -xvf release")
     def workingFolder = ctx.sh(returnStdout: true, script: "ls | grep DEFRA-${repoName}").trim()
+    ctx.echo(workingFolder)
     ctx.dir(workingFolder) {
       if(ctx.fileExists("changelog")) {
         ctx.echo("release has migrations")
@@ -77,7 +78,7 @@ class Database implements Serializable {
           ctx.sh("docker-compose -p $repoName-${ctx.BUILD_NUMBER} -f docker-compose.migrate.yaml run --no-deps database-up")
         }
       } else {
-        ctx.echo("release has migrations")
+        ctx.echo("release has no migrations")
         ctx.sh("ls -la")
       }
     }
