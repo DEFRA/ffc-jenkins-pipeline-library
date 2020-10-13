@@ -226,8 +226,7 @@ class Provision implements Serializable {
     return [
       "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
       "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
-      "POSTGRES_HOST=${appConfigValues[postgresHostKey]}",
-      "POSTGRES_SCHEMA_ROLE=$schemaRole"
+      "POSTGRES_HOST=${appConfigValues[postgresHostKey]}"      
     ]
   }
 
@@ -247,7 +246,7 @@ class Provision implements Serializable {
 
     return [
       "POSTGRES_DB=$database",
-      "POSTGRES_SCHEMA_NAME=$schemaName",
+      "POSTGRES_SCHEMA_NAME=$schemaName"
     ]
   }
 
@@ -268,8 +267,9 @@ class Provision implements Serializable {
     def token = getSchemaToken(ctx, schemaRole)
     
     return [
-    "POSTGRES_SCHEMA_USERNAME=$schemaUser",
-    "POSTGRES_SCHEMA_PASSWORD=$token",
+      "POSTGRES_SCHEMA_USERNAME=$schemaUser",
+      "POSTGRES_SCHEMA_PASSWORD=$token",
+      "POSTGRES_SCHEMA_ROLE=$schemaRole"
     ]
   }
 
