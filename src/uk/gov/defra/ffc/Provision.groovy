@@ -215,28 +215,18 @@ class Provision implements Serializable {
     def adminUserKey = 'postgresService.ffcDemoAdminUser'
     def adminPasswordKey = 'postgresService.ffcDemoAdminPassword'
     def postgresHostKey = 'postgresService.postgresExternalName'
-    def postgresUserKey = 'pr/postgresService.postgresUser'
     def searchKeys = [
       adminUserKey,
       adminPasswordKey,
-      postgresHostKey,
-      postgresUserKey
+      postgresHostKey
     ]
 
-    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
-    def schemaUser = appConfigValues[postgresUserKey]
-    if (!schemaUser) {
-      throw new Exception("No $postgresUserKey AppConfig in $environment environment")
-    }
-    def schemaRole = schemaUser.split('@')[0]
-    def token = getSchemaToken(ctx, schemaRole)
+    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)    
     
     return [
       "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
       "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
       "POSTGRES_HOST=${appConfigValues[postgresHostKey]}",
-      "POSTGRES_SCHEMA_USERNAME=$schemaUser",
-      "POSTGRES_SCHEMA_PASSWORD=$token",
       "POSTGRES_SCHEMA_ROLE=$schemaRole"
     ]
   }
@@ -255,25 +245,31 @@ class Provision implements Serializable {
 
     def schemaName = getSchemaName(repoName, pr)
 
-    // if not PR then need to get correct managed identiy and not PR identity
-    if(pr == '') {
-      def schemaUser = appConfigValues[postgresUserKey]
-      if (!schemaUser) {
-        throw new Exception("No $postgresUserKey AppConfig in $environment environment")
-      }
-      def schemaRole = schemaUser.split('@')[0]
-      def token = getSchemaToken(ctx, schemaRole)
-      return [
-      "POSTGRES_DB=$database",
-      "POSTGRES_SCHEMA_NAME=$schemaName",
-      "POSTGRES_SCHEMA_USERNAME=$schemaUser",
-      "POSTGRES_SCHEMA_PASSWORD=$token",
-      ]
-    }
-
     return [
       "POSTGRES_DB=$database",
       "POSTGRES_SCHEMA_NAME=$schemaName",
+    ]
+  }
+
+  private static def getUserPostgresEnvVars(ctx, environment, repoName, pr) {
+    def isPr = pr != ''
+    def appConfigPrefix = environment + '/'
+    def postgresUserKey = isPr ? 'pr/postgresService.postgresUser' : 'postgresService.postgresUser'
+
+    def appConfigValues = isPr
+      ? Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, Utils.defaultNullLabel, false) 
+      : Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, repoName, false)
+    
+    def schemaUser = appConfigValues[postgresUserKey]
+    if (!schemaUser) {
+      throw new Exception("No $postgresUserKey AppConfig in $environment environment")
+    }
+    def schemaRole = schemaUser.split('@')[0]
+    def token = getSchemaToken(ctx, schemaRole)
+    
+    return [
+    "POSTGRES_SCHEMA_USERNAME=$schemaUser",
+    "POSTGRES_SCHEMA_PASSWORD=$token",
     ]
   }
 
@@ -288,6 +284,7 @@ class Provision implements Serializable {
   static def getMigrationEnvVars(ctx, environment, repoName, pr) {
     def envVars = getCommonPostgresEnvVars(ctx, environment)
     def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
-    return envVars + repoEnvVars
+    def userEnvVars = getUserPostgresEnvVars(ctx, environment, repoName, pr)
+    return envVars + repoEnvVars + userEnvVars
   }  
 }
