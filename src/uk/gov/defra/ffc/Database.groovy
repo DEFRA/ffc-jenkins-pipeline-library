@@ -76,6 +76,8 @@ class Database implements Serializable {
       if(ctx.fileExists("changelog")) {
         ctx.echo("release has migrations")
         def envVars = Provision.getMigrationEnvVars(ctx, environment, repoName, '')
+        def list = envVars.join(",")
+        ctx.echo(list)
         ctx.withEnv(Provision.getMigrationEnvVars(ctx, environment, repoName, '')) {
           ctx.sh("docker-compose -p $repoName-${ctx.BUILD_NUMBER} -f docker-compose.migrate.yaml run --no-deps database-up")
         }
