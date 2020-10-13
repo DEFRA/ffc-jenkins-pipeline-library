@@ -234,7 +234,7 @@ class Provision implements Serializable {
     def adminUserKey = 'postgresService.ffcDemoAdminUser'
     def adminPasswordKey = 'postgresService.ffcDemoAdminPassword'
     def postgresHostKey = 'postgresService.postgresExternalName'
-    def postgresUserKey = pr != '' ? 'pr/postgresService.postgresUser' : 'postgresService.postgresUser'
+    def postgresUserKey = pr != '' ? 'pr/postgresService.postgresUser' : "${repoName}/postgresService.postgresUser"
     def searchKeys = [
       adminUserKey,
       adminPasswordKey,
