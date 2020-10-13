@@ -264,17 +264,17 @@ class Provision implements Serializable {
       def schemaRole = schemaUser.split('@')[0]
       def token = getSchemaToken(ctx, schemaRole)
       return [
-      "POSTGRES_DB=$database",
-      "POSTGRES_SCHEMA_NAME=$schemaName",
-      "POSTGRES_SCHEMA_USERNAME=$schemaUser",
-      "POSTGRES_SCHEMA_PASSWORD=$token",
+        "POSTGRES_DB=$database",
+        "POSTGRES_SCHEMA_NAME=$schemaName",
+        "POSTGRES_SCHEMA_USERNAME=$schemaUser",
+        "POSTGRES_SCHEMA_PASSWORD=$token",
+      ]
+    } else {
+      return [
+        "POSTGRES_DB=$database",
+        "POSTGRES_SCHEMA_NAME=$schemaName",
       ]
     }
-
-    return [
-      "POSTGRES_DB=$database",
-      "POSTGRES_SCHEMA_NAME=$schemaName",
-    ]
   }
 
   static def getProvisionedDbSchemaConfigValues(ctx, repoName, pr) {
