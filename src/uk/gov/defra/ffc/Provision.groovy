@@ -234,7 +234,7 @@ class Provision implements Serializable {
     def adminUserKey = 'postgresService.ffcDemoAdminUser'
     def adminPasswordKey = 'postgresService.ffcDemoAdminPassword'
     def postgresHostKey = 'postgresService.postgresExternalName'
-    def postgresUserKey = 'pr/postgresService.postgresUser'
+    def postgresUserKey = pr != '' ? 'pr/postgresService.postgresUser' : 'postgresService.postgresUser'
     def searchKeys = [
       adminUserKey,
       adminPasswordKey,
@@ -248,16 +248,7 @@ class Provision implements Serializable {
       throw new Exception("No $postgresUserKey AppConfig in $environment environment")
     }
     def schemaRole = schemaUser.split('@')[0]
-    def token = ''
-
-    // consuming repository migration scripts are used during deployment which use the schema env vars instead of admin
-    // if not pr then need to move admin values to schema
-    if(pr != '') {
-      token = getSchemaToken(ctx, schemaRole)
-    } else {
-      schemaUser = appConfigValues[adminUserKey]
-      token = escapeQuotes(appConfigValues[adminPasswordKey])
-    }
+    def token = getSchemaToken(ctx, schemaRole)
     
     return [
       "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
