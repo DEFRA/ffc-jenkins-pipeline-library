@@ -255,6 +255,7 @@ class Provision implements Serializable {
 
     def schemaName = getSchemaName(repoName, pr)
 
+    // if not PR then need to get correct managed identiy and not PR identity
     if(pr != '') {
       def schemaUser = appConfigValues[postgresUserKey]
       if (!schemaUser) {
