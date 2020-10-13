@@ -196,26 +196,7 @@ class Provision implements Serializable {
 
   private static def getResourceScript(ctx, resourcePath, filename, destinationFolder){
     getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
-  }
-
-  private static def getRepoPostgresEnvVars(ctx, environment, repoName, pr) {
-    def appConfigPrefix = environment + '/'
-    def postgresDbKey = 'postgresService.postgresDb'
-
-    def appConfigValues = Utils.getConfigValues(ctx, [postgresDbKey], appConfigPrefix, repoName, false)
-
-    def database = appConfigValues[postgresDbKey]
-    if (!database) {
-      throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
-    }
-
-    def schemaName = getSchemaName(repoName, pr)
-
-    return [
-      "POSTGRES_DB=$database",
-      "POSTGRES_SCHEMA_NAME=$schemaName",
-    ]
-  }
+  }  
 
   public static def getSchemaName(repoName, pr) {
     if(pr != '') {
@@ -229,12 +210,12 @@ class Provision implements Serializable {
     return ctx.sh(returnStdout: true, script: "curl -s 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fossrdbms-aad.database.windows.net&client_id=$clientId' -H Metadata:true | jq -r .access_token").trim()
   }
 
-  private static def getCommonPostgresEnvVars(ctx, environment, pr) {
+  private static def getCommonPostgresEnvVars(ctx, environment) {
     def appConfigPrefix = environment + '/'
     def adminUserKey = 'postgresService.ffcDemoAdminUser'
     def adminPasswordKey = 'postgresService.ffcDemoAdminPassword'
     def postgresHostKey = 'postgresService.postgresExternalName'
-    def postgresUserKey = pr != '' ? 'pr/postgresService.postgresUser' : "${repoName}/postgresService.postgresUser"
+    def postgresUserKey = 'pr/postgresService.postgresUser'
     def searchKeys = [
       adminUserKey,
       adminPasswordKey,
@@ -260,6 +241,41 @@ class Provision implements Serializable {
     ]
   }
 
+  private static def getRepoPostgresEnvVars(ctx, environment, repoName, pr) {
+    def appConfigPrefix = environment + '/'
+    def postgresDbKey = 'postgresService.postgresDb'
+    def postgresUserKey = 'postgresService.postgresUser'
+
+    def appConfigValues = Utils.getConfigValues(ctx, [postgresDbKey, postgresUserKey], appConfigPrefix, repoName, false)
+
+    def database = appConfigValues[postgresDbKey]
+    if (!database) {
+      throw new Exception("No $postgresDbKey AppConfig for $repoName in $environment environment")
+    }
+
+    def schemaName = getSchemaName(repoName, pr)
+
+    if(pr != '') {
+      def schemaUser = appConfigValues[postgresUserKey]
+      if (!schemaUser) {
+        throw new Exception("No $postgresUserKey AppConfig in $environment environment")
+      }
+      def schemaRole = schemaUser.split('@')[0]
+      def token = getSchemaToken(ctx, schemaRole)
+      return [
+      "POSTGRES_DB=$database",
+      "POSTGRES_SCHEMA_NAME=$schemaName",
+      "POSTGRES_SCHEMA_USERNAME=$schemaUser",
+      "POSTGRES_SCHEMA_PASSWORD=$token",
+      ]
+    }
+
+    return [
+      "POSTGRES_DB=$database",
+      "POSTGRES_SCHEMA_NAME=$schemaName",
+    ]
+  }
+
   static def getProvisionedDbSchemaConfigValues(ctx, repoName, pr) {
     def configValues = [:]
     if (ctx.fileExists( './docker-compose.migrate.yaml')) {
@@ -269,7 +285,7 @@ class Provision implements Serializable {
   }
 
   static def getMigrationEnvVars(ctx, environment, repoName, pr) {
-    def envVars = getCommonPostgresEnvVars(ctx, environment, pr)
+    def envVars = getCommonPostgresEnvVars(ctx, environment)
     def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
     return envVars + repoEnvVars
   }  
