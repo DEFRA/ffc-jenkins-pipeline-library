@@ -76,7 +76,7 @@ class Build implements Serializable {
     def script = "docker run --rm -u node " +
     "--mount type=bind,source='$ctx.WORKSPACE/package.json',target=$containerWorkDir/package.json " +
     "--mount type=bind,source='$ctx.WORKSPACE/package-lock.json',target=$containerWorkDir/package-lock.json " +
-    "$containerImage npm audit --audit-level=$auditLevel --$logType"
+    "$containerImage npm audit --audit-level=$auditLevel --production --$logType"
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.NpmAudit.Context, description: GitHubStatus.NpmAudit.Description) {
       ctx.sh(returnStatus: !failOnIssues, script: script)
     }
