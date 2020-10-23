@@ -30,6 +30,7 @@ class Provision implements Serializable {
     //   ctx.sh("az servicebus subscription delete ${getResGroupAndNamespace(ctx)} --name $it")
     // }
     def topics = listExistingTopics(ctx, prefix)
+    ctx.echo(topics.join(","))
     topics.each {
       ctx.sh("az servicebus topic delete ${getResGroupAndNamespace(ctx)} --name $it")
     }
