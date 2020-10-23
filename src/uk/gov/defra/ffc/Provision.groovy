@@ -159,6 +159,11 @@ class Provision implements Serializable {
       queues.each {
         envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
       }
+      def topics = readManifest(ctx, azureProvisionConfigFile, 'topics')
+      topics.each {
+        envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+        envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+      }
     }
     envVars.push("MESSAGE_QUEUE_HOST=${appConfigValues[messageQueueHost]}")
     envVars.push("MESSAGE_QUEUE_PASSWORD=${escapeQuotes(appConfigValues[messageQueuePassword])}")
