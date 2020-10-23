@@ -13,7 +13,7 @@ class Provision implements Serializable {
 
   private static def deletePrResources(ctx, environment, repoName, pr) {
     deleteQueues(ctx, "$repoName-pr$pr-")
-    deleteTopicsAndSubscriptions(ctx, "$repoName-pr$pr-")
+    deleteTopics(ctx, "$repoName-pr$pr-")
     deletePrDatabase(ctx, environment, repoName, pr)
   }
 
@@ -24,11 +24,7 @@ class Provision implements Serializable {
     }
   }
 
-  private static def deleteTopicsAndSubscriptions(ctx, prefix) {
-    // def subscriptions = listExistingSubscriptions(ctx, prefix)
-    // subscriptions.each {
-    //   ctx.sh("az servicebus subscription delete ${getResGroupAndNamespace(ctx)} --name $it")
-    // }
+  private static def deleteTopics(ctx, prefix) {
     def topics = listExistingTopics(ctx, prefix)
     topics.each {
       ctx.sh("az servicebus topic delete ${getResGroupAndNamespace(ctx)} --name $it")
@@ -63,13 +59,6 @@ class Provision implements Serializable {
     return subscriptionNames.tokenize('\n')
   }
 
-  private static def listExistingSubscriptions(ctx, prefix) {
-    def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
-    def script = "az servicebus topic subscription list ${getResGroupAndNamespace(ctx)} | $jqCommand"
-    def topicNames = ctx.sh(returnStdout: true, script: script).trim()
-    return topicNames.tokenize('\n')
-  }
-
   static def createBuildAndPrQueues(ctx, environment, repoName, pr) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       createAllQueuesAndTopics(ctx, azureProvisionConfigFile, repoName, pr)
@@ -82,7 +71,7 @@ class Provision implements Serializable {
 
   static def deleteBuildResources(ctx, repoName, pr) {
     deleteQueues(ctx, getBuildQueuePrefix(ctx, repoName, pr))
-    deleteTopicsAndSubscriptions(ctx, getBuildQueuePrefix(ctx, repoName, pr))
+    deleteTopics(ctx, getBuildQueuePrefix(ctx, repoName, pr))
   }
 
   private static def createAllQueuesAndTopics(ctx, filePath, repoName, pr) {
