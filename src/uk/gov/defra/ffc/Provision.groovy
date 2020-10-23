@@ -13,6 +13,7 @@ class Provision implements Serializable {
 
   private static def deletePrResources(ctx, environment, repoName, pr) {
     deleteQueues(ctx, "$repoName-pr$pr-")
+    deleteTopicsAndSubscriptions(ctx, "$repoName-pr$pr-")
     deletePrDatabase(ctx, environment, repoName, pr)
   }
 
@@ -20,6 +21,17 @@ class Provision implements Serializable {
     def queues = listExistingQueues(ctx, prefix)
     queues.each {
       ctx.sh("az servicebus queue delete ${getResGroupAndNamespace(ctx)} --name $it")
+    }
+  }
+
+  private static def deleteTopicsAndSubscriptions(ctx, prefix) {
+    def subscriptions = listExistingSubscriptions(ctx, prefix)
+    subscriptions.each {
+      ctx.sh("az servicebus subscription delete ${getResGroupAndNamespace(ctx)} --name $it")
+    }
+    def topics = listExistingTopics(ctx, prefix)
+    topics.each {
+      ctx.sh("az servicebus topic delete ${getResGroupAndNamespace(ctx)} --name $it")
     }
   }
 
@@ -44,9 +56,23 @@ class Provision implements Serializable {
     return queueNames.tokenize('\n')
   }
 
+  private static def listExistingSubscriptions(ctx, prefix) {
+    def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
+    def script = "az servicebus topic list ${getResGroupAndNamespace(ctx)} | $jqCommand"
+    def subscriptionNames = ctx.sh(returnStdout: true, script: script).trim()
+    return subscriptionNames.tokenize('\n')
+  }
+
+  private static def listExistingTopics(ctx, prefix) {
+    def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
+    def script = "az servicebus topic subscription list ${getResGroupAndNamespace(ctx)} | $jqCommand"
+    def topicNames = ctx.sh(returnStdout: true, script: script).trim()
+    return topicNames.tokenize('\n')
+  }
+
   static def createBuildAndPrQueues(ctx, environment, repoName, pr) {
-    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {      
-      createAllQueues(ctx, azureProvisionConfigFile, repoName, pr)
+    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      createAllQueuesAndTopics(ctx, azureProvisionConfigFile, repoName, pr)
     }
   }
 
@@ -56,11 +82,14 @@ class Provision implements Serializable {
 
   static def deleteBuildResources(ctx, repoName, pr) {
     deleteQueues(ctx, getBuildQueuePrefix(ctx, repoName, pr))
+    deleteTopicsAndSubscriptions(ctx, getBuildQueuePrefix(ctx, repoName, pr))
   }
 
-  private static def createAllQueues(ctx, filePath, repoName, pr) {
+  private static def createAllQueuesAndTopics(ctx, filePath, repoName, pr) {
     def queues = readManifest(ctx, filePath, 'queues')
     createQueues(ctx, queues, repoName, pr)
+    def topics = readManifest(ctx, filePath, 'topics')
+    createTopics(ctx, topics, repoName, pr)
   }
 
   private static def createQueues(ctx, queues, repoName, pr) {
@@ -70,20 +99,53 @@ class Provision implements Serializable {
     }
   }
 
-  private static def createPrQueues(ctx, queues, repoName, pr) {
-    queues.each {
-      createQueue(ctx, getPrQueueName(repoName, pr, it))
+  private static def createTopics(ctx, topics, repoName, pr) {
+    createBuildTopics(ctx, topics, repoName, pr)
+    if(pr != '') {
+      createPrTopics(ctx, topics, repoName, pr)
     }
-  }
-
-  static def getPrQueueName(repoName, pr, queueName) {
-    return "$repoName-pr$pr-$queueName"
   }
 
   private static def createBuildQueues(ctx, queues, repoName, pr) {
     queues.each {
       createQueue(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it")
     }
+  }
+
+  private static def createBuildTopics(ctx, topics, repoName, pr) {
+    topics.each {
+      createTopicAndSubscription(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+    }
+  }
+
+  private static def createPrQueues(ctx, queues, repoName, pr) {
+    queues.each {
+      createQueue(ctx, getPrQueueName(repoName, pr, it))
+    }
+  }
+
+  private static def createPrTopics(ctx, topics, repoName, pr) {
+    topics.each {
+      createTopicAndSubscription(ctx, getPrQueueName(repoName, pr, it))
+    }
+  }
+
+  private static def createQueue(ctx, queueName) {
+    validateQueueName(queueName)
+    def azCommand = 'az servicebus queue create'
+    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
+  }
+
+  private static def createTopicAndSubscription(ctx, topicName) {
+    validateQueueName(queueName)
+    def azTopicCommand = 'az servicebus topic create'
+    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $topicName --max-size 1024")
+    def azSubscriptionCommand = 'az servicebus topic subscription create'
+    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $topicName --topic-name $topicName")
+  }
+
+  static def getPrQueueName(repoName, pr, queueName) {
+    return "$repoName-pr$pr-$queueName"
   }
 
   static def getBuildQueueEnvVars(ctx, repoName, pr, environment) {
@@ -113,13 +175,7 @@ class Provision implements Serializable {
     envVars.push("MESSAGE_QUEUE_PASSWORD=${escapeQuotes(appConfigValues[messageQueuePassword])}")
     envVars.push("MESSAGE_QUEUE_USER=${appConfigValues[messageQueueUser]}")
     return envVars
-  }
-
-  private static def createQueue(ctx, queueName) {
-    validateQueueName(queueName)
-    def azCommand = 'az servicebus queue create'
-    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
-  }
+  }  
 
   static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
     def configValues = [:]
