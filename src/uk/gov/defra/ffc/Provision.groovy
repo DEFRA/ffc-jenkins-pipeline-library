@@ -25,10 +25,10 @@ class Provision implements Serializable {
   }
 
   private static def deleteTopicsAndSubscriptions(ctx, prefix) {
-    def subscriptions = listExistingSubscriptions(ctx, prefix)
-    subscriptions.each {
-      ctx.sh("az servicebus subscription delete ${getResGroupAndNamespace(ctx)} --name $it")
-    }
+    // def subscriptions = listExistingSubscriptions(ctx, prefix)
+    // subscriptions.each {
+    //   ctx.sh("az servicebus subscription delete ${getResGroupAndNamespace(ctx)} --name $it")
+    // }
     def topics = listExistingTopics(ctx, prefix)
     topics.each {
       ctx.sh("az servicebus topic delete ${getResGroupAndNamespace(ctx)} --name $it")
@@ -56,14 +56,14 @@ class Provision implements Serializable {
     return queueNames.tokenize('\n')
   }
 
-  private static def listExistingSubscriptions(ctx, prefix) {
+  private static def listExistingTopics(ctx, prefix) {
     def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
     def script = "az servicebus topic list ${getResGroupAndNamespace(ctx)} | $jqCommand"
     def subscriptionNames = ctx.sh(returnStdout: true, script: script).trim()
     return subscriptionNames.tokenize('\n')
   }
 
-  private static def listExistingTopics(ctx, prefix) {
+  private static def listExistingSubscriptions(ctx, prefix) {
     def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
     def script = "az servicebus topic subscription list ${getResGroupAndNamespace(ctx)} | $jqCommand"
     def topicNames = ctx.sh(returnStdout: true, script: script).trim()
