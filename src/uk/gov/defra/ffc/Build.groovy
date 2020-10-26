@@ -13,7 +13,7 @@ class Build implements Serializable {
   private static def verifyCommitBuildable(ctx, pr) {
     if (pr) {
       ctx.echo("Building PR$pr")
-    } else if (ctx.BRANCH_NAME == 'master') {
+    } else if (ctx.BRANCH_NAME == 'master' || ctx.BRANCH_NAME == 'main') {
       ctx.echo('Building master branch')
     } else {
       ctx.currentBuild.result = 'ABORTED'
