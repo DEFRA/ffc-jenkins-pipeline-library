@@ -7,27 +7,20 @@ class Provision implements Serializable {
 
   static def createResources(ctx, environment, repoName, pr) {
     deletePrResources(ctx, environment, repoName, pr)
-    createBuildAndPrQueues(ctx, environment, repoName, pr)
+    createServiceBusEntities(ctx, environment, repoName, pr)
     createPrDatabase(ctx, environment, repoName, pr)
   }
 
   private static def deletePrResources(ctx, environment, repoName, pr) {
-    deleteQueues(ctx, "$repoName-pr$pr-")
-    deleteTopics(ctx, "$repoName-pr$pr-")
+    deleteServiceBusEntities(ctx, "$repoName-pr$pr-", 'queue')
+    deleteServiceBusEntities(ctx, "$repoName-pr$pr-")
     deletePrDatabase(ctx, environment, repoName, pr)
   }
 
-  private static def deleteQueues(ctx, prefix) {
-    def queues = listExistingQueues(ctx, prefix)
-    queues.each {
-      ctx.sh("az servicebus queue delete ${getResGroupAndNamespace(ctx)} --name $it")
-    }
-  }
-
-  private static def deleteTopics(ctx, prefix) {
-    def topics = listExistingTopics(ctx, prefix)
-    topics.each {
-      ctx.sh("az servicebus topic delete ${getResGroupAndNamespace(ctx)} --name $it")
+  private static def deleteServiceBusEntities(ctx, prefix, entity) {
+    def entities = listExistingServiceBusEntities(ctx, prefix, entity)
+    entities.each {
+      ctx.sh("az servicebus ${entity} delete ${getResGroupAndNamespace(ctx)} --name $it")
     }
   }
 
@@ -45,23 +38,16 @@ class Provision implements Serializable {
     }
   }
 
-  private static def listExistingQueues(ctx, prefix) {
+  private static def listExistingServiceBusEntity(ctx, prefix, entity) {
     def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
-    def script = "az servicebus queue list ${getResGroupAndNamespace(ctx)} | $jqCommand"
+    def script = "az servicebus ${entity} list ${getResGroupAndNamespace(ctx)} | $jqCommand"
     def queueNames = ctx.sh(returnStdout: true, script: script).trim()
     return queueNames.tokenize('\n')
   }
 
-  private static def listExistingTopics(ctx, prefix) {
-    def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
-    def script = "az servicebus topic list ${getResGroupAndNamespace(ctx)} | $jqCommand"
-    def subscriptionNames = ctx.sh(returnStdout: true, script: script).trim()
-    return subscriptionNames.tokenize('\n')
-  }
-
-  static def createBuildAndPrQueues(ctx, environment, repoName, pr) {
+  static def createServiceBusEntities(ctx, environment, repoName, pr) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
-      createAllQueuesAndTopics(ctx, azureProvisionConfigFile, repoName, pr)
+      createAllServiceBusEntities(ctx, azureProvisionConfigFile, repoName, pr)
     }
   }
 
@@ -70,11 +56,11 @@ class Provision implements Serializable {
   }  
 
   static def deleteBuildResources(ctx, repoName, pr) {
-    deleteQueues(ctx, getBuildQueuePrefix(ctx, repoName, pr))
-    deleteTopics(ctx, getBuildQueuePrefix(ctx, repoName, pr))
+    deleteServiceBusEntities(ctx, getBuildQueuePrefix(ctx, repoName, pr), 'queue')
+    deleteServiceBusEntities(ctx, getBuildQueuePrefix(ctx, repoName, pr), 'topic')
   }
 
-  private static def createAllQueuesAndTopics(ctx, filePath, repoName, pr) {
+  private static def createAllServiceBusEntities(ctx, filePath, repoName, pr) {
     def queues = readManifest(ctx, filePath, 'queues')
     createQueues(ctx, queues, repoName, pr)
     def topics = readManifest(ctx, filePath, 'topics')
