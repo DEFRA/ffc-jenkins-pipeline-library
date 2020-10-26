@@ -160,7 +160,6 @@ class Provision implements Serializable {
   static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
     def queueConfigValues = [:]
     def topicConfigValues = [:]
-    def subscriptionConfigValues = [:]
 
     if (hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
@@ -170,12 +169,10 @@ class Provision implements Serializable {
       def topics = readManifest(ctx, azureProvisionConfigFile, 'topics')
       topics.each {
         topicConfigValues["container.${it}TopicAddress"] = getPrQueueName(repoName, pr, it)
-      }
-      topics.each {
         topicConfigValues["container.${it}SubscriptionAddress"] = getPrQueueName(repoName, pr, it)
       }
     }
-    return queueConfigValues + topicConfigValues + subscriptionConfigValues
+    return queueConfigValues + topicConfigValues
   }  
 
   private static def validateQueueName(name) {
