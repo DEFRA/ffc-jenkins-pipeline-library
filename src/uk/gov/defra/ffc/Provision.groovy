@@ -13,7 +13,7 @@ class Provision implements Serializable {
 
   private static def deletePrResources(ctx, environment, repoName, pr) {
     deleteServiceBusEntities(ctx, "$repoName-pr$pr-", 'queue')
-    deleteServiceBusEntities(ctx, "$repoName-pr$pr-")
+    deleteServiceBusEntities(ctx, "$repoName-pr$pr-", 'topic')
     deletePrDatabase(ctx, environment, repoName, pr)
   }
 
