@@ -13,7 +13,6 @@ e.g. GitHub.
 * [deployToCluster](deployToCluster.md)
 * [helm](helm.md)
 * [notifySlack](notifySlack.md)
-* [queues](queues.md)
 * [release](release.md)
 * [secretScanner](secretScanner.md)
 * [test](test.md)
