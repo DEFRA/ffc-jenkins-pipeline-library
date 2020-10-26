@@ -18,27 +18,27 @@ def call(Map config=[:]) {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
       }
 
-      // if (pr != '') {
-      //   stage('Verify version incremented') {
-      //     version.verifyPackageJsonIncremented()
-      //   }
-      // }
+      if (pr != '') {
+        stage('Verify version incremented') {
+          version.verifyPackageJsonIncremented()
+        }
+      }
 
-      // if (config.containsKey('validateClosure')) {
-      //   config['validateClosure']()
-      // }
+      if (config.containsKey('validateClosure')) {
+        config['validateClosure']()
+      }
 
-      // stage('Helm lint') {
-      //   test.lintHelm(repoName)
-      // }
+      stage('Helm lint') {
+        test.lintHelm(repoName)
+      }
 
-      // stage('npm audit') {
-      //   build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
-      // }
+      stage('npm audit') {
+        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
+      }
 
-      // stage('Snyk test') {
-      //   build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
-      // }
+      stage('Snyk test') {
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
+      }
 
       stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
