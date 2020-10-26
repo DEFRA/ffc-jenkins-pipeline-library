@@ -38,7 +38,7 @@ class Provision implements Serializable {
     }
   }
 
-  private static def listExistingServiceBusEntity(ctx, prefix, entity) {
+  private static def listExistingServiceBusEntities(ctx, prefix, entity) {
     def jqCommand = "jq -r '.[]| select(.name | startswith(\"$prefix\")) | .name'"
     def script = "az servicebus ${entity} list ${getResGroupAndNamespace(ctx)} | $jqCommand"
     def queueNames = ctx.sh(returnStdout: true, script: script).trim()
