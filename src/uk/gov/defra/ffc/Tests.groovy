@@ -6,19 +6,23 @@ import uk.gov.defra.ffc.Utils
 class Tests implements Serializable {
   static def runTests(ctx, projectName, serviceName, buildNumber, tag, pr, environment) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunTests.Context, description: GitHubStatus.RunTests.Description) {
-      try {
-        ctx.sh('mkdir -p -m 777 test-output')
-        if (ctx.fileExists('./docker-compose.migrate.yaml')) {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml run database-up")
+      if (ctx.fileExists('docker-compose.test.yaml')) {
+        try {
+          ctx.sh('mkdir -p -m 777 test-output')
+          if (ctx.fileExists('./docker-compose.migrate.yaml')) {
+            ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml run database-up")
+          }
+          ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr, environment)) {
+            ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
+          }
+        } finally {
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
+          if (ctx.fileExists('./docker-compose.migrate.yaml')) {
+            ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml down -v")
+          }
         }
-        ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr, environment)) {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
-        }
-      } finally {
-        ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
-        if (ctx.fileExists('./docker-compose.migrate.yaml')) {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml down -v")
-        }
+      }else {
+        ctx.echo("Did not find docker-compose.test.yaml so did not run tests.")
       }
     }
   }
