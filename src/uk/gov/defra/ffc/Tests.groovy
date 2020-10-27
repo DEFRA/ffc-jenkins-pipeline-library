@@ -22,7 +22,7 @@ class Tests implements Serializable {
           }
         }
       }else {
-        ctx.echo("Did not find docker-compose.test.yaml so did not run tests.")
+        ctx.echo("docker-compose.test.yaml not found, skipping test run")
       }
     }
   }
@@ -40,7 +40,7 @@ class Tests implements Serializable {
         }
       }
     } else {
-      ctx.echo("Did not find $zapDockerComposeFile so did not run ZAP scan.")
+      ctx.echo("$zapDockerComposeFile <filename> not found, skipping test run")
     }
   }
 
