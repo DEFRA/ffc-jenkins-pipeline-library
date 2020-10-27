@@ -40,7 +40,7 @@ class Tests implements Serializable {
         }
       }
     } else {
-      ctx.echo("$zapDockerComposeFile <filename> not found, skipping test run")
+      ctx.echo("$zapDockerComposeFile not found, skipping test run")
     }
   }
 
