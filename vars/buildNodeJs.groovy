@@ -39,12 +39,13 @@ def call(Map config=[:]) {
       stage('Snyk test') {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
-      if (ctx.fileExists('./docker-compose.test.yaml')) {
+      
+      if (fileExists('./docker-compose.test.yaml')) {
         stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
         }
       } else {
-      ctx.echo("docker-compose.test.yaml not found, skipping test run")
+      echo("docker-compose.test.yaml not found, skipping test run")
       }
       
 
@@ -56,28 +57,28 @@ def call(Map config=[:]) {
         config['buildClosure']()
       }
 
-      if (ctx.fileExists('./docker-compose.test.yaml')) {
+      if (fileExists('./docker-compose.test.yaml')) {
         stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
       }
       } else {
-      ctx.echo("docker-compose.test.yaml not found, skipping test run")
+      echo("docker-compose.test.yaml not found, skipping test run")
       }
       
-      if (ctx.fileExists('./docker-compose.test.yaml')) {
+      if (fileExists('./docker-compose.test.yaml')) {
         stage('Create JUnit report') {
         test.createJUnitReport()
         }
       } else {
-      ctx.echo("docker-compose.test.yaml not found, skipping test run")
+      echo("docker-compose.test.yaml not found, skipping test run")
       }
       
-      if (ctx.fileExists('./docker-compose.test.yaml')) {
+      if (fileExists('./docker-compose.test.yaml')) {
         stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
       } else {
-      ctx.echo("docker-compose.test.yaml not found, skipping test run")
+      echo("docker-compose.test.yaml not found, skipping test run")
       }
       
 
