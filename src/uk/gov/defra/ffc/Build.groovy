@@ -28,10 +28,14 @@ class Build implements Serializable {
   }
 
   static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.BuildTestImage.Context, description: GitHubStatus.BuildTestImage.Description) {
-      ctx.docker.withRegistry("https://$registry", credentialsId) {
-        ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build")
+    if (ctx.fileExists('./docker-compose.test.yaml')) {
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.BuildTestImage.Context, description: GitHubStatus.BuildTestImage.Description) {
+        ctx.docker.withRegistry("https://$registry", credentialsId) {
+          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build")
+        }
       }
+    }else {
+      ctx.echo("docker-compose.test.yaml not found, skipping test run")
     }
   }
 
