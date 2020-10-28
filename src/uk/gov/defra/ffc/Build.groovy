@@ -34,7 +34,7 @@ class Build implements Serializable {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build")
         }
       }
-    }else {
+    } else {
       ctx.echo("docker-compose.test.yaml not found, skipping test run")
     }
   }

@@ -21,7 +21,7 @@ class Tests implements Serializable {
             ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml down -v")
           }
         }
-      }else {
+      } else {
         ctx.echo("docker-compose.test.yaml not found, skipping test run")
       }
     }
