@@ -33,8 +33,12 @@ def call(Map config=[:]) {
         config['buildClosure']()
       }
 
-      stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+      if (ctx.fileExists('./docker-compose.test.yaml')) {
+        stage('Build test image') {
+          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+        }
+      } else {
+      ctx.echo("docker-compose.test.yaml not found, skipping test run")
       }
 
       stage('Provision resources') {
@@ -50,9 +54,14 @@ def call(Map config=[:]) {
         }
       }
 
-      stage('Run tests') {
+      if (ctx.fileExists('./docker-compose.test.yaml')) {
+        stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
+        }
+      } else {
+      ctx.echo("docker-compose.test.yaml not found, skipping test run")
       }
+      
 
      stage('Publish pact broker') {
         pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
