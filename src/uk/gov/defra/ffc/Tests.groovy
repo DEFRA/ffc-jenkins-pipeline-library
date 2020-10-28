@@ -6,7 +6,7 @@ import uk.gov.defra.ffc.Utils
 class Tests implements Serializable {
   static def runTests(ctx, projectName, serviceName, buildNumber, tag, pr, environment) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunTests.Context, description: GitHubStatus.RunTests.Description) {
-      if (ctx.fileExists('docker-compose.test.yaml')) {
+      if (ctx.fileExists('./docker-compose.test.yaml')) {
         try {
           ctx.sh('mkdir -p -m 777 test-output')
           if (ctx.fileExists('./docker-compose.migrate.yaml')) {
