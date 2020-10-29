@@ -1,5 +1,6 @@
 library("defra-library@$BRANCH_NAME")
 
+def defaultBranch = 'master'
 def pr = ''
 def repoName = ''
 def versionFileName = 'VERSION'
@@ -9,7 +10,7 @@ node {
 
   try {
     stage('Set PR and version variables') {
-      (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName))
+      (repoName, pr, versionTag) = build.getVariables(version.getFileVersion(versionFileName), defaultBranch)
     }
 
     if (pr != '') {
