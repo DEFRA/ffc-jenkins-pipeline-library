@@ -11,7 +11,7 @@ Sends a message to the ffc-notifications Slack workspace when the Jenkins build
 fails.
 
 Takes one parameter:
-- optional channel name for master branch build failures to be reported in,
+- optional channel name for main branch build failures to be reported in,
   must contain the # before the channel name e.g. `#generalbuildfailures`
 
 Example usage:

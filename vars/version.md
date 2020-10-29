@@ -14,7 +14,7 @@ of several projects, versions can be retrieved for each of them.
 
 ## verifyCSProjIncremented
 
-Compares the master version with the branch version from the provided project
+Compares the main version with the branch version from the provided project
 name. If the version has been incremented correctly a message will be `echoed`
 displaying the new and the old version, i.e.
 `version increment valid '1.0.0' -> '1.0.1'`.
@@ -31,7 +31,7 @@ Returns the package version from the `package.json` file.
 
 ## verifyPackageJsonIncremented
 
-Compares the master version with the branch version of the `package.json`.
+Compares the main version with the branch version of the `package.json`.
 If the version has been incremented correctly message will be `echoed`
 displaying the new and the old version, i.e.
 `version increment valid '1.0.0' -> '1.0.1'`.
@@ -50,7 +50,7 @@ It takes one parameter:
 
 ## verifyFileIncremented
 
-Compares the master version with the branch version defined in a given file.
+Compares the main version with the branch version defined in a given file.
 If the version has been incremented correctly message will be `echoed`
 displaying the new and the old version, i.e.
 

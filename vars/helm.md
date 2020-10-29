@@ -68,8 +68,8 @@ is used.
 Example usage:
 
 ```
-helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master')
-helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', 'master', 'acr', false)
+helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', '1.0.0')
+helm.publishChart('myregistry.mydockerhub.com', 'ffc-demo-web', '1.0.0', 'acr', false)
 ```
 
 ## deployRemoteChart
