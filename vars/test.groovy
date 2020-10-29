@@ -24,12 +24,12 @@ def analyseDotNetCode(repoName, branch, defaultBranch, pr) {
   Tests.analyseDotNetCode(this, buildCodeAnalysisDotNetParams(repoName, branch, defaultBranch, pr))
 }
 
-def buildCodeAnalysisNodeJsParams(projectName, branch, pr) {
-  return Tests.buildCodeAnalysisNodeJsParams(projectName, branch, pr)
+def buildCodeAnalysisNodeJsParams(projectName, branch, defaultBranch, pr) {
+  return Tests.buildCodeAnalysisNodeJsParams(projectName, branch, defaultBranch, pr)
 }
 
-def buildCodeAnalysisDotNetParams(projectName, branch, pr) {
-  return Tests.buildCodeAnalysisDotNetParams(projectName, branch, pr)
+def buildCodeAnalysisDotNetParams(projectName, branch, defaultBranch, pr) {
+  return Tests.buildCodeAnalysisDotNetParams(projectName, branch, defaultBranch, pr)
 }
 
 def runAcceptanceTests(pr, environment, repoName) {
