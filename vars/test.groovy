@@ -16,12 +16,12 @@ def deleteOutput(containerImage, containerWorkDir) {
   Tests.deleteOutput(this, containerImage, containerWorkDir)
 }
 
-def analyseNodeJsCode(sonarQubeEnv, sonarScanner, repoName, branch, pr) {
-  Tests.analyseNodeJsCode(this, sonarQubeEnv, sonarScanner, buildCodeAnalysisNodeJsParams(repoName, branch, pr))
+def analyseNodeJsCode(sonarQubeEnv, sonarScanner, repoName, branch, defaultBranch, pr) {
+  Tests.analyseNodeJsCode(this, sonarQubeEnv, sonarScanner, buildCodeAnalysisNodeJsParams(repoName, branch, defaultBranch, pr))
 }
 
-def analyseDotNetCode(repoName, branch, pr) {
-  Tests.analyseDotNetCode(this, buildCodeAnalysisDotNetParams(repoName, branch, pr))
+def analyseDotNetCode(repoName, branch, defaultBranch, pr) {
+  Tests.analyseDotNetCode(this, buildCodeAnalysisDotNetParams(repoName, branch, defaultBranch, pr))
 }
 
 def buildCodeAnalysisNodeJsParams(projectName, branch, pr) {

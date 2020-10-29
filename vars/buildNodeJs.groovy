@@ -54,33 +54,33 @@ def call(Map config=[:]) {
         provision.createResources(config.environment, repoName, pr)
       }
 
-      // if (config.containsKey('buildClosure')) {
-      //   config['buildClosure']()
-      // }
+      if (config.containsKey('buildClosure')) {
+        config['buildClosure']()
+      }
 
-      // stage('Run tests') {
-      //   build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
-      // }
+      stage('Run tests') {
+        build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
+      }
 
-      // stage('Create JUnit report') {
-      //   test.createJUnitReport()
-      // }
+      stage('Create JUnit report') {
+        test.createJUnitReport()
+      }
 
-      // stage('Fix lcov report') {
-      //   utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      // }
+      stage('Fix lcov report') {
+        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      }
 
-      // stage('SonarCloud analysis') {
-      //   test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
-      // }
+      stage('SonarCloud analysis') {
+        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
+      }
 
-      // stage('Run Zap Scan') {
-      //   test.runZapScan(repoName, BUILD_NUMBER, tag)
-      // }
+      stage('Run Zap Scan') {
+        test.runZapScan(repoName, BUILD_NUMBER, tag)
+      }
 
-      // stage('Publish pact broker') {
-      //   pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
-      // }
+      stage('Publish pact broker') {
+        pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
+      }
 
       // if (config.containsKey('testClosure')) {
       //   config['testClosure']()

@@ -66,7 +66,7 @@ def call(Map config=[:]) {
       }
 
       stage('SonarCloud analysis') {
-        test.analyseDotNetCode(repoName, BRANCH_NAME, pr)
+        test.analyseDotNetCode(repoName, BRANCH_NAME, defaultBranch, pr)
       }
 
       if (config.containsKey('testClosure')) {
