@@ -40,9 +40,12 @@ def call(Map config=[:]) {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
 
-      stage('Build test image') {
+      if (fileExists('./docker-compose.test.yaml')) {
+        stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+        }
       }
+      
 
       stage('Provision resources') {
         provision.createResources(config.environment, repoName, pr)
@@ -52,17 +55,19 @@ def call(Map config=[:]) {
         config['buildClosure']()
       }
 
-      stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
-      }
+      if (fileExists('./docker-compose.test.yaml')) {
+        stage('Run tests') {
+          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
+        }
 
-      stage('Create JUnit report') {
-        test.createJUnitReport()
-      }
+        stage('Create JUnit report') {
+          test.createJUnitReport()
+        }
 
-      stage('Fix lcov report') {
-        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-      }
+        stage('Fix lcov report') {
+          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+        }
+      } 
 
       stage('SonarCloud analysis') {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)

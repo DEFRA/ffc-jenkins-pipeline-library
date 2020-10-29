@@ -33,26 +33,28 @@ def call(Map config=[:]) {
         config['buildClosure']()
       }
 
-      stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-      }
+      if (fileExists('./docker-compose.snyk.yaml')){
+       stage('Snyk test') {
+         // ensure obj folder exists and is writable by all
+         sh("chmod 777 ${config.project}/obj || mkdir -p -m 777 ${config.project}/obj")
+         build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
+         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln", pr)
+       }
+     }
 
       stage('Provision resources') {
         provision.createResources(config.environment, repoName, pr)
       }
 
-      if (fileExists('./docker-compose.snyk.yaml')){
-        stage('Snyk test') {
-          // ensure obj folder exists and is writable by all
-          sh("chmod 777 ${config.project}/obj || mkdir -p -m 777 ${config.project}/obj")
-          build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
-          build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln", pr)
+      if (fileExists('./docker-compose.test.yaml')) {
+        stage('Build test image') {
+          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
         }
-      }
 
-      stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
-      }
+        stage('Run tests') {
+          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
+        }
+      } 
 
      stage('Publish pact broker') {
         pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
