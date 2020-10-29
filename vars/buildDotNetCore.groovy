@@ -9,6 +9,7 @@ def call(Map config=[:]) {
   node {
     try {
       stage('Set default branch') {
+        echo(defaultBranch)
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
 
