@@ -13,7 +13,6 @@ def call(Map config=[:]) {
       }
 
       stage('Checkout source code') {
-        echo(defaultBranch)
         build.checkoutSourceCode(defaultBranch)
       }
 
