@@ -1,4 +1,5 @@
 def call(Map config=[:]) {
+  def defaultBranch
   def containerSrcFolder = '\\/home\\/node'
   def nodeDevelopmentImage = 'defradigital/node-development'
   def localSrcFolder = '.'
@@ -10,6 +11,11 @@ def call(Map config=[:]) {
 
   node {
     try {
+      stage('Determine default branch') {
+        defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
+        echo(defaultBranch)
+      }
+
       stage('Checkout source code') {
         build.checkoutSourceCode()
       }
