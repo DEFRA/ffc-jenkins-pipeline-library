@@ -19,9 +19,9 @@ def call(Map config=[:]) {
         build.checkoutSourceCode(defaultBranch)
       }
 
-      // stage('Set PR, and tag variables') {
-      //   (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
-      // }
+      stage('Set PR, and tag variables') {
+        (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion(), defaultBranch)
+      }
 
       // if (pr != '') {
       //   stage('Verify version incremented') {

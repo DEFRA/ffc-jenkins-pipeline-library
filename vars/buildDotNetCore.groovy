@@ -18,7 +18,7 @@ def call(Map config=[:]) {
 
       stage('Set PR, and tag variables') {
         csProjVersion = version.getCSProjVersion(config.project)
-        (repoName, pr, tag, mergedPrNo) = build.getVariables(csProjVersion)
+        (repoName, pr, tag, mergedPrNo) = build.getVariables(csProjVersion, defaultBranch)
       }
 
       if (pr != '') {

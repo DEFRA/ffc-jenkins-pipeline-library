@@ -3,7 +3,7 @@ import uk.gov.defra.ffc.Docker
 import uk.gov.defra.ffc.Tests
 
 def getVariables(version) {
-  return Build.getVariables(this, version)
+  return Build.getVariables(this, version, defaultBranch)
 }
 
 def getDefaultBranch(defaultBranch, requestedBranch) {
