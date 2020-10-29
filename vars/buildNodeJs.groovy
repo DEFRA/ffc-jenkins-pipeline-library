@@ -62,7 +62,7 @@ def call(Map config=[:]) {
 
         stage('Create JUnit report') {
           test.createJUnitReport()
-        }     
+        }
 
         stage('Fix lcov report') {
           utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
