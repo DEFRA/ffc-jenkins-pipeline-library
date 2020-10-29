@@ -2,7 +2,7 @@ import uk.gov.defra.ffc.Build
 import uk.gov.defra.ffc.Docker
 import uk.gov.defra.ffc.Tests
 
-def getVariables(version) {
+def getVariables(version, defaultBranch) {
   return Build.getVariables(this, version, defaultBranch)
 }
 
