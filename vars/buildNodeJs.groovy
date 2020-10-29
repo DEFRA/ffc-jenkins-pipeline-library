@@ -39,13 +39,11 @@ def call(Map config=[:]) {
       stage('Snyk test') {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
-      
+
       if (fileExists('./docker-compose.test.yaml')) {
         stage('Build test image') {
         build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
         }
-      } else {
-      echo("docker-compose.test.yaml not found, skipping test run")
       }
       
 
@@ -61,25 +59,15 @@ def call(Map config=[:]) {
         stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
       }
-      } else {
-      echo("docker-compose.test.yaml not found, skipping test run")
-      }
-      
-      if (fileExists('./docker-compose.test.yaml')) {
+
         stage('Create JUnit report') {
         test.createJUnitReport()
-        }
-      } else {
-      echo("docker-compose.test.yaml not found, skipping test run")
-      }
+        }     
       
-      if (fileExists('./docker-compose.test.yaml')) {
         stage('Fix lcov report') {
         utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
-      } else {
-      echo("docker-compose.test.yaml not found, skipping test run")
-      }
+      } 
       
 
       stage('SonarCloud analysis') {

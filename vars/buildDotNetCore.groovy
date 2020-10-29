@@ -37,9 +37,7 @@ def call(Map config=[:]) {
         stage('Build test image') {
           build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
         }
-      } else {
-      echo("docker-compose.test.yaml not found, skipping test run")
-      }
+      } 
 
       stage('Provision resources') {
         provision.createResources(config.environment, repoName, pr)
@@ -52,15 +50,11 @@ def call(Map config=[:]) {
           build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
           build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln", pr)
         }
-      }
-
-      if (fileExists('./docker-compose.test.yaml')) {
+      
         stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
         }
-      } else {
-      echo("docker-compose.test.yaml not found, skipping test run")
-      }
+      } 
       
 
      stage('Publish pact broker') {
