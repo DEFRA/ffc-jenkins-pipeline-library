@@ -22,7 +22,7 @@ class Build implements Serializable {
   }
 
   static def getDefaultBranch(defaultBranch, requestedBranch) {
-    return requestedBranch != null ? requestedBranch : defaultBranch
+    return requestedBranch != '' ? requestedBranch : defaultBranch
   }
 
   static def checkoutSourceCode(ctx) {
