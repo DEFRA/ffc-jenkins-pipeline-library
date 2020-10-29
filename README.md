@@ -239,7 +239,7 @@ includes the list of variables that need to be setup as global properties.
 | `APP_CONFIG_SUBSCRIPTION`        | Name of subscription (in Azure) where the App Config resides                                         | :see_no_evil:                                                       |
 | `DOCKER_REGISTRY`                | Domain of Docker registry where non-public images are pushed to and pulled from                      | :see_no_evil:                                                       |
 | `DOCKER_REGISTRY_CREDENTIALS_ID` | Name of credential stored in Jenkins containing the credentials used to access the `DOCKER_REGISTRY` | :see_no_evil:                                                       |
-| `HELM_CHART_REPO_PUBLIC`         | Path to the public Helm chart repository                                                             | https://raw.githubusercontent.com/defra/ffc-helm-repository/main/ |
+| `HELM_CHART_REPO_PUBLIC`         | Path to the public Helm chart repository                                                             | https://raw.githubusercontent.com/defra/ffc-helm-repository/master/ |
 | `HELM_CHART_REPO_TYPE`           | Type of repository where Helm charts are stored. Options are `acr` or `artifactory`                  | `acr`                                                               |
 | `JENKINS_DEPLOY_SITE_ROOT`       | FQDN of Jenkins instance                                                                             | :see_no_evil:                                                       |
 | `SNYK_ORG`                       | Name of Snyk organisation                                                                            | `defra-ffc`                                                         |
