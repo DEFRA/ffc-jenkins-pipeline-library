@@ -82,54 +82,54 @@ def call(Map config=[:]) {
         pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
       }
 
-      // if (config.containsKey('testClosure')) {
-      //   config['testClosure']()
-      // }
+      if (config.containsKey('testClosure')) {
+        config['testClosure']()
+      }
 
-      // stage('Build & push container image') {
-      //   build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
-      // }
+      stage('Build & push container image') {
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
+      }
 
-      // if (pr != '') {
-      //   stage('Helm install') {
-      //     helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag, pr)
-      //   }
-      // } else {
-      //   stage('Publish chart') {
-      //     helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
-      //   }
+      if (pr != '') {
+        stage('Helm install') {
+          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag, pr)
+        }
+      } else {
+        stage('Publish chart') {
+          helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
+        }
 
-      //   stage('Trigger GitHub release') {
-      //     withCredentials([
-      //       string(credentialsId: 'github-auth-token', variable: 'gitToken')
-      //     ]) {
-      //       release.trigger(tag, repoName, tag, gitToken)
-      //     }
-      //   }
+        stage('Trigger GitHub release') {
+          withCredentials([
+            string(credentialsId: 'github-auth-token', variable: 'gitToken')
+          ]) {
+            release.trigger(tag, repoName, tag, gitToken)
+          }
+        }
 
-      //   stage('Trigger Deployment') {
-      //     withCredentials([
-      //       string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
-      //     ]) {
-      //       deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': config.environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
-      //     }
-      //   }
-      // }
+        stage('Trigger Deployment') {
+          withCredentials([
+            string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
+          ]) {
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': config.environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+          }
+        }
+      }
 
-      // if (config.containsKey('deployClosure')) {
-      //   config['deployClosure']()
-      // }
+      if (config.containsKey('deployClosure')) {
+        config['deployClosure']()
+      }
 
-      // stage('Run Acceptance Tests') {
-      //   test.runAcceptanceTests(pr, config.environment, repoName)
-      // }
+      stage('Run Acceptance Tests') {
+        test.runAcceptanceTests(pr, config.environment, repoName)
+      }
 
     } catch(e) {
       def errMsg = utils.getErrorMessage(e)
       echo("Build failed with message: $errMsg")
 
       stage('Send build failure slack notification') {
-        notifySlack.buildFailure('#generalbuildfailures')
+        notifySlack.buildFailure('#generalbuildfailures', defaultBranch)
       }
 
       if (config.containsKey('failureClosure')) {
@@ -138,17 +138,17 @@ def call(Map config=[:]) {
 
       throw e
     } finally {
-      // stage('Clean up test output') {
-      //   test.deleteOutput(nodeDevelopmentImage, containerSrcFolder)
-      // }
+      stage('Clean up test output') {
+        test.deleteOutput(nodeDevelopmentImage, containerSrcFolder)
+      }
 
-      // stage('Clean up resources') {
-      //   provision.deleteBuildResources(repoName, pr)
-      // }
+      stage('Clean up resources') {
+        provision.deleteBuildResources(repoName, pr)
+      }
 
-      // if (config.containsKey('finallyClosure')) {
-      //   config['finallyClosure']()
-      // }
+      if (config.containsKey('finallyClosure')) {
+        config['finallyClosure']()
+      }
     }
   }
 }

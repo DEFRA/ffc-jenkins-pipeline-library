@@ -3,14 +3,14 @@ package uk.gov.defra.ffc
 class Notifications implements Serializable {
   private static String color = '#ff0000'
 
-  static def buildFailure(ctx, channel) {
+  static def buildFailure(ctx, channel, defaultBranch) {
     def msg = """BUILD FAILED
             ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
             (<${ctx.BUILD_URL}|Open>)"""
 
-    if(ctx.BRANCH_NAME == 'master') {
+    if(ctx.BRANCH_NAME == defaultBranch) {
       msg = "@here ${msg}"
-      channel = '#masterbuildfailures'
+      channel = '#mainbuildfailures'
     }
 
     ctx.slackSend(channel: channel,
@@ -23,7 +23,7 @@ class Notifications implements Serializable {
             ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
             (<${ctx.BUILD_URL}|Open>)"""
 
-    ctx.slackSend(channel: '#masterbuildfailures',
+    ctx.slackSend(channel: '#mainbuildfailures',
               color: Notifications.color,
               message: msg.replace('  ', ''))
   }
