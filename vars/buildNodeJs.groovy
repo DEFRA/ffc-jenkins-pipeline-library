@@ -46,13 +46,6 @@ def call(Map config=[:]) {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
 
-      if (fileExists('./docker-compose.test.yaml')) {
-        stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-        }
-      }
-      
-
       stage('Provision resources') {
         provision.createResources(config.environment, repoName, pr)
       }
@@ -62,6 +55,10 @@ def call(Map config=[:]) {
       }
 
       if (fileExists('./docker-compose.test.yaml')) {
+        stage('Build test image') {
+          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+        }
+
         stage('Run tests') {
           build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
         }
@@ -73,7 +70,11 @@ def call(Map config=[:]) {
         stage('Fix lcov report') {
           utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
-      } 
+
+        stage('Publish pact broker') {
+          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
+        }
+      }
 
       stage('SonarCloud analysis') {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
@@ -81,10 +82,6 @@ def call(Map config=[:]) {
 
       stage('Run Zap Scan') {
         test.runZapScan(repoName, BUILD_NUMBER, tag)
-      }
-
-      stage('Publish pact broker') {
-        pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
       }
 
       if (config.containsKey('testClosure')) {

@@ -61,10 +61,10 @@ def call(Map config=[:]) {
         stage('Run tests') {
           build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
         }
-      } 
 
-     stage('Publish pact broker') {
-        pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
+        stage('Publish pact broker') {
+            pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
+          }
       }
 
       stage('SonarCloud analysis') {
@@ -78,6 +78,7 @@ def call(Map config=[:]) {
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
+
       if (pr != '') {
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag, pr)
@@ -87,6 +88,7 @@ def call(Map config=[:]) {
         stage('Publish chart') {
           helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
         }
+
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
@@ -94,6 +96,7 @@ def call(Map config=[:]) {
             release.trigger(tag, repoName, tag, gitToken)
           }
         }
+
         stage('Trigger Deployment') {
           withCredentials([
             string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
