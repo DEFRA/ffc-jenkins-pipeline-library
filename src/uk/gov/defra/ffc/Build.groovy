@@ -22,7 +22,8 @@ class Build implements Serializable {
   }
 
   static def getDefaultBranch(defaultBranch, requestedBranch) {
-    return requestedBranch != '' ? requestedBranch : defaultBranch
+    echo(requestedBranch)
+    return requestedBranch != null ? requestedBranch : defaultBranch
   }
 
   static def checkoutSourceCode(ctx) {
