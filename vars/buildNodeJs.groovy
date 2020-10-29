@@ -20,7 +20,8 @@ def call(Map config=[:]) {
       }
 
       stage('Set PR, and tag variables') {
-        (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion(), defaultBranch)
+        def version = version.getPackageJsonVersion()
+        (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
 
       // if (pr != '') {
