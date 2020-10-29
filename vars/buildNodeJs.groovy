@@ -15,9 +15,9 @@ def call(Map config=[:]) {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
 
-      // stage('Checkout source code') {
-      //   build.checkoutSourceCode()
-      // }
+      stage('Checkout source code') {
+        build.checkoutSourceCode(defaultBranch)
+      }
 
       // stage('Set PR, and tag variables') {
       //   (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())

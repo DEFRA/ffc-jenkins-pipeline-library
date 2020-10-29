@@ -10,8 +10,8 @@ def getDefaultBranch(defaultBranch, requestedBranch) {
   return Build.getDefaultBranch(defaultBranch, requestedBranch)
 }
 
-def checkoutSourceCode() {
-  return Build.checkoutSourceCode(this)
+def checkoutSourceCode(defaultBranch) {
+  return Build.checkoutSourceCode(this, defaultBranch)
 }
 
 def buildTestImage(credentialsId, registry, projectName, buildNumber, tag) {

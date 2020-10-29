@@ -13,14 +13,14 @@ def call(Map config=[:]) {
       }
 
       stage('Checkout source code') {
-        build.checkoutSourceCode()
+        build.checkoutSourceCode(defaultBranch)
       }
 
       stage('Set PR, and tag variables') {
         csProjVersion = version.getCSProjVersion(config.project)
         (repoName, pr, tag, mergedPrNo) = build.getVariables(csProjVersion)
       }
-      
+
       if (pr != '') {
         stage('Verify version incremented') {
           version.verifyCSProjIncremented(config.project)
