@@ -31,7 +31,7 @@ class Build implements Serializable {
     ctx.sh("git fetch")
   }
 
-  static def getVariables(ctx, version) {
+  static def getVariables(ctx, version, defaultBranch) {
     def branch = ctx.BRANCH_NAME
     def repoName = Utils.getRepoName(ctx)
 
