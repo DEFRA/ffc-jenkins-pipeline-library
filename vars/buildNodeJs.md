@@ -13,6 +13,8 @@ For the details of what happens please review the
 buildNodeJs environment: 'dev'
 ```
 
+## npm Audit
+
 By default an [npm audit](https://docs.npmjs.com/cli/audit) will run for every
 build. If any issues are identified at a level of `moderate` or above the build
 will be marked as failed for PR builds only. When the step runs during a build
@@ -27,6 +29,8 @@ An example overriding the default values:
 ```
 buildNodeJs environment: 'dev', npmAuditLevel: 'low', npmAuditLogType: 'json', npmAuditFailOnIssues: true
 ```
+
+## Synk
 
 By default a
 [snyk test](https://support.snyk.io/hc/en-us/articles/360003812578#UUID-c88e66cf-431c-9ab1-d388-a8f82991c6e0)
@@ -44,4 +48,13 @@ An example overriding the default values:
 
 ```
 buildNodeJs environment: 'dev', snykFailOnIssues: true, snykOrganisation: 'my-org-name', snykSeverity: 'high'
+```
+
+## Default branch
+The build will assume the default branch in the repository is named `main`.  If not the default can be supplied in hte build configuration.
+
+For example:
+
+```
+buildNodeJs environment: 'dev', defaultBranch: 'master'
 ```
