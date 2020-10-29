@@ -57,18 +57,17 @@ def call(Map config=[:]) {
 
       if (fileExists('./docker-compose.test.yaml')) {
         stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
+          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
         }
 
         stage('Create JUnit report') {
-        test.createJUnitReport()
+          test.createJUnitReport()
         }     
-      
+
         stage('Fix lcov report') {
-        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
       } 
-      
 
       stage('SonarCloud analysis') {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
