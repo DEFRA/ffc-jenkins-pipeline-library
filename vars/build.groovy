@@ -7,7 +7,7 @@ def getVariables(version) {
 }
 
 def getDefaultBranch(defaultBranch, requestedBranch) {
-  return Build.getDefaultBranch(this, defaultBranch, requestedBranch)
+  return Build.getDefaultBranch(defaultBranch, requestedBranch)
 }
 
 def checkoutSourceCode() {

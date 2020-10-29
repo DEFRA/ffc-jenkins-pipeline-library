@@ -11,9 +11,8 @@ def call(Map config=[:]) {
 
   node {
     try {
-      stage('Determine default branch') {
+      stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
-        echo(defaultBranch)
       }
 
       // stage('Checkout source code') {

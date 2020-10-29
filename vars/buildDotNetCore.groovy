@@ -8,17 +8,19 @@ def call(Map config=[:]) {
 
   node {
     try {
-      stage('Determine default branch') {
+      stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
-        echo(defaultBranch)
       }
+
       stage('Checkout source code') {
         build.checkoutSourceCode()
       }
+
       stage('Set PR, and tag variables') {
         csProjVersion = version.getCSProjVersion(config.project)
         (repoName, pr, tag, mergedPrNo) = build.getVariables(csProjVersion)
       }
+      
       if (pr != '') {
         stage('Verify version incremented') {
           version.verifyCSProjIncremented(config.project)
