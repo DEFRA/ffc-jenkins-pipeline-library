@@ -1,5 +1,5 @@
 def call(Map config=[:]) {
-  def defaultBranch
+  def defaultBranch = 'main'
   def containerSrcFolder = '\\/home\\/node'
   def nodeDevelopmentImage = 'defradigital/node-development'
   def localSrcFolder = '.'
