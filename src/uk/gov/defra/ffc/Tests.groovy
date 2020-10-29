@@ -113,7 +113,7 @@ class Tests implements Serializable {
     ];
   }
 
-  static def buildCodeAnalysisDotNetParams(projectName, branch, defaultBranch pr) {
+  static def buildCodeAnalysisDotNetParams(projectName, branch, defaultBranch, pr) {
     def params = [
     'SONAR_ORGANIZATION': 'defra',
     'SONAR_PROJECT_KEY': projectName
