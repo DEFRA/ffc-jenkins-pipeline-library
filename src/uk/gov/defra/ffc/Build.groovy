@@ -21,7 +21,7 @@ class Build implements Serializable {
     }
   }
 
-  static def getDefaultBranch(defaultBranch, requestedBranch) {
+  static def getDefaultBranch(ctx, defaultBranch, requestedBranch) {
     ctx.echo(requestedBranch)
     return requestedBranch != null ? requestedBranch : defaultBranch
   }
