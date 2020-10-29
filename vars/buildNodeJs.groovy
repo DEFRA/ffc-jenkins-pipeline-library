@@ -24,11 +24,11 @@ def call(Map config=[:]) {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
 
-      // if (pr != '') {
-      //   stage('Verify version incremented') {
-      //     version.verifyPackageJsonIncremented()
-      //   }
-      // }
+      if (pr != '') {
+        stage('Verify version incremented') {
+          version.verifyPackageJsonIncremented(defaultBranch)
+        }
+      }
 
       // if (config.containsKey('validateClosure')) {
       //   config['validateClosure']()

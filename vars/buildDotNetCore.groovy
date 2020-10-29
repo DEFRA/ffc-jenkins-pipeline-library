@@ -23,7 +23,7 @@ def call(Map config=[:]) {
 
       if (pr != '') {
         stage('Verify version incremented') {
-          version.verifyCSProjIncremented(config.project)
+          version.verifyCSProjIncremented(config.project, defaultBranch)
         }
       }
 

@@ -12,12 +12,12 @@ def getFileVersion(fileName) {
   return Version.getFileVersion(this, fileName)
 }
 
-def verifyCSProjIncremented(projectName) {
-  Version.verifyCSProjIncremented(this, projectName)
+def verifyCSProjIncremented(projectName, defaultBranch) {
+  Version.verifyCSProjIncremented(this, projectName, defaultBranch)
 }
 
-def verifyPackageJsonIncremented() {
-  Version.verifyPackageJsonIncremented(this)
+def verifyPackageJsonIncremented(defaultBranch) {
+  Version.verifyPackageJsonIncremented(this, defaultBranch)
 }
 
 def verifyFileIncremented(fileName) {
