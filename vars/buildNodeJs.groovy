@@ -13,7 +13,6 @@ def call(Map config=[:]) {
     try {
       stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
-        echo(defaultBranch)
       }
 
       stage('Checkout source code') {

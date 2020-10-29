@@ -7,7 +7,6 @@ def getVariables(version, defaultBranch) {
 }
 
 def getDefaultBranch(defaultBranch, requestedBranch) {
-  echo(requestedBranch)
   return Build.getDefaultBranch(defaultBranch, requestedBranch)
 }
 
