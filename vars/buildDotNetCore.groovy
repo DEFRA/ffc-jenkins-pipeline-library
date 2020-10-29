@@ -33,15 +33,19 @@ def call(Map config=[:]) {
         config['buildClosure']()
       }
 
+      stage('Provision resources') {
+        provision.createResources(config.environment, repoName, pr)
+      }
+
       if (fileExists('./docker-compose.test.yaml')) {
         stage('Build test image') {
           build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
         }
-      } 
 
-      stage('Provision resources') {
-        provision.createResources(config.environment, repoName, pr)
-      }
+        stage('Run tests') {
+        build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
+        }
+      } 
 
       if (fileExists('./docker-compose.snyk.yaml')){
         stage('Snyk test') {
@@ -50,11 +54,8 @@ def call(Map config=[:]) {
           build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
           build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln", pr)
         }
-      
-        stage('Run tests') {
-        build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
-        }
       } 
+      
       
 
      stage('Publish pact broker') {

@@ -58,7 +58,7 @@ def call(Map config=[:]) {
       if (fileExists('./docker-compose.test.yaml')) {
         stage('Run tests') {
         build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
-      }
+        }
 
         stage('Create JUnit report') {
         test.createJUnitReport()
