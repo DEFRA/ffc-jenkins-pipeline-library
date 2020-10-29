@@ -30,29 +30,29 @@ def call(Map config=[:]) {
         }
       }
 
-      // if (config.containsKey('validateClosure')) {
-      //   config['validateClosure']()
-      // }
+      if (config.containsKey('validateClosure')) {
+        config['validateClosure']()
+      }
 
-      // stage('Helm lint') {
-      //   test.lintHelm(repoName)
-      // }
+      stage('Helm lint') {
+        test.lintHelm(repoName)
+      }
 
-      // stage('npm audit') {
-      //   build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
-      // }
+      stage('npm audit') {
+        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
+      }
 
-      // stage('Snyk test') {
-      //   build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
-      // }
+      stage('Snyk test') {
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
+      }
 
-      // stage('Build test image') {
-      //   build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-      // }
+      stage('Build test image') {
+        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+      }
 
-      // stage('Provision resources') {
-      //   provision.createResources(config.environment, repoName, pr)
-      // }
+      stage('Provision resources') {
+        provision.createResources(config.environment, repoName, pr)
+      }
 
       // if (config.containsKey('buildClosure')) {
       //   config['buildClosure']()

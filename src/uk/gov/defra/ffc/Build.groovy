@@ -4,17 +4,17 @@ import uk.gov.defra.ffc.GitHubStatus
 
 class Build implements Serializable {
   /**
-   * If the build is a branch with a Pull Request (PR), or the master branch a
+   * If the build is a branch with a Pull Request (PR), or the main branch a
    * message will be `echoed` describing the type of build.
    *
-   * If the build is not for a PR or the master branch an error will be thrown with
-   * the message `Build aborted - not a PR or a master branch`
+   * If the build is not for a PR or the main branch an error will be thrown with
+   * the message `Build aborted - not a PR or a main branch`
    */
   private static def verifyCommitBuildable(ctx, pr, defaultBranch) {
     if (pr) {
       ctx.echo("Building PR$pr")
     } else if (ctx.BRANCH_NAME == defaultBranch) {
-      ctx.echo('Building master branch')
+      ctx.echo('Building main branch')
     } else {
       ctx.currentBuild.result = 'ABORTED'
       ctx.error('Build aborted - not a PR or a main branch')
