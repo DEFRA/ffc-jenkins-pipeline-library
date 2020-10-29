@@ -31,15 +31,7 @@ class Build implements Serializable {
     ctx.sh("git fetch")
   }
 
-  static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.BuildTestImage.Context, description: GitHubStatus.BuildTestImage.Description) {
-      ctx.docker.withRegistry("https://$registry", credentialsId) {
-        ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build")
-      }
-    }
-  }
-
-  static def getVariables(ctx, version, defaultBranch) {
+  static def getVariables(ctx, version) {
     def branch = ctx.BRANCH_NAME
     def repoName = Utils.getRepoName(ctx)
 
