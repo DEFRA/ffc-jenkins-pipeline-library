@@ -1,4 +1,5 @@
 def call(Map config=[:]) {
+  def defaultBranch = 'main'
   def tag = ''
   def mergedPrNo = ''
   def pr = ''
@@ -7,6 +8,10 @@ def call(Map config=[:]) {
 
   node {
     try {
+      stage('Determine default branch') {
+        defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
+        echo(defaultBranch)
+      }
       stage('Checkout source code') {
         build.checkoutSourceCode()
       }

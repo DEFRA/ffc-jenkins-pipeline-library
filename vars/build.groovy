@@ -6,6 +6,10 @@ def getVariables(version) {
   return Build.getVariables(this, version)
 }
 
+def getDefaultBranch(defaultBranch, requestedBranch) {
+  return Build.getDefaultBranch(defaultBranch, requestedBranch)
+}
+
 def checkoutSourceCode() {
   return Build.checkoutSourceCode(this)
 }
