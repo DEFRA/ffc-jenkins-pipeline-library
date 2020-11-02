@@ -5,11 +5,23 @@
 Below are the methods available on the script. They can be executed by calling
 `<script>.<method>` e.g. `build.getVariables()`
 
+## getDefaultBranch
+
+Returns the default branch for a repository, if a value is supplied then it will be used,
+otherwise the default `main` will be used.
+
+Takes two parameters
+- the default branch to use if one is not supplied, e.g. `main`
+- optional override to the default
+
 ## checkoutSourceCode
 
 Checks out the source code for the current repository branch.
-As the repository version is validated against the `master` branch, the remote `master` branch
+As the repository version is validated against the `main` branch, the remote `main` branch
 will also be fetched to ensure it is available for comparison.
+
+Takes one parameter
+- the default branch name, e.g. `main`
 
 ## getVariables
 
@@ -17,7 +29,7 @@ Supplied with the version of the repo being built, an array containing the
 following will be returned:
 - the repo name, e.g. `ffc-demo-web`
 - the PR number, i.e. `53`
-- the tag that will be used, either the SemVer number (for master
+- the tag that will be used, either the SemVer number (for main
   branch) or the PR number prefixed with pr, i.e. `pr53`
 - the merged PR number
 

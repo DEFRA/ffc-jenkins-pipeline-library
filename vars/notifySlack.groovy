@@ -1,7 +1,7 @@
 import uk.gov.defra.ffc.Notifications
 
-def buildFailure(channel) {
-  Notifications.buildFailure(this, channel)
+def buildFailure(channel, defaultBranch) {
+  Notifications.buildFailure(this, channel, defaultBranch)
 }
 
 def deploymentFailure() {

@@ -10,7 +10,7 @@ The library is versioned following the principle of the
 [semantic versioning specification](https://semver.org/). When updating the
 library you will need to increment the version number in the
 [VERSION](VERSION) file.
-Upon merge to the master branch a new GitHub release will automatically be
+Upon merge to the main branch a new GitHub release will automatically be
 created, tagged with the `MAJOR`, `MINOR` and `PATCH` versions. For example
 version `2.4.6` will have the tags `2`, `2.4` and `2.4.6`.
 
@@ -47,7 +47,7 @@ There is no check to ensure a new `MAJOR` version is being added in sequence.
 **Note:** The change described above is the first step towards providing full
 multi-version support. Currently there is no consideration for which branch the
 change will be merged into and by default the changes will be merged into
-`master`. This is not ideal due to the likely differences between `MAJOR`
+`main`. This is not ideal due to the likely differences between `MAJOR`
 versions. Therefore in order to fully support multiple versions new branches
 will be required in order for those versions to co-exist. Currently this can be
 achieved manually but will be automated at some point.
@@ -175,7 +175,7 @@ version of a release can be targeted.
 
 ```
 @Library('defra-library')
-@Library('defra-library@master')
+@Library('defra-library@main')
 @Library('defra-library@3.1.2')
 @Library('defra-library@3.1')
 @Library('defra-library@3')
@@ -184,11 +184,11 @@ version of a release can be targeted.
 Once the library has been loaded any methods available within a
 [global variable](https://www.jenkins.io/doc/book/pipeline/shared-libraries/#defining-global-variables)
 can be used. For example if there is a script called `build.groovy` within the
-`vars` directory and it contains a method with the name `masterBranch` it
+`vars` directory and it contains a method with the name `mainBranch` it
 could be called like this:
 
 ```
-build.masterBranch()
+build.mainBranch()
 ```
 For a more detailed example the [Jenkinsfile](Jenkinsfile) in this repo can be
 used. There is no default build configuration for the library so it is made up

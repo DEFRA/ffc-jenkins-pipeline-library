@@ -1,4 +1,5 @@
 def call(Map config=[:]) {
+  def defaultBranch = 'main'
   def tag = ''
   def mergedPrNo = ''
   def pr = ''
@@ -7,16 +8,22 @@ def call(Map config=[:]) {
 
   node {
     try {
-      stage('Checkout source code') {
-        build.checkoutSourceCode()
+      stage('Set default branch') {
+        defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
+
+      stage('Checkout source code') {
+        build.checkoutSourceCode(defaultBranch)
+      }
+
       stage('Set PR, and tag variables') {
         csProjVersion = version.getCSProjVersion(config.project)
-        (repoName, pr, tag, mergedPrNo) = build.getVariables(csProjVersion)
+        (repoName, pr, tag, mergedPrNo) = build.getVariables(csProjVersion, defaultBranch)
       }
+
       if (pr != '') {
         stage('Verify version incremented') {
-          version.verifyCSProjIncremented(config.project)
+          version.verifyCSProjIncremented(config.project, defaultBranch)
         }
       }
 
@@ -54,14 +61,14 @@ def call(Map config=[:]) {
         stage('Run tests') {
           build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
         }
-      } 
 
-     stage('Publish pact broker') {
-        pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
+        stage('Publish pact broker') {
+            pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
+          }
       }
 
       stage('SonarCloud analysis') {
-        test.analyseDotNetCode(repoName, BRANCH_NAME, pr)
+        test.analyseDotNetCode(repoName, BRANCH_NAME, defaultBranch, pr)
       }
 
       if (config.containsKey('testClosure')) {
@@ -71,6 +78,7 @@ def call(Map config=[:]) {
       stage('Push container image') {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
+
       if (pr != '') {
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag, pr)
@@ -80,6 +88,7 @@ def call(Map config=[:]) {
         stage('Publish chart') {
           helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
         }
+
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
@@ -87,6 +96,7 @@ def call(Map config=[:]) {
             release.trigger(tag, repoName, tag, gitToken)
           }
         }
+
         stage('Trigger Deployment') {
           withCredentials([
             string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
@@ -103,7 +113,7 @@ def call(Map config=[:]) {
       echo("Build failed with message: $e.message")
 
       stage('Send build failure slack notification') {
-        notifySlack.buildFailure('#generalbuildfailures')
+        notifySlack.buildFailure('#generalbuildfailures', defaultBranch)
       }
 
       if (config.containsKey('failureClosure')) {

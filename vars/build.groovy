@@ -2,12 +2,16 @@ import uk.gov.defra.ffc.Build
 import uk.gov.defra.ffc.Docker
 import uk.gov.defra.ffc.Tests
 
-def getVariables(version) {
-  return Build.getVariables(this, version)
+def getVariables(version, defaultBranch) {
+  return Build.getVariables(this, version, defaultBranch)
 }
 
-def checkoutSourceCode() {
-  return Build.checkoutSourceCode(this)
+def getDefaultBranch(defaultBranch, requestedBranch) {
+  return Build.getDefaultBranch(defaultBranch, requestedBranch)
+}
+
+def checkoutSourceCode(defaultBranch) {
+  return Build.checkoutSourceCode(this, defaultBranch)
 }
 
 def buildTestImage(credentialsId, registry, projectName, buildNumber, tag) {

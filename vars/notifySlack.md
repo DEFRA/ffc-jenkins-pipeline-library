@@ -10,14 +10,15 @@ Below are the methods available on the script. They can be executed by calling
 Sends a message to the ffc-notifications Slack workspace when the Jenkins build
 fails.
 
-Takes one parameter:
-- optional channel name for master branch build failures to be reported in,
+Takes two parameters:
+- optional channel name for main branch build failures to be reported in,
   must contain the # before the channel name e.g. `#generalbuildfailures`
+- name of the default branch
 
 Example usage:
 
 ```
-notifySlack.buildFailure("#generalbuildfailures")
+notifySlack.buildFailure("#generalbuildfailures", 'main')
 ```
 
 ## sendMessage

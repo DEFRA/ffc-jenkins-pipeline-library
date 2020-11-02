@@ -4,41 +4,45 @@ import uk.gov.defra.ffc.GitHubStatus
 
 class Build implements Serializable {
   /**
-   * If the build is a branch with a Pull Request (PR), or the master branch a
+   * If the build is a branch with a Pull Request (PR), or the main branch a
    * message will be `echoed` describing the type of build.
    *
-   * If the build is not for a PR or the master branch an error will be thrown with
-   * the message `Build aborted - not a PR or a master branch`
+   * If the build is not for a PR or the main branch an error will be thrown with
+   * the message `Build aborted - not a PR or a main branch`
    */
-  private static def verifyCommitBuildable(ctx, pr) {
+  private static def verifyCommitBuildable(ctx, pr, defaultBranch) {
     if (pr) {
       ctx.echo("Building PR$pr")
-    } else if (ctx.BRANCH_NAME == 'master') {
-      ctx.echo('Building master branch')
+    } else if (ctx.BRANCH_NAME == defaultBranch) {
+      ctx.echo('Building main branch')
     } else {
       ctx.currentBuild.result = 'ABORTED'
-      ctx.error('Build aborted - not a PR or a master branch')
+      ctx.error('Build aborted - not a PR or a main branch')
     }
   }
 
-  static def checkoutSourceCode(ctx) {
+  static def getDefaultBranch(defaultBranch, requestedBranch) {
+    return requestedBranch != null ? requestedBranch : defaultBranch
+  }
+
+  static def checkoutSourceCode(ctx, defaultBranch) {
     ctx.checkout(ctx.scm)
-    ctx.sh("git remote set-branches --add origin master")
+    ctx.sh("git remote set-branches --add origin ${defaultBranch}")
     ctx.sh("git fetch")
   }
 
-  static def getVariables(ctx, version) {
+  static def getVariables(ctx, version, defaultBranch) {
     def branch = ctx.BRANCH_NAME
     def repoName = Utils.getRepoName(ctx)
 
     // use the git API to get the open PR for a branch
     // Note: This will cause issues if one branch has two open PRs
     def pr = ctx.sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
-    Build.verifyCommitBuildable(ctx, pr)
+    Build.verifyCommitBuildable(ctx, pr, defaultBranch)
 
     def tag
 
-    if (branch == 'master') {
+    if (branch == defaultBranch) {
       tag = version
     } else {
       def rawTag = pr ? "pr$pr" : branch

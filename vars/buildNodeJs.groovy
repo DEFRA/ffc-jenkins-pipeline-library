@@ -1,4 +1,5 @@
 def call(Map config=[:]) {
+  def defaultBranch = 'main'
   def containerSrcFolder = '\\/home\\/node'
   def nodeDevelopmentImage = 'defradigital/node-development'
   def localSrcFolder = '.'
@@ -10,17 +11,22 @@ def call(Map config=[:]) {
 
   node {
     try {
+      stage('Set default branch') {
+        defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
+      }
+
       stage('Checkout source code') {
-        build.checkoutSourceCode()
+        build.checkoutSourceCode(defaultBranch)
       }
 
       stage('Set PR, and tag variables') {
-        (repoName, pr, tag, mergedPrNo) = build.getVariables(version.getPackageJsonVersion())
+        def version = version.getPackageJsonVersion()
+        (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
 
       if (pr != '') {
         stage('Verify version incremented') {
-          version.verifyPackageJsonIncremented()
+          version.verifyPackageJsonIncremented(defaultBranch)
         }
       }
 
@@ -40,13 +46,6 @@ def call(Map config=[:]) {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
 
-      if (fileExists('./docker-compose.test.yaml')) {
-        stage('Build test image') {
-        build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-        }
-      }
-      
-
       stage('Provision resources') {
         provision.createResources(config.environment, repoName, pr)
       }
@@ -56,6 +55,10 @@ def call(Map config=[:]) {
       }
 
       if (fileExists('./docker-compose.test.yaml')) {
+        stage('Build test image') {
+          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+        }
+
         stage('Run tests') {
           build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
         }
@@ -67,18 +70,18 @@ def call(Map config=[:]) {
         stage('Fix lcov report') {
           utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
-      } 
+
+        stage('Publish pact broker') {
+          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
+        }
+      }
 
       stage('SonarCloud analysis') {
-        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, pr)
+        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
       }
 
       stage('Run Zap Scan') {
         test.runZapScan(repoName, BUILD_NUMBER, tag)
-      }
-
-      stage('Publish pact broker') {
-        pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
       }
 
       if (config.containsKey('testClosure')) {
@@ -128,7 +131,7 @@ def call(Map config=[:]) {
       echo("Build failed with message: $errMsg")
 
       stage('Send build failure slack notification') {
-        notifySlack.buildFailure('#generalbuildfailures')
+        notifySlack.buildFailure('#generalbuildfailures', defaultBranch)
       }
 
       if (config.containsKey('failureClosure')) {
