@@ -61,4 +61,9 @@ class GitHubStatus implements Serializable {
     static final Context = "${BASECTX}zap-version"
     static final Description = 'Zap scan'
   }
+
+  class Pa11y {
+    static final Context = "${BASECTX}pa11y-version"
+    static final Description = 'Accessibility tests'
+  }
 }

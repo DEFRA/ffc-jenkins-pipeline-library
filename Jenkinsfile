@@ -19,10 +19,6 @@ node {
       }
     }
 
-    stage('Run GitHub Super-Linter') {
-      test.runGitHubSuperLinter()
-    }
-
     if (pr == '') {
       stage('Trigger GitHub release') {
         withCredentials([
