@@ -39,3 +39,8 @@ def runAcceptanceTests(pr, environment, repoName) {
 def runZapScan(projectName, buildNumber, tag) {
   Tests.runZapScan(this, projectName, buildNumber, tag)
 }
+
+
+def runPa11y(projectName, buildNumber, tag) {
+  Tests.runPa11y(this, projectName, buildNumber, tag)
+}

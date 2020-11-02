@@ -84,6 +84,10 @@ def call(Map config=[:]) {
         test.runZapScan(repoName, BUILD_NUMBER, tag)
       }
 
+      stage('Run Accessibility tests') {
+        test.runPa11y(repoName, BUILD_NUMBER, tag)
+      }
+
       if (config.containsKey('testClosure')) {
         config['testClosure']()
       }
