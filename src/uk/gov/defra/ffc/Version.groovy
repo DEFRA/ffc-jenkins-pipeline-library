@@ -47,10 +47,10 @@ class Version implements Serializable {
    * otherwise it will print a message stating the version increment.
    */
   static def errorOnNoVersionIncrement(ctx, previousVersion, currentVersion){
-    def cleanPreviousVersion = Version.extractSemVerVersion(previousVersion)
-    def cleanCurrentVersion = Version.extractSemVerVersion(currentVersion)
+    def cleanPreviousVersion = extractSemVerVersion(previousVersion)
+    def cleanCurrentVersion = extractSemVerVersion(currentVersion)
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.VerifyVersion.Context, description: GitHubStatus.VerifyVersion.Description) {
-      if (Version.hasIncremented(cleanPreviousVersion, cleanCurrentVersion)) {
+      if (hasIncremented(cleanPreviousVersion, cleanCurrentVersion)) {
         ctx.echo("Version increment valid '$previousVersion' -> '$currentVersion'.")
       } else {
         ctx.error("Version increment invalid '$previousVersion' -> '$currentVersion'.")
@@ -103,20 +103,20 @@ class Version implements Serializable {
   }
 
   static def verifyCSProjIncremented(ctx, projectName, defaultBranch) {
-    def mainVersion = Version.getCSProjVersionMain(ctx, projectName, defaultBranch)
-    def version = Version.getCSProjVersion(ctx, projectName)
-    Version.errorOnNoVersionIncrement(ctx, mainVersion, version)
+    def mainVersion =getCSProjVersionMain(ctx, projectName, defaultBranch)
+    def version = getCSProjVersion(ctx, projectName)
+    errorOnNoVersionIncrement(ctx, mainVersion, version)
   }
 
   static def verifyPackageJsonIncremented(ctx, defaultBranch) {
-    def mainVersion = Version.getPackageJsonVersionMain(ctx, defaultBranch)
-    def version = Version.getPackageJsonVersion(ctx)
-    Version.errorOnNoVersionIncrement(ctx, mainVersion, version)
+    def mainVersion = getPackageJsonVersionMain(ctx, defaultBranch)
+    def version = getPackageJsonVersion(ctx)
+    errorOnNoVersionIncrement(ctx, mainVersion, version)
   }
 
   static def verifyFileIncremented(ctx, fileName) {
-    def currentVersion = Version.getFileVersion(ctx, fileName)
-    def previousVersion = Version.getPreviousFileVersion(ctx, fileName, currentVersion)
-    Version.errorOnNoVersionIncrement(ctx, previousVersion, currentVersion)
+    def currentVersion = getFileVersion(ctx, fileName)
+    def previousVersion = getPreviousFileVersion(ctx, fileName, currentVersion)
+    errorOnNoVersionIncrement(ctx, previousVersion, currentVersion)
   }
 }
