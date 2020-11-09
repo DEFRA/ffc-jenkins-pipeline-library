@@ -46,7 +46,7 @@ class Release implements Serializable {
   }
 
   static def trigger(ctx, versionTag, repoName, releaseDescription, token){
-    if (Release.exists(ctx, versionTag, repoName, token)) {
+    if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo("Release $versionTag already exists")
       return false
     }
@@ -56,7 +56,7 @@ class Release implements Serializable {
     result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
     ctx.echo("The release result is $result")
 
-    if (Release.exists(ctx, versionTag, repoName, token)) {
+    if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo('Release Successful')
     } else {
       throw new Exception('Release failed')
@@ -73,7 +73,7 @@ class Release implements Serializable {
     def minorTag = "${versionList[0]}.${versionList[1]}"
     def commitSha = Utils.getCommitSha(ctx)
 
-    Release.tagCommit(ctx, minorTag, commitSha, repoName)
-    Release.tagCommit(ctx, majorTag, commitSha, repoName)
+    tagCommit(ctx, minorTag, commitSha, repoName)
+    tagCommit(ctx, majorTag, commitSha, repoName)
   }
 }

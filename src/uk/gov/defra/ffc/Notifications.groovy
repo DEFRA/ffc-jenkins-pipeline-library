@@ -14,7 +14,7 @@ class Notifications implements Serializable {
     }
 
     ctx.slackSend(channel: channel,
-              color: Notifications.color,
+              color: color,
               message: msg.replace('  ', ''))
   }
 
@@ -24,13 +24,13 @@ class Notifications implements Serializable {
             (<${ctx.BUILD_URL}|Open>)"""
 
     ctx.slackSend(channel: '#mainbuildfailures',
-              color: Notifications.color,
+              color: color,
               message: msg.replace('  ', ''))
   }
 
   static def sendMessage(ctx, channel, message, useHere) {
     ctx.slackSend(channel: channel,
-              color: Notifications.color,
+              color: color,
               message: "${useHere ? '@here ' : ''}$message")
   }
 }
