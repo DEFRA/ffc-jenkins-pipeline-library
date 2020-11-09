@@ -36,7 +36,7 @@ class SecretScanner implements Serializable {
     def githubReposUrl = "https://api.github.com/users/$githubOwner/repos?per_page=100"
 
     def curlHeaders = ctx.sh(returnStdout: true, script: "$curlAuth --head $githubReposUrl")
-    def numPages = SecretScanner.getNumPages(ctx, curlHeaders)
+    def numPages = getNumPages(ctx, curlHeaders)
 
     ctx.echo("Number of pages of repos: $numPages")
 
@@ -94,8 +94,8 @@ class SecretScanner implements Serializable {
     ctx.withCredentials([ctx.string(credentialsId: githubCredentialId, variable: 'githubToken')]) {
       def curlAuth = "curl --header 'Authorization: token $ctx.githubToken' --silent"
 
-      def matchingRepos = SecretScanner.getMatchingRepos(ctx, curlAuth, githubOwner, repositoryPrefix)
-      def commitCheckDate = SecretScanner.getCommitCheckDate(scanWindowHrs)
+      def matchingRepos = getMatchingRepos(ctx, curlAuth, githubOwner, repositoryPrefix)
+      def commitCheckDate = getCommitCheckDate(scanWindowHrs)
 
       ctx.echo("Commit check date: $commitCheckDate")
 
@@ -113,7 +113,7 @@ class SecretScanner implements Serializable {
         branches.each { branch ->
           def githubCommitUrl = "https://api.github.com/repos/$repo/commits?since=$commitCheckDate\\&sha=${branch.name}\\&per_page=100"
           def curlHeaders = ctx.sh(returnStdout: true, script: "$curlAuth --head $githubCommitUrl")
-          def numPages = SecretScanner.getNumPages(ctx, curlHeaders)
+          def numPages = getNumPages(ctx, curlHeaders)
 
           (numPages as Integer).times { page ->
             def commitResults = ctx.sh(returnStdout: true, script: "$curlAuth $githubCommitUrl\\&page=${page+1}")
@@ -123,11 +123,11 @@ class SecretScanner implements Serializable {
         }
 
         if (commitShas.size() > 0) {
-          def secretMessages = SecretScanner.runTruffleHog(ctx, dockerImgName, repo, excludeStrings, commitShas)
+          def secretMessages = runTruffleHog(ctx, dockerImgName, repo, excludeStrings, commitShas)
 
           if (!secretMessages.isEmpty()) {
             secretsFound = true
-            SecretScanner.reportSecrets(ctx, secretMessages, repo, slackChannel)
+            reportSecrets(ctx, secretMessages, repo, slackChannel)
           }
         }
 
@@ -141,18 +141,18 @@ class SecretScanner implements Serializable {
   static def scanFullHistory(ctx, githubCredentialId, dockerImgName, githubOwner, repositoryPrefix, excludeStrings, slackChannel="") {
     ctx.withCredentials([ctx.string(credentialsId: githubCredentialId, variable: 'githubToken')]) {
       def curlAuth = "curl --header 'Authorization: token $ctx.githubToken' --silent"
-      def matchingRepos = SecretScanner.getMatchingRepos(ctx, curlAuth, githubOwner, repositoryPrefix)
+      def matchingRepos = getMatchingRepos(ctx, curlAuth, githubOwner, repositoryPrefix)
 
       def secretsFound = false
 
       matchingRepos.each { repo ->
         ctx.echo("Scanning $repo")
 
-        def secretMessages = SecretScanner.runTruffleHog(ctx, dockerImgName, repo, excludeStrings)
+        def secretMessages = runTruffleHog(ctx, dockerImgName, repo, excludeStrings)
 
         if (!secretMessages.isEmpty()) {
           secretsFound = true
-          SecretScanner.reportSecrets(ctx, secretMessages, repo, slackChannel)
+          reportSecrets(ctx, secretMessages, repo, slackChannel)
         }
 
         ctx.echo("Finished scanning $repo")
