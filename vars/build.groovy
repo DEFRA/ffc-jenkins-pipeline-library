@@ -26,11 +26,11 @@ def buildAndPushContainerImage(String credentialsId, String registry, String ima
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
 
-def npmAudit(String auditLevel, String logType, String failOnIssues, String containerImage, String containerWorkDir, int pr) {
+def npmAudit(String auditLevel, String logType, String failOnIssues, String containerImage, String containerWorkDir, String pr) {
   Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr)
 }
 
-def extractSynkFiles(String projectName, int buildNumber, String tag) {
+def extractSynkFiles(String projectName, String buildNumber, String tag) {
   Build.extractSynkFiles(this, projectName, buildNumber, tag)
 }
 
