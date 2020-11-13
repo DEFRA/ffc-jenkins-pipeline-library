@@ -31,7 +31,7 @@ def npmAudit(String auditLevel, String logType, String failOnIssues, String cont
 }
 
 def extractSynkFiles(String projectName, String buildNumber, String tag) {
-  Build.extractSynkFiles(this, projectName, buildNumber.toInteger(), tag)
+  Build.extractSynkFiles(this, projectName, buildNumber, tag)
 }
 
 def snykTest(String failOnIssues, String organisation, String severity, String targetFile = '', String pr) {
