@@ -6,7 +6,7 @@ def call(Map config=[:]) {
   def lcovFile = './test-output/lcov.info'
   def repoName = 'ffc-demo-web'
   def pr = 'psd-524-github-commit-message'
-  def tag = ''
+  def tag = 'test'
   def mergedPrNo = ''
 
   node {
