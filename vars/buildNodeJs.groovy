@@ -19,7 +19,7 @@ def call(Map config=[:]) {
       stage('Checkout source code') {
         build.checkoutSourceCode(defaultBranch)
       }
-      
+
       stage('Set PR, and tag variables') {
         def version = version.getPackageJsonVersion()
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
@@ -166,7 +166,7 @@ def call(Map config=[:]) {
 
       throw e
     } finally {
-      stage('Clean up test output') {
+      /* stage('Clean up test output') {
         test.deleteOutput(nodeDevelopmentImage, containerSrcFolder)
       }
 
@@ -176,7 +176,7 @@ def call(Map config=[:]) {
 
       if (config.containsKey('finallyClosure')) {
         config['finallyClosure']()
-      }
+      } */
     }
   }
 }
