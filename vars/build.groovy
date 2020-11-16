@@ -18,7 +18,7 @@ def buildTestImage(String credentialsId, String registry, String projectName, St
   Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, tag)
 }
 
-def runTests(String projectName, String serviceName, String buildNumber, String tag, int pr, String environment) {
+def runTests(String projectName, String serviceName, String buildNumber, String tag, String pr, String environment) {
   Tests.runTests(this, projectName, serviceName, buildNumber, tag, pr, environment)
 }
 
