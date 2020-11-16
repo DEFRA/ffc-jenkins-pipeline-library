@@ -4,14 +4,23 @@ def call(Map config=[:]) {
   def nodeDevelopmentImage = 'defradigital/node-development'
   def localSrcFolder = '.'
   def lcovFile = './test-output/lcov.info'
-  def repoName = ''
-  def pr = ''
+  def repoName = 'ffc-demo-web'
+  def pr = 'psd-524-github-commit-message'
   def tag = ''
   def mergedPrNo = ''
 
   node {
     try {
-      stage('Set default branch') {
+      
+      stage('Trigger GitHub release') {
+          withCredentials([
+            string(credentialsId: 'github-auth-token', variable: 'gitToken')
+          ]) {
+            release.trigger(tag, repoName, tag, gitToken)
+          }
+        }
+
+/*       stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
 
@@ -128,7 +137,7 @@ def call(Map config=[:]) {
 
       stage('Run Acceptance Tests') {
         test.runAcceptanceTests(pr, config.environment, repoName)
-      }
+      } */
 
     } catch(e) {
       def errMsg = utils.getErrorMessage(e)
