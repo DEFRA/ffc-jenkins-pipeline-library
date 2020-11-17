@@ -47,6 +47,9 @@ class Build implements Serializable {
     } else {
       // def rawTag = pr ? "pr$pr" : branch
       def rawTag = Utils.getCommitMessage()
+
+      ctx.echo("rawTag: $rawTag")
+
       tag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
