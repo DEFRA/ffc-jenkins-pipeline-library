@@ -45,8 +45,8 @@ class Build implements Serializable {
     if (branch == defaultBranch) {
       tag = version
     } else {
-      // def rawTag = pr ? "pr$pr" : branch
-      def rawTag = Utils.getCommitMessage(ctx)
+      def rawTag = pr ? "pr$pr" : branch
+      //def rawTag = Utils.getCommitMessage(ctx)
 
       ctx.echo("rawTag: $rawTag")
 
