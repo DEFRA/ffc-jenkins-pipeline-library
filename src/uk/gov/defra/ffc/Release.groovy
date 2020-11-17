@@ -46,6 +46,10 @@ class Release implements Serializable {
   }
 
   static def trigger(ctx, versionTag, repoName, releaseDescription, token){
+
+    ctx.echo("releaseDescription: $releaseDescription")
+    ctx.echo("versionTag $versionTag")
+    
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo("Release $versionTag already exists")
       return false
