@@ -29,8 +29,8 @@ def call(Map config=[:]) {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            
-            release.trigger(utils.getCommitMessage(), repoName, utils.getCommitMessage(), gitToken)
+            def commitMessage = utils.getCommitMessage()
+            release.trigger(commitMessage, repoName, commitMessage, gitToken)
           }
         }
 
