@@ -45,11 +45,30 @@ class Release implements Serializable {
     }
   }
 
+  /* static def URI uriEncode(String url) {
+    try {
+        def int lastSlashIndex = url.lastIndexOf('/') + 1
+        return new URI(url.substring(0, lastSlashIndex) + URLEncoder.encode(url.substring(lastSlashIndex), "UTF-8"))
+    }
+    catch (e) {
+        log.error ('error while encoding uri for ' + url + ' - message: ' + e.message)
+        return null
+    }
+  }
+ */
+
+
   static def trigger(ctx, versionTag, repoName, releaseDescription, token){
 
     ctx.echo("releaseDescription: $releaseDescription")
     ctx.echo("versionTag $versionTag")
-    
+
+    String encoded_versionTag = java.net.URLEncoder.encode(versionTag, "UTF-8")
+
+    ctx.echo("versionTag encoded: $encoded_versionTag")
+
+    assert (uriEncode(url).toString() == 
+
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo("Release $versionTag already exists")
       return false
