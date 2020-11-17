@@ -67,8 +67,6 @@ class Release implements Serializable {
 
     ctx.echo("versionTag encoded: $encoded_versionTag")
 
-    assert (uriEncode(url).toString() == 
-
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo("Release $versionTag already exists")
       return false
