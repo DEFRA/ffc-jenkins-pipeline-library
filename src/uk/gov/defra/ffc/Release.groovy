@@ -77,7 +77,7 @@ class Release implements Serializable {
     result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
     ctx.echo("The release result is $result")
 
-    if (exists(ctx, encoded_versionTag, repoName, token)) {
+    if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo('Release Successful')
     } else {
       throw new Exception('Release failed')
