@@ -25,6 +25,12 @@ def call(Map config=[:]) {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
 
+      if (pr != '') {
+        stage('Verify version incremented') {
+          version.verifyPackageJsonIncremented(defaultBranch)
+        }
+      }
+
       stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')

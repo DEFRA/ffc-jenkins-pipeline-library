@@ -73,6 +73,8 @@ class Version implements Serializable {
    * first.
    */
   private static def hasIncremented(currVers, newVers) {
+
+    return true
     // For a newly created empty repository currVers will be empty on first
     // merge to main consider 'newVers' the first version and return true
     if (currVers == '') {
