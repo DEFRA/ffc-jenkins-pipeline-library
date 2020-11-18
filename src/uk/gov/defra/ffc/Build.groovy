@@ -49,8 +49,6 @@ class Build implements Serializable {
       tag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
-    tag = version
-
     def mergedPrNo = Utils.getMergedPrNo(ctx)
     def repoUrl = Utils.getRepoUrl(ctx)
     return [repoName, pr, tag, mergedPrNo]
