@@ -63,10 +63,6 @@ class Release implements Serializable {
     ctx.echo("releaseDescription: $releaseDescription")
     ctx.echo("versionTag $versionTag")
 
-    String encoded_versionTag = java.net.URLEncoder.encode(versionTag, "UTF-8")
-
-    ctx.echo("versionTag encoded: $encoded_versionTag")
-
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo("Release $versionTag already exists")
       return false
