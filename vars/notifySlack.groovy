@@ -1,6 +1,6 @@
 import uk.gov.defra.ffc.Notifications
 
-def buildFailure(channel, defaultBranch) {
+def buildFailure(String channel, String defaultBranch) {
   Notifications.buildFailure(this, channel, defaultBranch)
 }
 
@@ -8,6 +8,6 @@ def deploymentFailure() {
   Notifications.deploymentFailure(this)
 }
 
-def sendMessage(channel, message, useHere) {
+def sendMessage(String channel, String message, String useHere) {
   Notifications.sendMessage(this, channel, message, useHere)
 }
