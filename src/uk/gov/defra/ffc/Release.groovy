@@ -71,8 +71,8 @@ class Release implements Serializable {
     ctx.echo("Triggering release $versionTag for $repoName")
     boolean result = false
 
-     String releaseDescriptionTrimmed = releaseDescription.replaceAll("\\r\\n|\\r|\\n", " ")
-    // String releaseDescriptionTrimmed = releaseDescription.replaceAll('\n','<br />')
+     //String releaseDescriptionTrimmed = releaseDescription.replaceAll("\\r\\n|\\r|\\n", " ")
+     String releaseDescriptionTrimmed = releaseDescription.replaceAll('\n','<br />')
 
      //String releaseDescriptionTrimmed = releaseDescription.replaceAll('$','')
      //String releaseDescriptionTrimmed = Utils.escapeSpecialChars(releaseDescription)
