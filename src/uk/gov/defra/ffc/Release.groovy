@@ -74,8 +74,8 @@ class Release implements Serializable {
     // String releaseDescriptionTrimmed = releaseDescription.replaceAll("\\r\\n|\\r|\\n", " ")
     // String releaseDescriptionTrimmed = releaseDescription.replaceAll('\n','<br />')
 
-     String releaseDescriptionTrimmed = releaseDescription.replaceAll('$','')
-     releaseDescriptionTrimmed = Utils.escapeSpecialChars(releaseDescription)
+     //String releaseDescriptionTrimmed = releaseDescription.replaceAll('$','')
+     String releaseDescriptionTrimmed = Utils.escapeSpecialChars(releaseDescription)
 
     result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" $releaseDescriptionTrimmed \" }' https://api.github.com/repos/DEFRA/$repoName/releases")
     ctx.echo("The release result is $result")
