@@ -8,6 +8,6 @@ def deploymentFailure() {
   Notifications.deploymentFailure(this)
 }
 
-def sendMessage(String channel, String message, String useHere) {
+def sendMessage(String channel, String message, Boolean useHere) {
   Notifications.sendMessage(this, channel, message, useHere)
 }
