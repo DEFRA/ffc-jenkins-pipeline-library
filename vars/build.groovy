@@ -14,11 +14,11 @@ def checkoutSourceCode(String defaultBranch) {
   return Build.checkoutSourceCode(this, defaultBranch)
 }
 
-def buildTestImage(String credentialsId, String registry, String projectName, String buildNumber, String tag) {
+def buildTestImage(String credentialsId, String registry, String projectName, int buildNumber, String tag) {
   Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, tag)
 }
 
-def runTests(String projectName, String serviceName, String buildNumber, String tag, String pr, String environment) {
+def runTests(String projectName, String serviceName, int buildNumber, String tag, String pr, String environment) {
   Tests.runTests(this, projectName, serviceName, buildNumber, tag, pr, environment)
 }
 
@@ -30,7 +30,7 @@ def npmAudit(String auditLevel, String logType, String failOnIssues, String cont
   Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr)
 }
 
-def extractSynkFiles(String projectName, String buildNumber, String tag) {
+def extractSynkFiles(String projectName, int buildNumber, String tag) {
   Build.extractSynkFiles(this, projectName, buildNumber, tag)
 }
 
