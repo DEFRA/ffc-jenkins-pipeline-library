@@ -100,6 +100,16 @@ def call(Map config=[:]) {
         stage('Helm install') {
           helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag, pr)
         }
+
+        stage('Trigger GitHub release') {
+          withCredentials([
+            string(credentialsId: 'github-auth-token', variable: 'gitToken')
+          ]) {
+            def commitMessage = utils.getCommitMessage()
+            release.trigger(tag, repoName, commitMessage, gitToken)            
+          }
+        }
+        
       } else {
         stage('Publish chart') {
           helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
