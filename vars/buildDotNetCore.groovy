@@ -44,7 +44,7 @@ def call(Map config=[:]) {
        stage('Snyk test') {
          // ensure obj folder exists and is writable by all
          sh("chmod 777 ${config.project}/obj || mkdir -p -m 777 ${config.project}/obj")
-         build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
+         build.extractSynkFiles(repoName, BUILD_NUMBER.toInteger(), tag)
          build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln", pr)
        }
      }
@@ -55,11 +55,11 @@ def call(Map config=[:]) {
 
       if (fileExists('./docker-compose.test.yaml')) {
         stage('Build test image') {
-          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER.toInteger(), tag)
+          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
         }
 
         stage('Run tests') {
-          build.runTests(repoName, repoName, BUILD_NUMBER.toInteger(), tag, pr, config.environment)
+          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
         }
 
         stage('Publish pact broker') {

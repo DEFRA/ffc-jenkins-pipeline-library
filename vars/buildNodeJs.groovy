@@ -56,11 +56,11 @@ def call(Map config=[:]) {
 
       if (fileExists('./docker-compose.test.yaml')) {
         stage('Build test image') {
-          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER.toInteger(), tag)
+          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
         }
 
         stage('Run tests') {
-          build.runTests(repoName, repoName, BUILD_NUMBER.toInteger(), tag, pr, config.environment)
+          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
         }
 
         stage('Create JUnit report') {
@@ -81,11 +81,11 @@ def call(Map config=[:]) {
       }
 
       stage('Run Zap Scan') {
-        test.runZapScan(repoName, BUILD_NUMBER.toInteger(), tag)
+        test.runZapScan(repoName, BUILD_NUMBER, tag)
       }
 
       stage('Run Accessibility tests') {
-        test.runPa11y(repoName, BUILD_NUMBER.toInteger(), tag)
+        test.runPa11y(repoName, BUILD_NUMBER, tag)
       }
 
       if (config.containsKey('testClosure')) {
