@@ -71,7 +71,7 @@ class Release implements Serializable {
     ctx.echo("Triggering release $versionTag for $repoName")
     boolean result = false
 
-     String releaseDescriptionTrimmed = releaseDescription.replaceAll("\\r\\n|\\r|\\n", "<br />")
+     //String releaseDescriptionTrimmed = releaseDescription.replaceAll("\\r\\n|\\r|\\n", "<br />")
      // String releaseDescriptionTrimmed = releaseDescription.replaceAll('\n','<br />')
 
      //String releaseDescriptionTrimmed = releaseDescription.replaceAll('$','')
@@ -79,7 +79,7 @@ class Release implements Serializable {
 
      //ctx.echo("releaseDescriptionTrimmed: $releaseDescriptionTrimmed")
 
-    result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" $releaseDescriptionTrimmed \" }' https://api.github.com/repos/DEFRA/$repoName/releases")
+    result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" $releaseDescription \" }' https://api.github.com/repos/DEFRA/$repoName/releases")
     ctx.echo("The release result is $result")
 
     if (exists(ctx, versionTag, repoName, token)) {
