@@ -1,6 +1,6 @@
 import uk.gov.defra.ffc.Version
 
-def getCSProjVersion(projName) {
+def getCSProjVersion(String projName) {
   return Version.getCSProjVersion(this, projName)
 }
 
@@ -8,18 +8,18 @@ def getPackageJsonVersion() {
   return Version.getPackageJsonVersion(this)
 }
 
-def getFileVersion(fileName) {
+def getFileVersion(String fileName) {
   return Version.getFileVersion(this, fileName)
 }
 
-def verifyCSProjIncremented(projectName, defaultBranch) {
+def verifyCSProjIncremented(String projectName, String defaultBranch) {
   Version.verifyCSProjIncremented(this, projectName, defaultBranch)
 }
 
-def verifyPackageJsonIncremented(defaultBranch) {
+def verifyPackageJsonIncremented(String defaultBranch) {
   Version.verifyPackageJsonIncremented(this, defaultBranch)
 }
 
-def verifyFileIncremented(fileName) {
+def verifyFileIncremented(String fileName) {
   Version.verifyFileIncremented(this, fileName)
 }
