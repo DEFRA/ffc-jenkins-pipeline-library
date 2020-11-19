@@ -26,7 +26,7 @@ def buildAndPushContainerImage(String credentialsId, String registry, String ima
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
 
-def npmAudit(String auditLevel, String logType, String failOnIssues, String containerImage, String containerWorkDir, String pr) {
+def npmAudit(String auditLevel, String logType, Boolean failOnIssues, String containerImage, String containerWorkDir, String pr) {
   Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr)
 }
 
