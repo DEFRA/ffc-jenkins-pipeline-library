@@ -78,7 +78,7 @@ class Build implements Serializable {
     }
   }
 
-  static def extractSynkFiles(ctx, projectName, buildNumber.toInteger(), tag) {
+  static def extractSynkFiles(ctx, projectName, buildNumber, tag) {
     try {
       ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.snyk.yaml up")
     } finally {
