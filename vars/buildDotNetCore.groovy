@@ -55,11 +55,11 @@ def call(Map config=[:]) {
 
       if (fileExists('./docker-compose.test.yaml')) {
         stage('Build test image') {
-          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER.toInteger(), tag)
         }
 
         stage('Run tests') {
-          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
+          build.runTests(repoName, repoName, BUILD_NUMBER.toInteger(), tag, pr, config.environment)
         }
 
         stage('Publish pact broker') {
