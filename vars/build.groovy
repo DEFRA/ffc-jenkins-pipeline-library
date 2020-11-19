@@ -34,6 +34,6 @@ def extractSynkFiles(String projectName, String buildNumber, String tag) {
   Build.extractSynkFiles(this, projectName, buildNumber, tag)
 }
 
-def snykTest(String failOnIssues, String organisation, String severity, String targetFile = '', String pr) {
+def snykTest(Boolean failOnIssues, String organisation, String severity, String targetFile = '', String pr) {
   Build.snykTest(this, failOnIssues, organisation, severity, targetFile, pr)
 }
