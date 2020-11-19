@@ -44,40 +44,16 @@ class Release implements Serializable {
       ctx.deleteDir()
     }
   }
-
-  /* static def URI uriEncode(String url) {
-    try {
-        def int lastSlashIndex = url.lastIndexOf('/') + 1
-        return new URI(url.substring(0, lastSlashIndex) + URLEncoder.encode(url.substring(lastSlashIndex), "UTF-8"))
-    }
-    catch (e) {
-        log.error ('error while encoding uri for ' + url + ' - message: ' + e.message)
-        return null
-    }
-  }
- */
-
-
+  
   static def trigger(ctx, versionTag, repoName, releaseDescription, token){
-
-    ctx.echo("releaseDescription: $releaseDescription")
-    ctx.echo("versionTag $versionTag")
-
+   
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo("Release $versionTag already exists")
       return false
     }
 
     ctx.echo("Triggering release $versionTag for $repoName")
-    boolean result = false
-
-     //String releaseDescriptionTrimmed = releaseDescription.replaceAll("\\r\\n|\\r|\\n", "<br />")
-     // String releaseDescriptionTrimmed = releaseDescription.replaceAll('\n','<br />')
-
-     //String releaseDescriptionTrimmed = releaseDescription.replaceAll('$','')
-     //String releaseDescriptionTrimmed = Utils.escapeSpecialChars(releaseDescription)
-
-     //ctx.echo("releaseDescriptionTrimmed: $releaseDescriptionTrimmed")
+    boolean result = false    
 
     result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" $releaseDescription \" }' https://api.github.com/repos/DEFRA/$repoName/releases")
     ctx.echo("The release result is $result")

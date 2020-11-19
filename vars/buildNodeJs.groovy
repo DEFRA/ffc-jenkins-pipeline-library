@@ -11,36 +11,7 @@ def call(Map config=[:]) {
 
   node {
     try {
-      
       stage('Set default branch') {
-        defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
-      }
-
-      stage('Checkout source code') {
-        build.checkoutSourceCode(defaultBranch)
-      }
-
-      stage('Set PR, and tag variables') {
-        def version = version.getPackageJsonVersion()
-        (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
-      }
-
-      if (pr != '') {
-        stage('Verify version incremented') {
-          version.verifyPackageJsonIncremented(defaultBranch)
-        }
-      }
-
-      stage('Trigger GitHub release') {
-          withCredentials([
-            string(credentialsId: 'github-auth-token', variable: 'gitToken')
-          ]) {
-            def commitMessage = utils.getCommitMessage()
-            release.trigger(tag, repoName, commitMessage, gitToken)
-          }
-        }
-
-/*    stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
 
@@ -138,7 +109,8 @@ def call(Map config=[:]) {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            release.trigger(tag, repoName, tag, gitToken)
+            def commitMessage = utils.getCommitMessage()
+            release.trigger(tag, repoName, commitMessage, gitToken)            
           }
         }
 
@@ -157,7 +129,7 @@ def call(Map config=[:]) {
 
       stage('Run Acceptance Tests') {
         test.runAcceptanceTests(pr, config.environment, repoName)
-      } */
+      }
 
     } catch(e) {
       def errMsg = utils.getErrorMessage(e)
@@ -173,7 +145,7 @@ def call(Map config=[:]) {
 
       throw e
     } finally {
-      /* stage('Clean up test output') {
+      stage('Clean up test output') {
         test.deleteOutput(nodeDevelopmentImage, containerSrcFolder)
       }
 
@@ -183,7 +155,7 @@ def call(Map config=[:]) {
 
       if (config.containsKey('finallyClosure')) {
         config['finallyClosure']()
-      } */
+      }
     }
   }
 }
