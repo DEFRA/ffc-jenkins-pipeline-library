@@ -1,10 +1,10 @@
-def call(Map config=[:]) {
-  def defaultBranch = 'main'
-  def tag = ''
-  def mergedPrNo = ''
-  def pr = ''
-  def repoName = ''
-  def csProjVersion = ''
+void call(Map config=[:]) {
+  string defaultBranch = 'main'
+  string tag = ''
+  string mergedPrNo = ''
+  string pr = ''
+  string repoName = ''
+  string csProjVersion = ''
 
   node {
     try {

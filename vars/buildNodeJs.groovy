@@ -1,13 +1,13 @@
-def call(Map config=[:]) {
-  def defaultBranch = 'main'
-  def containerSrcFolder = '\\/home\\/node'
-  def nodeDevelopmentImage = 'defradigital/node-development'
-  def localSrcFolder = '.'
-  def lcovFile = './test-output/lcov.info'
-  def repoName = ''
-  def pr = ''
-  def tag = ''
-  def mergedPrNo = ''
+void call(Map config=[:]) {
+  String defaultBranch = 'main'
+  String containerSrcFolder = '\\/home\\/node'
+  String nodeDevelopmentImage = 'defradigital/node-development'
+  String localSrcFolder = '.'
+  String lcovFile = './test-output/lcov.info'
+  String repoName = ''
+  String pr = ''
+  String tag = ''
+  String mergedPrNo = ''
 
   node {
     try {

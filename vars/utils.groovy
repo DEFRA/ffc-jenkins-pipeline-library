@@ -1,21 +1,21 @@
 import uk.gov.defra.ffc.Utils
 
-def replaceInFile(from, to, file) {
+void replaceInFile(String from, String to, String file) {
   Utils.replaceInFile(this, from, to, file)
 }
 
-def getCommitMessage() {
+String getCommitMessage() {
   return Utils.getCommitMessage(this)
 }
 
-def getCommitSha() {
+String getCommitSha() {
   return Utils.getCommitSha(this)
 }
 
-def getRepoName() {
+String getRepoName() {
   return Utils.getRepoName(this)
 }
 
-def getErrorMessage(e) {
+String getErrorMessage(e) {
   return Utils.getErrorMessage(e)
 }
