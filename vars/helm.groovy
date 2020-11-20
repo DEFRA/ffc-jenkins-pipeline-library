@@ -1,22 +1,22 @@
 import uk.gov.defra.ffc.Helm
 
-def getExtraCommands(String tag) {
+String getExtraCommands(String tag) {
   return Helm.getExtraCommands(tag)
 }
 
-def getPrCommands(String registry, String chartName, String tag) {
+String getPrCommands(String registry, String chartName, String tag) {
   return Helm.getPrCommands(registry, chartName, tag, BUILD_NUMBER)
 }
 
-def deployChart(String environment, String registry, String chartName, String tag, String pr) {
+void deployChart(String environment, String registry, String chartName, String tag, String pr) {
   Helm.deployChart(this, environment, registry, chartName, tag, pr)
 }
 
-def undeployChart(String environment, String chartName, String tag) {
+void undeployChart(String environment, String chartName, String tag) {
   Helm.undeployChart(this, environment, chartName, tag)
 }
 
-def publishChart(String registry, String chartName, String tag, String helmChartRepoType="artifactory", Boolean overwriteImagePath=true) {
+void publishChart(String registry, String chartName, String tag, String helmChartRepoType="artifactory", Boolean overwriteImagePath=true) {
   if (helmChartRepoType) {
     switch (helmChartRepoType.toLowerCase()) {
       case 'artifactory':
@@ -33,7 +33,7 @@ def publishChart(String registry, String chartName, String tag, String helmChart
   }
 }
 
-def deployRemoteChart(String environment, String namespace, String chartName, String chartVersion, String helmChartRepoType='artifactory') {
+void deployRemoteChart(String environment, String namespace, String chartName, String chartVersion, String helmChartRepoType='artifactory') {
   if (helmChartRepoType) {
     switch (helmChartRepoType.toLowerCase()) {
       case 'artifactory':
