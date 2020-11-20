@@ -110,7 +110,7 @@ def call(Map config=[:]) {
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
             def commitMessage = utils.getCommitMessage()
-            release.trigger(tag, repoName, commitMessage, gitToken)            
+            release.trigger(tag, repoName, commitMessage, gitToken)
           }
         }
 

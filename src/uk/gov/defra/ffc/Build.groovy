@@ -45,7 +45,7 @@ class Build implements Serializable {
     if (branch == defaultBranch) {
       tag = version
     } else {
-      def rawTag = pr ? "pr$pr" : branch      
+      def rawTag = pr ? "pr$pr" : branch
       tag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
     }
 
