@@ -1,4 +1,4 @@
-def call(Map config=[:], Closure body={}) {
+void call(Map config=[:], Closure body={}) {
   node {
     try {
       stage('Deploy Database') {
