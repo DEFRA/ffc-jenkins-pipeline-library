@@ -2,38 +2,38 @@ import uk.gov.defra.ffc.Build
 import uk.gov.defra.ffc.Docker
 import uk.gov.defra.ffc.Tests
 
-def getVariables(version, defaultBranch) {
+String [] getVariables(String version, String defaultBranch) {
   return Build.getVariables(this, version, defaultBranch)
 }
 
-def getDefaultBranch(defaultBranch, requestedBranch) {
+String getDefaultBranch(String defaultBranch, String requestedBranch) {
   return Build.getDefaultBranch(defaultBranch, requestedBranch)
 }
 
-def checkoutSourceCode(defaultBranch) {
+String checkoutSourceCode(String defaultBranch) {
   return Build.checkoutSourceCode(this, defaultBranch)
 }
 
-def buildTestImage(credentialsId, registry, projectName, buildNumber, tag) {
+void buildTestImage(String credentialsId, String registry, String projectName, String buildNumber, String tag) {
   Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, tag)
 }
 
-def runTests(projectName, serviceName, buildNumber, tag, pr, environment) {
+void runTests(String projectName, String serviceName, String buildNumber, String tag, String pr, String environment) {
   Tests.runTests(this, projectName, serviceName, buildNumber, tag, pr, environment)
 }
 
-def buildAndPushContainerImage(credentialsId, registry, imageName, tag) {
+void buildAndPushContainerImage(String credentialsId, String registry, String imageName, String tag) {
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
 
-def npmAudit(auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr) {
+void npmAudit(String auditLevel, String logType, Boolean failOnIssues, String containerImage, String containerWorkDir, String pr) {
   Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr)
 }
 
-def extractSynkFiles(projectName, buildNumber, tag) {
+void extractSynkFiles(String projectName, String buildNumber, String tag) {
   Build.extractSynkFiles(this, projectName, buildNumber, tag)
 }
 
-def snykTest(failOnIssues, organisation, severity, targetFile = '', pr) {
+void snykTest(Boolean failOnIssues, String organisation, String severity, String targetFile = '', String pr) {
   Build.snykTest(this, failOnIssues, organisation, severity, targetFile, pr)
 }

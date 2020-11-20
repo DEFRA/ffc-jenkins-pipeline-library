@@ -1,13 +1,13 @@
 import uk.gov.defra.ffc.Notifications
 
-def buildFailure(channel, defaultBranch) {
+void buildFailure(String channel, String defaultBranch) {
   Notifications.buildFailure(this, channel, defaultBranch)
 }
 
-def deploymentFailure() {
+void deploymentFailure() {
   Notifications.deploymentFailure(this)
 }
 
-def sendMessage(channel, message, useHere) {
+void sendMessage(String channel, String message, Boolean useHere) {
   Notifications.sendMessage(this, channel, message, useHere)
 }
