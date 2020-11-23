@@ -24,11 +24,11 @@ void analyseDotNetCode(String repoName, String branch, String defaultBranch, Str
   Tests.analyseDotNetCode(this, buildCodeAnalysisDotNetParams(repoName, branch, defaultBranch, pr))
 }
 
-String[] buildCodeAnalysisNodeJsParams(String projectName, String branch, String defaultBranch, String pr) {
+def buildCodeAnalysisNodeJsParams(String projectName, String branch, String defaultBranch, String pr) {
   return Tests.buildCodeAnalysisNodeJsParams(projectName, branch, defaultBranch, pr)
 }
 
-String[] buildCodeAnalysisDotNetParams(String projectName, String branch, String defaultBranch, String pr) {
+def buildCodeAnalysisDotNetParams(String projectName, String branch, String defaultBranch, String pr) {
   return Tests.buildCodeAnalysisDotNetParams(projectName, branch, defaultBranch, pr)
 }
 
