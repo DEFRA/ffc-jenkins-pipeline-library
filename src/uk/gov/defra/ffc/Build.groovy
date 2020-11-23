@@ -95,10 +95,10 @@ class Build implements Serializable {
 
     ctx.echo("SNYK_TOKEN: $token")
     
-    def script = "docker run -it -e SNYK_TOKEN=$snykTokenId -e USER_ID=1234 -e MONITOR=true -v $containerWorkDir:/$repoName snyk/snyk-cli:npm test --org=$organisation"
+    //def script = "docker run -it -e SNYK_TOKEN=$snykTokenId -e USER_ID=1234 -e MONITOR=true -v $containerWorkDir:/$repoName snyk/snyk-cli:npm test --org=$organisation"
 
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
-      ctx.sh(returnStatus: !failOnIssues, script: script)
+      //ctx.sh(returnStatus: !failOnIssues, script: script)
     }
   }
 }
