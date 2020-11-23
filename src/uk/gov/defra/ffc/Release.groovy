@@ -44,7 +44,7 @@ class Release implements Serializable {
       ctx.deleteDir()
     }
   }
-  
+
   static def trigger(ctx, versionTag, repoName, releaseDescription, token){
    
     if (exists(ctx, versionTag, repoName, token)) {
