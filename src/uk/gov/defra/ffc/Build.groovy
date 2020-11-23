@@ -91,8 +91,9 @@ class Build implements Serializable {
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
     String repoName = Utils.getRepoName(ctx)
+    String token = Utils.getCommitSha(ctx)
 
-    ctx.echo("SNYK_TOKEN: $snykTokenId")
+    ctx.echo("SNYK_TOKEN: $token")
     
     def script = "docker run -it -e SNYK_TOKEN=$snykTokenId -e USER_ID=1234 -e MONITOR=true -v $containerWorkDir:/$repoName snyk/snyk-cli:npm test --org=$organisation"
 
