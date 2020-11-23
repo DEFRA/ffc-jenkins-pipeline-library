@@ -43,6 +43,12 @@ void call(Map config=[:]) {
       }
 
       stage('Snyk test') {
+
+        echo("config.snykFailOnIssues: $config.snykFailOnIssues")
+        echo("config.snykOrganisation: $config.snykOrganisation")
+        echo("config.snykSeverity: $config.snykSeverity")
+        echo("pr: $pr")
+
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
 
