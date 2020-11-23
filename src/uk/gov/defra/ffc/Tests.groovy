@@ -171,11 +171,11 @@ class Tests implements Serializable {
           def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
           ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}"]) {
           ctx.sh('docker-compose run wdio-cucumber')
-          }          
+          }
         }
     } finally {
           ctx.sh('docker-compose down -v')
-        }         
+        }
       }
     } else {
       ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
