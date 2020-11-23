@@ -109,7 +109,8 @@ void call(Map config=[:]) {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            release.trigger(tag, repoName, tag, gitToken)
+            String commitMessage = utils.getCommitMessage()
+            release.trigger(tag, repoName, commitMessage, gitToken)
           }
         }
 

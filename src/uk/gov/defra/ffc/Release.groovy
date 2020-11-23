@@ -46,14 +46,16 @@ class Release implements Serializable {
   }
 
   static def trigger(ctx, versionTag, repoName, releaseDescription, token){
+   
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo("Release $versionTag already exists")
       return false
     }
 
     ctx.echo("Triggering release $versionTag for $repoName")
-    boolean result = false
-    result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" Release $releaseDescription\" }' https://api.github.com/repos/DEFRA/$repoName/releases")
+    boolean result = false    
+
+    result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" $releaseDescription \" }' https://api.github.com/repos/DEFRA/$repoName/releases")
     ctx.echo("The release result is $result")
 
     if (exists(ctx, versionTag, repoName, token)) {

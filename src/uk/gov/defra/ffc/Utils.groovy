@@ -9,7 +9,8 @@ class Utils implements Serializable {
   }
 
   static def getCommitMessage(ctx) {
-    return ctx.sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
+    def commitMessage = ctx.sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
+    return commitMessage.replaceAll("\\r\\n|\\r|\\n", "<br />")
   }
 
   static def getCommitSha(ctx) {
