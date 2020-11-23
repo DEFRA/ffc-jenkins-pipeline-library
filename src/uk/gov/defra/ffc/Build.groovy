@@ -90,8 +90,12 @@ class Build implements Serializable {
     failOnIssues = shouldFailOnIssues(failOnIssues, pr)
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
+    String repoName = Utils.getRepoName(ctx)
+
+    def script = "docker run -it -e $snykTokenId -e USER_ID=1234 -e MONITOR=true -v $containerWorkDir:/$repoName snyk/snyk-cli:npm test --org=$organisation"
+
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
-      ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token', failOnIssues: failOnIssues, organisation: organisation, severity: severity, targetFile: targetFile, additionalArguments: '--insecure')
+      ctx.sh(returnStatus: !failOnIssues, script: script)
     }
   }
 }
