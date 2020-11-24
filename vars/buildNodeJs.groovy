@@ -49,7 +49,7 @@ void call(Map config=[:]) {
         echo("config.snykSeverity: $config.snykSeverity")
         echo("pr: $pr")
 
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr, containerSrcFolder, repoName)
       }
 
       stage('Provision resources') {
