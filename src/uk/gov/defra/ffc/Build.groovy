@@ -99,7 +99,7 @@ class Build implements Serializable {
       def script = "docker run -it -e 'SNYK_TOKEN=$ctx.githubToken' -e 'USER_ID=1234' -e 'MONITOR=true' -v '$containerWorkDir:/$repoName' snyk/snyk-cli:npm test --org=$organisation"
     } */
     
-    ctx.withCredentials([ctx.string(credentialsId: 'snyk-token', variable: 'snykToken')
+    ctx.withCredentials([ctx.string(credentialsId: 'ffc-snyk-token', variable: 'snykToken')
     ]) {
         ctx.echo("SNYK TOKEN: $ctx.snykToken")
         def script = "docker run -it -e 'SNYK_TOKEN=$ctx.snykToken' -e 'USER_ID=1234' -e 'MONITOR=true' -v '$containerWorkDir:/$repoName' snyk/snyk-cli:npm test --org=$organisation"
