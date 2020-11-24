@@ -77,7 +77,7 @@ class Tests implements Serializable {
 
   static def deleteOutput(ctx, containerImage, containerWorkDir) {
     // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
-    ctx.sh("[ -d \"$ctx.WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$ctx.WORKSPACE/test-output',target=/$containerWorkDir/test-output $containerImage chown 1000: -R $ctx.WORKSPACE")    
+    ctx.sh("[ -d \"$ctx.WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$ctx.WORKSPACE',target=/$containerWorkDir $containerImage chown 1000: -R $containerWorkDir")    
   }
 
   static def analyseNodeJsCode(ctx, sonarQubeEnv, sonarScanner, params) {
