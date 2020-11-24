@@ -105,7 +105,7 @@ class Build implements Serializable {
         }
       } */
       
-        def script = "docker run -it -e 'SNYK_TOKEN=cbdbcd2c-bf47-4d4b-9371-a9c17099fe65' -e 'USER_ID=1234' -e 'MONITOR=true' -v '$containerWorkDir:/$repoName' snyk/snyk-cli:npm test --org=$organisation"
+        def script = "docker run -it -e 'SNYK_TOKEN=cbdbcd2c-bf47-4d4b-9371-a9c17099fe65' -e 'USER_ID=1234' -e 'MONITOR=true' -v '$containerWorkDir:/$project' snyk/snyk-cli:npm test --org=$organisation"
         ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
           ctx.sh(returnStatus: !failOnIssues, script: script)
         }
