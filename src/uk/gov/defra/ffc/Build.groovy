@@ -89,8 +89,7 @@ class Build implements Serializable {
   static def snykTest(ctx, failOnIssues, organisation, severity, targetFile, pr, containerWorkDir, repoName) {
     failOnIssues = shouldFailOnIssues(failOnIssues, pr)
     organisation = organisation ?: ctx.SNYK_ORG
-    severity = severity ?: 'medium'
-    String repoName = Utils.getRepoName(ctx)
+    severity = severity ?: 'medium'    
     String token = Utils.getCommitSha(ctx)   
     
     /* ctx.withCredentials([ctx.string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {    
