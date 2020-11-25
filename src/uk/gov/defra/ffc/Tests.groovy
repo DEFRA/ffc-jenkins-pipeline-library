@@ -75,11 +75,6 @@ class Tests implements Serializable {
     ctx.junit('test-output/junit.xml')
   }
 
-  static def deleteOutput(ctx, containerImage, containerWorkDir) {
-    // clean up files created by node/ubuntu user that cannot be deleted by jenkins. Note: uses global environment variable
-    ctx.sh("[ -d \"$ctx.WORKSPACE/test-output\" ] && docker run --rm -u node --mount type=bind,source='$ctx.WORKSPACE/test-output',target=/$containerWorkDir/test-output $containerImage rm -rf test-output/*")
-  }
-
   static def changeOwnershipOfWorkspace(ctx, containerImage, containerWorkDir) {
     ctx.sh("[ -d \"$ctx.WORKSPACE\" ]  && docker run --rm -u root --privileged --mount type=bind,source='$ctx.WORKSPACE',target=/$containerWorkDir $containerImage chown $ctx.JENKINS_USER_ID:$ctx.JENKINS_GROUP_ID -R -v .")
   }

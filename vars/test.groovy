@@ -12,10 +12,6 @@ void createJUnitReport() {
   Tests.createJUnitReport(this)
 }
 
-void deleteOutput(String containerImage, String containerWorkDir) {
-  Tests.deleteOutput(this, containerImage, containerWorkDir)
-}
-
 void changeOwnershipOfWorkspace(String containerImage, String containerWorkDir) {
   Tests.changeOwnershipOfWorkspace(this, containerImage, containerWorkDir)
 }
