@@ -96,19 +96,19 @@ class Build implements Serializable {
       def script = "docker run -it -e 'SNYK_TOKEN=$ctx.githubToken' -e 'USER_ID=1234' -e 'MONITOR=true' -v '$containerWorkDir:/$repoName' snyk/snyk-cli:npm test --org=$organisation"
     } */
     
-    /* ctx.withCredentials([ctx.string(credentialsId: 'ffc-snyk-token', variable: 'snykToken')
+    ctx.withCredentials([ctx.string(credentialsId: 'ffc-snyk-token', variable: 'snykToken')
     ]) {
         ctx.echo("SNYK TOKEN: $ctx.snykToken")
-        def script = "docker run -it -e 'SNYK_TOKEN=$ctx.snykToken' -e 'USER_ID=1234' -e 'MONITOR=true' -v '$containerWorkDir:/$repoName' snyk/snyk-cli:npm test --org=$organisation"
+        def script = "docker run -e 'SNYK_TOKEN=$ctx.snykToken' -e 'USER_ID=1234' -e 'MONITOR=true' -v '$ctx.WORKSPACE:/project' snyk/snyk-cli:npm test --org=$organisation"
         ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
           ctx.sh(returnStatus: !failOnIssues, script: script)
         }
-      } */
+      }
       
-        def script = "docker run -e 'SNYK_TOKEN=cbdbcd2c-bf47-4d4b-9371-a9c17099fe65' -v '/home/node:/project' snyk/snyk-cli:npm test --org=$organisation"
+        /* def script = "docker run -e 'SNYK_TOKEN=cbdbcd2c-bf47-4d4b-9371-a9c17099fe65' -v '/home/node:/project' snyk/snyk-cli:npm test --org=$organisation"
         ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
           ctx.sh(returnStatus: !failOnIssues, script: script)
-        }
+        } */
       
   }
 }
