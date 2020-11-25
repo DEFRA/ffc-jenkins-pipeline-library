@@ -16,6 +16,10 @@ void deleteOutput(String containerImage, String containerWorkDir) {
   Tests.deleteOutput(this, containerImage, containerWorkDir)
 }
 
+void changeOwnershipOfWorkspace(String containerImage, String containerWorkDir) {
+  Tests.changeOwnershipOfWorkspace(this, containerImage, containerWorkDir)
+}
+
 void analyseNodeJsCode(String sonarQubeEnv, String sonarScanner, String repoName, String branch, String defaultBranch, String pr) {
   Tests.analyseNodeJsCode(this, sonarQubeEnv, sonarScanner, buildCodeAnalysisNodeJsParams(repoName, branch, defaultBranch, pr))
 }
@@ -39,7 +43,6 @@ void runAcceptanceTests(String pr, String environment, String repoName) {
 void runZapScan(String projectName, String buildNumber, String tag) {
   Tests.runZapScan(this, projectName, buildNumber, tag)
 }
-
 
 void runPa11y(String projectName, String buildNumber, String tag) {
   Tests.runPa11y(this, projectName, buildNumber, tag)

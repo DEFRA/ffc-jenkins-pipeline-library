@@ -146,7 +146,7 @@ void call(Map config=[:]) {
       throw e
     } finally {
       stage('Clean up test output') {
-        test.deleteOutput(nodeDevelopmentImage, containerSrcFolder)
+        test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
       }
 
       stage('Clean up resources') {
