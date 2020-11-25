@@ -95,7 +95,7 @@ class Build implements Serializable {
     /* ctx.withCredentials([ctx.string(credentialsId: 'github-auth-token', variable: 'githubToken')]) {    
       def script = "docker run -it -e 'SNYK_TOKEN=$ctx.githubToken' -e 'USER_ID=1234' -e 'MONITOR=true' -v '$containerWorkDir:/$repoName' snyk/snyk-cli:npm test --org=$organisation"
     } */
-    ctx.sh('mkdir -p -m 777 snyk-cli'){
+    ctx.sh('mkdir -p -m 777 snyk-cli')
       ctx.dir('snyk-cli') {
 
 
@@ -108,7 +108,7 @@ class Build implements Serializable {
           }
         }
       }
-    }
+    
         /* def script = "docker run -e 'SNYK_TOKEN=cbdbcd2c-bf47-4d4b-9371-a9c17099fe65' -v '/home/node:/project' snyk/snyk-cli:npm test --org=$organisation"
         ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
           ctx.sh(returnStatus: !failOnIssues, script: script)
