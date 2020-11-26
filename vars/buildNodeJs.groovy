@@ -43,7 +43,7 @@ void call(Map config=[:]) {
       }
 
       stage('Snyk test') {  
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr, 'npm')
       }
 
       stage('Provision resources') {
