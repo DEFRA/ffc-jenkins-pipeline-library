@@ -11,6 +11,10 @@ void call(Map config=[:]) {
 
   node {
     try {
+      stage('Ensure clean workspace') {
+        deleteDir()
+      }
+
       stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
