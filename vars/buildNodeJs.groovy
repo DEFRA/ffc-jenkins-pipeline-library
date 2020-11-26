@@ -42,14 +42,8 @@ void call(Map config=[:]) {
         build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
       }
 
-      stage('Snyk test') {
-
-        echo("config.snykFailOnIssues: $config.snykFailOnIssues")
-        echo("config.snykOrganisation: $config.snykOrganisation")
-        echo("config.snykSeverity: $config.snykSeverity")
-        echo("pr: $pr")
-
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr, containerSrcFolder, repoName)
+      stage('Snyk test') {  
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
 
       stage('Provision resources') {
