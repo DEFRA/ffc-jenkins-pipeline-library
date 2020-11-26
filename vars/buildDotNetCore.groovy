@@ -1,13 +1,19 @@
 void call(Map config=[:]) {
-  string defaultBranch = 'main'
-  string tag = ''
-  string mergedPrNo = ''
-  string pr = ''
-  string repoName = ''
-  string csProjVersion = ''
+  String defaultBranch = 'main'
+  String tag = ''
+  String mergedPrNo = ''
+  String pr = ''
+  String repoName = ''
+  String csProjVersion = ''
+  String containerSrcFolder = '\\/home\\/dotnet'
+  String dotnetDevelopmentImage = 'defradigital/dotnetcore-development'
 
   node {
     try {
+      stage('Ensure clean workspace') {
+        deleteDir()
+      }
+
       stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
@@ -123,6 +129,9 @@ void call(Map config=[:]) {
 
       throw e
     } finally {
+      stage('Change ownership of outputs') {
+        test.changeOwnershipOfWorkspace(dotnetDevelopmentImage, containerSrcFolder)
+      }
 
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)
