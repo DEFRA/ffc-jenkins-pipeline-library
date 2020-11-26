@@ -76,7 +76,7 @@ class Tests implements Serializable {
   }
 
   static def changeOwnershipOfWorkspace(ctx, containerImage, containerWorkDir) {
-    ctx.sh("[ -d \"$ctx.WORKSPACE\" ]  && docker run --rm -u root --privileged --mount type=bind,source='$ctx.WORKSPACE',target=/$containerWorkDir $containerImage chown $ctx.JENKINS_USER_ID:$ctx.JENKINS_GROUP_ID -R -v .")
+    ctx.sh("[ -d \"$ctx.WORKSPACE\" ]  && docker run --rm -u root --privileged --mount type=bind,source='$ctx.WORKSPACE',target=/$containerWorkDir $containerImage chown $ctx.JENKINS_USER_ID:$ctx.JENKINS_GROUP_ID -R .")
   }
 
   static def analyseNodeJsCode(ctx, sonarQubeEnv, sonarScanner, params) {
