@@ -86,12 +86,21 @@ class Build implements Serializable {
     }
   }
 
-  static def snykTest(ctx, failOnIssues, organisation, severity, targetFile, pr) {
+  static def snykTest(ctx, failOnIssues, organisation, severity, targetFile, pr, containerWorkDir, repoName) {
     failOnIssues = shouldFailOnIssues(failOnIssues, pr)
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
-    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
-      ctx.snykSecurity(snykInstallation: 'snyk-default', snykTokenId: 'snyk-token', failOnIssues: failOnIssues, organisation: organisation, severity: severity, targetFile: targetFile, additionalArguments: '--insecure')
-    }
+    
+    ctx.sh('mkdir -p -m 777 snyk-cli')
+    ctx.dir('snyk-cli') {
+      ctx.withCredentials([ctx.string(credentialsId: 'ffc-snyk-token', variable: 'snykToken')
+      ]) {
+          ctx.echo("SNYK TOKEN: $ctx.snykToken")
+          def script = "docker run -e 'SNYK_TOKEN=$ctx.snykToken' -e 'MONITOR=true' -v '$ctx.WORKSPACE:/project' snyk/snyk-cli:npm test --json" 
+          ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
+            ctx.sh(returnStatus: !failOnIssues, script: script)
+          }
+        }
+      }
   }
 }
