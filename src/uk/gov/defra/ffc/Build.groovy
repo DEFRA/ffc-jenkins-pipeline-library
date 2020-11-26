@@ -86,7 +86,7 @@ class Build implements Serializable {
     }
   }
 
-  static def snykTest(ctx, failOnIssues, organisation, severity, targetFile, pr, type) {
+  static def snykTest(ctx, failOnIssues, organisation, severity, targetFile, pr) {
     failOnIssues = shouldFailOnIssues(failOnIssues, pr)
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
