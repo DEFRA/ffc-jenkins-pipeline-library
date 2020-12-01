@@ -128,7 +128,7 @@ class Provision implements Serializable {
     // only one). The keys are set to the `dev` env. If the PR env was to use a
     // different message queue host it would be checked here and
     // `appConfigPrefix` updated accordingly.
-    def appConfigPrefix = environment + '/'
+    def appConfigPrefix = 'common/'
     def messageQueueHost = 'container.messageQueueHost'
     def messageQueuePassword = 'container.messageQueuePassword'
     def messageQueueUser = 'container.messageQueueUser'
@@ -293,8 +293,8 @@ class Provision implements Serializable {
 
   private static def getUserPostgresEnvVars(ctx, environment, repoName, pr) {
     def isPr = pr != ''
-    def appConfigPrefix = environment + '/'
-    def postgresUserKey = isPr ? 'pr/postgresService.postgresUser' : 'postgresService.postgresUser'
+    def appConfigPrefix = isPr ? 'pr/' : environment + '/'
+    def postgresUserKey = 'postgresService.postgresUser'
 
     def appConfigValues = isPr
       ? Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, Utils.defaultNullLabel, false) 
