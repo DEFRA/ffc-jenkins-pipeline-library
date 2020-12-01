@@ -1,5 +1,6 @@
 void call(Map config=[:]) {
   String defaultBranch = 'main'
+  String environment = 'snd'
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
   String localSrcFolder = '.'
@@ -17,6 +18,10 @@ void call(Map config=[:]) {
 
       stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
+      }
+
+      stage('Set environment') {
+        environment = config.environment != null ? config.environment : environment
       }
 
       stage('Checkout source code') {
