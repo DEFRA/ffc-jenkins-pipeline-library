@@ -56,7 +56,7 @@ void call(Map config=[:]) {
       }
 
       stage('Provision resources') {
-        provision.createResources(config.environment, repoName, pr)
+        provision.createResources(environment, repoName, pr)
       }
 
       if (config.containsKey('buildClosure')) {
@@ -69,7 +69,7 @@ void call(Map config=[:]) {
         }
 
         stage('Run tests') {
-          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
+          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
         }
 
         stage('Create JUnit report') {
@@ -107,7 +107,7 @@ void call(Map config=[:]) {
 
       if (pr != '') {
         stage('Helm install') {
-          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag, pr)
+          helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
         }
       } else {
         stage('Publish chart') {
@@ -127,7 +127,7 @@ void call(Map config=[:]) {
           withCredentials([
             string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
           ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': config.environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
           }
         }
       }
@@ -137,7 +137,7 @@ void call(Map config=[:]) {
       }
 
       stage('Run Acceptance Tests') {
-        test.runAcceptanceTests(pr, config.environment, repoName)
+        test.runAcceptanceTests(pr, environment, repoName)
       }
 
     } catch(e) {
