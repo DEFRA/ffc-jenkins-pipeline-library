@@ -43,9 +43,9 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      // stage('Helm lint') {
-      //   test.lintHelm(repoName)
-      // }
+      stage('Helm lint') {
+        test.lintHelm(repoName)
+      }
 
       // stage('npm audit') {
       //   build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
