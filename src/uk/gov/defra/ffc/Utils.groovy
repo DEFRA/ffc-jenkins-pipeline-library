@@ -3,6 +3,7 @@ package uk.gov.defra.ffc
 class Utils implements Serializable {
   static String suppressConsoleOutput = '#!/bin/bash +x\n'
   static String defaultNullLabel = '\\\\0'
+  static int appConfigReturnLimit = 1000
 
   static def replaceInFile(ctx, from, to, file) {
     ctx.sh("sed -i -e 's/$from/$to/g' $file")
@@ -98,7 +99,7 @@ class Utils implements Serializable {
   static def getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel=defaultNullLabel, escapeChars = true) {
     // The jq command in the follow assumes there is only one value per key
     // This is true ONLY if you specify a label in the az appconfig kv command
-    def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"*\" --label=$appConfigLabel --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
+    def appConfigResults = ctx.sh(returnStdout: true, script:"$suppressConsoleOutput az appconfig kv list --subscription \$APP_CONFIG_SUBSCRIPTION --name \$APP_CONFIG_NAME --key \"$appConfigPrefix*\" --label=$appConfigLabel --top $appConfigReturnLimit --resolve-keyvault | jq '. | map({ (.key): .value }) | add'").trim()
     def appConfigMap = ctx.readJSON([text: appConfigResults, returnPojo: true]) ?: [:]
     def configValues = [:]
 
