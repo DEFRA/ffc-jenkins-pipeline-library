@@ -46,7 +46,7 @@ class Helm implements Serializable {
         def extraCommands = getExtraCommands(tag)
         def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-        // read Helm values file to get list of keys to match in Azure Applicaiton Configuration
+        // read Helm values file to get list of keys to match in Azure Application Configuration
         def helmValuesKeys = getHelmValuesKeys(ctx, helmValuesFilePath)
 
         // first get all common keys from Azure Applicaiton Configuration matching Helm values
@@ -174,17 +174,44 @@ class Helm implements Serializable {
             ctx.sh("helm registry login $ctx.DOCKER_REGISTRY --username $ctx.username --password $ctx.password")
             ctx.sh("helm chart pull $helmChartName")
             ctx.sh("helm chart export $helmChartName --destination .")
+            String helmValuesFilePath = "$chartName/values.yaml"
 
             def extraCommands = getExtraCommands(chartVersion)
 
-            def helmValuesKeys = getHelmValuesKeys(ctx, "$chartName/values.yaml")
-            def appConfigPrefix = environment + '/'
-            def defaultConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
-            def defaultConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
+            def helmValuesKeys = getHelmValuesKeys(ctx, helmValuesFilePath)
+
+            // first get all common keys from Azure Applicaiton Configuration matching Helm values
+            String commonPrefix = 'common/'
+            def commonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix))
+            def commonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix, chartName))
+
+            // next get all environment specific keys from Azure Applicaiton Configuration matching Helm values
+            String environmentPrefix = environment + '/'
+            def environmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix))
+            def environmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix, chartName))
+
+            // next get all service specific keys from Azure Applicaiton Configuration if the values file includes a workstream property
+            String serviceName = ctx.sh(returnStdout: true, script: "yq r $helmValuesFilePath workstream").trim()
+            def serviceCommonConfigValues
+            def serviceCommonConfigValuesChart
+            def serviceEnvironmentConfigValues
+            def serviceEnvironmentConfigValuesChart 
+
+            if(serviceName != '') {
+              // get common values for a service
+              String serviceCommonPrefix = serviceName + '/common'
+              serviceCommonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix))
+              serviceCommonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix, chartName))
+
+              // get environment values for a service
+              String serviceEnvironmentPrefix = serviceName + '/' + environment + '/'
+              serviceEnvironmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceEnvironmentPrefix))
+              serviceEnvironmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceEnvironmentPrefix, chartName))
+            }
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
             ctx.echo('Running helm upgrade, console output suppressed')
-            ctx.sh("$Utils.suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $defaultConfigValues $defaultConfigValuesChart --set namespace=$namespace $extraCommands")
+            ctx.sh("$Utils.suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart --set namespace=$namespace $extraCommands")
 
             ctx.deleteDir()
           }
