@@ -43,67 +43,67 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      stage('Helm lint') {
-        test.lintHelm(repoName)
-      }
+      // stage('Helm lint') {
+      //   test.lintHelm(repoName)
+      // }
 
-      stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
-      }
+      // stage('npm audit') {
+      //   build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
+      // }
 
-      stage('Snyk test') {
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
-      }
+      // stage('Snyk test') {
+      //   build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
+      // }
 
-      stage('Provision resources') {
-        provision.createResources(environment, repoName, pr)
-      }
+      // stage('Provision resources') {
+      //   provision.createResources(environment, repoName, pr)
+      // }
 
-      if (config.containsKey('buildClosure')) {
-        config['buildClosure']()
-      }
+      // if (config.containsKey('buildClosure')) {
+      //   config['buildClosure']()
+      // }
 
-      if (fileExists('./docker-compose.test.yaml')) {
-        stage('Build test image') {
-          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-        }
+      // if (fileExists('./docker-compose.test.yaml')) {
+      //   stage('Build test image') {
+      //     build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+      //   }
 
-        stage('Run tests') {
-          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
-        }
+      //   stage('Run tests') {
+      //     build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
+      //   }
 
-        stage('Create JUnit report') {
-          test.createJUnitReport()
-        }
+      //   stage('Create JUnit report') {
+      //     test.createJUnitReport()
+      //   }
 
-        stage('Fix lcov report') {
-          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-        }
+      //   stage('Fix lcov report') {
+      //     utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      //   }
 
-        stage('Publish pact broker') {
-          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
-        }
-      }
+      //   stage('Publish pact broker') {
+      //     pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
+      //   }
+      // }
 
-      stage('SonarCloud analysis') {
-        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
-      }
+      // stage('SonarCloud analysis') {
+      //   test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
+      // }
 
-      stage('Run Zap Scan') {
-        test.runZapScan(repoName, BUILD_NUMBER, tag)
-      }
+      // stage('Run Zap Scan') {
+      //   test.runZapScan(repoName, BUILD_NUMBER, tag)
+      // }
 
-      stage('Run Accessibility tests') {
-        test.runPa11y(repoName, BUILD_NUMBER, tag)
-      }
+      // stage('Run Accessibility tests') {
+      //   test.runPa11y(repoName, BUILD_NUMBER, tag)
+      // }
 
-      if (config.containsKey('testClosure')) {
-        config['testClosure']()
-      }
+      // if (config.containsKey('testClosure')) {
+      //   config['testClosure']()
+      // }
 
-      stage('Build & push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
-      }
+      // stage('Build & push container image') {
+      //   build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
+      // }
 
       if (pr != '') {
         stage('Helm install') {

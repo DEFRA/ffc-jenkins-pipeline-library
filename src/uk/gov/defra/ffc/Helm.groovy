@@ -55,7 +55,7 @@ class Helm implements Serializable {
         def environmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix))
         def environmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix, chartName))
 
-        String serviceName = helmValuesKeys['workstream']
+        def serviceName = helmValuesKeys['workstream']
         def serviceCommonConfigValues
         def serviceCommonConfigValuesChart
         def serviceEnvironmentConfigValues
