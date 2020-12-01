@@ -16,7 +16,7 @@ class Utils implements Serializable {
     ctx.echo('output commit messge replaced: ' + commitMessage.replace(/'/, /\'/))
     ctx.echo('output commit messge : ' + commitMessage)
 
-    return commitMessage.replaceAll("\\r\\n|\\r|\\n", "<br />").replace(/'/, /\'/)
+    return commitMessage.replaceAll("\\r\\n|\\r|\\n", "<br />").replace(/'/, /\u0027/)
   }
 
   static def getCommitSha(ctx) {
