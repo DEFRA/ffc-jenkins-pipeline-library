@@ -13,10 +13,10 @@ class Utils implements Serializable {
 
     commitMessage = escapeSpecialChars(commitMessage)
 
-    ctx.echo('output commit messge replaced: ' + commitMessage.replace(/'/, /\u0027/))
+    ctx.echo('output commit messge replaced: ' + commitMessage.replace("'", /'"'"'/))
     ctx.echo('output commit messge : ' + commitMessage)
 
-    return commitMessage.replaceAll("\\r\\n|\\r|\\n", "<br />").replace(/'/, /\u0027/)
+    return commitMessage.replaceAll("\\r\\n|\\r|\\n", "<br />").replace("'", /'"'"'/)
   }
 
   static def getCommitSha(ctx) {
