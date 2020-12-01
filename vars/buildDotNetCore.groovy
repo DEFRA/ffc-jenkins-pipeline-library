@@ -1,5 +1,6 @@
 void call(Map config=[:]) {
   String defaultBranch = 'main'
+  String environment = 'snd'
   String tag = ''
   String mergedPrNo = ''
   String pr = ''
@@ -16,6 +17,10 @@ void call(Map config=[:]) {
 
       stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
+      }
+
+      stage('Set environment') {
+        environment = config.environment != null ? config.environment : environment
       }
 
       stage('Checkout source code') {
@@ -56,7 +61,7 @@ void call(Map config=[:]) {
      }
 
       stage('Provision resources') {
-        provision.createResources(config.environment, repoName, pr)
+        provision.createResources(environment, repoName, pr)
       }
 
       if (fileExists('./docker-compose.test.yaml')) {
@@ -65,7 +70,7 @@ void call(Map config=[:]) {
         }
 
         stage('Run tests') {
-          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, config.environment)
+          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
         }
 
         stage('Publish pact broker') {
@@ -87,7 +92,7 @@ void call(Map config=[:]) {
 
       if (pr != '') {
         stage('Helm install') {
-          helm.deployChart(config.environment, DOCKER_REGISTRY, repoName, tag, pr)
+          helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
         }
       }
       else {
