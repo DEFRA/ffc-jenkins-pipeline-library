@@ -46,11 +46,35 @@ class Helm implements Serializable {
         def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
         def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
-        def appConfigPrefix = environment + '/'
-        def defaultConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix))
-        def defaultConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, appConfigPrefix, chartName))
-        def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/')))
-        def prConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, (appConfigPrefix + 'pr/'), chartName))
+
+        String commonPrefix = 'common/'
+        def commonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix))
+        def commonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix, chartName))
+
+        String environmentPrefix = environment + '/'
+        def environmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix))
+        def environmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix, chartName))
+
+        String serviceName = helmValuesKeys['workstream']
+        def serviceCommonConfigValues
+        def serviceCommonConfigValuesChart
+        def serviceEnvironmentConfigValues
+        def serviceEnvironmentConfigValuesChart 
+
+        if(serviceName != '') {
+          String serviceCommonPrefix = serviceName + '/common'
+          serviceCommonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix))
+          serviceCommonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix, chartName))
+
+          String serviceEnvironmentPrefix = serviceName + '/common'
+          serviceEnvironmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceEnvironmentPrefix))
+          serviceEnvironmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceEnvironmentPrefix, chartName))
+        }
+
+        String prConfigPrefix = 'pr/'
+        def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, prConfigPrefix))
+        def prConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, prConfigPrefix, chartName))
+
         def prProvisionedValues = configItemsToSetString(
           Provision.getProvisionedQueueConfigValues(ctx, chartName, pr) +
           Provision.getProvisionedDbSchemaConfigValues(ctx, chartName, pr)
@@ -58,7 +82,7 @@ class Helm implements Serializable {
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.echo('Running helm upgrade, console output suppressed')
-        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $defaultConfigValues $defaultConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $prCommands $extraCommands")
+        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $prCommands $extraCommands")
         writeUrlIfIngress(ctx, deploymentName)
       }
     }
