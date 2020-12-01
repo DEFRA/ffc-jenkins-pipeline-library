@@ -267,7 +267,7 @@ class Provision implements Serializable {
     return [
       "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
       "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
-      "POSTGRES_HOST=${appConfigValues[postgresHostKey]}"      
+      "POSTGRES_HOST=${appConfigValues[postgresHostKey]}"
     ]
   }
 
