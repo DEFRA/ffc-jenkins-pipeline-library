@@ -13,9 +13,6 @@ class Utils implements Serializable {
 
     commitMessage = escapeSpecialChars(commitMessage)
 
-    ctx.echo('output commit messge replaced: ' + commitMessage.replace("'", /'"'"'/))
-    ctx.echo('output commit messge : ' + commitMessage)
-
     return commitMessage.replaceAll("\\r\\n|\\r|\\n", "<br />")
   }
 
