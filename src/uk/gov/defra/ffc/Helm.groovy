@@ -46,16 +46,20 @@ class Helm implements Serializable {
         def extraCommands = getExtraCommands(tag)
         def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
+        // read Helm values file to get list of keys to match in Azure Applicaiton Configuration
         def helmValuesKeys = getHelmValuesKeys(ctx, helmValuesFilePath)
 
+        // first get all common keys from Azure Applicaiton Configuration matching Helm values
         String commonPrefix = 'common/'
         def commonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix))
         def commonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix, chartName))
 
+        // next get all environment specific keys from Azure Applicaiton Configuration matching Helm values
         String environmentPrefix = environment + '/'
         def environmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix))
         def environmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix, chartName))
 
+        // next get all service specific keys from Azure Applicaiton Configuration if the values file includes a workstream property
         String serviceName = ctx.sh(returnStdout: true, script: "yq r $helmValuesFilePath workstream").trim()
         def serviceCommonConfigValues
         def serviceCommonConfigValuesChart
@@ -63,19 +67,23 @@ class Helm implements Serializable {
         def serviceEnvironmentConfigValuesChart 
 
         if(serviceName != '') {
+          // get common values for a service
           String serviceCommonPrefix = serviceName + '/common'
           serviceCommonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix))
           serviceCommonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix, chartName))
 
-          String serviceEnvironmentPrefix = serviceName + '/common'
+          // get environment values for a service
+          String serviceEnvironmentPrefix = serviceName + '/' + environment + '/'
           serviceEnvironmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceEnvironmentPrefix))
           serviceEnvironmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceEnvironmentPrefix, chartName))
         }
 
+        // next get all pr specific values
         String prConfigPrefix = 'pr/'
         def prConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, prConfigPrefix))
         def prConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, prConfigPrefix, chartName))
 
+        // finally get all dynamically provisioned values
         def prProvisionedValues = configItemsToSetString(
           Provision.getProvisionedQueueConfigValues(ctx, chartName, pr) +
           Provision.getProvisionedDbSchemaConfigValues(ctx, chartName, pr)
