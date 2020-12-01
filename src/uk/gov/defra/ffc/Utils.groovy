@@ -10,6 +10,9 @@ class Utils implements Serializable {
 
   static def getCommitMessage(ctx) {
     def commitMessage = ctx.sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
+
+    commitMessage = escapeSpecialChars(commitMessage)
+
     return commitMessage.replaceAll("\\r\\n|\\r|\\n", "<br />")
   }
 
