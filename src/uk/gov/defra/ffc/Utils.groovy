@@ -16,7 +16,7 @@ class Utils implements Serializable {
     ctx.echo('output commit messge replaced: ' + commitMessage.replace("'", /'"'"'/))
     ctx.echo('output commit messge : ' + commitMessage)
 
-    return commitMessage.replaceAll("\\r\\n|\\r|\\n", "<br />").replace("'", /'"'"'/)
+    return commitMessage.replaceAll("\\r\\n|\\r|\\n", "<br />")
   }
 
   static def getCommitSha(ctx) {
@@ -80,7 +80,7 @@ class Utils implements Serializable {
   }
 
   static def escapeSpecialChars(str) {
-    return str.replace('\\', '\\\\\\\\').replace(/,/, /\,/).replace(/"/, /\"/).replace(/`/, /\`/)
+    return str.replace('\\', '\\\\\\\\').replace(/,/, /\,/).replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/)
   }
 
   /**
