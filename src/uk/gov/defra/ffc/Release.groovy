@@ -55,7 +55,7 @@ class Release implements Serializable {
     ctx.echo("Triggering release $versionTag for $repoName")
     boolean result = false    
 
-    result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" Rename docker compose migration file to stop Liquibase running in deploy script (which currently doesn''t work) \" }' https://api.github.com/repos/DEFRA/$repoName/releases")
+    result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" Rename docker compose migration file to stop Liquibase running in deploy script (which currently doesn'''t work) \" }' https://api.github.com/repos/DEFRA/$repoName/releases")
     ctx.echo("The release result is $result")
 
     if (exists(ctx, versionTag, repoName, token)) {
