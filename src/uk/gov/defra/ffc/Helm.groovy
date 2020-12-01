@@ -41,11 +41,12 @@ class Helm implements Serializable {
   static def deployChart(ctx, environment, registry, chartName, tag, pr) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+        String helmValuesFilePath = "helm/$chartName/values.yaml"
         def deploymentName = "$chartName-$tag"
         def extraCommands = getExtraCommands(tag)
         def prCommands = getPrCommands(registry, chartName, tag, ctx.BUILD_NUMBER)
 
-        def helmValuesKeys = getHelmValuesKeys(ctx, "helm/$chartName/values.yaml")
+        def helmValuesKeys = getHelmValuesKeys(ctx, helmValuesFilePath)
 
         String commonPrefix = 'common/'
         def commonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix))
@@ -55,7 +56,7 @@ class Helm implements Serializable {
         def environmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix))
         def environmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix, chartName))
 
-        def serviceName = helmValuesKeys['workstream']
+        String serviceName = ctx.sh(returnStdout: true, script: "yq r $helmValuesFilePath workstream").trim()
         def serviceCommonConfigValues
         def serviceCommonConfigValuesChart
         def serviceEnvironmentConfigValues
