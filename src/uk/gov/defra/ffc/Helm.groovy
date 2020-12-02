@@ -68,7 +68,7 @@ class Helm implements Serializable {
 
         if(serviceName != '') {
           // get common values for a service
-          String serviceCommonPrefix = serviceName + '/common'
+          String serviceCommonPrefix = serviceName + '/common/'
           serviceCommonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix))
           serviceCommonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix, chartName))
 
@@ -199,7 +199,7 @@ class Helm implements Serializable {
 
             if(serviceName != '') {
               // get common values for a service
-              String serviceCommonPrefix = serviceName + '/common'
+              String serviceCommonPrefix = serviceName + '/common/'
               serviceCommonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix))
               serviceCommonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix, chartName))
 
