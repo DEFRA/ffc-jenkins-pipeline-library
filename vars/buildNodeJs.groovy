@@ -80,10 +80,8 @@ void call(Map config=[:]) {
           utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
 
-        if (pr == '') {
-          stage('Publish pact broker') {
-            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
-          }
+        stage('Publish pact broker') {
+          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
         }
       }
 
