@@ -3,11 +3,12 @@ package uk.gov.defra.ffc
 class Pact implements Serializable {
   static def publishContractsToPactBroker(ctx, repoName, version, commitSha, branchName) {
 
-    ctx.sh('mkdir -p -m 777 test-output')
-    ctx.dir('test-output') {
+    //ctx.sh('mkdir -p -m 777 test-output')
+    
       ctx.withCredentials([
         ctx.usernamePassword(credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword')
       ]) {
+        ctx.dir('test-output') {
           ctx.echo "Publish pacts to broker"
           def pacts = ctx.findFiles glob: "$repoName-*.json"
           ctx.echo "Found ${pacts.size()} pact file(s) to publish"
