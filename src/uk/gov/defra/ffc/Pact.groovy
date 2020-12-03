@@ -16,7 +16,7 @@ class Pact implements Serializable {
             def provider = pact.name.substring("$repoName-".length(), pact.name.indexOf(".json"))
             ctx.echo "Publishing ${pact.name} to broker"
            
-            def script = "docker --rm -e $ctx.PACT_BROKER_URL/pacts/provider/$provider/consumer/$repoName/version/$version+$commitSha -e $ctx.pactUsername -e $ctx.pactPassword pactfoundation/pact-cli:latest broker create-version-tag --pacticipant $pact.name --version $version+$commitSha --tag main"                                  
+            def script = "docker run -e $ctx.PACT_BROKER_URL/pacts/provider/$provider/consumer/$repoName/version/$version+$commitSha -e $ctx.pactUsername -e $ctx.pactPassword pactfoundation/pact-cli:latest broker create-version-tag --pacticipant $pact.name --version $version+$commitSha --tag main"                                  
               ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.PactBrokerTest.Context, description: GitHubStatus.PactBrokerTest.Description) {
               ctx.sh(returnStatus: true, script: script)
             }
