@@ -81,7 +81,7 @@ void call(Map config=[:]) {
         }
 
         stage('Publish pact broker') {
-          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
+          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha(), defaultBranch)
         }
       }
 
