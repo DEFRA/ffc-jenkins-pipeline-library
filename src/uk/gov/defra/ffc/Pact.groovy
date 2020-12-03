@@ -5,7 +5,7 @@ class Pact implements Serializable {
 
     ctx.sh('mkdir -p -m 777 test-output')
     ctx.dir('test-output') {
-      ctx.withCredentials([ctx.string(credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword')
+      ctx.usernamePassword([ctx.string(credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword')
       ]) {
 
           ctx.echo "Publish pacts to broker"
