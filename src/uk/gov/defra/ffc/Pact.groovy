@@ -5,9 +5,9 @@ class Pact implements Serializable {
 
     ctx.sh('mkdir -p -m 777 test-output')
     ctx.dir('test-output') {
-      ctx.usernamePassword([ctx.string(credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword')
+      ctx.withCredentials([
+        ctx.usernamePassword(credentialsId: 'pact-broker-credentials', usernameVariable: 'pactUsername', passwordVariable: 'pactPassword')
       ]) {
-
           ctx.echo "Publish pacts to broker"
           def pacts = ctx.findFiles glob: "$repoName-*.json"
           ctx.echo "Found ${pacts.size()} pact file(s) to publish"
