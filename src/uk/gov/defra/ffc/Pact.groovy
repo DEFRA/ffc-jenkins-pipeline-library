@@ -17,7 +17,7 @@ class Pact implements Serializable {
             ctx.echo "Publishing ${pact.name} to broker"
            
             //def script = "docker run --rm -e PACT_DISABLE_SSL_VERIFICATION=true -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL/pacts/provider/$provider/consumer/$repoName/version/$version+$commitSha -e PACT_BROKER_USERNAME=$ctx.pactUsername -e PACT_BROKER_PASSWORD=$ctx.pactPassword pactfoundation/pact-cli:latest broker create-version-tag --pacticipant $pact.name --version $version+$commitSha --tag main"
-            def script = "docker run --rm -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL -e PACT_BROKER_USERNAME=$ctx.pactUsername -e PACT_BROKER_PASSWORD=$ctx.pactPassword pactfoundation/pact-cli:latest publish /test-output/$pact.name --consumer-app-version $version+$commitSha $pact --tag main"
+            def script = "docker run --rm -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL -e PACT_BROKER_USERNAME=$ctx.pactUsername -e PACT_BROKER_PASSWORD=$ctx.pactPassword pactfoundation/pact-cli:latest publish $ctx.WORKSPACE/test-output/$pact.name --consumer-app-version $version+$commitSha $pact --tag main"
               ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.PactBrokerTest.Context, description: GitHubStatus.PactBrokerTest.Description) {
               ctx.sh(returnStatus: true, script: script)
             }
