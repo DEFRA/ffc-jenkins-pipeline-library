@@ -74,7 +74,7 @@ void call(Map config=[:]) {
         }
 
         stage('Publish pact broker') {
-            pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha(), defaultBranch)
+            pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
           }
       }
 
