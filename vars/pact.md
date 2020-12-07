@@ -15,9 +15,8 @@ Takes three parameters:
 - repository name
 - version number
 - commitSha
-- branch name
 
 Example usage:
 ```
-pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha(), branchName)
+pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
 ```
