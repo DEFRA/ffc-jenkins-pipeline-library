@@ -73,9 +73,11 @@ void call(Map config=[:]) {
           build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
         }
 
-        stage('Publish pact broker') {
-            pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
-          }
+        if (pr == '') {
+          stage('Publish pact broker') {
+              pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
+            }
+        }
       }
 
       stage('SonarCloud analysis') {
