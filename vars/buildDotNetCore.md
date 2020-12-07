@@ -10,7 +10,7 @@ For the details of what happens please review the
 ```
 @Library('defra-library@v-8') _
 
-buildDotNetCore environment: 'dev', project: 'FFCDemoDotNetCoreProjectName'
+buildDotNetCore project: 'FFCDemoDotNetCoreProjectName'
 ```
 
 ## Synk
@@ -28,5 +28,16 @@ The build will assume the default branch in the repository is named `main`.  If 
 For example:
 
 ```
-buildDotNetCore environment: 'dev', project: 'FFCDemoDotNetCoreProjectName', defaultBranch: 'master'
+buildDotNetCore project: 'FFCDemoDotNetCoreProjectName', defaultBranch: 'master'
+```
+
+## Environment
+
+As part of the PR workflow, every commit will be dynamically deployed to the default Sandpit cluster, `snd`.  This also applied to all main branch code post merge.  
+If a different environment within the Sandpit environment should be used for this purpose then the default can be overriden.
+
+For example:
+
+```
+buildDotNetCore project: 'FFCDemoDotNetCoreProjectName', environment: 'snd2'
 ```

@@ -80,16 +80,16 @@ specified.
 
 Example Node.js Jenkinsfile:
 ```
-@Library('defra-library@5') _
+@Library('defra-library@v-9') _
 
-buildNodeJs environment: 'dev'
+buildNodeJs()
 ```
 
 Example .NET Core Jenkinsfile:
 ```
-@Library('defra-library@5') _
+@Library('defra-library@v-9') _
 
-buildDotNetCore environment: 'dev', project: 'FFCDemoPaymentService'
+buildDotNetCore project: 'FFCDemoPaymentService'
 ```
 
 Ideally, the default build will be suitable and can be used in place of
@@ -134,8 +134,7 @@ def extraFinallyThings = {
   }
 }
 
-buildNodeJs environment: 'dev',
-            finallyClosure: extraFinallyThings,
+buildNodeJs finallyClosure: extraFinallyThings,
             testClosure: extraTestThings
 ```
 
@@ -176,9 +175,9 @@ version of a release can be targeted.
 ```
 @Library('defra-library')
 @Library('defra-library@main')
-@Library('defra-library@3.1.2')
-@Library('defra-library@3.1')
-@Library('defra-library@3')
+@Library('defra-library@v-3.1.2')
+@Library('defra-library@v-3.1')
+@Library('defra-library@v-3')
 ```
 
 Once the library has been loaded any methods available within a
