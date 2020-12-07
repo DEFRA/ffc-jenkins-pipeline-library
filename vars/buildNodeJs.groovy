@@ -43,8 +43,10 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      stage('Publish pact broker') {
-          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha(), defaultBranch)
+      if (pr == '') {
+        stage('Publish pact broker') {
+            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha(), defaultBranch)
+        }
       }
 
       stage('Helm lint') {
