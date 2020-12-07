@@ -52,9 +52,9 @@ class GitHubStatus implements Serializable {
     static final Description = 'Snyk test'
   }
 
-  class PactBrokerTest {
-    static final Context = "${BASECTX}pact-broker-test"
-    static final Description = 'PactBroker test'
+  class PactBrokerPublish {
+    static final Context = "${BASECTX}pact-broker-publish"
+    static final Description = 'Pact Broker publish'
   }
 
   class VerifyVersion {

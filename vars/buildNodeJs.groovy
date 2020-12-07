@@ -82,7 +82,7 @@ void call(Map config=[:]) {
 
         if (pr == '') {
           stage('Publish pact broker') {
-            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha(), defaultBranch)
+            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
           }
         }
       }
