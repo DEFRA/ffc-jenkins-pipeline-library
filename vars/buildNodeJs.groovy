@@ -42,13 +42,7 @@ void call(Map config=[:]) {
       if (config.containsKey('validateClosure')) {
         config['validateClosure']()
       }
-
-      if (pr == '') {
-        stage('Publish pact broker') {
-            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha(), defaultBranch)
-        }
-      }
-
+    
       stage('Helm lint') {
         test.lintHelm(repoName)
       }
@@ -86,8 +80,10 @@ void call(Map config=[:]) {
           utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
 
-        stage('Publish pact broker') {
-          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha(), defaultBranch)
+        if (pr == '') {
+          stage('Publish pact broker') {
+            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha(), defaultBranch)
+          }
         }
       }
 
