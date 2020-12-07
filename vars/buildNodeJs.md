@@ -8,9 +8,9 @@ For the details of what happens please review the
 [buildNodeJs](buildNodeJs.groovy) script.
 
 ```
-@Library('defra-library@v-8') _
+@Library('defra-library@v-9') _
 
-buildNodeJs environment: 'dev'
+buildNodeJs()
 ```
 
 ## npm Audit
@@ -27,7 +27,7 @@ keys `npmAuditLevel`, `npmAuditLogType` and `npmAuditFailOnIssues`.
 An example overriding the default values:
 
 ```
-buildNodeJs environment: 'dev', npmAuditLevel: 'low', npmAuditLogType: 'json', npmAuditFailOnIssues: true
+buildNodeJs npmAuditLevel: 'low', npmAuditLogType: 'json', npmAuditFailOnIssues: true
 ```
 
 ## Synk
@@ -56,5 +56,16 @@ The build will assume the default branch in the repository is named `main`.  If 
 For example:
 
 ```
-buildNodeJs environment: 'dev', defaultBranch: 'master'
+buildNodeJs defaultBranch: 'master'
+```
+
+## Environment
+
+As part of the PR workflow, every commit will be dynamically deployed to the default Sandpit cluster, `snd`.  This also applied to all main branch code post merge.  
+If a different environment within the Sandpit environment should be used for this purpose then the default can be overriden.
+
+For example:
+
+```
+buildNodeJs project: 'FFCDemoDotNetCoreProjectName', environment: 'snd2'
 ```
