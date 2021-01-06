@@ -193,7 +193,13 @@ class Provision implements Serializable {
   }
 
   private static def getBuildQueuePrefix (ctx, repoName, pr) {
-    return "$repoName-build$ctx.BUILD_NUMBER-$pr-"
+    String queuePrefix = "$repoName-$ctx.BUILD_NUMBER-$pr-"
+
+    if(queuePrefix.length() > 50) {
+      queuePrefix.replaceAll("[AaEeIiOoUu]", "")
+    }
+    
+    return queuePrefix
   }
 
   private static def createPrDatabase(ctx, environment, repoName, pr) {
