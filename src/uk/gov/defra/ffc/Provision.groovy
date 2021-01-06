@@ -115,7 +115,7 @@ class Provision implements Serializable {
     validateQueueName(topicName)
 
     if(topicName.length() > 50) {
-      topicName.replaceAll("[AaEeIiOoUu]", "")
+      topicName = topicName.replaceAll("[AaEeIiOoUu]", "")
     }
     
     def azTopicCommand = 'az servicebus topic create'
