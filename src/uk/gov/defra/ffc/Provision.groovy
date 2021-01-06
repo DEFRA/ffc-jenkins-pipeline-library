@@ -113,10 +113,6 @@ class Provision implements Serializable {
 
   private static def createTopicAndSubscription(ctx, topicName) {
     validateQueueName(topicName)
-
-    if(topicName.length() > 50) {
-      topicName = topicName.replaceAll("[AaEeIiOoUu]", "")
-    }
     
     def azTopicCommand = 'az servicebus topic create'
     ctx.sh("$azTopicCommand ${getResGroupAndNamespace(ctx)} --name $topicName --max-size 1024")
@@ -198,7 +194,7 @@ class Provision implements Serializable {
   }
 
   private static def getBuildQueuePrefix (ctx, repoName, pr) {
-    String queuePrefix = "$repoName-Building$ctx.BUILD_NUMBER-$pr-"
+    String queuePrefix = "$repoName-$ctx.BUILD_NUMBER-$pr-"
 
     return queuePrefix
   }
