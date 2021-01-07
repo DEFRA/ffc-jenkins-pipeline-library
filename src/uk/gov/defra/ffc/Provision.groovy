@@ -113,7 +113,6 @@ class Provision implements Serializable {
 
   private static def createTopicAndSubscription(ctx, topicName) {
     validateQueueName(topicName)
-    
     def azTopicCommand = 'az servicebus topic create'
     ctx.sh("$azTopicCommand ${getResGroupAndNamespace(ctx)} --name $topicName --max-size 1024")
     def azSubscriptionCommand = 'az servicebus topic subscription create'
