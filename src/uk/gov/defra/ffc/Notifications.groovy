@@ -15,7 +15,7 @@ class Notifications implements Serializable {
       channel = '#mainbuildfailures'
     }
 
-    Utils.sendNotification(channel, msg, color)
+    Utils.sendNotification(ctx, channel, msg, color)
   }
 
   static def deploymentFailure(ctx) {
@@ -23,11 +23,11 @@ class Notifications implements Serializable {
             ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
             (<${ctx.BUILD_URL}|Open>)"""
 
-    Utils.sendNotification(channel, msg, color)
+    Utils.sendNotification(ctx, channel, msg, color)
   }
 
   static def sendMessage(ctx, channel, message, useHere) {
 
-    Utils.sendNotification(channel, "${useHere ? '<!here> ' : ''}$message", color)    
+    Utils.sendNotification(ctx, channel, "${useHere ? '<!here> ' : ''}$message", color)    
   }
 }
