@@ -6,7 +6,7 @@ class Notifications implements Serializable {
   private static String color = '#ff0000'
 
   static def buildFailure(ctx, channel, defaultBranch) {
-    def msg = "\'BUILD FAILED ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}\'"
+    def msg = "\'<!here> BUILD FAILED ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} <${ctx.BUILD_URL}|Open>\'"    
 
     if(ctx.BRANCH_NAME == defaultBranch) {
       msg = "\'<!here> ${msg}\'"
