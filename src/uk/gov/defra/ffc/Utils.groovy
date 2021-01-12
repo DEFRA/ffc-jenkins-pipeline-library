@@ -129,6 +129,8 @@ class Utils implements Serializable {
 
   static def sendNotification(ctx, channel, msg, color){
   
+    ctx.echo("msg: $msg")
+    
     ctx.withCredentials([ctx.string(credentialsId: channel == '#mainbuildfailures' ? 'slack-mainbuildfailures-channel-webhook' : 'slack-generalbuildfailures-channel-webhook', variable: 'webHook')
     ]) {
 
