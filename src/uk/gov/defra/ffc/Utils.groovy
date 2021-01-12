@@ -127,7 +127,7 @@ class Utils implements Serializable {
     return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
   }  
 
-  static def sendNotification(channel, msg, color){
+  static def sendNotification(ctx, channel, msg, color){
   
     def webHook = "$channel == '#mainbuildfailures' ? 'slack-mainbuildfailures-channel-webhook' : 'slack-generalbuildfailures-channel-webhook'"
 
