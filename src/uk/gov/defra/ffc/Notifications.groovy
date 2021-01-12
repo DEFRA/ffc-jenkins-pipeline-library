@@ -17,7 +17,7 @@ class Notifications implements Serializable {
   }
 
   static def deploymentFailure(ctx) {
-    def msg = "\'<!here> DEPLOYMENT FAILED ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} (<${ctx.BUILD_URL}|Open>)\'"
+    def msg = "\'<!here> DEPLOYMENT FAILED \r\n${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} \r\n(<${ctx.BUILD_URL}|Open>)\'"
 
     Utils.sendNotification(ctx, '#mainbuildfailures', msg, color)
   }
