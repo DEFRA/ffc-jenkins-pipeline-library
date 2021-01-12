@@ -71,4 +71,9 @@ class GitHubStatus implements Serializable {
     static final Context = "${BASECTX}pa11y-version"
     static final Description = 'Accessibility tests'
   }
+
+  class SlackNotification {
+    static final Context = "${BASECTX}slack-notification"
+    static final Description = 'Slack Notification'
+  }
 }

@@ -1,5 +1,7 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.Utils
+
 class Notifications implements Serializable {
   private static String color = '#ff0000'
 
@@ -9,28 +11,23 @@ class Notifications implements Serializable {
             (<${ctx.BUILD_URL}|Open>)"""
 
     if(ctx.BRANCH_NAME == defaultBranch) {
-      msg = "@here ${msg}"
+      msg = "<!here> ${msg}"
       channel = '#mainbuildfailures'
     }
 
-    ctx.slackSend(channel: channel,
-              color: color,
-              message: msg.replace('  ', ''))
+    Utils.sendNotification(channel, msg, color)
   }
 
   static def deploymentFailure(ctx) {
-    def msg = """@here DEPLOYMENT FAILED
+    def msg = """<!here> DEPLOYMENT FAILED
             ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
             (<${ctx.BUILD_URL}|Open>)"""
 
-    ctx.slackSend(channel: '#mainbuildfailures',
-              color: color,
-              message: msg.replace('  ', ''))
+    Utils.sendNotification(channel, msg, color)
   }
 
   static def sendMessage(ctx, channel, message, useHere) {
-    ctx.slackSend(channel: channel,
-              color: color,
-              message: "${useHere ? '@here ' : ''}$message")
+
+    Utils.sendNotification(channel, "${useHere ? '<!here> ' : ''}$message", color)    
   }
 }
