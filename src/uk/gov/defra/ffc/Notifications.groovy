@@ -6,9 +6,9 @@ class Notifications implements Serializable {
   private static String color = '#ff0000'
 
   static def buildFailure(ctx, channel, defaultBranch) {
-    def msg = "\'<!here> BUILD FAILED ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} <${ctx.BUILD_URL}|Open>\'"    
+    def msg = "\'BUILD FAILED ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} <${ctx.BUILD_URL}|Open>\'"    
 
-    if(ctx.BRANCH_NAME == defaultBranch) {
+    if(ctx.BRANCH_NAME != defaultBranch) {
       msg = "\'<!here> ${msg}\'"
       channel = '#mainbuildfailures'
     }
@@ -17,15 +17,13 @@ class Notifications implements Serializable {
   }
 
   static def deploymentFailure(ctx) {
-    def msg = """<!here> DEPLOYMENT FAILED
-            ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
-            (<${ctx.BUILD_URL}|Open>)"""
+    def msg = "\'<!here> DEPLOYMENT FAILED ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} (<${ctx.BUILD_URL}|Open>)\'"
 
     Utils.sendNotification(ctx, '#mainbuildfailures', msg, color)
   }
 
   static def sendMessage(ctx, channel, message, useHere) {
 
-    Utils.sendNotification(ctx, channel, "${useHere ? '<!here> ' : ''}$message", color)    
+    Utils.sendNotification(ctx, channel, "\'${useHere ? '<!here> ' : ''}$message\'", color)    
   }
 }
