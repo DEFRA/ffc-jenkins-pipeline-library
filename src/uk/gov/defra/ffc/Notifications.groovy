@@ -8,7 +8,7 @@ class Notifications implements Serializable {
   static def buildFailure(ctx, channel, defaultBranch) {
     def msg = "BUILD FAILED ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} <${ctx.BUILD_URL}|Open>"    
 
-    if(ctx.BRANCH_NAME != defaultBranch) {
+    if(ctx.BRANCH_NAME == defaultBranch) {
       msg = "<!here> ${msg}"
       channel = '#mainbuildfailures'
     }
