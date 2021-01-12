@@ -13,7 +13,7 @@ class Notifications implements Serializable {
       channel = '#mainbuildfailures'
     }
 
-    Utils.sendNotification(ctx, channel, "<!here> ${msg}", color)
+    Utils.sendNotification(ctx, channel, '<!here>', color)
   }
 
   static def deploymentFailure(ctx) {
