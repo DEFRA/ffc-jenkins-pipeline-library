@@ -131,7 +131,7 @@ class Utils implements Serializable {
   
     def webHook = "$channel == '#mainbuildfailures' ? 'slack-mainbuildfailures-channel-webhook' : 'slack-generalbuildfailures-channel-webhook'"
 
-    ctx.withCredentials([ctx.string(credentialsId: "$webHook", variable: 'webHook')
+    ctx.withCredentials([ctx.string(credentialsId: $webHook, variable: 'webHook')
     ]) {
 
       def script = "docker run -e SLACK_WEBHOOK=$ctx.webHook -e SLACK_MESSAGE=$msg -e SLACK_COLOR=$color technosophos/slack-notify:latest"
