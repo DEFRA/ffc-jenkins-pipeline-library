@@ -23,7 +23,7 @@ class Notifications implements Serializable {
             ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
             (<${ctx.BUILD_URL}|Open>)"""
 
-    Utils.sendNotification(ctx, channel, msg, color)
+    Utils.sendNotification(ctx, '#mainbuildfailures', msg, color)
   }
 
   static def sendMessage(ctx, channel, message, useHere) {
