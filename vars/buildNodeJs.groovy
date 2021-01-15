@@ -33,88 +33,88 @@ void call(Map config=[:]) {
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
 
-      if (pr != '') {
-        stage('Verify version incremented') {
-          version.verifyPackageJsonIncremented(defaultBranch)
-        }
-      }
+      // if (pr != '') {
+      //   stage('Verify version incremented') {
+      //     version.verifyPackageJsonIncremented(defaultBranch)
+      //   }
+      // }
 
-      if (config.containsKey('validateClosure')) {
-        config['validateClosure']()
-      }
+      // if (config.containsKey('validateClosure')) {
+      //   config['validateClosure']()
+      // }
 
-      stage('Helm lint') {
-        test.lintHelm(repoName)
-      }
+      // stage('Helm lint') {
+      //   test.lintHelm(repoName)
+      // }
 
-      stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
-      }
+      // stage('npm audit') {
+      //   build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
+      // }
 
-      stage('Snyk test') {
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
-      }
+      // stage('Snyk test') {
+      //   build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
+      // }
 
-      stage('Provision resources') {
-        provision.createResources(environment, repoName, pr)
-      }
+      // stage('Provision resources') {
+      //   provision.createResources(environment, repoName, pr)
+      // }
 
-      if (config.containsKey('buildClosure')) {
-        config['buildClosure']()
-      }
+      // if (config.containsKey('buildClosure')) {
+      //   config['buildClosure']()
+      // }
 
-      if (fileExists('./docker-compose.test.yaml')) {
-        stage('Build test image') {
-          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-        }
+      // if (fileExists('./docker-compose.test.yaml')) {
+      //   stage('Build test image') {
+      //     build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+      //   }
 
-        stage('Run tests') {
-          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
-        }
+      //   stage('Run tests') {
+      //     build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
+      //   }
 
-        stage('Create JUnit report') {
-          test.createJUnitReport()
-        }
+      //   stage('Create JUnit report') {
+      //     test.createJUnitReport()
+      //   }
 
-        stage('Fix lcov report') {
-          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-        }
+      //   stage('Fix lcov report') {
+      //     utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      //   }
 
-        if (pr == '') {
-          stage('Publish pact broker') {
-            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
-          }
-        }
-      }
+      //   if (pr == '') {
+      //     stage('Publish pact broker') {
+      //       pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
+      //     }
+      //   }
+      // }
 
-      stage('SonarCloud analysis') {
-        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
-      }
+      // stage('SonarCloud analysis') {
+      //   test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
+      // }
 
-      stage('Run Zap Scan') {
-        test.runZapScan(repoName, BUILD_NUMBER, tag)
-      }
+      // stage('Run Zap Scan') {
+      //   test.runZapScan(repoName, BUILD_NUMBER, tag)
+      // }
 
-      stage('Run Accessibility tests') {
-        test.runPa11y(repoName, BUILD_NUMBER, tag)
-      }
+      // stage('Run Accessibility tests') {
+      //   test.runPa11y(repoName, BUILD_NUMBER, tag)
+      // }
 
-      if (config.containsKey('testClosure')) {
-        config['testClosure']()
-      }
+      // if (config.containsKey('testClosure')) {
+      //   config['testClosure']()
+      // }
 
-      stage('Build & push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
-      }
+      // stage('Build & push container image') {
+      //   build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
+      // }
 
-      if (pr != '') {
-        stage('Helm install') {
-          helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
-        }
-      } else {
-        stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
-        }
+      // if (pr != '') {
+      //   stage('Helm install') {
+      //     helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
+      //   }
+      // } else {
+      //   stage('Publish chart') {
+      //     helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
+      //   }
 
         stage('Trigger GitHub release') {
           withCredentials([
@@ -125,34 +125,34 @@ void call(Map config=[:]) {
           }
         }
 
-        stage('Trigger Deployment') {
-          withCredentials([
-            string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
-          ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
-          }
-        }
-      }
+      //   stage('Trigger Deployment') {
+      //     withCredentials([
+      //       string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
+      //     ]) {
+      //       deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+      //     }
+      //   }
+      // }
 
-      if (config.containsKey('deployClosure')) {
-        config['deployClosure']()
-      }
+      // if (config.containsKey('deployClosure')) {
+      //   config['deployClosure']()
+      // }
 
-      stage('Run Acceptance Tests') {
-        test.runAcceptanceTests(pr, environment, repoName)
-      }
+      // stage('Run Acceptance Tests') {
+      //   test.runAcceptanceTests(pr, environment, repoName)
+      // }
 
     } catch(e) {
       def errMsg = utils.getErrorMessage(e)
       echo("Build failed with message: $errMsg")
 
-      stage('Send build failure slack notification') {
-        notifySlack.buildFailure('#generalbuildfailures', defaultBranch)
-      }
+      // stage('Send build failure slack notification') {
+      //   notifySlack.buildFailure('#generalbuildfailures', defaultBranch)
+      // }
 
-      if (config.containsKey('failureClosure')) {
-        config['failureClosure']()
-      }
+      // if (config.containsKey('failureClosure')) {
+      //   config['failureClosure']()
+      // }
 
       throw e
     } finally {
@@ -160,13 +160,13 @@ void call(Map config=[:]) {
         test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
       }
 
-      stage('Clean up resources') {
-        provision.deleteBuildResources(repoName, pr)
-      }
+      // stage('Clean up resources') {
+      //   provision.deleteBuildResources(repoName, pr)
+      // }
 
-      if (config.containsKey('finallyClosure')) {
-        config['finallyClosure']()
-      }
+      // if (config.containsKey('finallyClosure')) {
+      //   config['finallyClosure']()
+      // }
     }
   }
 }
