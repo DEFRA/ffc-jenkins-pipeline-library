@@ -134,7 +134,7 @@ class Utils implements Serializable {
 
       def script = "docker run -e SLACK_WEBHOOK=$ctx.webHook -e SLACK_MESSAGE=$msg -e SLACK_COLOR=$color technosophos/slack-notify:latest"
         ctx.echo("Docker command: $script")
-        ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SlackNotification.Context, description: GitHubStatus.SlackNotification.Description) {
+        // ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SlackNotification.Context, description: GitHubStatus.SlackNotification.Description) {
         ctx.sh(returnStatus: true, script: script)
       }
     }
