@@ -1,6 +1,7 @@
 package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Utils
+import groovy.json.JsonOutput
 
 class Release implements Serializable {
   /**
