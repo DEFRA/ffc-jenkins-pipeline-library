@@ -12,7 +12,7 @@ class Utils implements Serializable {
   static def getCommitMessage(ctx) {
     def commitMessage = ctx.sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
 
-    //commitMessage = formatCommitMessage(commitMessage)
+    commitMessage = formatCommitMessage(commitMessage)
 
     return commitMessage
   }
@@ -82,7 +82,8 @@ class Utils implements Serializable {
   }
 
   static def formatCommitMessage(str) {
-    return str.replace("'", /'"'"'/).replaceAll("\\r\\n|\\r|\\n", "<br />")
+    return str.replace("%", "\%")
+    //return str.replace("'", /'"'"'/).replaceAll("\\r\\n|\\r|\\n", "<br />")
   }
 
   /**
