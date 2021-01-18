@@ -70,5 +70,5 @@ class GitHubStatus implements Serializable {
   class Pa11y {
     static final Context = "${BASECTX}pa11y-version"
     static final Description = 'Accessibility tests'
-  }  
+  }
 }
