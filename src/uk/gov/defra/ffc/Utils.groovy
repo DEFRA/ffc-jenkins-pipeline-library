@@ -11,7 +11,6 @@ class Utils implements Serializable {
 
   static def getCommitMessage(ctx) {
     def commitMessage = ctx.sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
-    // commitMessage = formatCommitMessage(commitMessage)
     return commitMessage
   }
 
@@ -77,10 +76,6 @@ class Utils implements Serializable {
 
   static def escapeSpecialChars(str) {
     return str.replace('\\', '\\\\\\\\').replace(",", /","/).replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/)
-  }
-
-  static def formatCommitMessage(str) {
-    return str.replace("'", /'"'"'/).replaceAll("\\r\\n|\\r|\\n", "<br />")
   }
 
   /**
