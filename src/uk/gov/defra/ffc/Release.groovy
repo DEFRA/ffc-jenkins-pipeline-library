@@ -56,7 +56,7 @@ class Release implements Serializable {
     ctx.echo("Triggering release $versionTag for $repoName")
     boolean result = false
 
-    def json = JsonOutput.toJson('{"tag_name":$versionTag, "name": "Release $versionTag, "body": $releaseDescription}')
+    def json = JsonOutput.toJson('{"tag_name":${versionTag}, "name": "Release ${versionTag}", "body": ${releaseDescription}}')
 
     result = ctx.sh(returnStdout: true, script: "curl -v -X POST -H 'Authorization: token $token' -d $json https://api.github.com/repos/DEFRA/$repoName/releases")    
 
