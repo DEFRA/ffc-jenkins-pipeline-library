@@ -1,7 +1,6 @@
 package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Utils
-import groovy.json.JsonSlurper
 import groovy.json.JsonOutput
 
 class Release implements Serializable {
@@ -57,8 +56,7 @@ class Release implements Serializable {
     ctx.echo("Triggering release $versionTag for $repoName")
     boolean result = false
 
-    def body = new JsonSlurper().parseText(releaseDescription)
-    def json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": body])
+    def json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": releaseDescription])
 
     result = ctx.sh(returnStdout: true, script: "curl -v -X POST -H 'Authorization: token $token' -d '$json' https://api.github.com/repos/DEFRA/$repoName/releases")    
 
