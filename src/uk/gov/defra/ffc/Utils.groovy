@@ -136,7 +136,7 @@ class Utils implements Serializable {
         ctx.echo("Docker command: $script")
         // ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SlackNotification.Context, description: GitHubStatus.SlackNotification.Description) {
         ctx.sh(returnStatus: true, script: script)
-      }
+      //}
     }
   }
 }
