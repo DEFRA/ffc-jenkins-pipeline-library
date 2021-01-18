@@ -82,7 +82,7 @@ class Utils implements Serializable {
   }
 
   static def formatCommitMessage(str) {
-    return str.replace("%", "\%")
+    return str.replace(/%/, /\%/)
     //return str.replace("'", /'"'"'/).replaceAll("\\r\\n|\\r|\\n", "<br />")
   }
 
