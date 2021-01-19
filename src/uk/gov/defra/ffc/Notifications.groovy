@@ -1,36 +1,29 @@
 package uk.gov.defra.ffc
 
+import uk.gov.defra.ffc.Utils
+
 class Notifications implements Serializable {
   private static String color = '#ff0000'
 
   static def buildFailure(ctx, channel, defaultBranch) {
-    def msg = """BUILD FAILED
-            ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
-            (<${ctx.BUILD_URL}|Open>)"""
+    def msg = "BUILD FAILED \r\n${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} \r\n(<${ctx.BUILD_URL}|Open>)"
 
     if(ctx.BRANCH_NAME == defaultBranch) {
-      msg = "@here ${msg}"
+      msg = "<!here> ${msg}"
       channel = '#mainbuildfailures'
     }
 
-    ctx.slackSend(channel: channel,
-              color: color,
-              message: msg.replace('  ', ''))
+    Utils.sendNotification(ctx, channel, "\'$msg\'", color)
   }
 
   static def deploymentFailure(ctx) {
-    def msg = """@here DEPLOYMENT FAILED
-            ${ctx.JOB_NAME}/${ctx.BUILD_NUMBER}
-            (<${ctx.BUILD_URL}|Open>)"""
+    def msg = "\'<!here> DEPLOYMENT FAILED \r\n${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} \r\n(<${ctx.BUILD_URL}|Open>)\'"
 
-    ctx.slackSend(channel: '#mainbuildfailures',
-              color: color,
-              message: msg.replace('  ', ''))
+    Utils.sendNotification(ctx, '#mainbuildfailures', msg, color)
   }
 
   static def sendMessage(ctx, channel, message, useHere) {
-    ctx.slackSend(channel: channel,
-              color: color,
-              message: "${useHere ? '@here ' : ''}$message")
+
+    Utils.sendNotification(ctx, channel, "\'${useHere ? '<!here> ' : ''}$message\'", color)    
   }
 }

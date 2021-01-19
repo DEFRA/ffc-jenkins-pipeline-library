@@ -118,5 +118,15 @@ class Utils implements Serializable {
 
   static def getUrlStatusCode(ctx, url) {
     return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
+  }  
+
+  static def sendNotification(ctx, channel, msg, color){
+
+    ctx.withCredentials([ctx.string(credentialsId: channel == '#mainbuildfailures' ? 'slack-mainbuildfailures-channel-webhook' : 'slack-generalbuildfailures-channel-webhook', variable: 'webHook')
+    ]) {
+
+      def script = "docker run -e SLACK_WEBHOOK=$ctx.webHook -e SLACK_MESSAGE=$msg -e SLACK_COLOR=$color technosophos/slack-notify:latest"
+      ctx.sh(returnStatus: true, script: script)      
+    }
   }
 }
