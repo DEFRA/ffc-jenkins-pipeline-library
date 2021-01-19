@@ -58,7 +58,7 @@ class Release implements Serializable {
     boolean result = false
 
     def json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"])
-    def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-Type: application/json' -d \'${json}\' https://api.github.com/repos/DEFRA/$repoName/releases"
+    def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-Type: application/json' -d \'""${json}""\' https://api.github.com/repos/DEFRA/$repoName/releases"
     ctx.echo(script)
     result = ctx.sh(returnStdout: true, script: script)
 
