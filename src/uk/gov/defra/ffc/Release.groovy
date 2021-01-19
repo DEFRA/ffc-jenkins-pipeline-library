@@ -57,7 +57,7 @@ class Release implements Serializable {
     boolean result = false
 
     String description = ctx.sh(returnStdout: true, script: "echo $releaseDescription | sed -z 's/\n/\\n/g'")
-    def script = "curl -v -XPOST -H 'Authorization: token $token' -d '{\"tag_name\": \"$versionTag\", \"name\": \"$versionTag\", \"body\": $description}' https://api.github.com/repos/DEFRA/$repoName/releases"    
+    def script = "curl -v -XPOST -H 'Authorization: token $token' -d '{\"tag_name\": \"$versionTag\", \"name\": \"$versionTag\", \"body\": \"$description\"}' https://api.github.com/repos/DEFRA/$repoName/releases"    
     
     //String json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"]).toString()
     //def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-Type: application/json' -d '${sanitizedJson}' https://api.github.com/repos/DEFRA/$repoName/releases"
