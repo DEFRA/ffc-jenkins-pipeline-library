@@ -2,7 +2,7 @@ package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Utils
 import groovy.json.JsonOutput
-//import java.net.URL
+import groovyx.net.http.HttpBuilder
 
 class Release implements Serializable {
   /**
@@ -57,10 +57,18 @@ class Release implements Serializable {
     ctx.echo("Triggering release $versionTag for $repoName")
     boolean result = false
 
-    def json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"])
-    def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-Type: application/json' -d \'""${json}""\' https://api.github.com/repos/DEFRA/$repoName/releases"
-    ctx.echo(script)
-    result = ctx.sh(returnStdout: true, script: script)
+    // def json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"])
+    // def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-Type: application/json' -d \'""${json}""\' https://api.github.com/repos/DEFRA/$repoName/releases"
+    // ctx.echo(script)
+    // result = ctx.sh(returnStdout: true, script: script)
+
+    def posts = configure {
+      request.uri = 'https://api.github.com'
+      request.uri.path = "/repos/DEFRA/$repoName/releases"
+      request.contentType = 'application/json'
+      request.body = json
+    }.post()
+
 
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo('Release Successful')
