@@ -56,7 +56,7 @@ class Release implements Serializable {
     ctx.echo("Triggering release $versionTag for $repoName")
     boolean result = false
 
-    def json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"]).toString()
+    String json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"]).toString()
     ctx.echo(json)
     def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-Type: application/json' -d '${json}' https://api.github.com/repos/DEFRA/$repoName/releases"
     //def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-Type: application/json' -d '{"tag_name":"pr130","name":"Release pr130","body":"Update package.json\n\n### Patch\r\n- this is purely a \"test\" to understand if the ^fix I have done; works!\r\n\r\n- if it doesn't then that is a 'shame'\r\n- if we are happy (i.e. the whole % of the team`), then we can celebrate* \\\\ TODO delete / @ this branch ~#\r\n\r\n### !\"\u00a3$%^&*()~#'/\\,.\n"}' https://api.github.com/repos/DEFRA/$repoName/releases"
