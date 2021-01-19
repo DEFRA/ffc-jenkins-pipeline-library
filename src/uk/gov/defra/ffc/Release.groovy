@@ -2,7 +2,7 @@ package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Utils
 import groovy.json.JsonOutput
-import java.net.URL
+//import java.net.URL
 
 class Release implements Serializable {
   /**
@@ -57,7 +57,7 @@ class Release implements Serializable {
     ctx.echo("Triggering release $versionTag for $repoName")
     boolean result = false
 
-    def json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription.trim()}"])
+    def json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"])
 
     // def post = new URL("https://api.github.com/repos/DEFRA/$repoName/releases")
     // post.setRequestMethod("POST")
@@ -72,7 +72,7 @@ class Release implements Serializable {
     // }
 
 
-    def script = "curl -v -X POST -H 'Authorization: token $token' -d "'"${json}"'" https://api.github.com/repos/DEFRA/$repoName/releases"
+    def script = "curl -v -X POST -H 'Authorization: token $token' --data-binary "'"${json}"'" https://api.github.com/repos/DEFRA/$repoName/releases"
     ctx.echo(script)
     result = ctx.sh(returnStdout: true, script: script)
 
