@@ -65,7 +65,7 @@ class Release implements Serializable {
     //def script = "curl -v -X POST -H 'Authorization: token $token' --data-urlencode 'tag_name=$versionTag' --data-urlencode 'name=$releaseName' --data-urlencode 'body=${json.body}' https://api.github.com/repos/DEFRA/$repoName/releases"
     //def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-Type: application/json' -d '{"tag_name":"pr130","name":"Release pr130","body":"Update package.json\n\n### Patch\r\n- this is purely a \"test\" to understand if the ^fix I have done; works!\r\n\r\n- if it doesn't then that is a 'shame'\r\n- if we are happy (i.e. the whole % of the team`), then we can celebrate* \\\\ TODO delete / @ this branch ~#\r\n\r\n### !\"\u00a3$%^&*()~#'/\\,.\n"}' https://api.github.com/repos/DEFRA/$repoName/releases"
     //ctx.echo(script)
-    result = ctx.sh(returnStdout: true, script: "jq -n --arg tag \"$versionTag\" --arg body \"$releaseDescription\" '{tag_name: \$tag, name: \$tag, body: \$body}'")// | curl -H 'Content-Type: application/json' -H 'Authorization: token $token' -X POST -k -d@- https://api.github.com/repos/DEFRA/$repoName/releases")
+    result = ctx.sh(returnStdout: true, script: "jq -n --arg tag \"$versionTag\" --arg body \"$releaseDescription\" '. | .[tag_name]=\$tag | .[name]=\$tag | .[body]=\$body}' <<<'{}'")// | curl -H 'Content-Type: application/json' -H 'Authorization: token $token' -X POST -k -d@- https://api.github.com/repos/DEFRA/$repoName/releases")
     ctx.echo(result)
 
     if (exists(ctx, versionTag, repoName, token)) {
