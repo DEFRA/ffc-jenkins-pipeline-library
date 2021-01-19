@@ -2,7 +2,7 @@ package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Utils
 import groovy.json.JsonOutput
-import groovyx.net.http.HttpBuilder
+import groovyx.net.http.HttpBuilder.configure
 
 class Release implements Serializable {
   /**
