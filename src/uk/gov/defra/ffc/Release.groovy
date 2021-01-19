@@ -59,22 +59,22 @@ class Release implements Serializable {
 
     def json = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription.trim()}"])
 
-    def post = new URL("https://api.github.com/repos/DEFRA/$repoName/releases")
-    post.setRequestMethod("POST")
-    post.setDoInput(true)
-    post.setRequestProperty("Content-Type", "application/json")
-    post.setRequestProperty("Authorization", "token $token")
-    post.getOutputStream().write(json.getBytes("UTF-8"))
-    def postResponse = post.getResponseCode()
+    // def post = new URL("https://api.github.com/repos/DEFRA/$repoName/releases")
+    // post.setRequestMethod("POST")
+    // post.setDoInput(true)
+    // post.setRequestProperty("Content-Type", "application/json")
+    // post.setRequestProperty("Authorization", "token $token")
+    // post.getOutputStream().write(json.getBytes("UTF-8"))
+    // def postResponse = post.getResponseCode()
 
-    if(!postResponse.equals(200)){
-      throw new Exception('Release failed')
-    }
+    // if(!postResponse.equals(200)){
+    //   throw new Exception('Release failed')
+    // }
 
 
-    // def script = "curl -v -X POST -H 'Authorization: token $token' -d \"\"${json}\"\" https://api.github.com/repos/DEFRA/$repoName/releases"
-    // ctx.echo(script)
-    // result = ctx.sh(returnStdout: true, script: script)
+    def script = "curl -v -X POST -H 'Authorization: token $token' -d "'"${json}"'" https://api.github.com/repos/DEFRA/$repoName/releases"
+    ctx.echo(script)
+    result = ctx.sh(returnStdout: true, script: script)
 
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo('Release Successful')
