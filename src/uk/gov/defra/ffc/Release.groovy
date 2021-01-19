@@ -56,7 +56,10 @@ class Release implements Serializable {
     ctx.echo("Triggering release $versionTag for $repoName")
     boolean result = false
 
+    // create json body for GitHub curl request, using JsonOutput will automatically escape all special characters
     def releaseBody = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"])
+
+    // saving JSON to a file avoids the issue of escaping the already escaped characters and the special characters behind them in shell command
     ctx.sh('mkdir -p -m 777 release-data')
     ctx.dir('release-data') {
       ctx.writeFile([file: 'releaseData.txt', text: releaseBody, encoding: "UTF-8"])
