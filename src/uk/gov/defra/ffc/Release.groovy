@@ -72,7 +72,7 @@ class Release implements Serializable {
     // }
 
 
-    def script = "curl -v -X POST -H 'Authorization: token $token' --data-binary "'"$json"'" https://api.github.com/repos/DEFRA/$repoName/releases"
+    def script = "curl -v -X POST -H 'Authorization: token $token' -d '"$json"' https://api.github.com/repos/DEFRA/$repoName/releases"
     ctx.echo(script)
     result = ctx.sh(returnStdout: true, script: script)
 
