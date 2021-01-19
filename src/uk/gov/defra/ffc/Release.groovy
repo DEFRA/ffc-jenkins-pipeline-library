@@ -59,7 +59,7 @@ class Release implements Serializable {
     def releaseBody = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"])
     ctx.sh('mkdir -p -m 777 release-data')
     ctx.dir('release-data') {
-      ctx.writeFile([file: 'releaseData.txt', text: ctx.releaseBody])
+      ctx.writeFile([file: 'releaseData.txt', text: releaseBody, encoding: "UTF-8"])
       def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-type: application/json' -d @releaseData.txt https://api.github.com/repos/DEFRA/$repoName/releases"
       result = ctx.sh(returnStdout: true, script: script)
     }
