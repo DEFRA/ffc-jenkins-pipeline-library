@@ -1,6 +1,7 @@
 package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Utils
+import groovy.json.JsonOutput
 
 class Release implements Serializable {
   /**
@@ -53,10 +54,18 @@ class Release implements Serializable {
     }
 
     ctx.echo("Triggering release $versionTag for $repoName")
-    boolean result = false    
+    boolean result = false
 
-    result = ctx.sh(returnStdout: true, script: "curl -s -X POST -H 'Authorization: token $token' -d '{ \"tag_name\" : \"$versionTag\", \"name\" : \"Release $versionTag\", \"body\" : \" $releaseDescription \" }' https://api.github.com/repos/DEFRA/$repoName/releases")
-    ctx.echo("The release result is $result")
+    // create json body for GitHub curl request, using JsonOutput will automatically escape all special characters
+    def releaseBody = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"])
+
+    // saving JSON to a file avoids the issue of escaping the already escaped characters and the special characters behind them in shell command
+    ctx.sh('mkdir -p -m 777 release-data')
+    ctx.dir('release-data') {
+      ctx.writeFile([file: 'releaseData.txt', text: releaseBody, encoding: "UTF-8"])
+      def script = "curl -v -X POST -H 'Authorization: token $token' -H 'Content-type: application/json' -d @releaseData.txt https://api.github.com/repos/DEFRA/$repoName/releases"
+      result = ctx.sh(returnStdout: true, script: script)
+    }
 
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo('Release Successful')
