@@ -23,7 +23,7 @@ void runTests(String projectName, String serviceName, String buildNumber, String
 }
 
 void buildAndPushContainerImage(String credentialsId, String registry, String imageName, String tag, String packageManager) {
-  Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag, String packageManager)
+  Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag, packageManager)
 }
 
 void npmAudit(String auditLevel, String logType, Boolean failOnIssues, String containerImage, String containerWorkDir, String pr) {
