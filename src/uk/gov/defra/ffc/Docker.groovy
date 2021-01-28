@@ -9,7 +9,7 @@ class Docker implements Serializable {
 
   static def buildAndPushContainerImage(ctx, credentialsId, registry, imageName, tag, packageManager) {
     ctx.docker.withRegistry("https://$registry", credentialsId) {
-      if (packageManager == 'NPM_REGISTRY' {
+      if (packageManager == 'NPM_REGISTRY') {
         ctx.sh("docker-compose -f docker-compose.yaml build --build-arg NPM_REGISTRY=${ctx.NPM_REGISTRY}")
       } else {
         ctx.sh("docker-compose -f docker-compose.yaml build --build-arg NUGET_REPOSITORY=${ctx.NUGET_REPOSITORY}")
