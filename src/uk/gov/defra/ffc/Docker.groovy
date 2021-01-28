@@ -14,4 +14,12 @@ class Docker implements Serializable {
       ctx.sh("docker push $registry/$imageName:$tag")
     }
   }
+
+  static def buildAndPushContainerImageCore(ctx, credentialsId, registry, imageName, tag) {
+    ctx.docker.withRegistry("https://$registry", credentialsId) {
+      ctx.sh("docker-compose -f docker-compose.yaml build --build-arg NUGET_REPOSITORY=${ctx.NUGET_REPOSITORY}")
+      ctx.sh("docker tag $imageName $registry/$imageName:$tag")
+      ctx.sh("docker push $registry/$imageName:$tag")
+    }
+  }
 }

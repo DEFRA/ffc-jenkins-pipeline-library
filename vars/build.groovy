@@ -26,6 +26,10 @@ void buildAndPushContainerImage(String credentialsId, String registry, String im
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
 
+void buildAndPushContainerImageCore(String credentialsId, String registry, String imageName, String tag) {
+  Docker.buildAndPushContainerImageCore(this, credentialsId, registry, imageName, tag)
+}
+
 void npmAudit(String auditLevel, String logType, Boolean failOnIssues, String containerImage, String containerWorkDir, String pr) {
   Build.npmAudit(this, auditLevel, logType, failOnIssues, containerImage, containerWorkDir, pr)
 }

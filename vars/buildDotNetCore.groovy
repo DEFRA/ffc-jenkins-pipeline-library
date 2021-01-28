@@ -89,7 +89,7 @@ void call(Map config=[:]) {
       }
 
       stage('Push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
+        build.buildAndPushContainerImageCore(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
       if (pr != '') {
