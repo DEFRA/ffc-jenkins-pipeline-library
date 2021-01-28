@@ -89,7 +89,7 @@ void call(Map config=[:]) {
       }
 
       stage('Push container image') {
-        build.buildAndPushContainerImageCore(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag, 'NUGET_REPOSITORY')
       }
 
       if (pr != '') {

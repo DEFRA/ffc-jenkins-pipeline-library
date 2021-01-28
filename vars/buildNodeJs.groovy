@@ -104,7 +104,7 @@ void call(Map config=[:]) {
       }
 
       stage('Build & push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag, 'NPM_REGISTRY')
       }
 
       if (pr != '') {

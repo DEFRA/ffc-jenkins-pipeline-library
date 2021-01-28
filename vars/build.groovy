@@ -22,12 +22,8 @@ void runTests(String projectName, String serviceName, String buildNumber, String
   Tests.runTests(this, projectName, serviceName, buildNumber, tag, pr, environment)
 }
 
-void buildAndPushContainerImage(String credentialsId, String registry, String imageName, String tag) {
-  Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
-}
-
-void buildAndPushContainerImageCore(String credentialsId, String registry, String imageName, String tag) {
-  Docker.buildAndPushContainerImageCore(this, credentialsId, registry, imageName, tag)
+void buildAndPushContainerImage(String credentialsId, String registry, String imageName, String tag, String packageManager) {
+  Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag, String packageManager)
 }
 
 void npmAudit(String auditLevel, String logType, Boolean failOnIssues, String containerImage, String containerWorkDir, String pr) {
