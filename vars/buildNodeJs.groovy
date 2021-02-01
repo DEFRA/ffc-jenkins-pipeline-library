@@ -9,7 +9,7 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  String packageManger = 'npm'
+  String packageManager = 'npm'
 
   node {
     try {

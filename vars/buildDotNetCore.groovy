@@ -8,7 +8,7 @@ void call(Map config=[:]) {
   String csProjVersion = ''
   String containerSrcFolder = '\\/home\\/dotnet'
   String dotnetDevelopmentImage = 'defradigital/dotnetcore-development'
-  String packageManger = 'nuget'
+  String packageManager = 'nuget'
 
   node {
     try {
