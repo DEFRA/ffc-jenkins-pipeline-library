@@ -8,6 +8,7 @@ void call(Map config=[:]) {
   String csProjVersion = ''
   String containerSrcFolder = '\\/home\\/dotnet'
   String dotnetDevelopmentImage = 'defradigital/dotnetcore-development'
+  String packageManger = 'nuget'
 
   node {
     try {
@@ -89,7 +90,7 @@ void call(Map config=[:]) {
       }
 
       stage('Push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag, 'NUGET_REPOSITORY')
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag, packageManager)
       }
 
       if (pr != '') {

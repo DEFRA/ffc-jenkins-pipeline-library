@@ -226,7 +226,7 @@ class Provision implements Serializable {
     getResourceFile(ctx, "$resourcePath/changelog", 'schema.changelog.xml', "$destinationFolder/changelog")
   }
 
-  private static def getResourceFile(ctx, resourcePath, filename, destinationFolder, makeExecutable = false){
+  public static def getResourceFile(ctx, resourcePath, filename, destinationFolder, makeExecutable = false){
     def fileContent = ctx.libraryResource("$resourcePath/$filename")
     ctx.writeFile(file: "$destinationFolder/$filename", text: fileContent, encoding: "UTF-8")
     if (makeExecutable) {
