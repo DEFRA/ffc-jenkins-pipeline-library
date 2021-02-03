@@ -60,7 +60,7 @@ void call(Map config=[:]) {
        }
      }
 
-      stage('Provision resources') {
+      stage('Provision any required resources') {
         provision.createResources(environment, repoName, pr)
       }
 
