@@ -1,5 +1,3 @@
-import uk.gov.defra.ImageMap
-
 def call(Map config=[:]) {
   node {
     checkout scm
