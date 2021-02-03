@@ -4,7 +4,6 @@ def defaultBranch = 'master'
 def pr = ''
 def repoName = ''
 def versionFileName = 'VERSION'
-String defaultBranch = 'master'
 
 node {
   checkout scm
