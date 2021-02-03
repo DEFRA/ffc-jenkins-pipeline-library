@@ -44,7 +44,7 @@ class Docker implements Serializable {
     return false
   }
 
-  static String removeTagFromImageName(String imageName) {
+  static String createRepositoryMap(String imageName) {
     return imageName.split(':')
   }
 

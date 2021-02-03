@@ -45,10 +45,10 @@ def call(Map config=[:]) {
         imageNameLatest = build.getImageName(repoName, 'latest', null, config.registry)
       }
 
-      stage("Build image") {
-        build.buildContainerImage(imageName)
-        build.buildContainerImage(imageNameLatest)
-      }
+      // stage("Build image") {
+      //   build.buildContainerImage(imageName)
+      //   build.buildContainerImage(imageNameLatest)
+      // }
 
       if(pr != '') {
         stage("Check if tag exists") {
