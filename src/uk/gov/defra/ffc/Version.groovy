@@ -116,9 +116,7 @@ class Version implements Serializable {
 
   static def verifyFileIncremented(ctx, fileName) {
     def currentVersion = getFileVersion(ctx, fileName)
-    ctx.echo("Current: ${currentVersion}")
     def previousVersion = getPreviousFileVersion(ctx, fileName, currentVersion)
-    ctx.echo("Previous: ${previousVersion}")
     errorOnNoVersionIncrement(ctx, previousVersion, currentVersion)
   }
 }
