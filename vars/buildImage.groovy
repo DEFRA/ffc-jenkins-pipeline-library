@@ -28,7 +28,7 @@ def call(Map config=[:]) {
 
       if (pr != '') {
         stage('Verify version incremented') {
-          version.verifyPackageJsonIncremented(defaultBranch)
+          version.verifyFileIncremented(versionFileName)
         }
       }
 
