@@ -7,6 +7,7 @@ def call(Map config=[:]) {
       String mergedPrNo = ''
       String defaultBranch = 'main'
       String versionFileName = 'VERSION'
+      String nodeDevelopmentImage = 'defradigital/node-development'
 
       stage('Ensure clean workspace') {
         deleteDir()
