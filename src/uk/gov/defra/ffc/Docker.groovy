@@ -16,7 +16,7 @@ class Docker implements Serializable {
   }
 
   static def buildContainerImage(ctx, imageName) {
-      ctx.sh("docker build --no-cache --tag ${imageName} .")
+    ctx.sh("docker build --no-cache --tag ${imageName} .")
   }
 
   static String getImageName(String repoName, String tag, String tagSuffix, String registry) {
@@ -31,4 +31,5 @@ class Docker implements Serializable {
 
   static String getTag(String tag, String tagSuffix) {
     return tagSuffix != '' ? "${tag}-${tagSuffix}" : tag
+  }
 }
