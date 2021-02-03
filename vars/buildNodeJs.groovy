@@ -142,7 +142,7 @@ void call(Map config=[:]) {
         config['deployClosure']()
       }
 
-      if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
+      if (fileExists('./test/acceptance/docker-compose.yaml')) {
         stage('Run Acceptance Tests') {
           test.runAcceptanceTests(pr, environment, repoName)
         }
