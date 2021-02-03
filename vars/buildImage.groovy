@@ -56,7 +56,7 @@ def call(Map config=[:]) {
         }
 
         if (!tagExists) {
-          stage("Push images (${version})") {
+          stage("Push image") {
             build.pushContainerImage(imageName)
             build.pushContainerImage(imageNameLatest)
           }
