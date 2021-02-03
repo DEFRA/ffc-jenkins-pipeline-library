@@ -20,11 +20,11 @@ class Docker implements Serializable {
   }
 
   static def pushContainerImage(ctx, imageName) {
-    withCredentials([
-      usernamePassword(credentialsId : DOCKERHUB_CREDENTIALS_ID,
+    ctx.withCredentials([
+      ctx.usernamePassword(credentialsId : ctx.DOCKERHUB_CREDENTIALS_ID,
         usernameVariable: 'username', passwordVariable: 'password')
     ]) {
-      ctx.sh("docker login --username $username --password $password")
+      ctx.sh("docker login --username ${ctx.username} --password ${ctx.password}")
       ctx.sh("docker push $imageName")
     }
   }
