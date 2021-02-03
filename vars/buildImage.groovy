@@ -1,15 +1,15 @@
 def call(Map config=[:]) {
+  String repoName = ''
+  String pr = ''
+  String tag = ''
+  String mergedPrNo = ''
+  String defaultBranch = 'main'
+  String versionFileName = 'VERSION'
+  String containerSrcFolder = '\\/home\\/node'
+  String nodeDevelopmentImage = 'defradigital/node-development'
+
   node {
     try {
-      String repoName = ''
-      String pr = ''
-      String tag = ''
-      String mergedPrNo = ''
-      String defaultBranch = 'main'
-      String versionFileName = 'VERSION'
-      String containerSrcFolder = '\\/home\\/node'
-      String nodeDevelopmentImage = 'defradigital/node-development'
-
       stage('Ensure clean workspace') {
         deleteDir()
       }
