@@ -36,7 +36,7 @@ class Docker implements Serializable {
   }
 
   static String getRegistry(String registry) {
-    return registry != null ? registry : 'defra-digital'
+    return registry != null ? registry : 'defradigital'
   }
 
   static String getTag(String tag, String tagSuffix = null) {
