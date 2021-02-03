@@ -53,7 +53,6 @@ def call(Map config=[:]) {
       if(pr != '') {
         stage("Check if tag exists") {
           tagExists = build.containerTagExists(imageName)
-          echo tagExists
         }
 
         // if (!tagExists) {
