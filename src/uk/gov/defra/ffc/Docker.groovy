@@ -29,7 +29,7 @@ class Docker implements Serializable {
     return registry != null ? registry : 'defra-digital'
   }
 
-  static String getTag(String tag, String tagSuffix) {
+  static String getTag(String tag, String tagSuffix = null) {
     return tagSuffix != null ? "${tag}-${tagSuffix}" : tag
   }
 }

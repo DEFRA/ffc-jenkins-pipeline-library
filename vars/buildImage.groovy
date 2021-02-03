@@ -41,7 +41,7 @@ def call(Map config=[:]) {
 
       stage('Set image name') {
         imageName = build.getImageName(repoName, tag, config.tagSuffix, config.registry)
-        imageNameLatest = build.getImageName(repoName, 'latest', '', config.registry)
+        imageNameLatest = build.getImageName(repoName, 'latest', null, config.registry)
       }
 
       stage("Build image") {
