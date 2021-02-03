@@ -40,7 +40,7 @@ class Docker implements Serializable {
   }
 
   static String getTag(String tag, String tagSuffix = null) {
-    return tagSuffix != null ? "3.0.0-${tagSuffix}" : tag
+    return tagSuffix != null ? "${tag}-${tagSuffix}" : tag
   }
 
   static Boolean containerTagExists(def ctx, String imageName) {
