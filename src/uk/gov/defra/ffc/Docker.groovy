@@ -19,6 +19,16 @@ class Docker implements Serializable {
     ctx.sh("docker build --no-cache --tag ${imageName} .")
   }
 
+  static def pushContainerImage(ctx, imageName) {
+    withCredentials([
+      usernamePassword(credentialsId : DOCKERHUB_CREDENTIALS_ID,
+        usernameVariable: 'username', passwordVariable: 'password')
+    ]) {
+      ctx.sh("docker login --username $username --password $password")
+      ctx.sh("docker push $imageName")
+    }
+  }
+
   static String getImageName(String repoName, String tag, String tagSuffix = null, String registry = null) {
     registry = getRegistry(registry)
     tag = getTag(tag, tagSuffix)
@@ -36,7 +46,6 @@ class Docker implements Serializable {
   static Boolean containerTagExists(def ctx, String imageName) {
     String[] repositoryMap = createRepositoryMap(imageName)
     String[] existingTags = getImageTags(ctx, repositoryMap[0])
-    ctx.echo("Checking for tag ${repositoryMap[1]}")
     if (existingTags.contains(repositoryMap[1])) {
       ctx.echo 'Tag exists in repository'
       return true
@@ -49,7 +58,6 @@ class Docker implements Serializable {
   }
 
   static String[] getImageTags(def ctx, String image) {
-    ctx.echo("Searching for ${image}")
     return ctx.sh(script: "curl https://index.docker.io/v1/repositories/$image/tags", returnStdout: true)
   }
 }

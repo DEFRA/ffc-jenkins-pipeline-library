@@ -46,6 +46,10 @@ void buildContainerImage(String imageName) {
   Docker.buildContainerImage(this, imageName)
 }
 
+void pushContainerImage(String imageName) {
+  Docker.pushContainerImage(this, imageName)
+}
+
 Boolean containerTagExists(String imageName) {
   return Docker.containerTagExists(this, imageName)
 }

@@ -45,22 +45,22 @@ def call(Map config=[:]) {
         imageNameLatest = build.getImageName(repoName, 'latest', null, config.registry)
       }
 
-      // stage("Build image") {
-      //   build.buildContainerImage(imageName)
-      //   build.buildContainerImage(imageNameLatest)
-      // }
+      stage("Build image") {
+        build.buildContainerImage(imageName)
+        build.buildContainerImage(imageNameLatest)
+      }
 
       if(pr != '') {
         stage("Check if tag exists") {
           tagExists = build.containerTagExists(imageName)
         }
 
-        // if (!tagExists) {
-        //   stage("Push images (${version})") {
-        //     pushImage(imageName)
-        //     pushImage(imageNameLatest)
-        //   }
-        // }
+        if (!tagExists) {
+          stage("Push images (${version})") {
+            build.pushContainerImage(imageName)
+            build.pushContainerImage(imageNameLatest)
+          }
+        }
       }
 
       if (config.containsKey('buildClosure')) {

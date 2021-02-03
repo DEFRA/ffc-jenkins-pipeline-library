@@ -211,6 +211,16 @@ Takes one parameter:
 build.buildContainerImage('defradigital/ffc-dotnet-core-sonar:1.0.0-dotnet3.1')
 ```
 
+## pushContainerImage
+Pushes a container image to a registry
+
+Takes one parameter:
+- `imageName` - name of image to tag the build with
+
+```
+build.pushContainerImage('defradigital/ffc-dotnet-core-sonar:1.0.0-dotnet3.1')
+```
+
 ## containerTagExists
 Checks to see if an image already exists in a repository
 
