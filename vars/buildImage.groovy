@@ -3,6 +3,8 @@ def call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
+  String imageName = ''
+  String imageNameLatest = ''
   String defaultBranch = 'main'
   String versionFileName = 'VERSION'
   String containerSrcFolder = '\\/home\\/node'
@@ -37,7 +39,28 @@ def call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      // TODO BUILD
+      stage('Set image name') {
+        imageName = build.getImageName(repoName, tag, config.tagSuffix, config.registry)
+        imageNameLatest = build.getImageName(repoName, 'latest', '', config.registry)
+      }
+
+      stage("Build image") {
+        build.buildContainerImage(imageName)
+        build.buildContainerImage(imageNameLatest)
+      }
+
+      // if (!tagExists(image.fullName(), version)) {
+      // if(config.prTag == '') {
+      //   stage("Push images (${version})") {
+      //     pushImage(developmentImage.fullName())
+      //     pushImage(image.fullName())
+      //     if (image.isLatest()) {
+      //       pushImage(developmentImage.fullName(true))
+      //       pushImage(image.fullName(true))
+      //     }
+      //   }
+      // }
+      // }
 
       if (config.containsKey('buildClosure')) {
         config['buildClosure']()

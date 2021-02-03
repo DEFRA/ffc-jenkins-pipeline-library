@@ -187,3 +187,26 @@ Takes five parameters, with `targetFile` being optional:
 build.snykTest(true, 'my-org-name', 'low')
 build.snykTest(true, 'my-org-name', 'low', 'my-project.sln')
 ```
+
+## getImageName
+Returns a container image name based on the repository and registry to publish to.
+
+Takes four parameters:
+- `repoName` - name of the repository
+- `tag` - version of the image to add as a tag.  Pass 'latest' here without a `tagSuffix` for a latest tag.
+- `tagSuffix` - optional parameter to be appended to to the version tag, will automatically be prefixed with `-`
+- `registry` - optional parameter to specify a container registry other than `defradigital`
+
+```
+String imageName = build.getImageName('ffc-dotnet-core-sonar', '1.0.0', 'dotnet3.1', 'myregistry')
+```
+
+## buildContainerImage
+Returns a container image name based on the repository and registry to publish to.
+
+Takes one parameter:
+- `imageName` - name of image to tag the build with
+
+```
+build.buildContainerImage('defradigital/ffc-dotnet-core-sonar:1.0.0-dotnet3.1')
+```

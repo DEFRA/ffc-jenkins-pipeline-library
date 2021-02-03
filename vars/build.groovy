@@ -37,3 +37,11 @@ void extractSynkFiles(String projectName, String buildNumber, String tag) {
 void snykTest(Boolean failOnIssues, String organisation, String severity, String targetFile = '', String pr) {
   Build.snykTest(this, failOnIssues, organisation, severity, targetFile, pr)
 }
+
+String getImageName(String repoName, String tag, String tagSuffix = '', String registry = '') {
+  Docker.getImageName(repoName, tag, tagSuffix, registry)
+}
+
+String buildContainerImage(String imageName) {
+  Docker.buildContainerImage(this, imageName)
+}
