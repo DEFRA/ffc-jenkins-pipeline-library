@@ -38,7 +38,7 @@ void snykTest(Boolean failOnIssues, String organisation, String severity, String
   Build.snykTest(this, failOnIssues, organisation, severity, targetFile, pr)
 }
 
-String getImageName(String repoName, String tag, String tagSuffix = '', String registry = '') {
+String getImageName(String repoName, String tag, String tagSuffix = null, String registry = null) {
   Docker.getImageName(repoName, tag, tagSuffix, registry)
 }
 

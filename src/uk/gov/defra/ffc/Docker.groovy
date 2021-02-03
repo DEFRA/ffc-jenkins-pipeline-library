@@ -19,17 +19,17 @@ class Docker implements Serializable {
     ctx.sh("docker build --no-cache --tag ${imageName} .")
   }
 
-  static String getImageName(String repoName, String tag, String tagSuffix, String registry) {
+  static String getImageName(String repoName, String tag, String tagSuffix = null, String registry = null) {
     registry = getRegistry(registry)
     tag = getTag(tag, tagSuffix)
     return "${registry}/${repoName}:${tag}"
   }
 
   static String getRegistry(String registry) {
-    return registry != '' ? registry : 'defra-digital'
+    return registry != null ? registry : 'defra-digital'
   }
 
   static String getTag(String tag, String tagSuffix) {
-    return tagSuffix != '' ? "${tag}-${tagSuffix}" : tag
+    return tagSuffix != null ? "${tag}-${tagSuffix}" : tag
   }
 }
