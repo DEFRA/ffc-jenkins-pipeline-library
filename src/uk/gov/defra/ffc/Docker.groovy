@@ -50,6 +50,6 @@ class Docker implements Serializable {
 
   static String[] getImageTags(def ctx, String image) {
     ctx.echo("Searching for ${image}")
-    return ctx.sh(script: "curl https://index.docker.io/v1/repositories/$imageName/tags", returnStdout: true)
+    return ctx.sh(script: "curl https://index.docker.io/v1/repositories/$image/tags", returnStdout: true)
   }
 }
