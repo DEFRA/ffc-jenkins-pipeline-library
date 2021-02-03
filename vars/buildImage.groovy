@@ -1,6 +1,5 @@
 def call(Map config=[:]) {
   node {
-    checkout scm
     try {
       String repoName = ''
       String pr = ''
@@ -40,18 +39,27 @@ def call(Map config=[:]) {
 
       if (config.containsKey('buildClosure')) {
         config['buildClosure']()
+      }      
+    } catch (err) {
+      def errMsg = utils.getErrorMessage(err)
+      echo("Build failed with message: $errMsg")
+
+      stage('Send build failure slack notification') {
+        notifySlack.buildFailure('#generalbuildfailures', defaultBranch)
       }
 
-        
-        // imageMaps.each { ImageMap imageMap ->
-        //   buildImages imageName: config.imageName, version: config.version, tagName: config.tagName, imageMap: imageMap, prTag: prTag
-        
-      
-  } catch (err) {
-      stage('Set GitHub status failure') {
-        updateBuildStatus(err.message, 'FAILURE')
+      if (config.containsKey('failureClosure')) {
+        config['failureClosure']()
       }
       throw err
+    } finally {
+      stage('Change ownership of outputs') {
+        test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
+      }
+
+      if (config.containsKey('finallyClosure')) {
+        config['finallyClosure']()
+      }
     }
   }
 }
