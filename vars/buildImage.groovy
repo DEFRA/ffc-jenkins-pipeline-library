@@ -50,7 +50,7 @@ def call(Map config=[:]) {
         build.buildContainerImage(imageNameLatest)
       }
 
-      if(pr != '') {
+      if(pr == '') {
         stage("Check if tag exists") {
           tagExists = build.containerTagExists(imageName)
         }
