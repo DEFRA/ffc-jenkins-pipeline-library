@@ -42,6 +42,10 @@ String getImageName(String repoName, String tag, String tagSuffix = null, String
   Docker.getImageName(repoName, tag, tagSuffix, registry)
 }
 
-String buildContainerImage(String imageName) {
+void buildContainerImage(String imageName) {
   Docker.buildContainerImage(this, imageName)
+}
+
+Boolean containerTagExists(String imageName) {
+  return Docker.containerTagExists(this, imageName)
 }

@@ -202,11 +202,21 @@ String imageName = build.getImageName('ffc-dotnet-core-sonar', '1.0.0', 'dotnet3
 ```
 
 ## buildContainerImage
-Returns a container image name based on the repository and registry to publish to.
+Builds a container image from a Dockerfile
 
 Takes one parameter:
 - `imageName` - name of image to tag the build with
 
 ```
 build.buildContainerImage('defradigital/ffc-dotnet-core-sonar:1.0.0-dotnet3.1')
+```
+
+## containerTagExists
+Checks to see if an image already exists in a repository
+
+Takes one parameter:
+- `imageName` - full image name
+
+```
+Boolean tagExists = build.containerTagExists('defradigital/ffc-dotnet-core-sonar:1.0.0-dotnet3.1')
 ```

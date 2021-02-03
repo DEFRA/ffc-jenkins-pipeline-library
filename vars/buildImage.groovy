@@ -9,6 +9,7 @@ def call(Map config=[:]) {
   String versionFileName = 'VERSION'
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
+  Boolean tagExists = false
 
   node {
     try {
@@ -49,18 +50,19 @@ def call(Map config=[:]) {
         build.buildContainerImage(imageNameLatest)
       }
 
-      // if (!tagExists(image.fullName(), version)) {
-      // if(config.prTag == '') {
-      //   stage("Push images (${version})") {
-      //     pushImage(developmentImage.fullName())
-      //     pushImage(image.fullName())
-      //     if (image.isLatest()) {
-      //       pushImage(developmentImage.fullName(true))
-      //       pushImage(image.fullName(true))
-      //     }
-      //   }
-      // }
-      // }
+      if(pr != '') {
+        stage("Check if tag exists") {
+          tagExists = build.containerTagExists(imageName)
+          echo tagExists
+        }
+
+        // if (!tagExists) {
+        //   stage("Push images (${version})") {
+        //     pushImage(imageName)
+        //     pushImage(imageNameLatest)
+        //   }
+        // }
+      }
 
       if (config.containsKey('buildClosure')) {
         config['buildClosure']()

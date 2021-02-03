@@ -32,4 +32,24 @@ class Docker implements Serializable {
   static String getTag(String tag, String tagSuffix = null) {
     return tagSuffix != null ? "${tag}-${tagSuffix}" : tag
   }
+
+  static Boolean containerTagExists(def ctx, String imageName) {
+    String[] repositoryMap = createRepositoryMap(imageName)
+    String[] existingTags = getImageTags(ctx, repositoryMap[0])
+    ctx.echo("Checking for tag ${repositoryMap[1]}")
+    if (existingTags.contains(repositoryMap[1])) {
+      ctx.echo 'Tag exists in repository'
+      return true
+    }
+    return false
+  }
+
+  static String removeTagFromImageName(String imageName) {
+    return imageName.split(':')
+  }
+
+  static String[] getImageTags(def ctx, String image) {
+    ctx.echo("Searching for ${image}")
+    return ctx.sh(script: "curl https://index.docker.io/v1/repositories/$imageName/tags", returnStdout: true)
+  }
 }
