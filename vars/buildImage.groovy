@@ -61,6 +61,15 @@ def call(Map config=[:]) {
             build.pushContainerImage(imageNameLatest)
           }
         }
+
+        stage('Trigger GitHub release') {
+          withCredentials([
+            string(credentialsId: 'github-auth-token', variable: 'gitToken')
+          ]) {
+            String commitMessage = utils.getCommitMessage()
+            release.trigger(tag, repoName, commitMessage, gitToken)            
+          }
+        }
       }
 
       if (config.containsKey('buildClosure')) {
