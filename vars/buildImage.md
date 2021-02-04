@@ -1,6 +1,6 @@
 # buildImage
 
-> The default build configuration for building and publising and image to DockerHub
+> The default build configuration for building and publising an image to DockerHub
 
 In order to use it with the default conventions simply add the following to
 your Jenkinsfile, replacing the name of the project with your project's name.
@@ -10,7 +10,7 @@ For the details of what happens please review the
 ```
 @Library('defra-library@v-9') _
 
-buildImage
+buildImage()
 ```
 
 ## Image tagging
