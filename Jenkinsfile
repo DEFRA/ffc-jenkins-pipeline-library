@@ -33,7 +33,11 @@ node {
       }
     }
   } catch(e) {
-    notifySlack.buildFailure('#generalbuildfailures')
+    echo("Build failed with message: $e.message")
+
+    stage('Send build failure slack notification') {
+      notifySlack.buildFailure('#generalbuildfailures', defaultBranch)
+    }
     throw e
   }
 }

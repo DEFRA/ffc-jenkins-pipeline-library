@@ -28,7 +28,7 @@ void call(Map config=[:]) {
         build.checkoutSourceCode(defaultBranch)
       }
 
-      stage('Set PR, and tag variables') {
+      stage('Set PR and tag variables') {
         def version = version.getPackageJsonVersion()
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
