@@ -65,7 +65,7 @@ def call(Map config=[:]) {
 
       if (config.containsKey('buildClosure')) {
         config['buildClosure']()
-      }      
+      }
     } catch (err) {
       def errMsg = utils.getErrorMessage(err)
       echo("Build failed with message: $errMsg")
