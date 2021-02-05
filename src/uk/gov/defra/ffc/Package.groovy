@@ -5,7 +5,7 @@ class Package implements Serializable {
     ctx.withCredentials([
       ctx.string(credentialsId: 'npm-publish-token', variable: 'token')
     ]) {  
-      ctx.sh("docker run --rm -v '${ctx.PWD}:/src' -e NPM_TOKEN=${ctx.token} -e TAG_NEXT=${tagNext} tozny/npm-publish")
+      ctx.sh("docker run --rm -v  \$(pwd)/:/src -e NPM_TOKEN=${ctx.token} -e TAG_NEXT=${tagNext} tozny/npm-publish")
     }
   }
 }
