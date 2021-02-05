@@ -38,7 +38,7 @@ def call(Map config=[:]) {
 
       if(pr != '') {
         stage("Publish to Npm (Next)") {
-          package.publishToNpm("${tag}-${BUILD_NUMBER}")
+          package.publishToNpm("${tag}-alpha.${BUILD_NUMBER}")
         }
       } else {
         stage("Publish to Npm") {
