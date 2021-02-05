@@ -3,13 +3,9 @@ def call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  String imageName = ''
-  String imageNameLatest = ''
   String defaultBranch = 'main'
-  String versionFileName = 'VERSION'
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
-  Boolean tagExists = false
 
   node {
     try {
@@ -26,13 +22,13 @@ def call(Map config=[:]) {
       }
 
       stage('Set PR and tag variables') {
-        def version = version.getFileVersion(versionFileName)
+        def version = version.getPackageJsonVersion()
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
 
       if (pr != '') {
         stage('Verify version incremented') {
-          version.verifyFileIncremented(versionFileName)
+           version.verifyPackageJsonIncremented(defaultBranch)
         }
       }
 
@@ -40,26 +36,14 @@ def call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      stage('Set image name') {
-        imageName = build.getImageName(repoName, tag, config.tagSuffix, config.registry)
-        imageNameLatest = build.getImageName(repoName, 'latest', null, config.registry)
-      }
-
-      stage("Build image") {
-        build.buildContainerImage(imageName)
-        build.buildContainerImage(imageNameLatest)
-      }
-
-      if(pr == '') {
-        stage("Check if tag exists") {
-          tagExists = build.containerTagExists(imageName)
+      if(pr != '') {
+        stage("Publish to Npm (Next)") {
+          def version = version.getPackageJsonVersion()
+          package.publishToNpm("${version}-alpha.${BUILD_NUMBER}")
         }
-
-        if (!tagExists) {
-          stage("Push image") {
-            build.pushContainerImage(imageName)
-            build.pushContainerImage(imageNameLatest)
-          }
+      } else {
+        stage("Publish to Npm") {
+          package.publishToNpm()
         }
 
         stage('Trigger GitHub release') {
