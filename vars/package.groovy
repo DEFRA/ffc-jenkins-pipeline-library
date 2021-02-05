@@ -1,6 +1,6 @@
 import uk.gov.defra.ffc.Package
 
-void publishToNpm(Boolean tagNext = false)
+void publishToNpm(String version = '')
 {
-  Package.publishToNpm(this, tagNext)
+  Package.publishToNpm(this, version)
 }
