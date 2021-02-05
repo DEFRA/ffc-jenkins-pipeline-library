@@ -3,7 +3,6 @@ def call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  String version = ''
   String defaultBranch = 'main'
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
@@ -23,7 +22,7 @@ def call(Map config=[:]) {
       }
 
       stage('Set PR and tag variables') {
-        version = version.getPackageJsonVersion()
+        def version = version.getPackageJsonVersion()
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
 
@@ -39,6 +38,7 @@ def call(Map config=[:]) {
 
       if(pr != '') {
         stage("Publish to Npm (Next)") {
+          def version = version.getPackageJsonVersion()
           package.publishToNpm("${version}-alpha.${BUILD_NUMBER}")
         }
       } else {
