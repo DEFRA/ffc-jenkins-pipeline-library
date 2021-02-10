@@ -60,12 +60,7 @@ class Utils implements Serializable {
     if (!errMessage) {
       def errCauses = e.getCauses()
       if (errCauses) {
-        def errMessages = []
-        errCauses.each { errCause ->
-          if (errCause instanceof io.snyk.jenkins.workflow.FoundIssuesCause) {
-            errMessages.add(errCause.getShortDescription())
-          }
-        }
+        def errMessages = []        
         errMessage = errMessages.join(', ')
       }
       errMessage = errMessage ?: 'No error message available.'
