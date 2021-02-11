@@ -56,21 +56,7 @@ class Utils implements Serializable {
   }
 
   static def getErrorMessage(e) {
-    def errMessage = e.message
-    if (!errMessage) {
-      def errCauses = e.getCauses()
-      if (errCauses) {
-        def errMessages = []
-        errCauses.each { errCause ->
-          if (errCause instanceof io.snyk.jenkins.workflow.FoundIssuesCause) {
-            errMessages.add(errCause.getShortDescription())
-          }
-        }
-        errMessage = errMessages.join(', ')
-      }
-      errMessage = errMessage ?: 'No error message available.'
-    }
-    return errMessage
+    return e.message ? e.message : 'No error message available'
   }
 
   static def escapeSpecialChars(str) {
