@@ -16,6 +16,9 @@ class Docker implements Serializable {
        // ctx.string(credentialsId: 'artifactory-nuget-token', variable: 'nugetToken')
       ]) {
         def resourcePath = 'uk/gov/defra/ffc/artifactory'
+        ctx.echo("Registry: ${ctx.NPM_REGISTRY}")
+        ctx.echo("NPM Token: ${ctx.npmToken}")
+        ctx.echo("Email: ${ctx.NPM_EMAIL}")        
 
         if (packageManager == 'npm') {
           Provision.getResourceFile(ctx, resourcePath, '.npmrc', '.')
