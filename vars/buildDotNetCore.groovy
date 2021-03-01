@@ -28,7 +28,7 @@ void call(Map config=[:]) {
         build.checkoutSourceCode(defaultBranch)
       }
 
-      stage('Set PR, and tag variables') {
+      stage('Set PR and tag variables') {
         csProjVersion = version.getCSProjVersion(config.project)
         (repoName, pr, tag, mergedPrNo) = build.getVariables(csProjVersion, defaultBranch)
       }
@@ -61,7 +61,7 @@ void call(Map config=[:]) {
        }
      }
 
-      stage('Provision resources') {
+      stage('Provision any required resources') {
         provision.createResources(environment, repoName, pr)
       }
 

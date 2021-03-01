@@ -25,7 +25,6 @@ class Tests implements Serializable {
 
   static def runZapScan(ctx, projectName, buildNumber, tag) {
     def zapDockerComposeFile = 'docker-compose.zap.yaml'
-    if (ctx.fileExists("./$zapDockerComposeFile")) {
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.ZapScan.Context, description: GitHubStatus.ZapScan.Description) {
         try {
           // test-output exists if stage is run after 'runTests', take no risks and create it
@@ -35,14 +34,10 @@ class Tests implements Serializable {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile down -v")
         }
       }
-    } else {
-      ctx.echo("$zapDockerComposeFile not found, skipping test run")
-    }
   }
 
   static def runPa11y(ctx, projectName, buildNumber, tag) {
     def pa11yDockerComposeFile = 'docker-compose.pa11y.yaml'
-    if (ctx.fileExists("./$pa11yDockerComposeFile")) {
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.Pa11y.Context, description: GitHubStatus.Pa11y.Description) {
         try {
           // test-output exists if stage is run after 'runTests', take no risks and create it
@@ -52,9 +47,6 @@ class Tests implements Serializable {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $pa11yDockerComposeFile down -v")
         }
       }
-    } else {
-      ctx.echo("$pa11yDockerComposeFile not found, skipping test run")
-    }
   }
 
   static def lintHelm(ctx, chartName) {
@@ -153,7 +145,7 @@ class Tests implements Serializable {
   }
 
   static def runAcceptanceTests(ctx, pr,  environment, repoName) {
-    if (ctx.fileExists('./test/acceptance/docker-compose.yaml')) {
+    
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
           ctx.dir('./test/acceptance') {
@@ -177,8 +169,5 @@ class Tests implements Serializable {
           ctx.sh('docker-compose down -v')
         }
       }
-    } else {
-      ctx.echo('No "/test/acceptance/docker-compose.yaml" found therefore skipping this step.')
-    }
   }
 }

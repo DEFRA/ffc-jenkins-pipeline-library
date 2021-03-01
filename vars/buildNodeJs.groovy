@@ -29,7 +29,7 @@ void call(Map config=[:]) {
         build.checkoutSourceCode(defaultBranch)
       }
 
-      stage('Set PR, and tag variables') {
+      stage('Set PR and tag variables') {
         def version = version.getPackageJsonVersion()
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
@@ -56,7 +56,7 @@ void call(Map config=[:]) {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
 
-      stage('Provision resources') {
+      stage('Provision any required resources') {
         provision.createResources(environment, repoName, pr)
       }
 
@@ -92,12 +92,16 @@ void call(Map config=[:]) {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
       }
 
-      stage('Run Zap Scan') {
-        test.runZapScan(repoName, BUILD_NUMBER, tag)
+      if (fileExists('./docker-compose.zap.yaml')) {
+        stage('Run Zap Scan') {
+          test.runZapScan(repoName, BUILD_NUMBER, tag)
+        }
       }
 
-      stage('Run Accessibility tests') {
-        test.runPa11y(repoName, BUILD_NUMBER, tag)
+      if (fileExists('./docker-compose.pa11y.yaml')) {
+        stage('Run Accessibility tests') {
+          test.runPa11y(repoName, BUILD_NUMBER, tag)
+        }
       }
 
       if (config.containsKey('testClosure')) {
@@ -139,8 +143,10 @@ void call(Map config=[:]) {
         config['deployClosure']()
       }
 
-      stage('Run Acceptance Tests') {
-        test.runAcceptanceTests(pr, environment, repoName)
+      if (fileExists('./test/acceptance/docker-compose.yaml')) {
+        stage('Run Acceptance Tests') {
+          test.runAcceptanceTests(pr, environment, repoName)
+        }
       }
 
     } catch(e) {
