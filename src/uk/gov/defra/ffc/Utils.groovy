@@ -114,4 +114,14 @@ class Utils implements Serializable {
       ctx.sh(returnStatus: true, script: script)      
     }
   }
+
+  static def checkCredentialsExist(id) {
+    try {
+      withCredentials([string(credentialsId: id, variable: 'jenkinsToken')]) {
+        true
+      }
+    } catch (_) {
+      false
+    }
+  }
 }
