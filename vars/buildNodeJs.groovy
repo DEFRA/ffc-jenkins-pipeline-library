@@ -131,12 +131,14 @@ void call(Map config=[:]) {
 
         stage('Trigger Deployment') {
           if (utils.checkCredentialsExist("$repoName-deploy-token")) {
+            echo("$repoName-deploy-token")
             withCredentials([
               string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
             ]) {
               deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
             }
           } else {
+            echo("default-deploy-token")
             withCredentials([
               string(credentialsId: 'default-deploy-token', variable: 'jenkinsToken')
             ]) {
