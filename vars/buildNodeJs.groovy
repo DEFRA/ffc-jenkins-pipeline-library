@@ -111,7 +111,7 @@ void call(Map config=[:]) {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
-      if (pr != '') {
+      if (pr == '') {
         stage('Helm install') {
           helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
         }
