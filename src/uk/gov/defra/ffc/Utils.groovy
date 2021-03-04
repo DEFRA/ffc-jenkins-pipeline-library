@@ -116,7 +116,6 @@ class Utils implements Serializable {
   }
 
   static def checkCredentialsExist(ctx, id) {
-    ctx.echo("utils id: $id")
     try {
       ctx.withCredentials([ctx.string(credentialsId: id, variable: 'jenkinsToken')]) {
         true
