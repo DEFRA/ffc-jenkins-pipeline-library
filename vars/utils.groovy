@@ -21,6 +21,6 @@ String getErrorMessage(e) {
 }
 
 Boolean checkCredentialsExist(String id) {
-  return Utils.checkCredentialsExist(id)
+  return Utils.checkCredentialsExist(this, id)
 }
 
