@@ -115,7 +115,7 @@ class Utils implements Serializable {
     }
   }
 
-  static def checkCredentialsExist(ctx, id) {
+  static Boolean checkCredentialsExist(ctx, id) {
     try {
       ctx.withCredentials([ctx.string(credentialsId: id, variable: 'jenkinsToken')]) {
         true
