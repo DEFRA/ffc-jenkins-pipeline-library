@@ -111,12 +111,12 @@ void call(Map config=[:]) {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
-      if (pr == '') {
+      if (pr != '') {
         stage('Helm install') {
           helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
         }
       } else {
-        /* stage('Publish chart') {
+        stage('Publish chart') {
           helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
         }
 
@@ -127,7 +127,7 @@ void call(Map config=[:]) {
             String commitMessage = utils.getCommitMessage()
             release.trigger(tag, repoName, commitMessage, gitToken)
           }
-        } */
+        }
 
         stage('Trigger Deployment') {
           if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
