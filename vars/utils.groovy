@@ -19,3 +19,8 @@ String getRepoName() {
 String getErrorMessage(e) {
   return Utils.getErrorMessage(e)
 }
+
+Boolean checkCredentialsExist(String id) {
+  return Utils.checkCredentialsExist(this, id)
+}
+

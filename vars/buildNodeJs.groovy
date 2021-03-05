@@ -130,10 +130,18 @@ void call(Map config=[:]) {
         }
 
         stage('Trigger Deployment') {
-          withCredentials([
-            string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
-          ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+          if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
+            withCredentials([
+              string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
+            ]) {
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+            }
+          } else {            
+            withCredentials([
+              string(credentialsId: 'default-deploy-token', variable: 'jenkinsToken')
+            ]) {
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+            }
           }
         }
       }
