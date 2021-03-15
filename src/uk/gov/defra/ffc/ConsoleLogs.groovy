@@ -16,7 +16,7 @@ class ConsoleLogs implements Serializable {
     }
 
     ctx.echo("Date: $logName")
-    // ctx.echo("log name: log_/$logName/.txt")
+    ctx.echo("log name: log_"$logName".txt")
     // ctx.sh(script: $url > /var/log/jenkins/console/log_new Date().txt, returnStdout: true)
   }
 }
