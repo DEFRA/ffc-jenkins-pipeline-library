@@ -7,6 +7,15 @@ class ConsoleLogs implements Serializable {
     def folder = Utils.getFolder(ctx)
     def url = "$jenkinsUrl/job/$folder/job/$repoName-build/job/$branch/$buildNumber/consoleText"
 
-    ctx.echo("Url: $url") 
+    ctx.echo("Url: $url")
+
+    def logName = ""
+
+    use (groovy.time.TimeCategory) {
+       logName = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
+    }
+
+    ctx.echo("log name: log_$logName.txt")
+    // ctx.sh(script: $url > /var/log/jenkins/console/log_new Date().txt, returnStdout: true)
   }
 }
