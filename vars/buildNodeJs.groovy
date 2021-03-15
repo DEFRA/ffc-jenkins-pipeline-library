@@ -174,6 +174,10 @@ void call(Map config=[:]) {
         test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
       }
 
+      stage('Save console logs') {
+        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, repoName, branch, BUILD_NUMBER)
+      }
+
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)
       }
