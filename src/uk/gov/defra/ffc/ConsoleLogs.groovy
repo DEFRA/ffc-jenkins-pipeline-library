@@ -13,6 +13,7 @@ class ConsoleLogs implements Serializable {
 
     ctx.echo("Date: $logName")
     ctx.echo("log name: log_${logName}.txt")
-    ctx.sh(script: "${url} > /var/log/jenkins/console/${logName}", returnStdout: true)
+    def script = "$url > /var/log/jenkins/console/$logName"    
+    ctx.sh(script: script, returnStdout: true)
   }
 }
