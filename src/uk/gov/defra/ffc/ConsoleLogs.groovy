@@ -15,7 +15,8 @@ class ConsoleLogs implements Serializable {
        logName = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
     }
 
-    ctx.echo("log name: log_$logName.txt")
+    ctx.echo("Date: $logName")
+    // ctx.echo("log name: log_/$logName/.txt")
     // ctx.sh(script: $url > /var/log/jenkins/console/log_new Date().txt, returnStdout: true)
   }
 }
