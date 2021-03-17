@@ -22,7 +22,7 @@ class ConsoleLogs implements Serializable {
     ctx.dir('../../../../../../../../../log/jenkins/console/') {
     //ctx.sh("cd /var/log/jenkins/console/")
     //ctx.sh("USER root")
-    ctx.sh("chown -R jenkins /var/log/jenkins/console/")
+    //ctx.sh("chown -R jenkins /var/log/jenkins/console/")
     ctx.sh("ls")
 
     // ctx.sh("chmod 777 /var/log/jenkins/console/")
