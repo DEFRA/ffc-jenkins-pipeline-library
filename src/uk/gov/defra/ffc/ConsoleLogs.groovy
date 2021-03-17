@@ -21,7 +21,7 @@ class ConsoleLogs implements Serializable {
     ctx.sh("ls")
     ctx.dir('../../../../../../../../../log/jenkins/console/') {
     //ctx.sh("cd /var/log/jenkins/console/")
-    ctx.sh("USER root")
+    //ctx.sh("USER root")
     ctx.sh("chown -R jenkins /var/log/jenkins/console/")
     ctx.sh("ls")
 
