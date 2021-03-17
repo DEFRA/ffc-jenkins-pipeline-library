@@ -14,9 +14,9 @@ class ConsoleLogs implements Serializable {
     ctx.echo("Date: $logName")
     ctx.echo("log name: log_${logName}.txt")
     //ctx.echo("dir ls")
-    ctx.sh("dir ls")
+    ctx.sh("ls")
     ctx.sh("cd ~")
-    ctx.sh("dir ls")
+    ctx.sh("ls")
     ctx.sh("cd /var/log/jenkins/console/")
 
     // ctx.sh("chmod 777 /var/log/jenkins/console/")
