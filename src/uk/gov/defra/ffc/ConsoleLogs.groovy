@@ -15,7 +15,7 @@ class ConsoleLogs implements Serializable {
     ctx.echo("log name: log_${logName}.txt")
    
     ctx.sh("ls")
-    ctx.sh("[ -d /var/log/jenkins/console ]  && docker run --rm -u root --privileged --mount type=bind,source=/var/log/jenkins/console,target=/home/node defradigital/node-development chown $JENKINS_USER_ID:$JENKINS_GROUP_ID -R -v .")
+    ctx.sh("[ -d /var/log/jenkins/console ]  && docker run --rm -u root --privileged --mount type=bind,source=/var/log/jenkins/console,target=/home/node defradigital/node-development chown $ctx.JENKINS_USER_ID:$ctx.JENKINS_GROUP_ID -R -v .")
    
       def script = "curl $url > /var/log/jenkins/console/log_${logName}.txt"
       ctx.echo("script: $script")
