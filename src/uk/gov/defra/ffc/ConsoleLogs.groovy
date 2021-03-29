@@ -7,7 +7,7 @@ class ConsoleLogs implements Serializable {
     def folder = Utils.getFolder(ctx)
     def url = "$jenkinsUrl/job/$folder/job/$repoName-build/job/$branch/$buildNumber/consoleText"
 
-    def logFileName = new Date().format("yyyy-MM-dd_HH-mm-ss", TimeZone.getTimeZone('UTC'))
+    def logFileName = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
     
     ctx.sh("[ -d /var/log/jenkins/console ]  && docker run --rm -u root --privileged --mount type=bind,source=/var/log/jenkins/console,target=/home/node defradigital/node-development chown $ctx.JENKINS_USER_ID:$ctx.JENKINS_GROUP_ID -R -v .")
    
