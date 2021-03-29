@@ -9,7 +9,7 @@ class ConsoleLogs implements Serializable {
 
     ctx.echo("Url: $url")
 
-    def logName = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
+    def logName = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
 
     ctx.echo("Date: $logName")
     ctx.echo("log name: log_${logName}.txt")
