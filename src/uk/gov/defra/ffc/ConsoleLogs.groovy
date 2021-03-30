@@ -7,14 +7,14 @@ class ConsoleLogs implements Serializable {
     def folder = Utils.getFolder(ctx)
     def url = "$jenkinsUrl/job/$folder/job/$repoName-build/job/$branch/$buildNumber/consoleText"
 
-    saveLogFile(url, logFilePath)
+    saveLogFile(ctx, url, logFilePath)
   }
 
   static def save(ctx, jenkinsUrl, repoName, buildNumber, logFilePath) {
     def folder = Utils.getFolder(ctx)
     def url = "$jenkinsUrl/job/$folder/job/$repoName-deploy/$buildNumber/consoleText"
 
-    saveLogFile(url, logFilePath)
+    saveLogFile(ctx, url, logFilePath)
   }
 
   static def saveLogFile(ctx, url, logFilePath) {
