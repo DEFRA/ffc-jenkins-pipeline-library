@@ -4,15 +4,15 @@ import uk.gov.defra.ffc.Utils
 
 class ConsoleLogs implements Serializable {
   static def save(ctx, jenkinsUrl, repoName, branch, buildNumber, logFilePath) {
-    def folder = Utils.getFolder(ctx)
-    def url = "$jenkinsUrl/job/$folder/job/$repoName-build/job/$branch/$buildNumber/consoleText"
+    
+    def url = "$jenkinsUrl/job/$Utils.getFolder(ctx)/job/$repoName-build/job/$branch/$buildNumber/consoleText"
 
     saveLogFile(ctx, url, logFilePath)
   }
 
   static def save(ctx, jenkinsUrl, repoName, buildNumber, logFilePath) {
-    def folder = Utils.getFolder(ctx)
-    def url = "$jenkinsUrl/job/$folder/job/$repoName-deploy/$buildNumber/consoleText"
+    
+    def url = "$jenkinsUrl/job/$Utils.getFolder(ctx)/job/$repoName-deploy/$buildNumber/consoleText"
 
     saveLogFile(ctx, url, logFilePath)
   }
