@@ -11,6 +11,10 @@ void call(Map config=[:], Closure body={}) {
     } catch(e) {
       notifySlack.deploymentFailure()
       throw e
+    } finally {
+      stage('Save console logs') {
+        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, config.chartName, BUILD_NUMBER)
+      }
     }
   }
 }
