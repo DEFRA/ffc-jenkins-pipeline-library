@@ -16,7 +16,7 @@ class ConsoleLogs implements Serializable {
     ctx.sh(script: script, returnStdout: true)
   }
 
-  static def saveTest(ctx, jenkinsUrl, repoName, buildNumber) {
+  static def save(ctx, jenkinsUrl, repoName, buildNumber) {
     def folder = Utils.getFolder(ctx)
     def url = "$jenkinsUrl/job/$folder/job/$repoName-deploy/$buildNumber/consoleText"
 
