@@ -175,7 +175,7 @@ void call(Map config=[:]) {
       }
 
       stage('Save console logs') {
-        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, repoName, BRANCH_NAME, BUILD_NUMBER)
+        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, repoName, BRANCH_NAME, BUILD_NUMBER, '/var/log/jenkins/console')
       }
 
       stage('Clean up resources') {
