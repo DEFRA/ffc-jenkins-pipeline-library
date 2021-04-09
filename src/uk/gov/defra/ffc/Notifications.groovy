@@ -10,7 +10,7 @@ class Notifications implements Serializable {
 
     if(ctx.BRANCH_NAME == defaultBranch) {
       msg = "<!here> ${msg}"
-      channel = '#mainbuildfailures'
+      channel = 'mainbuildfailures'
     }
 
     Utils.sendNotification(ctx, channel, "\'$msg\'", color)
@@ -19,7 +19,7 @@ class Notifications implements Serializable {
   static def deploymentFailure(ctx) {
     def msg = "\'<!here> DEPLOYMENT FAILED \r\n${ctx.JOB_NAME}/${ctx.BUILD_NUMBER} \r\n(<${ctx.BUILD_URL}|Open>)\'"
 
-    Utils.sendNotification(ctx, '#mainbuildfailures', msg, color)
+    Utils.sendNotification(ctx, 'mainbuildfailures', msg, color)
   }
 
   static def sendMessage(ctx, channel, message, useHere) {
