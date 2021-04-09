@@ -36,7 +36,7 @@ node {
     echo("Build failed with message: $e.message")
 
     stage('Send build failure slack notification') {
-      notifySlack.buildFailure('#generalbuildfailures', defaultBranch)
+      notifySlack.buildFailure('generalbuildfailures', defaultBranch)
     }
     throw e
   }

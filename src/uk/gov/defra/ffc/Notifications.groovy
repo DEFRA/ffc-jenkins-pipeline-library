@@ -24,6 +24,6 @@ class Notifications implements Serializable {
 
   static def sendMessage(ctx, channel, message, useHere) {
 
-    Utils.sendNotification(ctx, channel, "\'${useHere ? '<!here> ' : ''}$message\'", color)    
+    Utils.sendNotification(ctx, channel, "\'${useHere ? '<!here> ' : ''}$message\'", color)
   }
 }
