@@ -111,7 +111,7 @@ class Utils implements Serializable {
     ]) {
 
       def script = "docker run -e SLACK_WEBHOOK=$ctx.webHook -e SLACK_MESSAGE=$msg -e SLACK_COLOR=$color technosophos/slack-notify:latest"
-      ctx.sh(returnStatus: true, script: script)      
+      ctx.sh(returnStatus: true, script: script)
     }
   }
 
