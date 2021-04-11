@@ -64,7 +64,7 @@ class Helm implements Serializable {
         def serviceCommonConfigValues
         def serviceCommonConfigValuesChart
         def serviceEnvironmentConfigValues
-        def serviceEnvironmentConfigValuesChart 
+        def serviceEnvironmentConfigValuesChart
 
         if(serviceName != '') {
           // get common values for a service
@@ -91,7 +91,7 @@ class Helm implements Serializable {
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.echo('Running helm upgrade, console output suppressed')
-        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $prCommands $extraCommands")
+        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $prCommands $extraCommands")
         writeUrlIfIngress(ctx, deploymentName)
       }
     }
@@ -195,7 +195,7 @@ class Helm implements Serializable {
             def serviceCommonConfigValues
             def serviceCommonConfigValuesChart
             def serviceEnvironmentConfigValues
-            def serviceEnvironmentConfigValuesChart 
+            def serviceEnvironmentConfigValuesChart
 
             if(serviceName != '') {
               // get common values for a service
