@@ -90,19 +90,7 @@ class Helm implements Serializable {
         )
 
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
-        ctx.echo('Running helm upgrade, console output suppressed')
-        ctx.echo("common: $commonConfigValues")
-        ctx.echo("common chart: $commonConfigValuesChart")
-        ctx.echo("env: $environmentConfigValues")
-        ctx.echo("env chart: $environmentConfigValuesChart")
-        ctx.echo("service common: $serviceCommonConfigValues")
-        ctx.echo("service common chart: $serviceCommonConfigValuesChart")
-        ctx.echo("service env: $serviceEnvironmentConfigValues")
-        ctx.echo("service env chart: $serviceEnvironmentConfigValuesChart")
-        ctx.echo("pr: $prConfigValues")
-        ctx.echo("pr chart: $prConfigValuesChart")
-        ctx.echo("pr provisioned $prProvisionedValues")
-        ctx.sh("helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $prCommands $extraCommands")
+        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $prCommands $extraCommands")
         writeUrlIfIngress(ctx, deploymentName)
       }
     }
