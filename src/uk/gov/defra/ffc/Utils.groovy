@@ -60,7 +60,7 @@ class Utils implements Serializable {
   }
 
   static def escapeSpecialChars(str) {
-    return str.replace('\\', '\\\\\\\\').replace(",", /","/).replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/)
+    return str.replace('\\', '\\\\\\\\').replace(",", /","/).replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/).replace(/$/, /\$/)
   }
 
   /**
@@ -103,7 +103,7 @@ class Utils implements Serializable {
 
   static def getUrlStatusCode(ctx, url) {
     return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
-  }  
+  }
 
   static def sendNotification(ctx, channel, msg, color){
 
