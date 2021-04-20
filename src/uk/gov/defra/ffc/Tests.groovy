@@ -165,11 +165,11 @@ class Tests implements Serializable {
             def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
 
             ctx.withEnv(["BROWSERSTACK_USERNAME=$ctx.browserStackUsername"]) {
-              echo "BROWSERSTACK_USERNAME = ${env.BROWSERSTACK_USERNAME}"
+              echo "BROWSERSTACK_USERNAME = ${ctx.BROWSERSTACK_USERNAME}"
             }
 
             ctx.withEnv(["BROWSERSTACK_ACCESS_TOKEN=$ctx.browserStackAccessToken"]) {
-              echo "BROWSERSTACK_ACCESS_TOKEN = ${env.BROWSERSTACK_ACCESS_TOKEN}"
+              echo "BROWSERSTACK_ACCESS_TOKEN = ${ctx.BROWSERSTACK_ACCESS_TOKEN}"
             }
 
             ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}"]) {
