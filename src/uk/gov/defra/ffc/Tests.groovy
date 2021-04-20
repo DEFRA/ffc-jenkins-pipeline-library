@@ -164,6 +164,8 @@ class Tests implements Serializable {
             def domain = serverConfig['ingress.server'].trim()
             def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
 
+            ctx.echo(ctx.browserStackUsername)
+            ctx.echo(ctx.browserStackAccessToken)
             ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}", 
                           "BROWSERSTACK_USERNAME=${ctx.browserStackUsername}", 
                           "BROWSERSTACK_ACCESS_TOKEN=${ctx.browserStackAccessToken}"]) {
