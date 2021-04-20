@@ -163,9 +163,16 @@ class Tests implements Serializable {
             def endpoint = endpointConfig['ingress.endpoint'].trim()
             def domain = serverConfig['ingress.server'].trim()
             def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
-            ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}", 
-                          "BROWSERSTACK_USERNAME=$ctx.browserStackUsername", 
-                          "BROWSERSTACK_ACCESS_TOKEN=$ctx.browserStackAccessToken"]) {
+
+            ctx.withEnv(["BROWSERSTACK_USERNAME=$ctx.browserStackUsername"]) {
+              echo "BROWSERSTACK_USERNAME = ${env.BROWSERSTACK_USERNAME}"
+            }
+
+            ctx.withEnv(["BROWSERSTACK_ACCESS_TOKEN=$ctx.browserStackAccessToken"]) {
+              echo "BROWSERSTACK_ACCESS_TOKEN = ${env.BROWSERSTACK_ACCESS_TOKEN}"
+            }
+
+            ctx.withEnv(["TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}"]) {
             ctx.sh('docker-compose -f docker-compose.yaml build')
             ctx.sh('docker-compose run wdio-cucumber')
             }
