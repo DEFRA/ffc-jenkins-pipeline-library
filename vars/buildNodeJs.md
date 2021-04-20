@@ -51,7 +51,7 @@ buildNodeJs environment: 'dev', snykFailOnIssues: true, snykOrganisation: 'my-or
 ```
 
 ## Default branch
-The build will assume the default branch in the repository is named `main`.  If not the default can be supplied in hte build configuration.
+The build will assume the default branch in the repository is named `main`.  If not the default can be supplied in the build configuration.
 
 For example:
 

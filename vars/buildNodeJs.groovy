@@ -28,7 +28,7 @@ void call(Map config=[:]) {
         build.checkoutSourceCode(defaultBranch)
       }
 
-      stage('Set PR, and tag variables') {
+      stage('Set PR and tag variables') {
         def version = version.getPackageJsonVersion()
         (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
       }
@@ -130,10 +130,18 @@ void call(Map config=[:]) {
         }
 
         stage('Trigger Deployment') {
-          withCredentials([
-            string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
-          ]) {
-            deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+          if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
+            withCredentials([
+              string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
+            ]) {
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+            }
+          } else {            
+            withCredentials([
+              string(credentialsId: 'default-deploy-token', variable: 'jenkinsToken')
+            ]) {
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+            }
           }
         }
       }
@@ -153,7 +161,7 @@ void call(Map config=[:]) {
       echo("Build failed with message: $errMsg")
 
       stage('Send build failure slack notification') {
-        notifySlack.buildFailure('#generalbuildfailures', defaultBranch)
+        notifySlack.buildFailure('generalbuildfailures', defaultBranch)
       }
 
       if (config.containsKey('failureClosure')) {

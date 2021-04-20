@@ -23,7 +23,7 @@ An example can be seen in [ffc-demo-payment-service-core](https://github.com/DEF
 The `Snyk test` stage will ensure the `obj` folder is writable by Docker to allow file extraction.
 
 ## Default branch
-The build will assume the default branch in the repository is named `main`.  If not the default can be supplied in hte build configuration.
+The build will assume the default branch in the repository is named `main`.  If not the default can be supplied in the build configuration.
 
 For example:
 
