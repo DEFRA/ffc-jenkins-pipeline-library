@@ -41,3 +41,11 @@ For example:
 ```
 buildDotNetCore project: 'FFCDemoDotNetCoreProjectName', environment: 'snd2'
 ```
+
+## Support Image without Helm
+
+To optionally support images that won't target Kubernetes
+
+```
+buildNodeJs noHelm: true
+```

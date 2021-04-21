@@ -9,6 +9,7 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
+  String noHelm = false
 
   node {
     try {
@@ -20,8 +21,12 @@ void call(Map config=[:]) {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
 
+      stage('Set noHelm') {
+        noHelm = config.noHelm != null ? config.noHelm : noHelm
+      }
+
       stage('Set environment') {
-        environment = config.environment != null ? config.environment : environment
+        environment = config.noHelm != null ? config.environment : environment
       }
 
       stage('Checkout source code') {
@@ -43,8 +48,10 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      stage('Helm lint') {
-        test.lintHelm(repoName)
+      if(!noHelm) {
+        stage('Helm lint') {
+          test.lintHelm(repoName)
+        }
       }
 
       stage('npm audit') {
@@ -55,8 +62,10 @@ void call(Map config=[:]) {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
 
-      stage('Provision any required resources') {
-        provision.createResources(environment, repoName, pr)
+      if(!noHelm) {
+        stage('Provision any required resources') {
+          provision.createResources(environment, repoName, pr)
+        }
       }
 
       if (config.containsKey('buildClosure')) {
@@ -111,15 +120,20 @@ void call(Map config=[:]) {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
-      if (pr != '') {
-        stage('Helm install') {
-          helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
+      if(!noHelm) {
+        if (pr != '') {
+          stage('Helm install') {
+            helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
+          }
+        } else {
+          stage('Publish chart') {
+            helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
+          }
         }
-      } else {
-        stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
-        }
+      }
 
+
+      if (pr == '') {
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
@@ -128,7 +142,9 @@ void call(Map config=[:]) {
             release.trigger(tag, repoName, commitMessage, gitToken)
           }
         }
+      }
 
+      if(!noHelm && pr != '') {
         stage('Trigger Deployment') {
           if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
             withCredentials([
