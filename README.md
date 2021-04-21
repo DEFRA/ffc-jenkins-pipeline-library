@@ -65,8 +65,8 @@ locally is achieved by executing
 
 ### Default build configurations
 
-A default build configuration is available for both Node.js and .NET Core
-projects. Both configurations require an environment to be specified.
+A default build configuration is available for Node.js, .NET Core and a common helm chart
+projects. All configurations require an environment to be specified.
 Specifying an environment means that in future we'll be able to
 support pipelines for different clusters, such as staging and production
 environments.
@@ -90,6 +90,13 @@ Example .NET Core Jenkinsfile:
 @Library('defra-library@v-9') _
 
 buildDotNetCore project: 'FFCDemoPaymentService'
+```
+
+Example Common helm chart without an image:
+```
+@Library('defra-library@v-9') _
+
+buildHelm()
 ```
 
 Ideally, the default build will be suitable and can be used in place of
