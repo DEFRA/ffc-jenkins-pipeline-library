@@ -108,7 +108,7 @@ class Helm implements Serializable {
 
   static def publishChart(ctx, registry, chartName, tag) {
     ctx.withCredentials([
-      ctx.usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password'),
+      ctx.usernamePassword(credentialsId: 'artifactory-credentials', usernameVariable: 'username', passwordVariable: 'password')
     ]) {
       // jenkins doesn't tidy up folder, remove old charts before running
       ctx.sh('rm -rf helm-charts')
