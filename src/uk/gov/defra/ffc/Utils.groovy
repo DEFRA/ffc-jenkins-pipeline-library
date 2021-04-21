@@ -56,25 +56,11 @@ class Utils implements Serializable {
   }
 
   static def getErrorMessage(e) {
-    def errMessage = e.message
-    if (!errMessage) {
-      def errCauses = e.getCauses()
-      if (errCauses) {
-        def errMessages = []
-        errCauses.each { errCause ->
-          if (errCause instanceof io.snyk.jenkins.workflow.FoundIssuesCause) {
-            errMessages.add(errCause.getShortDescription())
-          }
-        }
-        errMessage = errMessages.join(', ')
-      }
-      errMessage = errMessage ?: 'No error message available.'
-    }
-    return errMessage
+    return e.message ? e.message : 'No error message available'
   }
 
   static def escapeSpecialChars(str) {
-    return str.replace('\\', '\\\\\\\\').replace(",", /","/).replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/)
+    return str.replace('\\', '\\\\\\\\').replace(",", /","/).replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/).replace(/$/, /\$/)
   }
 
   /**
@@ -117,15 +103,25 @@ class Utils implements Serializable {
 
   static def getUrlStatusCode(ctx, url) {
     return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
-  }  
+  }
 
   static def sendNotification(ctx, channel, msg, color){
 
-    ctx.withCredentials([ctx.string(credentialsId: channel == '#mainbuildfailures' ? 'slack-mainbuildfailures-channel-webhook' : 'slack-generalbuildfailures-channel-webhook', variable: 'webHook')
+    ctx.withCredentials([ctx.string(credentialsId: "slack-$channel-channel-webhook", variable: 'webHook')
     ]) {
 
       def script = "docker run -e SLACK_WEBHOOK=$ctx.webHook -e SLACK_MESSAGE=$msg -e SLACK_COLOR=$color technosophos/slack-notify:latest"
-      ctx.sh(returnStatus: true, script: script)      
+      ctx.sh(returnStatus: true, script: script)
+    }
+  }
+
+  static Boolean checkCredentialsExist(ctx, id) {
+    try {
+      ctx.withCredentials([ctx.string(credentialsId: id, variable: 'jenkinsToken')]) {
+        true
+      }
+    } catch (_) {
+      false
     }
   }
 }

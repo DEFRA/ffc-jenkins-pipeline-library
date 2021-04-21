@@ -64,7 +64,7 @@ class Helm implements Serializable {
         def serviceCommonConfigValues
         def serviceCommonConfigValuesChart
         def serviceEnvironmentConfigValues
-        def serviceEnvironmentConfigValuesChart 
+        def serviceEnvironmentConfigValuesChart
 
         if(serviceName != '') {
           // get common values for a service
@@ -195,7 +195,7 @@ class Helm implements Serializable {
             def serviceCommonConfigValues
             def serviceCommonConfigValuesChart
             def serviceEnvironmentConfigValues
-            def serviceEnvironmentConfigValuesChart 
+            def serviceEnvironmentConfigValuesChart
 
             if(serviceName != '') {
               // get common values for a service
