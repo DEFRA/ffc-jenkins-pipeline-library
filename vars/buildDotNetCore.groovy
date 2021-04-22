@@ -12,6 +12,11 @@ void call(Map config=[:]) {
 
   node {
     try {
+
+      if (!fileExists('./helm/')) {
+        noHelm = 'true'
+      }
+
       stage('Ensure clean workspace') {
         deleteDir()
       }
@@ -22,10 +27,6 @@ void call(Map config=[:]) {
 
       stage('Set environment') {
         environment = config.environment != null ? config.environment : environment
-      }
-
-      stage('Set noHelm') {
-        noHelm = config.noHelm != null ? config.noHelm : noHelm
       }
 
       stage('Checkout source code') {
