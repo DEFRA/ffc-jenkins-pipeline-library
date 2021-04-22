@@ -9,13 +9,12 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  def helmfiles = findFiles glob: './helm/**/*.yaml'
   String noHelm = 'false'
 
   node {
     try {
 
-      if (helmfiles.length == 0) {
+      if (!fileExists('./helm')) {
         noHelm = 'true'
       }
 
