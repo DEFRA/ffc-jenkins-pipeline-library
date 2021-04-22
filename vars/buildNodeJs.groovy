@@ -106,7 +106,7 @@ void call(Map config=[:]) {
         }
       }
 
-      if (fileExists('./docker-compose.pa11y.yaml') && noHelm == 'false') {
+      if (fileExists('./docker-compose.pa11y.yaml')) {
         stage('Run Accessibility tests') {
           test.runPa11y(repoName, BUILD_NUMBER, tag)
         }
@@ -166,7 +166,7 @@ void call(Map config=[:]) {
         config['deployClosure']()
       }
 
-      if (fileExists('./test/acceptance/docker-compose.yaml')) {
+      if (fileExists('./test/acceptance/docker-compose.yaml') && noHelm == 'false') {
         stage('Run Acceptance Tests') {
           test.runAcceptanceTests(pr, environment, repoName)
         }
