@@ -106,7 +106,7 @@ void call(Map config=[:]) {
         }
       }
 
-      if (fileExists('./docker-compose.pa11y.yaml')) {
+      if (fileExists('./docker-compose.pa11y.yaml') && noHelm == 'false') {
         stage('Run Accessibility tests') {
           test.runPa11y(repoName, BUILD_NUMBER, tag)
         }
