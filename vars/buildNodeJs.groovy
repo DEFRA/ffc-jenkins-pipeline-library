@@ -27,7 +27,7 @@ void call(Map config=[:]) {
       }
 
       stage('Set environment') {
-        environment = config.noHelm != null ? config.environment : environment
+        environment = config.environment != null ? config.environment : environment
       }
 
       stage('Checkout source code') {
@@ -165,7 +165,7 @@ void call(Map config=[:]) {
         config['deployClosure']()
       }
 
-      if (fileExists('./test/acceptance/docker-compose.yaml') && noHelm == 'false') {
+      if (fileExists('./test/acceptance/docker-compose.yaml') && hasHelmChart) {
         stage('Run Acceptance Tests') {
           test.runAcceptanceTests(pr, environment, repoName)
         }
