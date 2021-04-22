@@ -9,12 +9,15 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  def checkHelmFolder = new File('./helm/*/Chart.yaml')
-  String noHelm = checkHelmFolder.exists() ? 'false' : 'true'
-
+  String noHelm = 'false'
 
   node {
     try {
+
+      if (!fileExists('./helm/*/Chart.yaml')) {
+        noHelm = 'true'
+      }
+
       stage('Ensure clean workspace') {
         deleteDir()
       }
