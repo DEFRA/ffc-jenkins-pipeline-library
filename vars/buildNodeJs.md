@@ -74,5 +74,5 @@ buildNodeJs project: 'FFCDemoDotNetCoreProjectName', environment: 'snd2'
 To optionally support images that won't target Kubernetes
 
 ```
-buildNodeJs noHelm: true
+buildNodeJs noHelm: 'true'
 ```

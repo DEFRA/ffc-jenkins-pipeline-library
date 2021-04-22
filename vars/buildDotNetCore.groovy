@@ -8,7 +8,7 @@ void call(Map config=[:]) {
   String csProjVersion = ''
   String containerSrcFolder = '\\/home\\/dotnet'
   String dotnetDevelopmentImage = 'defradigital/dotnetcore-development'
-  String noHelm = false
+  String noHelm = 'false'
 
   node {
     try {
@@ -47,7 +47,7 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      if(noHelm == false) {
+      if(noHelm == 'false') {
         stage('Helm lint') {
           test.lintHelm(repoName)
         }
@@ -66,7 +66,7 @@ void call(Map config=[:]) {
        }
      }
 
-      if(noHelm == false) {
+      if(noHelm == 'false') {
         stage('Provision any required resources') {
           provision.createResources(environment, repoName, pr)
         }
@@ -100,7 +100,7 @@ void call(Map config=[:]) {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
-      if(noHelm == false) {
+      if(noHelm == 'false') {
         if (pr != '') {
           stage('Helm install') {
             helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
@@ -123,7 +123,7 @@ void call(Map config=[:]) {
         }
       }
 
-      if(noHelm == false && pr == '') {
+      if(noHelm == 'false' && pr == '') {
         stage('Trigger Deployment') {
           if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
             withCredentials([
@@ -161,8 +161,10 @@ void call(Map config=[:]) {
         test.changeOwnershipOfWorkspace(dotnetDevelopmentImage, containerSrcFolder)
       }
 
-      stage('Clean up resources') {
-        provision.deleteBuildResources(repoName, pr)
+      if(noHelm == 'false') {
+        stage('Clean up resources') {
+          provision.deleteBuildResources(repoName, pr)
+        }
       }
 
       if (config.containsKey('finallyClosure')) {
