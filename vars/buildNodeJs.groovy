@@ -9,7 +9,7 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  Boolean hasHelmChart = false
+  Boolean hasHelmChart = true
 
   node {
     try {
