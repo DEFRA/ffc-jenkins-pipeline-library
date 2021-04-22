@@ -9,13 +9,13 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  String noHelm = 'false'
+  Boolean hasHelmChart = false
 
   node {
     try {
 
       if (!fileExists('./helm/')) {
-        noHelm = 'true'
+        hasHelmChart = false
       }
 
       stage('Ensure clean workspace') {
@@ -49,7 +49,7 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      if(noHelm == 'false') {
+      if(hasHelmChart) {
         stage('Helm lint') {
           test.lintHelm(repoName)
         }
@@ -119,7 +119,7 @@ void call(Map config=[:]) {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
-      if(noHelm == 'false') {
+      if(hasHelmChart) {
         if (pr != '') {
           stage('Helm install') {
             helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
@@ -143,7 +143,7 @@ void call(Map config=[:]) {
         }
       }
 
-      if(noHelm == 'false' && pr == '') {
+      if(hasHelmChart && pr == '') {
         stage('Trigger Deployment') {
           if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
             withCredentials([
