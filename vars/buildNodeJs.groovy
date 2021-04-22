@@ -9,8 +9,9 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  String helmFolder = './helm/*/*.*'
-  String noHelm = fileExists(helmFolder) ? 'false' : 'true'
+  def checkHelmFolder = new File('./helm/*/Chart.ymal')
+  String noHelm = checkHelmFolder.exists() ? 'false' : 'true'
+
 
   node {
     try {
