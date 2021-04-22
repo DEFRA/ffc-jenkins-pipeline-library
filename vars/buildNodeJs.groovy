@@ -9,7 +9,9 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  String noHelm = 'false'
+  def checkHelmFolder = new File('./helm')
+  String noHelm = folder.exists() ? 'false' : 'true'
+
 
   node {
     try {
@@ -19,10 +21,6 @@ void call(Map config=[:]) {
 
       stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
-      }
-
-      stage('Set noHelm') {
-        noHelm = config.noHelm != null ? config.noHelm : noHelm
       }
 
       stage('Set environment') {
