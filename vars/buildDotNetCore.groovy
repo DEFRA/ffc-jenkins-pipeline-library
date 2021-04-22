@@ -67,10 +67,8 @@ void call(Map config=[:]) {
        }
      }
 
-      if(noHelm == 'false') {
-        stage('Provision any required resources') {
-          provision.createResources(environment, repoName, pr)
-        }
+      stage('Provision any required resources') {
+        provision.createResources(environment, repoName, pr)
       }
 
       if (fileExists('./docker-compose.test.yaml')) {
@@ -162,10 +160,8 @@ void call(Map config=[:]) {
         test.changeOwnershipOfWorkspace(dotnetDevelopmentImage, containerSrcFolder)
       }
 
-      if(noHelm == 'false') {
-        stage('Clean up resources') {
-          provision.deleteBuildResources(repoName, pr)
-        }
+      stage('Clean up resources') {
+        provision.deleteBuildResources(repoName, pr)
       }
 
       if (config.containsKey('finallyClosure')) {

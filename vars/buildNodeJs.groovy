@@ -63,10 +63,8 @@ void call(Map config=[:]) {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
 
-      if(noHelm == 'false') {
-        stage('Provision any required resources') {
-          provision.createResources(environment, repoName, pr)
-        }
+      stage('Provision any required resources') {
+        provision.createResources(environment, repoName, pr)
       }
 
       if (config.containsKey('buildClosure')) {
@@ -191,10 +189,8 @@ void call(Map config=[:]) {
         test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
       }
 
-      if(noHelm == 'false') {
-        stage('Clean up resources') {
-          provision.deleteBuildResources(repoName, pr)
-        }
+      stage('Clean up resources') {
+        provision.deleteBuildResources(repoName, pr)
       }
 
       if (config.containsKey('finallyClosure')) {
