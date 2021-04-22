@@ -109,6 +109,7 @@ void call(Map config=[:]) {
           stage('Publish chart') {
             helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
           }
+        }
       }
 
       if (pr == '') {
