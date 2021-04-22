@@ -10,7 +10,7 @@ void call(Map config=[:]) {
   String tag = ''
   String mergedPrNo = ''
   def checkHelmFolder = new File('./helm')
-  String noHelm = folder.exists() ? 'false' : 'true'
+  String noHelm = checkHelmFolder.exists() ? 'false' : 'true'
 
 
   node {
