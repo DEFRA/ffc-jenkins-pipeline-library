@@ -69,3 +69,7 @@ For example:
 ```
 buildNodeJs project: 'FFCDemoDotNetCoreProjectName', environment: 'snd2'
 ```
+
+## Support Image without Helm
+
+The pipeline supports images that do not need to target Kubernetes. The pipeline checks for the existence of a helm folder. If this folder does not exist, the helm steps are ignored.

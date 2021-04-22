@@ -9,9 +9,15 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
+  Boolean hasHelmChart = true
 
   node {
     try {
+
+      if (!fileExists('./helm/')) {
+        hasHelmChart = false
+      }
+
       stage('Ensure clean workspace') {
         deleteDir()
       }
@@ -43,8 +49,10 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      stage('Helm lint') {
-        test.lintHelm(repoName)
+      if(hasHelmChart) {
+        stage('Helm lint') {
+          test.lintHelm(repoName)
+        }
       }
 
       stage('npm audit') {
@@ -111,15 +119,20 @@ void call(Map config=[:]) {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
-      if (pr != '') {
-        stage('Helm install') {
-          helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
+      if(hasHelmChart) {
+        if (pr != '') {
+          stage('Helm install') {
+            helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
+          }
+        } else {
+          stage('Publish chart') {
+            helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
+          }
         }
-      } else {
-        stage('Publish chart') {
-          helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
-        }
+      }
 
+
+      if (pr == '') {
         stage('Trigger GitHub release') {
           withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
@@ -128,7 +141,9 @@ void call(Map config=[:]) {
             release.trigger(tag, repoName, commitMessage, gitToken)
           }
         }
+      }
 
+      if(hasHelmChart && pr == '') {
         stage('Trigger Deployment') {
           if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
             withCredentials([
@@ -150,7 +165,7 @@ void call(Map config=[:]) {
         config['deployClosure']()
       }
 
-      if (fileExists('./test/acceptance/docker-compose.yaml')) {
+      if (fileExists('./test/acceptance/docker-compose.yaml') && hasHelmChart) {
         stage('Run Acceptance Tests') {
           test.runAcceptanceTests(pr, environment, repoName)
         }
