@@ -14,7 +14,7 @@ void call(Map config=[:]) {
   node {
     try {
 
-      if (!fileExists('./helm')) {
+      if (!fileExists('./helm/')) {
         noHelm = 'true'
       }
 
