@@ -1,7 +1,5 @@
 package uk.gov.defra.ffc
-
 import uk.gov.defra.ffc.Utils
-
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import java.security.InvalidKeyException
@@ -16,7 +14,7 @@ class ConsoleLogs implements Serializable {
 
     saveLogFile(ctx, url, logFilePath, logFileDateTime)
 
-    processLogFile(ctx, logFilePath, logFileDateTime)
+    sendLogFileToLogAnalytics(ctx, logFilePath, logFileDateTime)
   }
 
   static def save(ctx, jenkinsUrl, repoName, buildNumber, logFilePath) {
@@ -27,7 +25,7 @@ class ConsoleLogs implements Serializable {
 
     saveLogFile(ctx, url, logFilePath, logFileDateTime)
 
-    processLogFile(ctx, logFilePath, logFileDateTime)
+    sendLogFileToLogAnalytics(ctx, logFilePath, logFileDateTime)
   }
 
   static def saveLogFile(ctx, url, logFilePath, logFileDateTime) {    
@@ -40,7 +38,7 @@ class ConsoleLogs implements Serializable {
 
   }
 
-  static processLogFile(ctx, logFilePath, logFileDateTime) {
+  static sendLogFileToLogAnalytics(ctx, logFilePath, logFileDateTime) {
 
     ctx.withCredentials([
       ctx.string(credentialsId: 'log-analytics-customer-id', variable: 'customerId'),
@@ -48,16 +46,13 @@ class ConsoleLogs implements Serializable {
       ctx.string(credentialsId: 'log-analytics-url', variable: 'url')
     ]) {
       
-      String logType = 'JenkinsExample'
-
+      String logType = 'Jenkins'
       String method = 'POST'
       String contentType = 'application/json'
       String resource = '/api/logs'
 
       def now = new Date().format("EEE, dd MMM yyyy HH:mm:ss zzz", TimeZone.getTimeZone('GMT'))
-
-      ctx.echo("${logFilePath}/log_${logFileDateTime}.txt")
-
+      
       String json = readJsonFromLogFile("${logFilePath}/log_${logFileDateTime}.txt")
           
       postData(ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
@@ -65,7 +60,7 @@ class ConsoleLogs implements Serializable {
     }
   }
   
-  @NonCPS // Don't run this in the Jenkins sandbox so that use (groovy.time.TimeCategory) will work
+  @NonCPS // Don't run this in the Jenkins sandbox
   static def readJsonFromLogFile(String fileName) {
 
     String json = ''  
@@ -77,7 +72,7 @@ class ConsoleLogs implements Serializable {
     return '['+ json.substring(1) + ']'
   }
 
-  static def hmac_sha256(String secretKey, String data) {
+  static def hmacSha256(String secretKey, String data) {
   
     Mac mac = Mac.getInstance("HmacSHA256")
     SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.decodeBase64(), "HmacSHA256")
@@ -86,7 +81,7 @@ class ConsoleLogs implements Serializable {
   }
 
   // Build the API signature
-  static def build_signature(customerId, sharedKey, date, contentLength, method, contentType, resource) {
+  static def buildSignature(customerId, sharedKey, date, contentLength, method, contentType, resource) {
       
     def xHeaders = 'x-ms-date:' + date
     def stringToHash = method + '\n' + contentLength.toString() + '\n' + contentType + '\n' + xHeaders + "\n" + resource
@@ -94,7 +89,7 @@ class ConsoleLogs implements Serializable {
     
     def decodedKey = sharedKey.decodeBase64()  
 
-    def encodedHash = hmac_sha256(sharedKey, stringToHash).encodeBase64().toString()
+    def encodedHash = hmacSha256(sharedKey, stringToHash).encodeBase64().toString()
     def authorization = 'SharedKey ' + customerId + ':' + encodedHash  
     return authorization
   }
@@ -104,7 +99,7 @@ class ConsoleLogs implements Serializable {
   
     def uri = new URL(url).openConnection() as HttpURLConnection
         
-    def signature = build_signature(customerId, sharedKey, now, json.length(), method, contentType, resource)
+    def signature = buildSignature(customerId, sharedKey, now, json.length(), method, contentType, resource)
     
     uri.setRequestMethod('POST')
     uri.setDoOutput(true)
