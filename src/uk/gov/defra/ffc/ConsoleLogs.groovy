@@ -56,7 +56,7 @@ class ConsoleLogs implements Serializable {
 
       def now = new Date().format("EEE, dd MMM yyyy HH:mm:ss zzz", TimeZone.getTimeZone('GMT'))
 
-      String json = readJsonFromLogFile("$logFilePath/log_${logFileDateTime}.txt")
+      String json = readJsonFromLogFile("${$logFilePath}/log_${logFileDateTime}.txt")
           
       postData(ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
 
