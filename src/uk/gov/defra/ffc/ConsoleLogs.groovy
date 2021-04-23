@@ -51,7 +51,7 @@ class ConsoleLogs implements Serializable {
     ctx.withCredentials([
       ctx.string(credentialsId: 'log-analytics-customer-id', variable: 'customerId'),
       ctx.string(credentialsId: 'log-analytics-shared-key', variable: 'sharedKey'),
-      ctx.string(credentialsId: 'log-analytics-url', variable: 'url'),
+      ctx.string(credentialsId: 'log-analytics-url', variable: 'url')
     ]) {
       
       String logType = 'JenkinsExample'
