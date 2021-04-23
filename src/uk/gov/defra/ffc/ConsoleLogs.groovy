@@ -65,7 +65,7 @@ class ConsoleLogs implements Serializable {
 
   static def readJsonFromLogFile(String fileName) {
 
-    ctx.echo("filename: ${fileName}")
+    ctx.echo("filename: $fileName")
     String json = ''  
     def lines = new File(fileName).eachLine { line ->
     
