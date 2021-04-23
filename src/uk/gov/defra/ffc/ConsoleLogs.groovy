@@ -58,7 +58,7 @@ class ConsoleLogs implements Serializable {
 
       String json = readJsonFromLogFile("$logFilePath/log_${logFileDateTime}.txt")
           
-      postData(customerId, sharedKey, json, method, contentType, resource, logType, url, now.toString())
+      postData(ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
 
     }
   }
