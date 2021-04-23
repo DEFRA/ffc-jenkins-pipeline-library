@@ -34,7 +34,7 @@ class ConsoleLogs implements Serializable {
     
     ctx.sh("[ -d $logFilePath ]  && docker run --rm -u root --privileged --mount type=bind,source=$logFilePath,target=/home/node defradigital/node-development chown $ctx.JENKINS_USER_ID:$ctx.JENKINS_GROUP_ID -R -v .")
    
-    def script = "curl $url > $logFilePath/log_${logFileDateTime}.txt"
+    def script = "curl ${url} > ${logFilePath}/log_${logFileDateTime}.txt"
     ctx.echo("script: $script")
     ctx.sh(script: script, returnStdout: true)
 
@@ -64,7 +64,8 @@ class ConsoleLogs implements Serializable {
 
     }
   }
-
+  
+  @NonCPS // Don't run this in the Jenkins sandbox so that use (groovy.time.TimeCategory) will work
   static def readJsonFromLogFile(String fileName) {
 
     String json = ''  
