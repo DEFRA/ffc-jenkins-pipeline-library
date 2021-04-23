@@ -1,12 +1,6 @@
 package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Utils
-import json
-import requests
-import datetime
-import hashlib
-import hmac
-import base64
 
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
