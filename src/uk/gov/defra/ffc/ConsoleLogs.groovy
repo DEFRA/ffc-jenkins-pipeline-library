@@ -46,7 +46,7 @@ class ConsoleLogs implements Serializable {
 
   }
 
-  static processLogFile(ctx, logFilePath, logFileDateTime)
+  static processLogFile(ctx, logFilePath, logFileDateTime) {
 
     ctx.withCredentials([
       ctx.string(credentialsId: 'log-analytics-customer-id', variable: 'customerId'),
