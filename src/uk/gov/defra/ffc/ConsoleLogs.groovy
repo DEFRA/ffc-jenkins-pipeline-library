@@ -124,4 +124,5 @@ class ConsoleLogs implements Serializable {
         println(uri.getInputStream().getText())
     }
   }
+}
 
