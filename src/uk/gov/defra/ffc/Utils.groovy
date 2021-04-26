@@ -60,7 +60,7 @@ class Utils implements Serializable {
   }
 
   static def escapeSpecialChars(str) {
-    return str.replace('\\', '\\\\\\\\').replace(",", /","/).replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/)
+    return str.replace('\\', '\\\\\\\\').replace(",", /","/).replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/).replace(/$/, /\$/)
   }
 
   /**
@@ -103,15 +103,15 @@ class Utils implements Serializable {
 
   static def getUrlStatusCode(ctx, url) {
     return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
-  }  
+  }
 
   static def sendNotification(ctx, channel, msg, color){
 
-    ctx.withCredentials([ctx.string(credentialsId: channel == '#mainbuildfailures' ? 'slack-mainbuildfailures-channel-webhook' : 'slack-generalbuildfailures-channel-webhook', variable: 'webHook')
+    ctx.withCredentials([ctx.string(credentialsId: "slack-$channel-channel-webhook", variable: 'webHook')
     ]) {
 
       def script = "docker run -e SLACK_WEBHOOK=$ctx.webHook -e SLACK_MESSAGE=$msg -e SLACK_COLOR=$color technosophos/slack-notify:latest"
-      ctx.sh(returnStatus: true, script: script)      
+      ctx.sh(returnStatus: true, script: script)
     }
   }
 
