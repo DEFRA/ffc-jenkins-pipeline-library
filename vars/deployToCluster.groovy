@@ -13,7 +13,7 @@ void call(Map config=[:], Closure body={}) {
       throw e
     } finally {
       stage('Publish to Log Analytics') {
-        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, config.chartName, BUILD_NUMBER, '/var/log/jenkins/console')
+        consoleLogs.save('/var/log/jenkins/console')
       }
     }
   }
