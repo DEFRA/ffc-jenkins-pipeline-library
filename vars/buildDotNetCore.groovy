@@ -168,6 +168,10 @@ void call(Map config=[:]) {
       if (config.containsKey('finallyClosure')) {
         config['finallyClosure']()
       }
+
+      stage('Publish to Log Analytics') {
+        consoleLogs.save('/var/log/jenkins/console')
+      }
     }
   }
 }
