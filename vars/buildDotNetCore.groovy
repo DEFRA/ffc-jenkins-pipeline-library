@@ -159,7 +159,7 @@ void call(Map config=[:]) {
     } finally {
       stage('Change ownership of outputs') {
         test.changeOwnershipOfWorkspace(dotnetDevelopmentImage, containerSrcFolder)
-      }      
+      }
 
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)

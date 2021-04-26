@@ -33,7 +33,7 @@ class ConsoleLogs implements Serializable {
     ctx.sh("[ -d $logFilePath ]  && docker run --rm -u root --privileged --mount type=bind,source=$logFilePath,target=/home/node defradigital/node-development chown $ctx.JENKINS_USER_ID:$ctx.JENKINS_GROUP_ID -R -v .")
    
     def script = "curl ${url} > ${logFilePath}/log_${logFileDateTime}.txt"
-    ctx.echo("script: $script")
+    
     ctx.sh(script: script, returnStdout: true)
 
   }
@@ -120,9 +120,9 @@ class ConsoleLogs implements Serializable {
         println(uri.getInputStream().getText())
 
         return true
-    } else {
-      return false
-    }
+    } 
+    
+    return false
   }
 }
 
