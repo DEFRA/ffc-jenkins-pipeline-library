@@ -12,7 +12,7 @@ void call(Map config=[:], Closure body={}) {
       notifySlack.deploymentFailure()
       throw e
     } finally {
-      stage('Save console logs') {
+      stage('Publish to Log Analytics') {
         consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, config.chartName, BUILD_NUMBER, '/var/log/jenkins/console')
       }
     }

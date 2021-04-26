@@ -146,11 +146,7 @@ void call(Map config=[:]) {
     } finally {
       stage('Change ownership of outputs') {
         test.changeOwnershipOfWorkspace(dotnetDevelopmentImage, containerSrcFolder)
-      }
-
-      stage('Save console logs') {
-        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, repoName, BRANCH_NAME, BUILD_NUMBER, '/var/log/jenkins/console')
-      }
+      }      
 
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)
@@ -158,6 +154,10 @@ void call(Map config=[:]) {
 
       if (config.containsKey('finallyClosure')) {
         config['finallyClosure']()
+      }
+
+      stage('Publish to Log Analytics') {
+        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, repoName, BRANCH_NAME, BUILD_NUMBER, '/var/log/jenkins/console')
       }
     }
   }
