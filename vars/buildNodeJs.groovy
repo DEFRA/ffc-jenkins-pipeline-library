@@ -182,7 +182,6 @@ void call(Map config=[:]) {
         config['finallyClosure']()
       }
 
-      sleep(50)
       stage('Publish to Log Analytics') {
         consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, repoName, BRANCH_NAME, BUILD_NUMBER, '/var/log/jenkins/console')
       }
