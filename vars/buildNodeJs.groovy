@@ -111,6 +111,12 @@ void call(Map config=[:]) {
         }
       }
 
+      if (fileExists('./docker-compose.axe.yaml')) {
+        stage('Run Accessibility tests') {
+          test.runAxe(repoName, BUILD_NUMBER, tag)
+        }
+      }
+
       if (config.containsKey('testClosure')) {
         config['testClosure']()
       }
