@@ -55,8 +55,12 @@ class ConsoleLogs implements Serializable {
       
       String json = readJsonFromLogFile("${logFilePath}/log_${logFileDateTime}.txt")
           
-      postData(ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
+      Bool success = postData(ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
 
+      if (success){
+        ctx.echo("Deleting log file: ${logFilePath}/log_${logFileDateTime}.txt")
+        ctx.sh("rm ${logFilePath}/log_${logFileDateTime}.txt")
+      }
     }
   }
   
@@ -114,6 +118,10 @@ class ConsoleLogs implements Serializable {
     println("response code: " + postRC)
     if(postRC.equals(200)) {
         println(uri.getInputStream().getText())
+
+        return true
+    } else {
+      return false
     }
   }
 }

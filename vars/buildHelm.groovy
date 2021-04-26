@@ -64,6 +64,11 @@ void call(Map config=[:]) {
     } catch(e) {
       notifySlack.buildFailure(e.message, "#generalbuildfailures")
       throw e
+    } finally {
+     
+      stage('Publish to Log Analytics') {
+        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, repoName, BRANCH_NAME, BUILD_NUMBER, '/var/log/jenkins/console')
+      }
     }
   }
 }
