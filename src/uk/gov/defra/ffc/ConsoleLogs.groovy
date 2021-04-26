@@ -8,7 +8,7 @@ import java.io.File
 class ConsoleLogs implements Serializable {
   static def save(ctx, jenkinsUrl, repoName, branch, buildNumber, logFilePath) {
 
-    ctx.echo("ctx workspace: $ctx.workspace")
+    ctx.echo("ctx job: $ctx.JOB_NAME")
     def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
 
     def folder = Utils.getFolder(ctx)
@@ -20,7 +20,7 @@ class ConsoleLogs implements Serializable {
   }
 
   static def save(ctx, jenkinsUrl, repoName, buildNumber, logFilePath) {
-    ctx.echo("ctx workspace: $ctx.workspace")
+    ctx.echo("ctx job: $ctx.JOB_NAME")
     def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
 
     def folder = Utils.getFolder(ctx)
