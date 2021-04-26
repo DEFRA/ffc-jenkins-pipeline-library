@@ -11,7 +11,7 @@ class ConsoleLogs implements Serializable {
     def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
 
     def folder = Utils.getFolder(ctx)
-    def url = "$ctx.BUILD_URL/consoleText"
+    def url = "${ctx.BUILD_URL}consoleText"
 
     saveLogFile(ctx, url, logFilePath, logFileDateTime)
 
