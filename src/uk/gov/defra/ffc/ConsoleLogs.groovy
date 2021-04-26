@@ -55,7 +55,7 @@ class ConsoleLogs implements Serializable {
       
       String json = readJsonFromLogFile("${logFilePath}/log_${logFileDateTime}.txt")
           
-      Bool success = postData(ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
+      boolean success = postData(ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
 
       if (success){
         ctx.echo("Deleting log file: ${logFilePath}/log_${logFileDateTime}.txt")
