@@ -7,6 +7,8 @@ import java.io.File
 
 class ConsoleLogs implements Serializable {
   static def save(ctx, jenkinsUrl, repoName, branch, buildNumber, logFilePath) {
+
+    echo('ctx workspace: ' + ctx.workspace)
     def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
 
     def folder = Utils.getFolder(ctx)
@@ -18,6 +20,7 @@ class ConsoleLogs implements Serializable {
   }
 
   static def save(ctx, jenkinsUrl, repoName, buildNumber, logFilePath) {
+    echo('ctx workspace: ' + ctx.workspace)
     def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
 
     def folder = Utils.getFolder(ctx)
@@ -33,7 +36,7 @@ class ConsoleLogs implements Serializable {
     ctx.sh("[ -d $logFilePath ]  && docker run --rm -u root --privileged --mount type=bind,source=$logFilePath,target=/home/node defradigital/node-development chown $ctx.JENKINS_USER_ID:$ctx.JENKINS_GROUP_ID -R -v .")
    
     def script = "curl ${url} > ${logFilePath}/log_${logFileDateTime}.txt"
-    
+
     ctx.sh(script: script, returnStdout: true)
 
   }
