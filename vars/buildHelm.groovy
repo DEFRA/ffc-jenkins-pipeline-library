@@ -67,7 +67,7 @@ void call(Map config=[:]) {
     } finally {
      
       stage('Publish to Log Analytics') {
-        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, repoName, BRANCH_NAME, BUILD_NUMBER, '/var/log/jenkins/console')
+        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, "$repoName-build", BRANCH_NAME, BUILD_NUMBER, '/var/log/jenkins/console')
       }
     }
   }
