@@ -10,7 +10,7 @@ class ConsoleLogs implements Serializable {
     def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
 
     def folder = Utils.getFolder(ctx)
-    def url = "$jenkinsUrl/job/$folder/job/$repoName-build/job/$branch/$buildNumber/consoleText"
+    def url = "$jenkinsUrl/job/$folder/job/$repoName/job/$branch/$buildNumber/consoleText"
 
     saveLogFile(ctx, url, logFilePath, logFileDateTime)
 
