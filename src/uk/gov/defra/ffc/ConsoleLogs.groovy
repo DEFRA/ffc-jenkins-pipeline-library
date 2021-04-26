@@ -6,25 +6,12 @@ import java.security.InvalidKeyException
 import java.io.File
 
 class ConsoleLogs implements Serializable {
-  static def save(ctx, jenkinsUrl, repoName, branch, buildNumber, logFilePath) {
+  static def save(ctx, logFilePath) {
 
-    ctx.echo("ctx job: $ctx.BUILD_URL")
     def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
 
     def folder = Utils.getFolder(ctx)
-    def url = "$jenkinsUrl/job/$folder/job/$repoName/job/$branch/$buildNumber/consoleText"
-
-    saveLogFile(ctx, url, logFilePath, logFileDateTime)
-
-    sendLogFileToLogAnalytics(ctx, logFilePath, logFileDateTime)
-  }
-
-  static def save(ctx, jenkinsUrl, repoName, buildNumber, logFilePath) {
-    ctx.echo("ctx job: $ctx.BUILD_URL")
-    def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
-
-    def folder = Utils.getFolder(ctx)
-    def url = "$jenkinsUrl/job/$folder/job/$repoName-deploy/$buildNumber/consoleText"
+    def url = "$ctx.BUILD_URL/consoleText"
 
     saveLogFile(ctx, url, logFilePath, logFileDateTime)
 

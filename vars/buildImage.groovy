@@ -97,7 +97,7 @@ def call(Map config=[:]) {
       }
 
       stage('Publish to Log Analytics') {
-        consoleLogs.save(JENKINS_DEPLOY_SITE_ROOT, repoName, BRANCH_NAME, BUILD_NUMBER, '/var/log/jenkins/console')
+        consoleLogs.save('/var/log/jenkins/console')
       }
     }
   }
