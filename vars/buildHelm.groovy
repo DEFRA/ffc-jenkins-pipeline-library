@@ -26,6 +26,10 @@ void call(Map config=[:]) {
         }
       }
 
+      stage('Helm lint') {
+        test.lintHelm(repoName)
+      }
+
       if (pr != '') {
           stage('Helm install') {
             helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
