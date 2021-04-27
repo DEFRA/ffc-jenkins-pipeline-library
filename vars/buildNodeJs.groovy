@@ -106,13 +106,13 @@ void call(Map config=[:]) {
       }
 
       if (fileExists('./docker-compose.pa11y.yaml')) {
-        stage('Run Accessibility tests') {
+        stage('Run Accessibility (pa11y) tests') {
           test.runPa11y(repoName, BUILD_NUMBER, tag)
         }
       }
 
       if (fileExists('./docker-compose.axe.yaml')) {
-        stage('Run Accessibility tests') {
+        stage('Run Accessibility (axe) tests') {
           test.runAxe(repoName, BUILD_NUMBER, tag)
         }
       }
