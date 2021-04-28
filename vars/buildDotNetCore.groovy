@@ -131,7 +131,7 @@ void call(Map config=[:]) {
             ]) {
               deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
             }
-          } else {            
+          } else {
             withCredentials([
               string(credentialsId: 'default-deploy-token', variable: 'jenkinsToken')
             ]) {

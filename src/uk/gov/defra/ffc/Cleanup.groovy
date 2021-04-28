@@ -18,6 +18,7 @@ class Cleanup implements Serializable {
         Helm.undeployChart(ctx, environment, repoName, "pr$closedPrNo")
         ctx.echo("Removing queues for PR $closedPrNo of $repoName after branch $branchName deleted")
         Provision.deletePrResources(ctx, environment, repoName, closedPrNo)
+        Docker.deleteContainerImage(ctx, repoName, closedPrNo)
       }
     }
   }

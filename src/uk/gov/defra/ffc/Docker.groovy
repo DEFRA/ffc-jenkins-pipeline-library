@@ -15,6 +15,12 @@ class Docker implements Serializable {
     }
   }
 
+  static def deleteContainerImage(ctx, imageName, tag) {
+    ctx.docker.withRegistry("https://${ctx.DOCKER_REGISTRY}", ctx.DOCKER_REGISTRY_CREDENTIALS_ID) {
+      ctx.sh("az acr repository delete --name ${ctx.DOCKER_REGISTRY} --image $imageName:$tag --yes")
+    }
+  }
+
   static def buildContainerImage(ctx, imageName) {
     ctx.sh("docker build --no-cache --tag ${imageName} .")
   }
