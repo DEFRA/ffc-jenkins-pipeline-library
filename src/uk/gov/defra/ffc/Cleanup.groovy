@@ -17,8 +17,9 @@ class Cleanup implements Serializable {
         ctx.echo("Tidying up kubernetes resources for PR $closedPrNo of $repoName after branch $branchName deleted")
         Helm.undeployChart(ctx, environment, repoName, "pr$closedPrNo")
         ctx.echo("Removing queues for PR $closedPrNo of $repoName after branch $branchName deleted")
-        Provision.deletePrResources(ctx, environment, repoName, "pr$closedPrNo")
-        Docker.deleteContainerImage(ctx, repoName, closedPrNo)
+        Provision.deletePrResources(ctx, environment, repoName, closedPrNo)
+        ctx.echo("Removing container image for PR $closedPrNo of $repoName after branch $branchName deleted")
+        Docker.deleteContainerImage(ctx, repoName, "pr$closedPrNo")
       }
     }
   }
