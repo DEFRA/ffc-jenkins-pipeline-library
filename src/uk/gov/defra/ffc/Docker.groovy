@@ -24,7 +24,9 @@ class Docker implements Serializable {
   static def deleteDanglingImages(ctx) {
     ctx.docker.withRegistry("https://${ctx.DOCKER_REGISTRY}", ctx.DOCKER_REGISTRY_CREDENTIALS_ID) {
       def repositories = listRepositories(ctx)
-      ctx.echo(repositories)
+      entities.each {
+        ctx.echo(it)
+      }      
     }
   }
 
