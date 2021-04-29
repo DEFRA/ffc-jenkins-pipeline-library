@@ -21,6 +21,12 @@ class Docker implements Serializable {
     }
   }
 
+  static def deleteDanglingImages(ctx) {
+    ctx.docker.withRegistry("https://${ctx.DOCKER_REGISTRY}", ctx.DOCKER_REGISTRY_CREDENTIALS_ID) {
+      ctx.sh("")
+    }
+  }
+
   static def buildContainerImage(ctx, imageName) {
     ctx.sh("docker build --no-cache --tag ${imageName} .")
   }
