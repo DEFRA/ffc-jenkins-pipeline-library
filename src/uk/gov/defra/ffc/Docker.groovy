@@ -23,7 +23,16 @@ class Docker implements Serializable {
 
   static def deleteDanglingImages(ctx) {
     ctx.docker.withRegistry("https://${ctx.DOCKER_REGISTRY}", ctx.DOCKER_REGISTRY_CREDENTIALS_ID) {
-      ctx.sh("")
+      def repositories = listRepositories(ctx)
+      ctx.echo(repositories)
+    }
+  }
+
+  static def listRepositories(ctx) {
+    ctx.docker.withRegistry("https://${ctx.DOCKER_REGISTRY}", ctx.DOCKER_REGISTRY_CREDENTIALS_ID) {
+      def script = "az acr repository list --name ${ctx.DOCKER_REGISTRY} -o tsv"
+      def repositories = ctx.sh(returnStdout: true, script: script).trim()
+      return repositories.tokenize('\n')
     }
   }
 
