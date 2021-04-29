@@ -17,11 +17,11 @@ following script:
 ```
 @Library('defra-library') _
 
-cleanup environment: 'dev'
+cleanup environment: 'snd'
 ```
 
 Note: The library may be set to a specific version with the `@` suffix, e.g.
-`defra-library@6`
+`defra-library@9`
 
 The `Pipeline Delete Event` event will need an additional parameter of
 `repoName` set to the name of the GitHub repository of the current build

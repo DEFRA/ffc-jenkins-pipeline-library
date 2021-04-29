@@ -23,4 +23,8 @@ class Cleanup implements Serializable {
       }
     }
   }
+
+  static def danglingImages(ctx) {
+    
+  }
 }
