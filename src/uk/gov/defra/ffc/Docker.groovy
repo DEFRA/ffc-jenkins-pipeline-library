@@ -25,7 +25,6 @@ class Docker implements Serializable {
     ctx.docker.withRegistry("https://${ctx.DOCKER_REGISTRY}", ctx.DOCKER_REGISTRY_CREDENTIALS_ID) {
       def repositories = listRepositories(ctx)
       repositories.each {
-        if(it == 'ffc-demo-web')
         ctx.sh("az acr repository show-manifests --name ${ctx.DOCKER_REGISTRY} --repository ${it} --query '[?tags[0]==null].digest' -o tsv | xargs -I% az acr repository delete --name ${ctx.DOCKER_REGISTRY} --image ${it}@% --y")
       }
     }
