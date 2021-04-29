@@ -23,4 +23,9 @@ class Cleanup implements Serializable {
       }
     }
   }
+
+  static def danglingImages(ctx) {
+    ctx.echo("Removing dangling images from ACR")
+    Docker.deleteDanglingImages(ctx)
+  }
 }
