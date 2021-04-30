@@ -15,6 +15,29 @@ class Docker implements Serializable {
     }
   }
 
+  static def deleteContainerImage(ctx, imageName, tag) {
+    ctx.docker.withRegistry("https://${ctx.DOCKER_REGISTRY}", ctx.DOCKER_REGISTRY_CREDENTIALS_ID) {
+      ctx.sh("az acr repository untag --name ${ctx.DOCKER_REGISTRY} --image $imageName:$tag --yes || echo error untagging image $imageName:$tag")
+    }
+  }
+
+  static def deleteDanglingImages(ctx) {
+    ctx.docker.withRegistry("https://${ctx.DOCKER_REGISTRY}", ctx.DOCKER_REGISTRY_CREDENTIALS_ID) {
+      def repositories = listRepositories(ctx)
+      repositories.each {
+        ctx.sh("az acr repository show-manifests --name ${ctx.DOCKER_REGISTRY} --repository ${it} --query '[?tags[0]==null].digest' -o tsv | xargs -I% az acr repository delete --name ${ctx.DOCKER_REGISTRY} --image ${it}@% --y")
+      }
+    }
+  }
+
+  static def listRepositories(ctx) {
+    ctx.docker.withRegistry("https://${ctx.DOCKER_REGISTRY}", ctx.DOCKER_REGISTRY_CREDENTIALS_ID) {
+      def script = "az acr repository list --name ${ctx.DOCKER_REGISTRY} -o tsv"
+      def repositories = ctx.sh(returnStdout: true, script: script).trim()
+      return repositories.tokenize('\n')
+    }
+  }
+
   static def buildContainerImage(ctx, imageName) {
     ctx.sh("docker build --no-cache --tag ${imageName} .")
   }
