@@ -60,7 +60,7 @@ class Utils implements Serializable {
   }
 
   static def escapeSpecialChars(str) {
-    return str.replace('\\', '\\\\\\\\').replace(",", /","/).replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/).replace(/$/, /\$/)
+    return str.replace('\\', '\\\\\\\\').replace(/,/, /\,/).replace(/"/, /\"/).replace(/`/, /\`/).replace(/$/, /\$/)
   }
 
   /**
