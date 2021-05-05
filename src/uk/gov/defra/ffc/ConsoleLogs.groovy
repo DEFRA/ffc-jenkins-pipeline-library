@@ -59,7 +59,7 @@ class ConsoleLogs implements Serializable {
     String json = ''  
     def lines = new File(fileName).eachLine { line ->
     
-      json = json + ',{"date":"' + new Date().format("EEE, dd MMM yyyy HH:mm:ss zzz", TimeZone.getTimeZone('GMT')) + '", "text":"' + line.replace("’", "").replace("‘", "").replace('"', '').replace('//', '').replace("'", "").replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/).replace('\\', '\\\\\\\\').replace('', '').replace('●', '').replace('⎈', '').replace('✓', '').replace('❤', '').replace('✔', '').replace('£','').replace('©','') + '"}'      
+      json = json + ',{"date":"' + new Date().format("EEE, dd MMM yyyy HH:mm:ss zzz", TimeZone.getTimeZone('GMT')) + '", "text":"' + line.replace("’", "").replace("‘", "").replace('"', '').replace('//', '').replace("'", "").replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/).replace('\\', '\\\\\\\\').replace('', '').replace('●', '').replace('⎈', '').replace('✓', '').replace('❤', '').replace('✔', '').replace('£','').replace('©','').replace('✖','') + '"}'      
     }
 
     return '['+ json.substring(1) + ']'
