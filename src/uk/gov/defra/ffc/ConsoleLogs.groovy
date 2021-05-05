@@ -44,11 +44,13 @@ class ConsoleLogs implements Serializable {
       
       String json = readJsonFromLogFile("${logFilePath}/log_${logFileDateTime}.txt")
           
-      boolean success = postData(ctx, ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
+      boolean success = postData(ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
 
       if (success){
         ctx.echo("Deleting log file: ${logFilePath}/log_${logFileDateTime}.txt")
         ctx.sh("rm ${logFilePath}/log_${logFileDateTime}.txt")
+      } else {
+        ctx.echo("Build ${ctx.BUILD_URL} didn't successfully log to Log Analytics!")
       }
     }
   }
@@ -88,7 +90,7 @@ class ConsoleLogs implements Serializable {
   }
 
   // Build and send a request to the POST API
-  static def postData(ctx, customerId, sharedKey, json, method, contentType, resource, logType, url, now) {
+  static def postData(customerId, sharedKey, json, method, contentType, resource, logType, url, now) {
   
     def uri = new URL(url).openConnection() as HttpURLConnection
         
@@ -104,12 +106,10 @@ class ConsoleLogs implements Serializable {
     uri.outputStream.write(json.getBytes("UTF-8"))
     uri.connect()
     def postRC = uri.getResponseCode();
-    ctx.echo("PostData Response Code: " + postRC)
+    
     if(postRC.equals(200)) {
-        ctx.echo("Ouptut : ${uri.getInputStream().getText()}")
-
         return true
-    } 
+    }
     
     return false
   }
