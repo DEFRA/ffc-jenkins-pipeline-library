@@ -9,8 +9,7 @@ class ConsoleLogs implements Serializable {
   static def save(ctx, logFilePath) {
 
     def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
-
-    def folder = Utils.getFolder(ctx)
+    
     def url = "${ctx.BUILD_URL}consoleText"
 
     saveLogFile(ctx, url, logFilePath, logFileDateTime)
@@ -45,7 +44,7 @@ class ConsoleLogs implements Serializable {
       
       String json = readJsonFromLogFile("${logFilePath}/log_${logFileDateTime}.txt")
           
-      boolean success = postData(ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
+      boolean success = postData(ctx, ctx.customerId, ctx.sharedKey, json, method, contentType, resource, logType, ctx.url, now.toString())
 
       if (success){
         ctx.echo("Deleting log file: ${logFilePath}/log_${logFileDateTime}.txt")
@@ -89,7 +88,7 @@ class ConsoleLogs implements Serializable {
   }
 
   // Build and send a request to the POST API
-  static def postData(customerId, sharedKey, json, method, contentType, resource, logType, url, now) {
+  static def postData(ctx, customerId, sharedKey, json, method, contentType, resource, logType, url, now) {
   
     def uri = new URL(url).openConnection() as HttpURLConnection
         
@@ -105,9 +104,9 @@ class ConsoleLogs implements Serializable {
     uri.outputStream.write(json.getBytes("UTF-8"))
     uri.connect()
     def postRC = uri.getResponseCode();
-    println("response code: " + postRC)
+    ctx.echo("PostData Response Code: " + postRC)
     if(postRC.equals(200)) {
-        println(uri.getInputStream().getText())
+        ctx.echo(uri.getInputStream().getText())
 
         return true
     } 
