@@ -106,7 +106,7 @@ class ConsoleLogs implements Serializable {
     def postRC = uri.getResponseCode();
     ctx.echo("PostData Response Code: " + postRC)
     if(postRC.equals(200)) {
-        ctx.echo(uri.getInputStream().getText())
+        ctx.echo("Ouptut : ${uri.getInputStream().getText()}")
 
         return true
     } 
