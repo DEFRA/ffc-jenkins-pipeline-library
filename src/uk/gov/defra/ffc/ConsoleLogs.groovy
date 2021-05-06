@@ -9,8 +9,7 @@ class ConsoleLogs implements Serializable {
   static def save(ctx, logFilePath) {
 
     def logFileDateTime = new Date().format("yyyy-MM-dd_HH:mm:ss", TimeZone.getTimeZone('UTC'))
-
-    def folder = Utils.getFolder(ctx)
+    
     def url = "${ctx.BUILD_URL}consoleText"
 
     saveLogFile(ctx, url, logFilePath, logFileDateTime)
@@ -50,6 +49,8 @@ class ConsoleLogs implements Serializable {
       if (success){
         ctx.echo("Deleting log file: ${logFilePath}/log_${logFileDateTime}.txt")
         ctx.sh("rm ${logFilePath}/log_${logFileDateTime}.txt")
+      } else {
+        ctx.echo("Build ${ctx.BUILD_URL} didn't successfully log to Log Analytics!")
       }
     }
   }
@@ -60,7 +61,7 @@ class ConsoleLogs implements Serializable {
     String json = ''  
     def lines = new File(fileName).eachLine { line ->
     
-      json = json + ',{"date":"' + new Date().format("EEE, dd MMM yyyy HH:mm:ss zzz", TimeZone.getTimeZone('GMT')) + '", "text":"' + line.replace("’", "").replace("‘", "").replace('"', '').replace('//', '').replace("'", "").replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/).replace('\\', '\\\\\\\\').replace('', '').replace('●', '').replace('⎈', '').replace('✓', '').replace('❤', '').replace('✔', '').replace('£','').replace('©','') + '"}'      
+      json = json + ',{"date":"' + new Date().format("EEE, dd MMM yyyy HH:mm:ss zzz", TimeZone.getTimeZone('GMT')) + '", "text":"' + line.replace("’", "").replace("‘", "").replace('"', '').replace('//', '').replace("'", "").replace(/"/, /\"/).replace(/`/, /\`/).replace("'", /'"'"'/).replace('\\', '\\\\\\\\').replace('', '').replace('●', '').replace('⎈', '').replace('✓', '').replace('❤', '').replace('✔', '').replace('£','').replace('©','').replace('✖','').replace('✕','').replace('🚨','').replace('›','') + '"}'      
     }
 
     return '['+ json.substring(1) + ']'
@@ -105,12 +106,10 @@ class ConsoleLogs implements Serializable {
     uri.outputStream.write(json.getBytes("UTF-8"))
     uri.connect()
     def postRC = uri.getResponseCode();
-    println("response code: " + postRC)
+    
     if(postRC.equals(200)) {
-        println(uri.getInputStream().getText())
-
         return true
-    } 
+    }
     
     return false
   }
