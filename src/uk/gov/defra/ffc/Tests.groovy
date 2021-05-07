@@ -53,7 +53,6 @@ class Tests implements Serializable {
     def axeDockerComposeFile = 'docker-compose.axe.yaml'
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.Axe.Context, description: GitHubStatus.Axe.Description) {
         try {
-          // test-output exists if stage is run after 'runTests', take no risks and create it
           ctx.sh('mkdir -p -m 666 test-output')
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $axeDockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ axe")
         } finally {
