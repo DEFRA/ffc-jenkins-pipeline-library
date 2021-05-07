@@ -38,6 +38,7 @@ class Tests implements Serializable {
 
   static def runAccessibility(ctx, projectName, buildNumber, tag, accessibilityTestType) {
     def dockerComposeFile = "docker-compose." + accessibilityTestType + ".yaml"
+    if (fileExists('./$dockerComposeFile')) {
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.Accessibility.Contexts[accessibilityTestType], description: GitHubStatus.Accessibility.Description) {
         try {
           ctx.sh('mkdir -p -m 666 test-output')
@@ -46,6 +47,7 @@ class Tests implements Serializable {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $dockerComposeFile down -v")
         }
       }
+    }
   }
 
   static def lintHelm(ctx, chartName) {
