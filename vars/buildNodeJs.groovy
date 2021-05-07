@@ -193,14 +193,18 @@ void call(Map config=[:]) {
     } finally {
       stage('Change ownership of outputs') {
         test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
-      }
-
+      }      
+ 
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)
       }
 
       if (config.containsKey('finallyClosure')) {
         config['finallyClosure']()
+      }
+
+      stage('Publish to Log Analytics') {
+        consoleLogs.save('/var/log/jenkins/console')
       }
     }
   }

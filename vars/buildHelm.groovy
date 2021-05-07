@@ -26,6 +26,10 @@ void call(Map config=[:]) {
         }
       }
 
+      stage('Helm lint') {
+        test.lintHelm(repoName)
+      }
+
       if (pr != '') {
           stage('Helm install') {
             helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
@@ -64,6 +68,11 @@ void call(Map config=[:]) {
     } catch(e) {
       notifySlack.buildFailure(e.message, "#generalbuildfailures")
       throw e
+    } finally {
+     
+      stage('Publish to Log Analytics') {
+        consoleLogs.save('/var/log/jenkins/console')
+      }
     }
   }
 }
