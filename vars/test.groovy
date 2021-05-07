@@ -40,14 +40,6 @@ void runZapScan(String projectName, String buildNumber, String tag) {
   Tests.runZapScan(this, projectName, buildNumber, tag)
 }
 
-void runPa11y(String projectName, String buildNumber, String tag) {
-  Tests.runPa11y(this, projectName, buildNumber, tag)
-}
-
-void runAxe(String projectName, String buildNumber, String tag) {
-  Tests.runAxe(this, projectName, buildNumber, tag)
-}
-
 void runAccessibility(String projectName, String buildNumber, String tag, String accessibilityTestType) {
   Tests.runAccessibility(this, projectName, buildNumber, tag, accessibilityTestType)
 }

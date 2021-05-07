@@ -36,31 +36,6 @@ class Tests implements Serializable {
       }
   }
 
-  static def runPa11y(ctx, projectName, buildNumber, tag) {
-    def pa11yDockerComposeFile = 'docker-compose.pa11y.yaml'
-      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.Pa11y.Context, description: GitHubStatus.Pa11y.Description) {
-        try {
-          // test-output exists if stage is run after 'runTests', take no risks and create it
-          ctx.sh('mkdir -p -m 666 test-output')
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $pa11yDockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ pa11y")
-        } finally {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $pa11yDockerComposeFile down -v")
-        }
-      }
-  }
-
-  static def runAxe(ctx, projectName, buildNumber, tag) {
-    def axeDockerComposeFile = 'docker-compose.axe.yaml'
-      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.Axe.Context, description: GitHubStatus.Axe.Description) {
-        try {
-          ctx.sh('mkdir -p -m 666 test-output')
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $axeDockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ axe")
-        } finally {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $axeDockerComposeFile down -v")
-        }
-      }
-  }
-
   static def runAccessibility(ctx, projectName, buildNumber, tag, accessibilityTestType) {
     def dockerComposeFile = "docker-compose." + accessibilityTestType + ".yaml"
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.Accessibility.Contexts[accessibilityTestType], description: GitHubStatus.Accessibility.Description) {
