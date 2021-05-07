@@ -76,4 +76,9 @@ class GitHubStatus implements Serializable {
     static final Context = "${BASECTX}axe-version"
     static final Description = 'Accessibility tests'
   }
+
+  class Accessibility {
+    static final Contexts = [pa11y: "${BASECTX}pa11y-version", axe: "${BASECTX}axe-version"]
+    static final Description = 'Accessibility tests'
+  }
 }
