@@ -4,11 +4,11 @@ class Function implements Serializable {
 
   static def createFunctionResources(ctx, repoName, pr) {
     deleteFunctionResources(ctx, repoName, pr)
-    createFunctionStorage(ctx, repoName, pr)
+    createFunctionStorage(ctx, repoName)
     createFunction(ctx, repoName, pr)
   }
 
-  static def createFunction(ctx, repoName){
+  static def createFunction(ctx, repoName, pr){
     def storageAccountName = repoName.replace('-','').replace('ffc', '')
     def azCreateFunction = "az functionapp create -n $repoName-pr$pr --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
     ctx.sh("$azCreateFunction")
@@ -20,7 +20,7 @@ class Function implements Serializable {
     ctx.sh("$azCreateFunctionStorage")
   }
 
-  private static def deleteFunctionResources(ctx, repoName) {
+  private static def deleteFunctionResources(ctx, repoName, pr) {
     def azDeleteFunction = "az functionapp delete --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP}"
     ctx.sh("$azDeleteFunction")
   }
