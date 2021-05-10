@@ -21,12 +21,6 @@ class Function implements Serializable {
     ctx.sh("$azCreateFunctionStorage")
   }
 
-  static def publishFunctionStorage(ctx, repoName){
-    def storageAccountName = repoName.replace('-','').replace('ffc', '')
-    def azPublishFunctionStorage = "func azure functionapp publish $FUNCTION_APP_NAME --javascript"
-    ctx.sh("$azCreateFunctionStorage")
-  }
-
   private static def deleteFunction(ctx, repoName, pr) {
     def azDeleteFunction = "az functionapp delete --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP}"
     ctx.sh("$azDeleteFunction")
@@ -34,7 +28,7 @@ class Function implements Serializable {
 
   private static def deleteFunctionStorage(ctx, repoName, pr) {
     def storageAccountName = repoName.replace('-','').replace('ffc', '')
-    def azDeleteFunction = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP}"
-    ctx.sh("$azDeleteFunction")
+    def azDeleteFunctionStorage = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP}"
+    ctx.sh("$azDeleteFunctionStorage")
   }
 }
