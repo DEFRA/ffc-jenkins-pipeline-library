@@ -28,7 +28,7 @@ class Function implements Serializable {
 
   private static def deleteFunctionStorage(ctx, repoName, pr) {
     def storageAccountName = repoName.replace('-','').replace('ffc', '')
-    def azDeleteFunctionStorage = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP}"
+    def azDeleteFunctionStorage = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --yes"
     ctx.sh("$azDeleteFunctionStorage")
   }
 }
