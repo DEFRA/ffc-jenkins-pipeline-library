@@ -94,18 +94,12 @@ void call(Map config=[:]) {
         }
       }
 
-      if (fileExists('./docker-compose.pa11y.yaml')) {
-        stage('Run Accessibility tests') {
-          test.runPa11y(repoName, BUILD_NUMBER, tag)
-        }
-      }
-
       if (config.containsKey('testClosure')) {
         config['testClosure']()
       }
 
-      stage('Build & push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
+      stage('Provision function app') {
+        function.createFunctionResources(repoName)
       }
 
       if (pr == '') {
@@ -121,12 +115,6 @@ void call(Map config=[:]) {
 
       if (config.containsKey('deployClosure')) {
         config['deployClosure']()
-      }
-
-      if (fileExists('./test/acceptance/docker-compose.yaml') && hasHelmChart) {
-        stage('Run Acceptance Tests') {
-          test.runAcceptanceTests(pr, environment, repoName)
-        }
       }
 
     } catch(e) {
