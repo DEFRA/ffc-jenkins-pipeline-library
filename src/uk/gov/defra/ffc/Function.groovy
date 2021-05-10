@@ -8,7 +8,8 @@ class Function implements Serializable {
   }
 
   static def createFunction(ctx, repoName){
-    def azCreateFunction = "az functionapp create -n $repoName --storage-account $repoName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
+    def storageAccountName = repoName.replace('-','').replace('ffc', '')
+    def azCreateFunction = "az functionapp create -n $repoName --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
     ctx.sh("$azCreateFunction")
   }
 
