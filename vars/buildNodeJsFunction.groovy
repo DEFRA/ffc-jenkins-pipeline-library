@@ -99,7 +99,7 @@ void call(Map config=[:]) {
       }
 
       stage('Provision function app') {
-        function.createFunctionResources(repoName)
+        function.createFunctionResources(repoName, pr)
       }
 
       if (pr == '') {
