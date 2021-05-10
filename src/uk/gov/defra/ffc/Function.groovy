@@ -13,7 +13,7 @@ class Function implements Serializable {
   }
 
   static def createFunctionStorage(ctx, repoName){
-    def storageAccountName = repoName.replace('-','')
+    def storageAccountName = repoName.replace('-','').replace('ffc', '')
     def azCreateFunctionStorage = "az storage account create -n $storageAccountName -l ${ctx.AZURE_REGION} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --sku Standard_LRS"
     ctx.sh("$azCreateFunctionStorage")
   }
