@@ -3,6 +3,7 @@ package uk.gov.defra.ffc
 class Function implements Serializable {
 
   static def createFunctionResources(ctx, repoName) {
+    deleteFunctionResources(ctx, repoName)
     createFunctionStorage(ctx, repoName)
     createFunction(ctx, repoName)
   }
@@ -17,5 +18,10 @@ class Function implements Serializable {
     def storageAccountName = repoName.replace('-','').replace('ffc', '')
     def azCreateFunctionStorage = "az storage account create -n $storageAccountName -l ${ctx.AZURE_REGION} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --sku Standard_LRS"
     ctx.sh("$azCreateFunctionStorage")
+  }
+
+  private static def deleteFunctionResources(ctx, repoName) {
+    def azDeleteFunction = "az functionapp delete --name $repoName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP}"
+    ctx.sh("$azDeleteFunction")
   }
 }
