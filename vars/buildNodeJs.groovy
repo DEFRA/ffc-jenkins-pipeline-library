@@ -10,6 +10,8 @@ void call(Map config=[:]) {
   String tag = ''
   String mergedPrNo = ''
   Boolean hasHelmChart = true
+  Boolean triggerDeployment = config.triggerDeployment != null ? config.triggerDeployment : true
+  String deploymentPipelineName = ''
 
   node {
     try {
@@ -149,19 +151,23 @@ void call(Map config=[:]) {
         }
       }
 
-      if(hasHelmChart && pr == '') {
+      if(triggerDeployment && hasHelmChart && pr == '') {
+        stage('Set deployment pipeline name') {
+          deploymentPipelineName = config.deploymentPipelineName != null ? config.deploymentPipelineName : "${repoName}-deploy"
+        }
+
         stage('Trigger Deployment') {
-          if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
+          if (utils.checkCredentialsExist("$repoName-deploy-token")) {
             withCredentials([
               string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
             ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
             }
-          } else {            
+          } else {
             withCredentials([
               string(credentialsId: 'default-deploy-token', variable: 'jenkinsToken')
             ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
             }
           }
         }
