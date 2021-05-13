@@ -190,13 +190,21 @@ class Tests implements Serializable {
             ctx.dir('./test/acceptance') {
             ctx.sh('mkdir -p -m 777 html-reports')
 
-            def url = buildUrl(ctx, pr,  environment, repoName)
-
+            def searchKeys = [
+              'ingress.endpoint',
+              'ingress.server'
+            ]
+            def appConfigPrefix = environment + '/'
+            def endpointConfig =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)
+            def serverConfig = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)
+            def endpoint = endpointConfig['ingress.endpoint'].trim()
+            def domain = serverConfig['ingress.server'].trim()
+            def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
             def envVars = []
 
             envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
             envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
-            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
+            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}")
 
             ctx.withEnv(envVars) {
             ctx.sh('docker-compose -f docker-compose.yaml build')
