@@ -192,6 +192,8 @@ class Tests implements Serializable {
 
             def url = buildUrl(ctx, pr,  environment, repoName)
 
+            def envVars = []
+
             envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
             envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
             envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
