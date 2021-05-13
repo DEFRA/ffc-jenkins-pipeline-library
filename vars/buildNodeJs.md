@@ -67,7 +67,23 @@ If a different environment within the Sandpit environment should be used for thi
 For example:
 
 ```
-buildNodeJs project: 'FFCDemoDotNetCoreProjectName', environment: 'snd2'
+buildNodeJs environment: 'snd2'
+```
+
+This main branch deployment can be disabled by setting the `triggerDeployment` value to `false`.
+
+For example:
+
+```
+buildNodeJs triggerDeployment: false
+```
+
+The build will assume the deployment pipeline has the naming convention `<repsitory name>-deploy`.  This can be overridden for custom naming conventions.
+
+For example:
+
+```
+buildNodeJs deploymentPipelineName: 'my-deployment-pipeline'
 ```
 
 ## Support Image without Helm

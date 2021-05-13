@@ -3,9 +3,9 @@ package uk.gov.defra.ffc
 import uk.gov.defra.ffc.Utils
 
 class Deploy implements Serializable {
-  static def trigger(ctx, jenkinsUrl, repoName, token, params) {
+  static def trigger(ctx, jenkinsUrl, deploymentPipelineName, token, params) {
     def folder = Utils.getFolder(ctx)
-    def url = "$jenkinsUrl/job/$folder/job/$repoName-deploy/buildWithParameters?token=$token"
+    def url = "$jenkinsUrl/job/$folder/job/$deploymentPipelineName/buildWithParameters?token=$token"
     params.each { param ->
       url = url + "\\&$param.key=$param.value"
     }
