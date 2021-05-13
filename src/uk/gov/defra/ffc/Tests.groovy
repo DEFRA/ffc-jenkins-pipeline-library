@@ -162,6 +162,8 @@ class Tests implements Serializable {
 
           def dynamicJmeterContent = "https;${hostname}.${domain};443"
 
+          ctx.sh('chmod 777 jmeterConfig.csv')
+
           new File("jmeterConfig.csv").withWriter { writer ->
               writer.write(dynamicJmeterContent)
           }
