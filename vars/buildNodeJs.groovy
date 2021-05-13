@@ -177,7 +177,7 @@ void call(Map config=[:]) {
         }
       }
 
-      if (fileExists('./test/performance/docker-compose.jmeter.yaml') && fileExists('./test/performance/jmeterConfig.csv') hasHelmChart) {
+      if (fileExists('./test/performance/docker-compose.jmeter.yaml') && fileExists('./test/performance/jmeterConfig.csv') && hasHelmChart) {
         stage('Run Jmeter Tests') {
           test.runJmeterTests(pr, environment, repoName)
         }
