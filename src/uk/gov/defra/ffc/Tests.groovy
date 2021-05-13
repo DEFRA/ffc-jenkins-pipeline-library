@@ -143,6 +143,43 @@ class Tests implements Serializable {
     ];
   }
 
+  static def buildUrl(ctx, pr,  environment, repoName) {
+    def searchKeys = [
+            'ingress.endpoint',
+            'ingress.server'
+          ]
+    def appConfigPrefix = environment + '/'
+    def endpointConfig =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)
+    def serverConfig = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)
+    def endpoint = endpointConfig['ingress.endpoint'].trim()
+    def domain = serverConfig['ingress.server'].trim()
+    def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
+
+    return "${hostname}.${domain}"
+  }
+
+  static def runJmeterTests(ctx, pr,  environment, repoName) {
+    
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
+        try {
+          ctx.dir('./test/performance') {
+          ctx.sh('mkdir -p -m 777 html-reports')
+
+          def url = buildUrl(ctx, pr,  environment, repoName)
+
+          def dynamicJmeterContent = "https;${url};443"
+
+          ctx.writeFile(file: "jmeterConfig.csv", text: dynamicJmeterContent, encoding: "UTF-8")
+
+          ctx.sh('docker-compose -f ../../docker-compose.yaml -f docker-compose.jmeter.yaml run jmeter-test')
+          
+        }
+      } finally {
+        ctx.sh('docker-compose down -v')
+      }
+    }
+  }
+
   static def runAcceptanceTests(ctx, pr,  environment, repoName) {
     
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
@@ -152,21 +189,13 @@ class Tests implements Serializable {
           ]) {
             ctx.dir('./test/acceptance') {
             ctx.sh('mkdir -p -m 777 html-reports')
-            def searchKeys = [
-              'ingress.endpoint',
-              'ingress.server'
-            ]
-            def appConfigPrefix = environment + '/'
-            def endpointConfig =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)
-            def serverConfig = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)
-            def endpoint = endpointConfig['ingress.endpoint'].trim()
-            def domain = serverConfig['ingress.server'].trim()
-            def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
+
+            def url = buildUrl(ctx, pr,  environment, repoName)
             def envVars = []
 
             envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
             envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
-            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${hostname}.${domain}")
+            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
 
             ctx.withEnv(envVars) {
             ctx.sh('docker-compose -f docker-compose.yaml build')

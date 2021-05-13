@@ -183,6 +183,12 @@ void call(Map config=[:]) {
         }
       }
 
+      if (fileExists('./test/performance/docker-compose.jmeter.yaml') && fileExists('./test/performance/jmeterConfig.csv') && hasHelmChart) {
+        stage('Run Jmeter Tests') {
+          test.runJmeterTests(pr, environment, repoName)
+        }
+      }
+
     } catch(e) {
       def errMsg = utils.getErrorMessage(e)
       echo("Build failed with message: $errMsg")

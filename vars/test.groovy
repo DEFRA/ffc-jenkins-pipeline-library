@@ -36,6 +36,10 @@ void runAcceptanceTests(String pr, String environment, String repoName) {
   Tests.runAcceptanceTests(this, pr, environment, repoName)
 }
 
+void runJmeterTests(String pr, String environment, String repoName) {
+  Tests.runJmeterTests(this, pr, environment, repoName)
+}
+
 void runZapScan(String projectName, String buildNumber, String tag) {
   Tests.runZapScan(this, projectName, buildNumber, tag)
 }
