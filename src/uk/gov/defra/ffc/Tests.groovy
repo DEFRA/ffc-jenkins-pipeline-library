@@ -147,6 +147,38 @@ class Tests implements Serializable {
     
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
+          ctx.dir('./test/performance') {
+          ctx.sh('mkdir -p -m 777 html-reports')
+          def searchKeys = [
+            'ingress.endpoint',
+            'ingress.server'
+          ]
+          def appConfigPrefix = environment + '/'
+          def endpointConfig =  Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, repoName, false)
+          def serverConfig = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)
+          def endpoint = endpointConfig['ingress.endpoint'].trim()
+          def domain = serverConfig['ingress.server'].trim()
+          def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
+
+          def dynamicJmeterContent = "https;${hostname}.${domain};443"
+
+          new File("jmeterConfig.csv").withWriter { writer ->
+              writer.write(dynamicJmeterContent)
+          }
+
+          ctx.sh('docker-compose -f ../../docker-compose.yaml -f docker-compose.jmeter.yaml run jmeter-test')
+          
+        }
+      } finally {
+        ctx.sh('docker-compose down -v')
+      }
+    }
+  }
+
+  static def runJmeterTests(ctx, pr,  environment, repoName) {
+    
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
+        try {
           ctx.withCredentials([
             ctx.usernamePassword(credentialsId: 'browserstack-credentials', usernameVariable: 'browserStackUsername', passwordVariable: 'browserStackAccessToken')
           ]) {
