@@ -9,17 +9,12 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  Boolean hasHelmChart = true
+  Boolean hasHelmChart = false
   Boolean triggerDeployment = config.triggerDeployment != null ? config.triggerDeployment : true
   String deploymentPipelineName = ''
 
   node {
     try {
-
-      if (!fileExists('./helm/')) {
-        hasHelmChart = false
-      }
-
       stage('Ensure clean workspace') {
         deleteDir()
       }
@@ -34,6 +29,10 @@ void call(Map config=[:]) {
 
       stage('Checkout source code') {
         build.checkoutSourceCode(defaultBranch)
+      }
+
+      if (fileExists('./helm/')) {
+        hasHelmChart = true
       }
 
       stage('Set PR and tag variables') {
@@ -205,8 +204,8 @@ void call(Map config=[:]) {
     } finally {
       stage('Change ownership of outputs') {
         test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
-      }      
- 
+      }
+
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)
       }
