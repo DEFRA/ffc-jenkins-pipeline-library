@@ -107,8 +107,14 @@ class Provision implements Serializable {
 
   private static def createQueue(ctx, queueName) {
     validateQueueName(queueName)
-    def azCommand = 'az servicebus queue create'
-    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
+    String azCommand = 'az servicebus queue create'
+    String sessionOption = getSessionOption(ctx, azureProvisionConfigFile, 'queues' queueName)
+    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024 $sessionOption")
+  }  
+
+  static def getSessionOption(ctx, filePath, resource, name) {
+    def option = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}(name==${name}).enableSessions").trim()
+    return option.toBoolean() ? '--enable-session' : ''
   }
 
   private static def createTopicAndSubscription(ctx, topicName) {
