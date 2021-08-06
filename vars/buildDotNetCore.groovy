@@ -8,17 +8,12 @@ void call(Map config=[:]) {
   String csProjVersion = ''
   String containerSrcFolder = '\\/home\\/dotnet'
   String dotnetDevelopmentImage = 'defradigital/dotnetcore-development'
-  Boolean hasHelmChart = true
+  Boolean hasHelmChart = false
   Boolean triggerDeployment = config.triggerDeployment != null ? config.triggerDeployment : true
   String deploymentPipelineName = ''
 
   node {
     try {
-
-      if (!fileExists('./helm/')) {
-        hasHelmChart = false
-      }
-
       stage('Ensure clean workspace') {
         deleteDir()
       }
@@ -33,6 +28,10 @@ void call(Map config=[:]) {
 
       stage('Checkout source code') {
         build.checkoutSourceCode(defaultBranch)
+      }
+
+      if (fileExists('./helm/')) {
+        hasHelmChart = true
       }
 
       stage('Set PR and tag variables') {
