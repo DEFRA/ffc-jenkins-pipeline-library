@@ -137,7 +137,7 @@ class Provision implements Serializable {
       messageQueuePassword,
       messageQueueUser
     ]
-    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
+    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false, environment)
     def envVars = []
 
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
@@ -262,7 +262,7 @@ class Provision implements Serializable {
       postgresHostKey
     ]
 
-    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)    
+    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false, environment)    
     
     return [
       "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
@@ -276,7 +276,7 @@ class Provision implements Serializable {
     def postgresDbKey = 'postgresService.postgresDb'
     def postgresUserKey = 'postgresService.postgresUser'
 
-    def appConfigValues = Utils.getConfigValues(ctx, [postgresDbKey, postgresUserKey], appConfigPrefix, repoName, false)
+    def appConfigValues = Utils.getConfigValues(ctx, [postgresDbKey, postgresUserKey], appConfigPrefix, repoName, false, environment)
 
     def database = appConfigValues[postgresDbKey]
     if (!database) {
@@ -297,8 +297,8 @@ class Provision implements Serializable {
     def postgresUserKey = 'postgresService.postgresUser'
 
     def appConfigValues = isPr
-      ? Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, Utils.defaultNullLabel, false) 
-      : Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, repoName, false)
+      ? Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, Utils.defaultNullLabel, false, environment) 
+      : Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, repoName, false, environment)
     
     def schemaUser = appConfigValues[postgresUserKey]
     if (!schemaUser) {
