@@ -2,7 +2,7 @@ package uk.gov.defra.ffc
 
 class Function implements Serializable {
 
-  static def createFunctionResources(ctx, repoName, pr, gitToken defaultBranch) {
+  static def createFunctionResources(ctx, repoName, pr, gitToken, defaultBranch) {
     deleteFunction(ctx, repoName, pr)
     deleteFunctionStorage(ctx, repoName, pr)
     enableGitAuth(ctx, gitToken)
