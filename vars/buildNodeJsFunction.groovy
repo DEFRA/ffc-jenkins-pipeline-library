@@ -99,7 +99,11 @@ void call(Map config=[:]) {
       }
 
       stage('Provision function app') {
-        function.createFunctionResources(repoName, pr)
+        withCredentials([
+            string(credentialsId: 'github-auth-token', variable: 'gitToken')
+          ]) {
+            function.createFunctionResources(repoName, pr, defaultBranch, gitToken)
+          }
       }
 
       if (pr == '') {
