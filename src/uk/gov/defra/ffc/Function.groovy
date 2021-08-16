@@ -2,7 +2,7 @@ package uk.gov.defra.ffc
 
 class Function implements Serializable {
 
-  static def createFunctionResources(ctx, repoName, pr, gitToken, defaultBranch) {
+  static def createFunctionResources(ctx, repoName, pr, gitToken defaultBranch) {
     deleteFunction(ctx, repoName, pr)
     deleteFunctionStorage(ctx, repoName, pr)
     enableGitAuth(ctx, gitToken)
@@ -11,15 +11,13 @@ class Function implements Serializable {
   }
 
   static def enableGitAuth(ctx, gitToken){
-    ctx.echo("GitAuth $gitToken")
-    ctx.sh("az functionapp deployment source update-token --git-token $gitToken")
+    ctx.sh("az functionapp deployment source update-token --git-token ${gitToken}")
   }
 
   static def createFunction(ctx, repoName, pr, defaultBranch){
     def repoUrl = Utils.getRepoUrl(ctx)
-    ctx.echo("$repoUrl $defaultBranch")
     def storageAccountName = repoName.replace('-','').replace('ffc', '')
-    def azCreateFunction = "az functionapp create -n $repoName-pr$pr --deployment-source-url $repoUrl --deployment-source-branch $defaultBranch --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
+    def azCreateFunction = "az functionapp create -n $repoName-pr$pr --deployment-source-url ${repoUrl} --deployment-source-branch ${defaultBranch} --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
     ctx.sh("$azCreateFunction")
   }
 
