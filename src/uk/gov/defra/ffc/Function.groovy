@@ -2,12 +2,26 @@ package uk.gov.defra.ffc
 
 class Function implements Serializable {
 
+  static String azureProvisionConfigFile = './provision.azure.yaml'
+
   static def createFunctionResources(ctx, repoName, pr, gitToken, defaultBranch) {
-    deleteFunction(ctx, repoName, pr)
-    deleteFunctionStorage(ctx, repoName, pr)
-    enableGitAuth(ctx, gitToken)
-    createFunctionStorage(ctx, repoName)
-    createFunction(ctx, repoName, pr, defaultBranch)
+    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      getStorageName(ctx, azureProvisionConfigFile)
+      deleteFunction(ctx, repoName, pr)
+      deleteFunctionStorage(ctx, repoName, pr)
+      enableGitAuth(ctx, gitToken)
+      createFunctionStorage(ctx, repoName)
+      createFunction(ctx, repoName, pr, defaultBranch)
+    }
+  }
+
+  static def getStorageName(ctx, azureProvisionConfigFile) {
+    def storage = readManifest(ctx, azureProvisionConfigFile, 'storage')
+
+    storage.each {
+      ctx.echo("Storage ${it}")
+      validateStorageName(it)
+    }
   }
 
   static def enableGitAuth(ctx, gitToken){
@@ -21,7 +35,7 @@ class Function implements Serializable {
     ctx.sh("$azCreateFunction")
   }
 
-  static def createFunctionStorage(ctx, repoName){
+  static def createFunctionStorage(ctx, storageAccountName){
     def storageAccountName = repoName.replace('-','').replace('ffc', '')
     def azCreateFunctionStorage = "az storage account create -n $storageAccountName -l ${ctx.AZURE_REGION} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --sku Standard_LRS"
     ctx.sh("$azCreateFunctionStorage")
@@ -36,5 +50,18 @@ class Function implements Serializable {
     def storageAccountName = repoName.replace('-','').replace('ffc', '')
     def azDeleteFunctionStorage = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --yes"
     ctx.sh("$azDeleteFunctionStorage")
+  }
+
+  static def hasResourcesToProvision(ctx, filePath) {
+    return ctx.fileExists(filePath)
+  } 
+
+  static def readManifest(ctx, filePath, resource) {
+    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*.name").trim()
+    return resources.tokenize('\n')
+  }
+
+  private static def validateStorageName(name) {
+    assert name ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '$name'"
   }
 }
