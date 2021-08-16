@@ -17,7 +17,7 @@ class Function implements Serializable {
 
   static def getStorageName(ctx, azureProvisionConfigFile) {
     def storage = readManifest(ctx, azureProvisionConfigFile, 'storage')
-    ctx.echo("Storage ${storage}")
+    ctx.echo("Storage ${storage[0]}")
     storage.each {
       ctx.echo("Storage ${it}")
       validateStorageName(it)
