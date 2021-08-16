@@ -12,7 +12,6 @@ void call(Map config=[:]) {
 
   node {
     try {
-
       stage('Ensure clean workspace') {
         deleteDir()
       }
