@@ -9,15 +9,12 @@ void call(Map config=[:]) {
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  Boolean hasHelmChart = true
+  Boolean hasHelmChart = false
+  Boolean triggerDeployment = config.triggerDeployment != null ? config.triggerDeployment : true
+  String deploymentPipelineName = ''
 
   node {
     try {
-
-      if (!fileExists('./helm/')) {
-        hasHelmChart = false
-      }
-
       stage('Ensure clean workspace') {
         deleteDir()
       }
@@ -32,6 +29,10 @@ void call(Map config=[:]) {
 
       stage('Checkout source code') {
         build.checkoutSourceCode(defaultBranch)
+      }
+
+      if (fileExists('./helm/')) {
+        hasHelmChart = true
       }
 
       stage('Set PR and tag variables') {
@@ -149,19 +150,23 @@ void call(Map config=[:]) {
         }
       }
 
-      if(hasHelmChart && pr == '') {
+      if(triggerDeployment && hasHelmChart && pr == '') {
+        stage('Set deployment pipeline name') {
+          deploymentPipelineName = config.deploymentPipelineName != null ? config.deploymentPipelineName : "${repoName}-deploy"
+        }
+
         stage('Trigger Deployment') {
-          if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
+          if (utils.checkCredentialsExist("$repoName-deploy-token")) {
             withCredentials([
               string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
             ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
             }
-          } else {            
+          } else {
             withCredentials([
               string(credentialsId: 'default-deploy-token', variable: 'jenkinsToken')
             ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
             }
           }
         }
@@ -174,6 +179,12 @@ void call(Map config=[:]) {
       if (fileExists('./test/acceptance/docker-compose.yaml') && hasHelmChart) {
         stage('Run Acceptance Tests') {
           test.runAcceptanceTests(pr, environment, repoName)
+        }
+      }
+
+      if (fileExists('./test/performance/docker-compose.jmeter.yaml') && fileExists('./test/performance/jmeterConfig.csv') && hasHelmChart) {
+        stage('Run Jmeter Tests') {
+          test.runJmeterTests(pr, environment, repoName)
         }
       }
 
@@ -193,8 +204,8 @@ void call(Map config=[:]) {
     } finally {
       stage('Change ownership of outputs') {
         test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
-      }      
- 
+      }
+
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)
       }

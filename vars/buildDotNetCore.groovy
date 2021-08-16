@@ -8,15 +8,12 @@ void call(Map config=[:]) {
   String csProjVersion = ''
   String containerSrcFolder = '\\/home\\/dotnet'
   String dotnetDevelopmentImage = 'defradigital/dotnetcore-development'
-  Boolean hasHelmChart = true
+  Boolean hasHelmChart = false
+  Boolean triggerDeployment = config.triggerDeployment != null ? config.triggerDeployment : true
+  String deploymentPipelineName = ''
 
   node {
     try {
-
-      if (!fileExists('./helm/')) {
-        hasHelmChart = false
-      }
-
       stage('Ensure clean workspace') {
         deleteDir()
       }
@@ -31,6 +28,10 @@ void call(Map config=[:]) {
 
       stage('Checkout source code') {
         build.checkoutSourceCode(defaultBranch)
+      }
+
+      if (fileExists('./helm/')) {
+        hasHelmChart = true
       }
 
       stage('Set PR and tag variables') {
@@ -118,24 +119,28 @@ void call(Map config=[:]) {
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
             String commitMessage = utils.getCommitMessage()
-            release.trigger(tag, repoName, commitMessage, gitToken)            
+            release.trigger(tag, repoName, commitMessage, gitToken)
           }
         }
       }
 
-      if(hasHelmChart && pr == '') {
+      if(triggerDeployment && hasHelmChart && pr == '') {
+        stage('Set deployment pipeline name') {
+          deploymentPipelineName = config.deploymentPipelineName != null ? config.deploymentPipelineName : "${repoName}-deploy"
+        }
+
         stage('Trigger Deployment') {
-          if (utils.checkCredentialsExist("$repoName-deploy-token")) {            
+          if (utils.checkCredentialsExist("$repoName-deploy-token")) {
             withCredentials([
               string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
             ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
             }
           } else {
             withCredentials([
               string(credentialsId: 'default-deploy-token', variable: 'jenkinsToken')
             ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, repoName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
+              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
             }
           }
         }

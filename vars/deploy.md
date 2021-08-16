@@ -25,5 +25,5 @@ Takes four parameters:
 Example usage:
 
 ```
-deploy.trigger((jenkinsDeployUrl, deployJobName, jenkinsToken, ['chartVersion':'1.0.0'])
+deploy.trigger((jenkinsDeployUrl, deploymentPipelineName, jenkinsToken, ['chartVersion':'1.0.0'])
 ```

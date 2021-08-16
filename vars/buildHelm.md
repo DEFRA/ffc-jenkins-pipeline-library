@@ -41,11 +41,27 @@ buildHelm defaultBranch: 'master'
 
 ## Environment
 
-As part of the PR workflow, every commit will be dynamically deployed to the default Sandpit cluster, `snd`.  This also applied to all main branch code post merge.  
+As part of the PR workflow, every commit will be dynamically deployed to the default Sandpit cluster, `snd`.  This also applied to all main branch code post merge.
 If a different environment within the Sandpit environment should be used for this purpose then the default can be overriden.
 
 For example:
 
 ```
-buildHelm project: 'FFCDemoDotNetCoreProjectName', environment: 'snd2'
+buildHelm environment: 'snd2'
+```
+
+This main branch deployment can be disabled by setting the `triggerDeployment` value to `false`.
+
+For example:
+
+```
+buildHelm triggerDeployment: false
+```
+
+The build will assume the deployment pipeline has the naming convention `<repsitory name>-deploy`.  This can be overridden for custom naming conventions.
+
+For example:
+
+```
+buildHelm deploymentPipelineName: 'my-deployment-pipeline'
 ```
