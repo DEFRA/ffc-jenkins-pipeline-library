@@ -6,37 +6,32 @@ class Function implements Serializable {
 
   static def createFunctionResources(ctx, repoName, pr, gitToken, defaultBranch) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
-      getStorageName(ctx, azureProvisionConfigFile)
+      def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile)
       deleteFunction(ctx, repoName, pr)
-      deleteFunctionStorage(ctx, repoName, pr)
+      deleteFunctionStorage(ctx, repoName, pr, storageAccountName)
       enableGitAuth(ctx, gitToken)
-      createFunctionStorage(ctx, repoName)
-      createFunction(ctx, repoName, pr, defaultBranch)
+      createFunctionStorage(ctx, repoName, storageAccountName)
+      createFunction(ctx, repoName, pr, defaultBranch, storageAccountName)
     }
   }
 
-  static def getStorageName(ctx, azureProvisionConfigFile) {
+  static def getStorageAccountName(ctx, azureProvisionConfigFile) {
     def storage = readManifest(ctx, azureProvisionConfigFile, 'storage')
-    ctx.echo("Storage ${storage[0]}")
-    storage.each {
-      ctx.echo("Storage ${it}")
-      validateStorageName(it)
-    }
+    validateStorageName(storage)
+    return storage
   }
 
   static def enableGitAuth(ctx, gitToken){
     ctx.sh("az functionapp deployment source update-token --git-token $gitToken")
   }
 
-  static def createFunction(ctx, repoName, pr, defaultBranch){
+  static def createFunction(ctx, repoName, pr, defaultBranch, storageAccountName){
     def repoUrl = Utils.getRepoUrl(ctx)
-    def storageAccountName = repoName.replace('-','').replace('ffc', '')
     def azCreateFunction = "az functionapp create -n $repoName-pr$pr --deployment-source-url $repoUrl --deployment-source-branch $defaultBranch --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
     ctx.sh("$azCreateFunction")
   }
 
-  static def createFunctionStorage(ctx, repoName){
-    def storageAccountName = repoName.replace('-','').replace('ffc', '')
+  static def createFunctionStorage(ctx, repoName, storageAccountName){
     def azCreateFunctionStorage = "az storage account create -n $storageAccountName -l ${ctx.AZURE_REGION} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --sku Standard_LRS"
     ctx.sh("$azCreateFunctionStorage")
   }
@@ -46,8 +41,7 @@ class Function implements Serializable {
     ctx.sh("$azDeleteFunction")
   }
 
-  private static def deleteFunctionStorage(ctx, repoName, pr) {
-    def storageAccountName = repoName.replace('-','').replace('ffc', '')
+  private static def deleteFunctionStorage(ctx, repoName, pr, storageAccountName) {
     def azDeleteFunctionStorage = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --yes"
     ctx.sh("$azDeleteFunctionStorage")
   }
@@ -58,7 +52,7 @@ class Function implements Serializable {
 
   static def readManifest(ctx, filePath, resource) {
     def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*.name").trim()
-    return resources.tokenize('\n')
+    return resources.tokenize('\n')[0]
   }
 
   private static def validateStorageName(name) {
