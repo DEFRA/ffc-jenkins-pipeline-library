@@ -17,7 +17,7 @@ class Function implements Serializable {
 
   static def getStorageName(ctx, azureProvisionConfigFile) {
     def storage = readManifest(ctx, azureProvisionConfigFile, 'storage')
-
+    ctx.echo("Storage ${it}")
     storage.each {
       ctx.echo("Storage ${it}")
       validateStorageName(it)
@@ -35,7 +35,7 @@ class Function implements Serializable {
     ctx.sh("$azCreateFunction")
   }
 
-  static def createFunctionStorage(ctx, storageAccountName){
+  static def createFunctionStorage(ctx, repoName){
     def storageAccountName = repoName.replace('-','').replace('ffc', '')
     def azCreateFunctionStorage = "az storage account create -n $storageAccountName -l ${ctx.AZURE_REGION} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --sku Standard_LRS"
     ctx.sh("$azCreateFunctionStorage")
