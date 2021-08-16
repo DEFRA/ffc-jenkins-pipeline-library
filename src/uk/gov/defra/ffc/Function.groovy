@@ -5,8 +5,14 @@ class Function implements Serializable {
   static def createFunctionResources(ctx, repoName, pr) {
     deleteFunction(ctx, repoName, pr)
     deleteFunctionStorage(ctx, repoName, pr)
+    zipFunctionResources(ctx)
     createFunctionStorage(ctx, repoName)
     createFunction(ctx, repoName, pr)
+  }
+
+  static def zipFunctionResources(ctx) {
+    ctx.sh("sudo apt install zip")
+    ctx.sh("zip -r deploy.zip ./*")
   }
 
   static def createFunction(ctx, repoName, pr){
