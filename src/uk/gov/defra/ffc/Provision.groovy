@@ -83,7 +83,7 @@ class Provision implements Serializable {
 
   private static def createBuildQueues(ctx, queues, repoName, pr) {
     queues.each {
-      String sessionOption = getSessionOption(ctx, azureProvisionConfigFile, 'queues', $it)
+      String sessionOption = getSessionOption(ctx, azureProvisionConfigFile, 'queues', it)
       createQueue(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it", sessionOption)
     }
   }
@@ -96,7 +96,7 @@ class Provision implements Serializable {
 
   private static def createPrQueues(ctx, queues, repoName, pr) {
     queues.each {
-      String sessionOption = getSessionOption(ctx, azureProvisionConfigFile, 'queues', $it)
+      String sessionOption = getSessionOption(ctx, azureProvisionConfigFile, 'queues', it)
       createQueue(ctx, getPrQueueName(repoName, pr, it), sessionOption)
     }
   }
