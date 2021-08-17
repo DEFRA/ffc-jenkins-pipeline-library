@@ -83,7 +83,8 @@ class Provision implements Serializable {
 
   private static def createBuildQueues(ctx, queues, repoName, pr) {
     queues.each {
-      createQueue(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+      String sessionOption = getSessionOption(ctx, azureProvisionConfigFile, 'queues', it)
+      createQueue(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it", sessionOption)
     }
   }
 
@@ -95,7 +96,8 @@ class Provision implements Serializable {
 
   private static def createPrQueues(ctx, queues, repoName, pr) {
     queues.each {
-      createQueue(ctx, getPrQueueName(repoName, pr, it))
+      String sessionOption = getSessionOption(ctx, azureProvisionConfigFile, 'queues', it)
+      createQueue(ctx, getPrQueueName(repoName, pr, it), sessionOption)
     }
   }
 
@@ -105,10 +107,17 @@ class Provision implements Serializable {
     }
   }
 
-  private static def createQueue(ctx, queueName) {
+  private static def createQueue(ctx, queueName, sessionOption = '') {
     validateQueueName(queueName)
-    def azCommand = 'az servicebus queue create'
-    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024")
+    String azCommand = 'az servicebus queue create'
+    ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024 $sessionOption")
+  }  
+
+  static def getSessionOption(ctx, filePath, resource, name) {
+    String script = "yq r $filePath resources.${resource}*\\(name==${name}\\).enableSessions"
+    ctx.echo(script)
+    def option = ctx.sh(returnStdout: true, script: script).trim()
+    return option.toBoolean() ? '--enable-session' : ''
   }
 
   private static def createTopicAndSubscription(ctx, topicName) {
