@@ -108,7 +108,7 @@ class Provision implements Serializable {
   private static def createQueue(ctx, queueName) {
     validateQueueName(queueName)
     String azCommand = 'az servicebus queue create'
-    String sessionOption = getSessionOption(ctx, azureProvisionConfigFile, 'queues' queueName)
+    String sessionOption = getSessionOption(ctx, azureProvisionConfigFile, 'queues', queueName)
     ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024 $sessionOption")
   }  
 
