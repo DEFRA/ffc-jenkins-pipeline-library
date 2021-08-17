@@ -113,7 +113,9 @@ class Provision implements Serializable {
   }  
 
   static def getSessionOption(ctx, filePath, resource, name) {
-    def option = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}(name==${name}).enableSessions").trim()
+    String script = "yq r $filePath resources.${resource}(name==${name}).enableSessions"
+    ctx.echo(script)
+    def option = ctx.sh(returnStdout: true, script: script).trim()
     return option.toBoolean() ? '--enable-session' : ''
   }
 
