@@ -19,7 +19,7 @@ class Function implements Serializable {
   }
   
   static def listFunctionApps(ctx, repoName, pr) {
-    def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list '[?name==$repoName-pr$]'")
+    def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[?name==$repoName-pr$]'")
     ctx.echo("functionApps $functionApps")
   }
 
