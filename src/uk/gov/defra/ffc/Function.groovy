@@ -19,7 +19,7 @@ class Function implements Serializable {
   }
   
   static def listFunctionApps(ctx, repoName, pr) {
-    def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[].{Name:name}'")
+    def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[?name ==\"$repoName-pr$pr\"]'")
     ctx.echo("functionApps $functionApps")
   }
 
@@ -43,7 +43,7 @@ class Function implements Serializable {
 
   static def createFunction(ctx, repoName, pr, defaultBranch, storageAccountName){
     def repoUrl = Utils.getRepoUrl(ctx)
-    def azCreateFunction = "az functionapp create -n $repoName-pr$pr --slot staging-pr$pr --deployment-source-url $repoUrl --deployment-source-branch $defaultBranch --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
+    def azCreateFunction = "az functionapp create -n $repoName-pr$pr --deployment-source-url $repoUrl --deployment-source-branch $defaultBranch --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
     ctx.sh("$azCreateFunction")
   }
 
