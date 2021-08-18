@@ -8,7 +8,7 @@ class Function implements Serializable {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile)
       //createSlots(ctx, repoName, pr)
-      listFunctionApps(ctx, repoName, pr)
+      // listFunctionApps(ctx, repoName, pr)
       deleteFunction(ctx, repoName, pr)
       deleteFunctionStorage(ctx, repoName, pr, storageAccountName)
       enableGitAuth(ctx, gitToken)
