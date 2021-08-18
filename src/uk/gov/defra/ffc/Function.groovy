@@ -56,7 +56,7 @@ class Function implements Serializable {
 
   static def deployFunction(ctx, repoName, pr, branch){
     def repoUrl = Utils.getRepoUrl(ctx)
-    def azCreateFunction = "az functionapp source config --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch branch --manual-integration"
+    def azCreateFunction = "az functionapp deployment source config --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch branch --manual-integration"
     ctx.sh("$azCreateFunction")
   }
 
