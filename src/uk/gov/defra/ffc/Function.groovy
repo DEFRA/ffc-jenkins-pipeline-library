@@ -7,8 +7,6 @@ class Function implements Serializable {
   static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile)
-      deleteFunction(ctx, repoName, pr)
-      deleteFunctionStorage(ctx, repoName, pr, storageAccountName)
       enableGitAuth(ctx, gitToken)
 
       if(!checkFunctionAppExists(ctx, repoName, pr)) {
@@ -24,14 +22,6 @@ class Function implements Serializable {
     def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[].{Name:name}'")
     def checkExists = functionApps.contains("$repoName-pr$pr")
     return checkExists
-  }
-
-  static def createSlots(ctx, repoName, pr) {
-    ctx.sh("az functionapp deployment slot create --name $repoName-pr$pr -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --slot staging-pr$pr")
-  }
-
-  static def swapSlots(ctx, repoName, pr) {
-    ctx.sh("az functionapp deployment slot swap --name $repoName-pr$pr -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --slot staging-pr$pr --target-slot production")
   }
 
   static def getStorageAccountName(ctx, azureProvisionConfigFile) {
@@ -56,8 +46,8 @@ class Function implements Serializable {
 
   static def deployFunction(ctx, repoName, pr, branch){
     def repoUrl = Utils.getRepoUrl(ctx)
-    def azCreateFunction = "az functionapp deployment source config --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch branch --manual-integration"
-    ctx.sh("$azCreateFunction")
+    def azDeployFunction = "az functionapp deployment source config --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch --manual-integration"
+    ctx.sh("$azDeployFunction")
   }
 
   private static def deleteFunction(ctx, repoName, pr) {
