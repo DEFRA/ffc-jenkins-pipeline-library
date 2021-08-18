@@ -7,16 +7,11 @@ class Function implements Serializable {
   static def createFunctionResources(ctx, repoName, pr, gitToken, defaultBranch) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile)
-      enableGitAuth(ctx, gitToken) 
-
-      if(checkFunctionExists(ctx, repoName, pr)) {
-        createSlots(ctx, repoName, pr)
-        createFunction(ctx, repoName, pr, defaultBranch, storageAccountName, "staging-pr$pr")
-        swapSlots(ctx, repoName, pr)
-      } else {
-        createFunctionStorage(ctx, repoName, storageAccountName)
-        createFunction(ctx, repoName, pr, defaultBranch, storageAccountName, "production")
-      }
+      deleteFunction(ctx, repoName, pr)
+      deleteFunctionStorage(ctx, repoName, pr, storageAccountName)
+      enableGitAuth(ctx, gitToken)
+      createFunctionStorage(ctx, repoName, storageAccountName)
+      createFunction(ctx, repoName, pr, defaultBranch, storageAccountName)
     }
   }
   
@@ -44,9 +39,9 @@ class Function implements Serializable {
     ctx.sh("az functionapp deployment source update-token --git-token $gitToken")
   }
 
-  static def createFunction(ctx, repoName, pr, defaultBranch, storageAccountName, slot){
+  static def createFunction(ctx, repoName, pr, defaultBranch, storageAccountName){
     def repoUrl = Utils.getRepoUrl(ctx)
-    def azCreateFunction = "az functionapp create -n $repoName-pr$pr --deployment-source-url $repoUrl --deployment-source-branch $defaultBranch --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --slot $slot --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
+    def azCreateFunction = "az functionapp create -n $repoName-pr$pr --deployment-source-url $repoUrl --deployment-source-branch $defaultBranch --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
     ctx.sh("$azCreateFunction")
   }
 
