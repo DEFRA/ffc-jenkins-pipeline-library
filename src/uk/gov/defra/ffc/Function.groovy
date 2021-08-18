@@ -21,7 +21,7 @@ class Function implements Serializable {
   static def listFunctionApps(ctx, repoName, pr) {
     def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[].{Name:name}'")
     ctx.echo("functionApps $functionApps")
-    ctx.echo("functionApps $functionApps.size()")
+    ctx.echo("functionApps $functionApps.contains($repoName-pr$pr)")
   }
 
   static def createSlots(ctx, repoName, pr) {
