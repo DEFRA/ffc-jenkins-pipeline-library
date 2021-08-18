@@ -7,14 +7,20 @@ class Function implements Serializable {
   static def createFunctionResources(ctx, repoName, pr, gitToken, defaultBranch) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile)
-      createSlots(ctx, repoName, pr)
-      //deleteFunction(ctx, repoName, pr)
-      //deleteFunctionStorage(ctx, repoName, pr, storageAccountName)
+      //createSlots(ctx, repoName, pr)
+      listFunctionApps()
+      deleteFunction(ctx, repoName, pr)
+      deleteFunctionStorage(ctx, repoName, pr, storageAccountName)
       enableGitAuth(ctx, gitToken)
       createFunctionStorage(ctx, repoName, storageAccountName)
       createFunction(ctx, repoName, pr, defaultBranch, storageAccountName)
-      swapSlots(ctx, repoName, pr)
+      //swapSlots(ctx, repoName, pr)
     }
+  }
+  
+  static def listFunctionApps() {
+    def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[].{Name:name}'")
+    ctx.echo(functionApps)
   }
 
   static def createSlots(ctx, repoName, pr) {
