@@ -4,18 +4,21 @@ class Function implements Serializable {
 
   static String azureProvisionConfigFile = './provision.azure.yaml'
 
-  static def createFunctionResources(ctx, repoName, pr, gitToken, defaultBranch) {
+  static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile)
       deleteFunction(ctx, repoName, pr)
       deleteFunctionStorage(ctx, repoName, pr, storageAccountName)
       enableGitAuth(ctx, gitToken)
-      createFunctionStorage(ctx, repoName, storageAccountName)
-      createFunction(ctx, repoName, pr, defaultBranch, storageAccountName)
+
+      if(!checkFunctionAppExists(ctx, repoName, pr)) {
+        createFunctionStorage(ctx, repoName, storageAccountName)
+        createFunction(ctx, repoName, pr, branch, storageAccountName)
+      }
     }
   }
   
-  static def checkFunctionAppExists(ctx, repoName, pr) {
+  static Boolean checkFunctionAppExists(ctx, repoName, pr) {
     def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[].{Name:name}'")
     def checkExists = functionApps.contains("$repoName-pr$pr")
     return checkExists
@@ -40,14 +43,19 @@ class Function implements Serializable {
   }
 
   static def createFunction(ctx, repoName, pr, defaultBranch, storageAccountName){
-    def repoUrl = Utils.getRepoUrl(ctx)
-    def azCreateFunction = "az functionapp create -n $repoName-pr$pr --deployment-source-url $repoUrl --deployment-source-branch $defaultBranch --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
+    def azCreateFunction = "az functionapp create -n $repoName-pr$pr --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
     ctx.sh("$azCreateFunction")
   }
 
   static def createFunctionStorage(ctx, repoName, storageAccountName){
     def azCreateFunctionStorage = "az storage account create -n $storageAccountName -l ${ctx.AZURE_REGION} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --sku Standard_LRS"
     ctx.sh("$azCreateFunctionStorage")
+  }
+
+  static def deployFunction(ctx, repoName, pr, branch, storageAccountName){
+    def repoUrl = Utils.getRepoUrl(ctx)
+    def azCreateFunction = "az functionapp source config --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch branch --manual-integration"
+    ctx.sh("$azCreateFunction")
   }
 
   private static def deleteFunction(ctx, repoName, pr) {
