@@ -13,6 +13,7 @@ class Function implements Serializable {
         createFunction(ctx, repoName, pr, branch, storageAccountName)
       }
 
+      enableGitAuth(ctx, gitToken)
       deployFunction(ctx, repoName, pr, branch, gitToken)
     }
   }
@@ -31,11 +32,17 @@ class Function implements Serializable {
   }
 
   static def enableGitAuth(ctx, gitToken){
-    ctx.sh("az functionapp deployment source update-token --git-token $gitToken")
+    ctx.sh("az functionapp deployment source update-token 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 $gitToken")
   }
 
   static def createFunction(ctx, repoName, pr, defaultBranch, storageAccountName){
     def azCreateFunction = "az functionapp create -n $repoName-pr$pr --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
+    ctx.sh("$azCreateFunction")
+  }
+
+  static def createAndDeployFunction(ctx, repoName, pr, defaultBranch, storageAccountName){
+    def repoUrl = Utils.getRepoUrl(ctx)
+    def azCreateFunction = "az functionapp create -n $repoName-pr$pr --deployment-source-url $repoUrl --deployment-source-branch $defaultBranch --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
     ctx.sh("$azCreateFunction")
   }
 
@@ -44,8 +51,7 @@ class Function implements Serializable {
     ctx.sh("$azCreateFunctionStorage")
   }
 
-  static def deployFunction(ctx, repoName, pr, branch, gitToken){
-    enableGitAuth(ctx, gitToken)
+  static def deployFunction(ctx, repoName, pr, branch){
     def repoUrl = Utils.getRepoUrl(ctx)
     def azDeployFunction = "az functionapp deployment source config --git-token $gitToken --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch"
     ctx.sh("$azDeployFunction")
