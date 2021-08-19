@@ -32,7 +32,7 @@ class Function implements Serializable {
   }
 
   static def enableGitAuth(ctx, gitToken){
-    ctx.sh("az functionapp deployment source update-token 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 $gitToken")
+    ctx.sh("az functionapp deployment source update-token --git-token $gitToken")
   }
 
   static def createFunction(ctx, repoName, pr, defaultBranch, storageAccountName){
