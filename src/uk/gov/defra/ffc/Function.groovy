@@ -7,14 +7,13 @@ class Function implements Serializable {
   static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile)
-      enableGitAuth(ctx, gitToken)
 
       if(!checkFunctionAppExists(ctx, repoName, pr)) {
         createFunctionStorage(ctx, repoName, storageAccountName)
         createFunction(ctx, repoName, pr, branch, storageAccountName)
       }
 
-      deployFunction(ctx, repoName, pr, branch)
+      deployFunction(ctx, repoName, pr, branch, gitToken)
     }
   }
   
@@ -45,8 +44,9 @@ class Function implements Serializable {
   }
 
   static def deployFunction(ctx, repoName, pr, branch){
+    enableGitAuth(ctx, gitToken)
     def repoUrl = Utils.getRepoUrl(ctx)
-    def azDeployFunction = "az functionapp deployment source config --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch --manual-integration"
+    def azDeployFunction = "az functionapp deployment source config --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch"
     ctx.sh("$azDeployFunction")
   }
 
