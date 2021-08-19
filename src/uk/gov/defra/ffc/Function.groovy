@@ -20,6 +20,7 @@ class Function implements Serializable {
   static Boolean checkFunctionAppExists(ctx, repoName, pr) {
     def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[].{Name:name}'")
     def checkExists = functionApps.contains("$repoName-pr$pr")
+    ctx.echo("Function app $repoName-pr$pr exists: $checkExists")A
     return checkExists
   }
 
@@ -46,7 +47,7 @@ class Function implements Serializable {
   static def deployFunction(ctx, repoName, pr, branch, gitToken){
     enableGitAuth(ctx, gitToken)
     def repoUrl = Utils.getRepoUrl(ctx)
-    def azDeployFunction = "az functionapp deployment source config --git-token $gitToken --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch --debug"
+    def azDeployFunction = "az functionapp deployment source config --git-token $gitToken --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch"
     ctx.sh("$azDeployFunction")
   }
 
