@@ -51,7 +51,7 @@ class Function implements Serializable {
     ctx.sh("$azCreateFunctionStorage")
   }
 
-  static def deployFunction(ctx, repoName, pr, branch){
+  static def deployFunction(ctx, repoName, pr, branch, gitToken){
     def repoUrl = Utils.getRepoUrl(ctx)
     def azDeployFunction = "az functionapp deployment source config --git-token $gitToken --name $repoName-pr$pr --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch"
     ctx.sh("$azDeployFunction")
