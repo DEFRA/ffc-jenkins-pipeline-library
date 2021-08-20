@@ -5,7 +5,11 @@ class Function implements Serializable {
   static String azureProvisionConfigFile = './provision.azure.yaml'
 
   static String createFunctionName(repoName, pr) {
-    return "$repoName-pr$pr"
+    if (pr != '') {
+      return "$repoName-pr$pr"
+    }
+
+    return "$repoName"
   }
 
   static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
