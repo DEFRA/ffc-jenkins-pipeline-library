@@ -172,8 +172,7 @@ class Helm implements Serializable {
           ctx.dir('helm-install') {
             def helmChartName = "$ctx.DOCKER_REGISTRY/$chartName:helm-$chartVersion"
             ctx.sh("helm registry login $ctx.DOCKER_REGISTRY --username $ctx.username --password $ctx.password")
-            ctx.sh("helm pull $helmChartName")
-            ctx.sh("helm chart export $helmChartName --destination .")
+            ctx.sh("helm pull $helmChartName --destination .")
             String helmValuesFilePath = "$chartName/values.yaml"
 
             def extraCommands = getExtraCommands(chartVersion)
