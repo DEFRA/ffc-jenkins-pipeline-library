@@ -140,8 +140,9 @@ class Helm implements Serializable {
 
           ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
           // ctx.sh("helm package $chartName-${tag}.tgz $helmChartName")
-          def chartZip = "$chartName-$tag​.tgz"
-          ctx.sh("helm push $chartZip $helmChartName")
+          def script = "helm push $chartName-$tag​.tgz $helmChartName"
+          ctx.echo(script)
+          ctx.sh(script)
 
 
           ctx.deleteDir()
