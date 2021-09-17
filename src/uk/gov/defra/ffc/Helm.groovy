@@ -139,8 +139,9 @@ class Helm implements Serializable {
           ctx.sh("helm package ../helm/$chartName --version $tag --dependency-update")
 
           ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
-          ctx.sh("helm package $chartName-${tag}.tgz $helmChartName")
-          ctx.sh("helm push $helmChartName $registry")
+          // ctx.sh("helm package $chartName-${tag}.tgz $helmChartName")
+          ctx.sh("helm push $chartName-${​tag}​.tgz $helmChartName")
+
 
           ctx.deleteDir()
         }
