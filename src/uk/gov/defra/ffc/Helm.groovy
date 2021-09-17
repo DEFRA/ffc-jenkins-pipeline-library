@@ -139,8 +139,8 @@ class Helm implements Serializable {
           ctx.sh("helm package ../helm/$chartName --version $tag --dependency-update")
 
           ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
-          ctx.sh("helm chart save $chartName-${tag}.tgz $helmChartName")
-          ctx.sh("helm chart push $helmChartName")
+          ctx.sh("helm package $chartName-${tag}.tgz $helmChartName")
+          ctx.sh("helm push $helmChartName")
 
           ctx.deleteDir()
         }
@@ -172,7 +172,7 @@ class Helm implements Serializable {
           ctx.dir('helm-install') {
             def helmChartName = "$ctx.DOCKER_REGISTRY/$chartName:helm-$chartVersion"
             ctx.sh("helm registry login $ctx.DOCKER_REGISTRY --username $ctx.username --password $ctx.password")
-            ctx.sh("helm chart pull $helmChartName")
+            ctx.sh("helm pull $helmChartName")
             ctx.sh("helm chart export $helmChartName --destination .")
             String helmValuesFilePath = "$chartName/values.yaml"
 
