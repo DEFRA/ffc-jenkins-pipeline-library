@@ -140,7 +140,7 @@ class Helm implements Serializable {
 
           ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
           ctx.sh("ls")
-          def script = "helm push ./$chartName-${tag}​.tgz oci://$helmChartName"
+          def script = "helm push ./$chartName-${tag}​.tgz oci://nowhere"
           ctx.echo(script)
           ctx.sh(script)
 
