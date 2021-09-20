@@ -127,7 +127,7 @@ void call(Map config=[:]) {
       }
 
       if(hasHelmChart) {
-        if (pr != '') {
+        if (pr == '') {
           stage('Helm install') {
             helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
           }
