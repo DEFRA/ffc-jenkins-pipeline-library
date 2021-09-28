@@ -16,7 +16,7 @@ class Pact implements Serializable {
           def provider = pact.name.substring("$repoName-".length(), pact.name.indexOf(".json"))
           ctx.echo "Publishing ${pact.name} to broker"
           String u = ctx.pactUsername
-          String p = ctx.pactUserPassword
+          String p = ctx.pactPassword
           ctx.echo "u: ${u}"
           ctx.echo "p: ${p}"
           
