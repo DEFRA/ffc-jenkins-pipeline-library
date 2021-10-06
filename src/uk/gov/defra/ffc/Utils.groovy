@@ -124,14 +124,4 @@ class Utils implements Serializable {
       false
     }
   }
-
-  static def executeHelmCommand(ctx, command){
-
-    ctx.withCredentials([ctx.string(credentialsId: "slack-$channel-channel-webhook", variable: 'webHook')
-    ]) {
-
-      def script = "docker run -e SLACK_WEBHOOK=$ctx.webHook -e SLACK_MESSAGE=$msg -e SLACK_COLOR=$color technosophos/slack-notify:latest"
-      ctx.sh(returnStatus: true, script: script)
-    }
-  }
 }
