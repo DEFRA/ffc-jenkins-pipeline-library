@@ -18,8 +18,8 @@ class Pact implements Serializable {
 
           ctx.echo ctx.pactPassword
           ctx.echo ctx.PACT_BROKER_PASSWORD
-          ctx.sh 'echo $ctx.pactPassword'
-          ctx.sh 'echo $ctx.pactPassword'
+          ctx.sh "echo $ctx.pactPassword"
+          ctx.sh "echo $pactPassword"
           def password = ctx.pactPassword
           ctx.echo "$password"
           ctx.echo "$ctx.PACT_BROKER_PASSWORD"
