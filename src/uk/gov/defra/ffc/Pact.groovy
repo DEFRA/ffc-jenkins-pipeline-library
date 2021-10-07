@@ -21,6 +21,12 @@ class Pact implements Serializable {
           ctx.sh "echo $ctx.pactPassword"
           def password = ctx.pactPassword + '-'
           ctx.echo password
+
+          def passwordSplit = password.split('/')
+          for ( String values : passwordSplit ) {
+            ctx.echo values
+          }
+
           if (password == ctx.pactPassword) {
             ctx.echo "MATCH"
           } else {
