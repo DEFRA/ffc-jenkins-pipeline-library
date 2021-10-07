@@ -21,10 +21,10 @@ class Pact implements Serializable {
           ctx.echo "$ctx.pactPassword"
           ctx.echo "$ctx.PACT_BROKER_PASSWORD"
 
-          if ctx.pactPassword == '' {
+          if (ctx.pactPassword == '') {
             ctx.echo "ctx.pactPassword is empty..."
           }
-          if ctx.pactPassword == ctx.PACT_BROKER_PASSWORD {
+          if (ctx.pactPassword == ctx.PACT_BROKER_PASSWORD) {
             ctx.echo "Passwords are the same."
           } else {
             ctx.echo "Passwords are different!"
