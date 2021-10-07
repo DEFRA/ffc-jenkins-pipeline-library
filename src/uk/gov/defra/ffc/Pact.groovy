@@ -22,7 +22,7 @@ class Pact implements Serializable {
           def password = ctx.pactPassword + '-'
           ctx.echo password
 
-          def passwordSplit = password.split('/')
+          def passwordSplit = password.split('L')
           for ( String values : passwordSplit ) {
             ctx.echo values
           }
