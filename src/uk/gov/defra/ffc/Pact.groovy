@@ -16,10 +16,15 @@ class Pact implements Serializable {
           def provider = pact.name.substring("$repoName-".length(), pact.name.indexOf(".json"))
           ctx.echo "Publishing ${pact.name} to broker"
 
-          if $ctx.pactPassword == '' {
+          ctx.echo ctx.pactPassword
+          ctx.echo ctx.PACT_BROKER_PASSWORD
+          ctx.echo "$ctx.pactPassword"
+          ctx.echo "$ctx.PACT_BROKER_PASSWORD"
+
+          if ctx.pactPassword == '' {
             ctx.echo "ctx.pactPassword is empty..."
           }
-          if $ctx.pactPassword == $ctx.PACT_BROKER_PASSWORD {
+          if ctx.pactPassword == ctx.PACT_BROKER_PASSWORD {
             ctx.echo "Passwords are the same."
           } else {
             ctx.echo "Passwords are different!"
