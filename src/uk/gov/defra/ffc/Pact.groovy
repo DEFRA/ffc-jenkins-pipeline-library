@@ -19,7 +19,7 @@ class Pact implements Serializable {
           ctx.echo ctx.pactPassword
           ctx.echo ctx.PACT_BROKER_PASSWORD
           ctx.sh "echo $ctx.pactPassword"
-          def password = ctx.pactPassword
+          def password = ctx.pactPassword + '-'
           ctx.echo password
           if (password == ctx.pactPassword) {
             ctx.echo "MATCH"
@@ -28,7 +28,7 @@ class Pact implements Serializable {
           }
           ctx.echo "$ctx.PACT_BROKER_PASSWORD"
 
-          def script = "docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL -e PACT_BROKER_USERNAME=$ctx.PACT_BROKER_USERNAME -e PACT_BROKER_PASSWORD=$password pactfoundation/pact-cli:latest broker publish --consumer-app-version $version+$commitSha $pact --tag main"
+          def script = "docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL -e PACT_BROKER_USERNAME=$ctx.PACT_BROKER_USERNAME -e PACT_BROKER_PASSWORD=$ctx.PACT_BROKER_PASSWORD pactfoundation/pact-cli:latest broker publish --consumer-app-version $version+$commitSha $pact --tag main"
             ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.PactBrokerPublish.Context, description: GitHubStatus.PactBrokerPublish.Description) {
             ctx.sh(returnStatus: true, script: script)
           }
