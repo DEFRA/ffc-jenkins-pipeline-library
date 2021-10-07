@@ -50,19 +50,19 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      if(hasHelmChart) {
-        stage('Helm lint') {
-          test.lintHelm(repoName)
-        }
-      }
+      // if(hasHelmChart) {
+      //   stage('Helm lint') {
+      //     test.lintHelm(repoName)
+      //   }
+      // }
 
-      stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
-      }
+      // stage('npm audit') {
+      //   build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
+      // }
 
-      stage('Snyk test') {
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
-      }
+      // stage('Snyk test') {
+      //   build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
+      // }
 
       stage('Provision any required resources') {
         provision.createResources(environment, repoName, pr)
@@ -89,11 +89,11 @@ void call(Map config=[:]) {
           utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
 
-        if (pr == '') {
-          stage('Publish pact broker') {
-            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
-          }
+        // if (pr == '') {
+        stage('Publish pact broker') {
+          pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
         }
+        // }
       }
 
       stage('SonarCloud analysis') {
