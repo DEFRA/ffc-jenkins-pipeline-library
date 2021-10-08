@@ -16,37 +16,21 @@ class Pact implements Serializable {
           def provider = pact.name.substring("$repoName-".length(), pact.name.indexOf(".json"))
           ctx.echo "Publishing ${pact.name} to broker"
 
-          // Use PACT_BROKER_PASSWORD rather than pactPassword as it is being
-          // mangled and fails authenication. To prevent password from being
-          // logged, set +x to disable command logging.
-          // def script = '''
-          //   set +x && \
-          //   echo "Script start here." && \
-          //   echo \$(echo $pactPassword | sed 's/^.//') && \
-          //   echo \$(echo $pactUsername | sed 's/^.//') && \
-          //   docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
-          //   -e PACT_BROKER_BASE_URL=\$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
-          //   -e PACT_BROKER_PASSWORD="\$PACT_BROKER_PASSWORD" pactfoundation/pact-cli:latest \
-          //   broker publish --consumer-app-version \
-          //   ''' + version + '''+''' + commitSha + ''' ''' + pact + ''' --tag main
-          //   '''
-
-          def script = """
-            docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
-            -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL -e PACT_BROKER_USERNAME=$ctx.pactUsername \
-            -e PACT_BROKER_PASSWORD="$ctx.pactPassword" pactfoundation/pact-cli:latest \
-            broker publish --consumer-app-version $version+$commitSha $pact --tag main
-            """
+          def script = '''
+            -e PACT_BROKER_BASE_URL=\$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
+            -e PACT_BROKER_PASSWORD=$pactUsername pactfoundation/pact-cli:latest \
+            broker publish --consumer-app-version \
+            ''' + version + '''+''' + commitSha + ''' ''' + pact + ''' --tag main
+            '''
 
             ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.PactBrokerPublish.Context, description: GitHubStatus.PactBrokerPublish.Description) {
-            def output = ctx.sh(returnStatus: true, script: script)
-            ctx.echo "output from command: $output"
+              def output = ctx.sh(returnStatus: true, script: script)
 
-            if (output == 0) {
-              ctx.echo("Pacts published successfully.")
-            } else {
-              ctx.error("Error occurred during publishing of pacts, please check the log for further details.")
-            }
+              if (output == 0) {
+                ctx.echo("Pacts published successfully.")
+              } else {
+                ctx.error("Error occurred during publishing of pacts, please check the log for further details.")
+              }
           }
         }
       }
