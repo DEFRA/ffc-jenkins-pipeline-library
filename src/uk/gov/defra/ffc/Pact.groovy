@@ -41,6 +41,11 @@ class Pact implements Serializable {
             def output = ctx.sh(returnStatus: true, script: script)
             ctx.echo "output from command: $output"
             // output = 2 when successful
+            if (output == 1) {
+              ctx.error("Error occurred during publishing of pacts.")
+            } else {
+              ctx.echo("Pacts published successfully.")
+            }
           }
         }
       }
