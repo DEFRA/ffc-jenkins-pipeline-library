@@ -37,7 +37,7 @@ class Pact implements Serializable {
           ctx.echo 'pactuser01'
 
           def script = """
-            pbpassword=$(echo $pactPassword | base64 --decode)
+            pbpassword=\$(echo $pactPassword | base64 --decode)
             echo $pbpassword
             docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
             -e PACT_BROKER_BASE_URL=$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
