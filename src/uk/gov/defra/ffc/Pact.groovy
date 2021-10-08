@@ -16,10 +16,14 @@ class Pact implements Serializable {
           def provider = pact.name.substring("$repoName-".length(), pact.name.indexOf(".json"))
           ctx.echo "Publishing ${pact.name} to broker"
 
+          // Use PACT_BROKER_PASSWORD rather than pactPassword as it is being
+          // mangled and fails authenication. To prevent password from being
+          // logged, set +x to disable command logging.
           def script = '''
+            set +x \
             docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
             -e PACT_BROKER_BASE_URL=\$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
-            -e PACT_BROKER_PASSWORD="$pactPassword" pactfoundation/pact-cli:latest \
+            -e PACT_BROKER_PASSWORD=\$PACT_BROKER_PASSWORD" pactfoundation/pact-cli:latest \
             broker publish --consumer-app-version \
             ''' + version + '''+''' + commitSha + ''' ''' + pact + ''' --tag main
             '''
