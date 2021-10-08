@@ -19,21 +19,23 @@ class Pact implements Serializable {
           // Use PACT_BROKER_PASSWORD rather than pactPassword as it is being
           // mangled and fails authenication. To prevent password from being
           // logged, set +x to disable command logging.
-          // def script = '''
+          def script = '''
+            set +x \
+            echo $pactPassword | sed 's/^.//' \
+            echo $pactUsername | sed 's/^.//' \
+            docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
+            -e PACT_BROKER_BASE_URL=\$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
+            -e PACT_BROKER_PASSWORD="\$PACT_BROKER_PASSWORD" pactfoundation/pact-cli:latest \
+            broker publish --consumer-app-version \
+            ''' + version + '''+''' + commitSha + ''' ''' + pact + ''' --tag main
+            '''
+          // def script = """
           //   set +x \
           //   docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
-          //   -e PACT_BROKER_BASE_URL=\$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
-          //   -e PACT_BROKER_PASSWORD="\$PACT_BROKER_PASSWORD" pactfoundation/pact-cli:latest \
-          //   broker publish --consumer-app-version \
-          //   ''' + version + '''+''' + commitSha + ''' ''' + pact + ''' --tag main
-          //   '''
-          def script = """
-            set +x \
-            docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
-            -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL -e PACT_BROKER_USERNAME=$ctx.pactUsername \
-            -e PACT_BROKER_PASSWORD="$ctx.PACT_BROKER_PASSWORD" pactfoundation/pact-cli:latest \
-            broker publish --consumer-app-version $version+$commitSha $pact --tag main
-            """
+          //   -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL -e PACT_BROKER_USERNAME=$ctx.pactUsername \
+          //   -e PACT_BROKER_PASSWORD="$ctx.PACT_BROKER_PASSWORD" pactfoundation/pact-cli:latest \
+          //   broker publish --consumer-app-version $version+$commitSha $pact --tag main
+          //   """
 
             ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.PactBrokerPublish.Context, description: GitHubStatus.PactBrokerPublish.Description) {
             def output = ctx.sh(returnStatus: true, script: script)
