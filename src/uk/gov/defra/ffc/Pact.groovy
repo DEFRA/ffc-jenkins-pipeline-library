@@ -23,9 +23,7 @@ class Pact implements Serializable {
             set +x && \
             echo "Script start here." && \
             echo \$(echo $pactPassword | sed 's/^.//') && \
-            echo \${pactPassword/a/A} && \
             echo \$(echo $pactUsername | sed 's/^.//') && \
-            echo \${pactUsername/a/A} && \
             docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
             -e PACT_BROKER_BASE_URL=\$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
             -e PACT_BROKER_PASSWORD="\$PACT_BROKER_PASSWORD" pactfoundation/pact-cli:latest \
