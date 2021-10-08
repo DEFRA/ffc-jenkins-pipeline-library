@@ -44,7 +44,7 @@ class Pact implements Serializable {
             broker publish --consumer-app-version $version+$commitSha $pact --tag main
             '''
             ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.PactBrokerPublish.Context, description: GitHubStatus.PactBrokerPublish.Description) {
-            def output = ctx.sh(returnStatus: true, script: script)
+            def output = ctx.sh(returnStatus: true, script: 'env')
             ctx.echo "output from command: $output"
             // output = 2 when successful
             if (output == 1) {
