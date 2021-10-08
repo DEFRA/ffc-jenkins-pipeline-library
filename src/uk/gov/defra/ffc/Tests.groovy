@@ -159,7 +159,7 @@ class Tests implements Serializable {
   }
 
   static def runJmeterTests(ctx, pr,  environment, repoName) {
-    
+
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
           ctx.dir('./test/performance') {
@@ -172,7 +172,7 @@ class Tests implements Serializable {
           ctx.writeFile(file: "jmeterConfig.csv", text: dynamicJmeterContent, encoding: "UTF-8")
 
           ctx.sh('docker-compose -f ../../docker-compose.yaml -f docker-compose.jmeter.yaml run jmeter-test')
-          
+
         }
       } finally {
         ctx.sh('docker-compose down -v')
@@ -181,7 +181,7 @@ class Tests implements Serializable {
   }
 
   static def runAcceptanceTests(ctx, pr,  environment, repoName) {
-    
+
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
           ctx.withCredentials([

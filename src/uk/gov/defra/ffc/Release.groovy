@@ -12,7 +12,7 @@ class Release implements Serializable {
    * - the repository name to check
    * - the GitHub connection token secret text
    */
-  private static def exists(ctx, versionTag, repoName, token){
+  private static def exists(ctx, versionTag, repoName, token) {
     try {
       return ctx.sh(returnStdout: true, script: "curl -s -H 'Authorization: token $token' https://api.github.com/repos/DEFRA/$repoName/releases/tags/$versionTag | jq '.tag_name'").trim().replaceAll (/"/, '') == versionTag ? true : false
     }
@@ -46,8 +46,7 @@ class Release implements Serializable {
     }
   }
 
-  static def trigger(ctx, versionTag, repoName, releaseDescription, token){
-   
+  static def trigger(ctx, versionTag, repoName, releaseDescription, token) {
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo("Release $versionTag already exists")
       return false
