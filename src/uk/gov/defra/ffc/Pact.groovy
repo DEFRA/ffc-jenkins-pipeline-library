@@ -20,12 +20,12 @@ class Pact implements Serializable {
           // mangled and fails authenication. To prevent password from being
           // logged, set +x to disable command logging.
           def script = '''
-            set +x \
-            echo "Script start here." \
-            echo \$(echo $pactPassword | sed 's/^.//') \
-            echo \${pactPassword/a/A}
-            echo \$(echo $pactUsername | sed 's/^.//') \
-            echo \${pactUsername/a/A}
+            set +x && \
+            echo "Script start here." && \
+            echo \$(echo $pactPassword | sed 's/^.//') && \
+            echo \${pactPassword/a/A} && \
+            echo \$(echo $pactUsername | sed 's/^.//') && \
+            echo \${pactUsername/a/A} && \
             docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
             -e PACT_BROKER_BASE_URL=\$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
             -e PACT_BROKER_PASSWORD="\$PACT_BROKER_PASSWORD" pactfoundation/pact-cli:latest \
@@ -44,10 +44,10 @@ class Pact implements Serializable {
             def output = ctx.sh(returnStatus: true, script: script)
             ctx.echo "output from command: $output"
 
-            if (output == 1) {
-              ctx.error("Error occurred during publishing of pacts, please check the log for further details.")
-            } else {
+            if (output == 0) {
               ctx.echo("Pacts published successfully.")
+            } else {
+              ctx.error("Error occurred during publishing of pacts, please check the log for further details.")
             }
           }
         }
