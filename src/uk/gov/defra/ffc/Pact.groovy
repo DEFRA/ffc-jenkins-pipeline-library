@@ -17,8 +17,9 @@ class Pact implements Serializable {
           ctx.echo "Publishing ${pact.name} to broker"
 
           def script = '''
+            docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
             -e PACT_BROKER_BASE_URL=\$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
-            -e PACT_BROKER_PASSWORD=$pactUsername pactfoundation/pact-cli:latest \
+            -e PACT_BROKER_PASSWORD=$pactPassword pactfoundation/pact-cli:latest \
             broker publish --consumer-app-version \
             ''' + version + '''+''' + commitSha + ''' ''' + pact + ''' --tag main
             '''
