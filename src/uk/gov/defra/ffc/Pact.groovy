@@ -36,13 +36,13 @@ class Pact implements Serializable {
           ctx.echo "pactuser01"
           ctx.echo 'pactuser01'
 
-          def script = "docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL -e PACT_BROKER_USERNAME=$ctx.PACT_BROKER_USERNAME -e PACT_BROKER_PASSWORD=$ctx.pactPassword pactfoundation/pact-cli:latest broker publish --consumer-app-version $version+$commitSha $pact --tag main"
+          def script = 'docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false -e PACT_BROKER_BASE_URL=$ctx.PACT_BROKER_URL -e PACT_BROKER_USERNAME=$ctx.PACT_BROKER_USERNAME -e PACT_BROKER_PASSWORD=$ctx.PACT_BROKER_PASSWORD pactfoundation/pact-cli:latest broker publish --consumer-app-version $version+$commitSha $pact --tag main'
             ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.PactBrokerPublish.Context, description: GitHubStatus.PactBrokerPublish.Description) {
             def output = ctx.sh(returnStatus: true, script: script)
             ctx.echo "output from command: $output"
             // output = 2 when successful
             if (output == 1) {
-              ctx.error("Error occurred during publishing of pacts.")
+              ctx.error("Error occurred during publishing of pacts, pleaes check the log for further details.")
             } else {
               ctx.echo("Pacts published successfully.")
             }
