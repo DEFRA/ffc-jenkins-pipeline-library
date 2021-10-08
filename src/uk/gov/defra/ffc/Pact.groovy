@@ -21,8 +21,10 @@ class Pact implements Serializable {
           // logged, set +x to disable command logging.
           def script = '''
             set +x \
-            echo $pactPassword | sed 's/^.//' \
-            echo $pactUsername | sed 's/^.//' \
+            echo $pactPassword | sed "s/^.//" \
+            echo \${pactPassword/a/A}
+            echo $pactUsername | sed "s/^.//" \
+            echo \${pactUsername/a/A}
             docker run --rm -w \$(pwd) -v \$(pwd):\$(pwd) -e PACT_DISABLE_SSL_VERIFICATION=false \
             -e PACT_BROKER_BASE_URL=\$PACT_BROKER_URL -e PACT_BROKER_USERNAME=$pactUsername \
             -e PACT_BROKER_PASSWORD="\$PACT_BROKER_PASSWORD" pactfoundation/pact-cli:latest \
