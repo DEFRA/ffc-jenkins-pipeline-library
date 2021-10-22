@@ -44,6 +44,6 @@ void runZapScan(String projectName, String buildNumber, String tag) {
   Tests.runZapScan(this, projectName, buildNumber, tag)
 }
 
-void runAccessibility(String projectName, String buildNumber, String tag, String accessibilityTestType) {
-  Tests.runAccessibility(this, projectName, buildNumber, tag, accessibilityTestType)
+void runAccessibilityTests(String projectName, String buildNumber, String tag, String accessibilityTestType) {
+  Tests.runAccessibilityTests(this, projectName, buildNumber, tag, accessibilityTestType)
 }
