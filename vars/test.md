@@ -123,6 +123,23 @@ Example usage:
 test.runAcceptanceTests(74)
 ```
 
+## runAccessibility
+
+Executes AXE or Pa11y accessibility tests if a corresponding Docker Compose
+file is found within the repo.
+
+Takes four parameters:
+- project name, e.g. `ffc-demo-web`
+- build number
+- container image tag
+- type of accessibility test i.e. `pa11y` or `axe`
+
+Example usage:
+
+```
+test.runAccessibility('ffc-demo-web', BUILD_NUMBER, 'pr99', 'pa11y')
+```
+
 ## runZapScan
 
 Checks for the existence of `docker-compose.zap.yaml` file in the root of the
