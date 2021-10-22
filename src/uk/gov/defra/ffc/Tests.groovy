@@ -38,7 +38,7 @@ class Tests implements Serializable {
 
   static def runAccessibility(ctx, projectName, buildNumber, tag, accessibilityTestType) {
     def dockerComposeFile = "docker-compose.${accessibilityTestType}.yaml"
-      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.Accessibility.Contexts[accessibilityTestType], description: GitHubStatus.Accessibility.Description) {
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAccessibilityTests.Contexts[accessibilityTestType], description: GitHubStatus.RunAccessibilityTests.Description) {
         try {
           ctx.sh('mkdir -p -m 666 test-output')
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $dockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ $accessibilityTestType")

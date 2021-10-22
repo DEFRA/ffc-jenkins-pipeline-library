@@ -42,6 +42,11 @@ class GitHubStatus implements Serializable {
     static final Description = 'Run acceptance tests'
   }
 
+  class RunAccessibilityTests {
+    static final Contexts = [pa11y: "${BASECTX}pa11y-version", axe: "${BASECTX}axe-version"]
+    static final Description = 'Run accessibility tests'
+  }
+
   class RunPerformanceTests {
     static final Context = "${BASECTX}run-performance-tests"
     static final Description = 'Run performance tests'
@@ -70,10 +75,5 @@ class GitHubStatus implements Serializable {
   class ZapScan {
     static final Context = "${BASECTX}zap-version"
     static final Description = 'Zap scan'
-  }
-
-  class Accessibility {
-    static final Contexts = [pa11y: "${BASECTX}pa11y-version", axe: "${BASECTX}axe-version"]
-    static final Description = 'Accessibility tests'
   }
 }
