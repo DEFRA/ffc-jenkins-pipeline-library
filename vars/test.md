@@ -123,7 +123,7 @@ Example usage:
 test.runAcceptanceTests(74)
 ```
 
-## runAccessibility
+## runAccessibilityTests
 
 Executes AXE or Pa11y accessibility tests if a corresponding Docker Compose
 file is found within the repo.
@@ -137,7 +137,7 @@ Takes four parameters:
 Example usage:
 
 ```
-test.runAccessibility('ffc-demo-web', BUILD_NUMBER, 'pr99', 'pa11y')
+test.runAccessibilityTests('ffc-demo-web', BUILD_NUMBER, 'pr99', 'pa11y')
 ```
 
 ## runZapScan
