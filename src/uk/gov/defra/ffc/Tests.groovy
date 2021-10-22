@@ -160,7 +160,7 @@ class Tests implements Serializable {
 
   static def runJmeterTests(ctx, pr,  environment, repoName) {
 
-      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunPerformanceTests.Context, description: GitHubStatus.RunPerformanceTests.Description) {
         try {
           ctx.dir('./test/performance') {
           ctx.sh('mkdir -p -m 777 html-reports')
