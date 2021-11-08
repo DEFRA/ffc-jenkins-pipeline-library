@@ -185,19 +185,20 @@ class Tests implements Serializable {
           ctx.withCredentials([
             ctx.usernamePassword(credentialsId: 'browserstack-credentials', usernameVariable: 'browserStackUsername', passwordVariable: 'browserStackAccessToken')
           ]) {
+            def envVars = Provision.getBuildQueueEnvVars(ctx, repoName, pr, environment)
+            envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
+            envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
+            def url = buildUrl(ctx, pr, environment, repoName)
+            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
+            ctx.echo("$envVars")
+
             ctx.dir('./test/acceptance') {
             ctx.sh('mkdir -p -m 777 html-reports')
 
-            def url = buildUrl(ctx, pr,  environment, repoName)
-            def envVars = []
-
-            envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
-            envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
-            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
-
             ctx.withEnv(envVars) {
-            ctx.sh('docker-compose -f docker-compose.yaml build')
-            ctx.sh('docker-compose run wdio-cucumber')
+              // ctx.sh('docker-compose -f docker-compose.yaml build')
+              // ctx.sh('docker-compose run wdio-cucumber')
+              ctx.sh('docker-compose up --build')
             }
           }
         }
