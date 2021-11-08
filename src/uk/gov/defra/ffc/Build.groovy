@@ -14,8 +14,6 @@ class Build implements Serializable {
     if (pr) {
       ctx.echo("Building PR$pr")
       ctx.env.PR_BUILD = true
-      ctx.echo(ctx.env)
-      ctx.echo(ctx.env.PR_BUILD)
     } else if (ctx.BRANCH_NAME == defaultBranch) {
       ctx.echo('Building main branch')
     } else {
