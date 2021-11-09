@@ -132,7 +132,7 @@ class Provision implements Serializable {
     return "$repoName-pr$pr-$queueName"
   }
 
-  static def getBuildQueueEnvVars(ctx, repoName, pr, environment) {
+  static def getMessageQueueCreds(ctx) {
     // There is a single set of keys for the message queue host (as there is
     // only one). The keys are set to the `dev` env. If the PR env was to use a
     // different message queue host it would be checked here and
@@ -148,6 +148,14 @@ class Provision implements Serializable {
     ]
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
     def envVars = []
+    envVars.push("MESSAGE_QUEUE_HOST=${appConfigValues[messageQueueHost]}")
+    envVars.push("MESSAGE_QUEUE_PASSWORD=${escapeQuotes(appConfigValues[messageQueuePassword])}")
+    envVars.push("MESSAGE_QUEUE_USER=${appConfigValues[messageQueueUser]}")
+    return envVars
+  }
+
+  static def getBuildQueueEnvVars(ctx, repoName, pr, environment) {
+    def envVars = getMessageQueueCreds(ctx)
 
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
@@ -160,9 +168,6 @@ class Provision implements Serializable {
         envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
       }
     }
-    envVars.push("MESSAGE_QUEUE_HOST=${appConfigValues[messageQueueHost]}")
-    envVars.push("MESSAGE_QUEUE_PASSWORD=${escapeQuotes(appConfigValues[messageQueuePassword])}")
-    envVars.push("MESSAGE_QUEUE_USER=${appConfigValues[messageQueueUser]}")
     return envVars
   }
 
