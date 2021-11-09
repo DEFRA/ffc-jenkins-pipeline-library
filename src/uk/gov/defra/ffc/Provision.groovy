@@ -132,7 +132,7 @@ class Provision implements Serializable {
     return "$repoName-pr$pr-$queueName"
   }
 
-  static def getMessageQueueCreds(ctx) {
+  private static def getMessageQueueCreds(ctx) {
     // There is a single set of keys for the message queue host (as there is
     // only one). The keys are set to the `dev` env. If the PR env was to use a
     // different message queue host it would be checked here and
@@ -154,18 +154,62 @@ class Provision implements Serializable {
     return envVars
   }
 
-  static def getBuildQueueEnvVars(ctx, repoName, pr, environment) {
+  static def getBuildQueueEnvVars(ctx, repoName, pr) {
+    // def envVars = getMessageQueueCreds(ctx)
+
+    // if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+    //   def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
+    //   queues.each {
+    //     envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+    //   }
+    //   def topics = readManifest(ctx, azureProvisionConfigFile, 'topics')
+    //   topics.each {
+    //     envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+    //     envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+    //   }
+    // }
+    // return envVars
+    return getQueueEnvVars(ctx, repoName, pr, 'build')
+  }
+
+  static def getPrQueueEnvVars(ctx, repoName, pr) {
+    // def envVars = getMessageQueueCreds(ctx)
+
+    // if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+    //   def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
+    //   queues.each {
+    //     envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getPrQueueName(repoName, pr, it)}")
+    //   }
+    //   def topics = readManifest(ctx, azureProvisionConfigFile, 'topics')
+    //   topics.each {
+    //     envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getPrQueueName(repoName, pr, it)}")
+    //     envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getPrQueueName(repoName, pr, it)}")
+    //   }
+    // }
+    return getQueueEnvVars(ctx, repoName, pr, 'pr')
+  }
+
+  private static def getQueueEnvVars(ctx, repoName, pr, queueType) {
     def envVars = getMessageQueueCreds(ctx)
 
-    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+    if (hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
       queues.each {
-        envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+        if (queueType == 'pr') {
+          envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getPrQueueName(repoName, pr, it)}")
+        } else if (queueType == 'build') {
+          envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+        }
       }
       def topics = readManifest(ctx, azureProvisionConfigFile, 'topics')
       topics.each {
-        envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
-        envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+        if (queueType == 'pr') {
+          envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getPrQueueName(repoName, pr, it)}")
+          envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getPrQueueName(repoName, pr, it)}")
+        } else if (queueType == 'build') {
+          envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+          envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+        }
       }
     }
     return envVars
