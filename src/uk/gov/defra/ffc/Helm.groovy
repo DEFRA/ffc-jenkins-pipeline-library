@@ -41,6 +41,10 @@ class Helm implements Serializable {
   static def deployChart(ctx, environment, registry, chartName, tag, pr) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.DeployChart.Context, description: GitHubStatus.DeployChart.Description) {
       ctx.withKubeConfig([credentialsId: "kubeconfig-$environment"]) {
+
+        def script = "docker run -e KUBECONFIG='/root/.kube/config:/root/.kube/some-other-context.yaml' --rm -v \$(pwd):/apps -w /apps -v ~/.kube:/root/.kube -v ~/.helm:/root/.helm -v ~/.config/helm:/root/.config/helm -v ~/.cache/helm:/root/.cache/helm alpine/helm:3.6.0 list"
+        ctx.sh(returnStatus: true, script: script)
+
         String helmValuesFilePath = "helm/$chartName/values.yaml"
         def deploymentName = "$chartName-$tag"
         def extraCommands = getExtraCommands(tag)
