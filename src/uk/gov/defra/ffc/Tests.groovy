@@ -11,7 +11,7 @@ class Tests implements Serializable {
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml run database-up")
         }
-        ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr, environment)) {
+        ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr)) {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
         }
       } finally {
@@ -185,19 +185,18 @@ class Tests implements Serializable {
           ctx.withCredentials([
             ctx.usernamePassword(credentialsId: 'browserstack-credentials', usernameVariable: 'browserStackUsername', passwordVariable: 'browserStackAccessToken')
           ]) {
+            def envVars = Provision.getPrQueueEnvVars(ctx, repoName, pr)
+            envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
+            envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
+            def url = buildUrl(ctx, pr, environment, repoName)
+            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
+
             ctx.dir('./test/acceptance') {
             ctx.sh('mkdir -p -m 777 html-reports')
 
-            def url = buildUrl(ctx, pr,  environment, repoName)
-            def envVars = []
-
-            envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
-            envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
-            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
-
             ctx.withEnv(envVars) {
-            ctx.sh('docker-compose -f docker-compose.yaml build')
-            ctx.sh('docker-compose run wdio-cucumber')
+              // Intentionally use `docker-compose.yaml` only
+              ctx.sh('docker-compose -f docker-compose.yaml up --build')
             }
           }
         }

@@ -13,6 +13,7 @@ class Build implements Serializable {
   private static def verifyCommitBuildable(ctx, pr, defaultBranch) {
     if (pr) {
       ctx.echo("Building PR$pr")
+      ctx.env.PR_BUILD = true
     } else if (ctx.BRANCH_NAME == defaultBranch) {
       ctx.echo('Building main branch')
     } else {
@@ -90,7 +91,7 @@ class Build implements Serializable {
     failOnIssues = shouldFailOnIssues(failOnIssues, pr)
     organisation = organisation ?: ctx.SNYK_ORG
     severity = severity ?: 'medium'
-    
+
     ctx.sh('mkdir -p -m 777 snyk-cli')
     ctx.dir('snyk-cli') {
       ctx.withCredentials([ctx.string(credentialsId: 'ffc-snyk-token', variable: 'snykToken')
