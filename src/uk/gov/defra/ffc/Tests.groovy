@@ -185,35 +185,16 @@ class Tests implements Serializable {
           ctx.withCredentials([
             ctx.usernamePassword(credentialsId: 'browserstack-credentials', usernameVariable: 'browserStackUsername', passwordVariable: 'browserStackAccessToken')
           ]) {
-            // TODO: env vars for queues are those used by the tests rather than those used by the application
-            // NOTE: Get queue env vars used by app
-            // def configDict = Provision.getProvisionedQueueConfigValues(ctx, repoName, pr)
-            // ctx.echo("CONFIG VALUES (in dict): $configDict")
-
-            // def configArray = []
-            // configDict.each {
-            //   configArray.push("")
-            // }
-            // def values = configDict.values()
-            // ctx.echo("CONFIG VALUES (in array): $values")
-
             def envVars = Provision.getPrQueueEnvVars(ctx, repoName, pr)
-            ctx.echo("MESSAGE QUEUE CREDS: $envVars")
-
-            // def envVars = Provision.getBuildQueueEnvVars(ctx, repoName, pr, environment)
-            // def envVars = configDict.values() + messageQueueCreds
             envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
             envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
             def url = buildUrl(ctx, pr, environment, repoName)
             envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
-            ctx.echo("$envVars")
 
             ctx.dir('./test/acceptance') {
             ctx.sh('mkdir -p -m 777 html-reports')
 
             ctx.withEnv(envVars) {
-              // ctx.sh('docker-compose -f docker-compose.yaml build')
-              // ctx.sh('docker-compose run wdio-cucumber')
               ctx.sh('docker-compose up --build')
             }
           }

@@ -155,37 +155,10 @@ class Provision implements Serializable {
   }
 
   static def getBuildQueueEnvVars(ctx, repoName, pr) {
-    // def envVars = getMessageQueueCreds(ctx)
-
-    // if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
-    //   def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
-    //   queues.each {
-    //     envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
-    //   }
-    //   def topics = readManifest(ctx, azureProvisionConfigFile, 'topics')
-    //   topics.each {
-    //     envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
-    //     envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
-    //   }
-    // }
-    // return envVars
     return getQueueEnvVars(ctx, repoName, pr, 'build')
   }
 
   static def getPrQueueEnvVars(ctx, repoName, pr) {
-    // def envVars = getMessageQueueCreds(ctx)
-
-    // if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
-    //   def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
-    //   queues.each {
-    //     envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getPrQueueName(repoName, pr, it)}")
-    //   }
-    //   def topics = readManifest(ctx, azureProvisionConfigFile, 'topics')
-    //   topics.each {
-    //     envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getPrQueueName(repoName, pr, it)}")
-    //     envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getPrQueueName(repoName, pr, it)}")
-    //   }
-    // }
     return getQueueEnvVars(ctx, repoName, pr, 'pr')
   }
 
