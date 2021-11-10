@@ -195,7 +195,8 @@ class Tests implements Serializable {
             ctx.sh('mkdir -p -m 777 html-reports')
 
             ctx.withEnv(envVars) {
-              ctx.sh('docker-compose up --build')
+              // Intentionally use `docker-compose.yaml` only
+              ctx.sh('docker-compose -f docker-compose.yaml up --build')
             }
           }
         }
