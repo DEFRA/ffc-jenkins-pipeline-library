@@ -11,6 +11,11 @@ Returns the project version from the `[projectName].csproj` file. It requires
 the project name to be passed as a parameter, but this means that in a solution
 of several projects, versions can be retrieved for each of them.
 
+## getCSTargetFramework
+
+Returns the target framework from the `[projectName].csproj` file. It requires
+the project name to be passed as a parameter, but this means that in a solution
+of several projects, target frameworks can be retrieved for each of them.
 
 ## verifyCSProjIncremented
 

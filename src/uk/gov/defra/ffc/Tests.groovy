@@ -2,6 +2,7 @@ package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.GitHubStatus
 import uk.gov.defra.ffc.Utils
+import uk.gov.defra.ffc.Version
 
 class Tests implements Serializable {
   static def runTests(ctx, projectName, serviceName, buildNumber, tag, pr, environment) {
@@ -84,7 +85,7 @@ class Tests implements Serializable {
     }
   }
 
-  static def analyseDotNetCode(ctx, params) {
+  static def analyseDotNetCode(ctx, projectName, params) {
     ctx.withCredentials([
       ctx.string(credentialsId: 'sonarcloud-token', variable: 'token'),
     ]) {
@@ -92,7 +93,18 @@ class Tests implements Serializable {
       params.each { param ->
         args = args + " -e $param.key=$param.value"
       }
+      String imageTag = getDotNetSonarImageVersion(ctx, projectName)
       ctx.sh("docker run -v \$(pwd)/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar:1.2.3-dotnet3.1")
+    }
+  }
+
+  static String getDotNetSonarImageVersion(ctx, projectName) {
+    String targetFramework = Version.getCSTargetFramework(ctx, projectName)
+    switch(targetFramework) {
+      case "netcoreapp3.1":
+        return "1.2.3-dotnet3.1"
+      case "net6.0":
+        return "1.3.0-dotnet6.0"
     }
   }
 

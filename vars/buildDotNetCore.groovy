@@ -89,7 +89,7 @@ void call(Map config=[:]) {
       }
 
       stage('SonarCloud analysis') {
-        test.analyseDotNetCode(repoName, BRANCH_NAME, defaultBranch, pr)
+        test.analyseDotNetCode(repoName, config.project, BRANCH_NAME, defaultBranch, pr)
       }
 
       if (config.containsKey('testClosure')) {
