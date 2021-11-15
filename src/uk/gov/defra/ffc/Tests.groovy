@@ -207,8 +207,9 @@ class Tests implements Serializable {
             ctx.sh('mkdir -p -m 777 html-reports')
 
             ctx.withEnv(envVars) {
-              // Intentionally use `docker-compose.yaml` only
-              ctx.sh('docker-compose -f docker-compose.yaml up --build')
+              // Intentionally only use `docker-compose.yaml`. Abort on
+              // container exit ensures exit code is returned from `sh` step.
+              ctx.sh('docker-compose -f docker-compose.yaml up --build --abort-on-container-exit')
             }
           }
         }
