@@ -59,19 +59,19 @@ void call(Map config=[:]) {
         config['buildClosure']()
       }
 
-      if (fileExists('./docker-compose.test.yaml')) {
-        stage('run test image') {
-          build.runTestImage()
-        }
 
-        stage('Create JUnit report') {
-          test.createJUnitReport()
-        }
-
-        stage('Fix lcov report') {
-          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-        }
+      stage('run test image') {
+        build.runTestImage()
       }
+
+      stage('Create JUnit report') {
+        test.createJUnitReport()
+      }
+
+      stage('Fix lcov report') {
+        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      }
+
 
       stage('SonarCloud analysis') {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
