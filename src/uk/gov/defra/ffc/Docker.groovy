@@ -3,10 +3,8 @@ package uk.gov.defra.ffc
 class Docker implements Serializable {
 
   static def runTestImage(ctx) {
-    ctx.withCredentials([
-      ctx.string(credentialsId: 'npm-publish-token', variable: 'token')
-    ]) {
-      ctx.sh("docker run --rm -v \$(pwd)/:/tmp/ffc-pay-event defradigital/node-development:1.2.11-node16.13.0 /bin/sh -c 'cd /tmp/ffc-pay-event; npm install; npm test'")
+    ctx.withCredentials() {
+      ctx.sh("docker run --rm -v \$(pwd)/:/node/home/project defradigital/node-development:1.2.11-node16.13.0 /bin/sh -c 'cd /tmp/ffc-pay-event; npm install; npm test'")
     }
   }
 
