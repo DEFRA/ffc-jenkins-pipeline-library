@@ -2,6 +2,7 @@ package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.GitHubStatus
 import uk.gov.defra.ffc.Utils
+import uk.gov.defra.ffc.Version
 
 class Tests implements Serializable {
   static def runTests(ctx, projectName, serviceName, buildNumber, tag, pr, environment) {
@@ -11,7 +12,7 @@ class Tests implements Serializable {
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml run database-up")
         }
-        ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr, environment)) {
+        ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr)) {
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
         }
       } finally {
@@ -36,9 +37,9 @@ class Tests implements Serializable {
       }
   }
 
-  static def runAccessibility(ctx, projectName, buildNumber, tag, accessibilityTestType) {
+  static def runAccessibilityTests(ctx, projectName, buildNumber, tag, accessibilityTestType) {
     def dockerComposeFile = "docker-compose.${accessibilityTestType}.yaml"
-      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.Accessibility.Contexts[accessibilityTestType], description: GitHubStatus.Accessibility.Description) {
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAccessibilityTests.Contexts[accessibilityTestType], description: GitHubStatus.RunAccessibilityTests.Description) {
         try {
           ctx.sh('mkdir -p -m 666 test-output')
           ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $dockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ $accessibilityTestType")
@@ -84,7 +85,7 @@ class Tests implements Serializable {
     }
   }
 
-  static def analyseDotNetCode(ctx, params) {
+  static def analyseDotNetCode(ctx, projectName, params) {
     ctx.withCredentials([
       ctx.string(credentialsId: 'sonarcloud-token', variable: 'token'),
     ]) {
@@ -92,7 +93,18 @@ class Tests implements Serializable {
       params.each { param ->
         args = args + " -e $param.key=$param.value"
       }
-      ctx.sh("docker run -v \$(pwd)/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar:latest")
+      String imageTag = getDotNetSonarImageVersion(ctx, projectName)
+      ctx.sh("docker run -v \$(pwd)/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar:1.2.3-dotnet3.1")
+    }
+  }
+
+  static String getDotNetSonarImageVersion(ctx, projectName) {
+    String targetFramework = Version.getCSTargetFramework(ctx, projectName)
+    switch(targetFramework) {
+      case "netcoreapp3.1":
+        return "1.2.3-dotnet3.1"
+      case "net6.0":
+        return "1.3.0-dotnet6.0"
     }
   }
 
@@ -153,14 +165,13 @@ class Tests implements Serializable {
     def serverConfig = Utils.getConfigValues(ctx, searchKeys,  appConfigPrefix, Utils.defaultNullLabel, false)
     def endpoint = endpointConfig['ingress.endpoint'].trim()
     def domain = serverConfig['ingress.server'].trim()
-    def hostname = pr == '' ? endpoint : "${endpoint}-pr${pr}"
+    def hostname = pr == '' ? endpoint : "${repoName}-pr${pr}"
 
     return "${hostname}.${domain}"
   }
 
   static def runJmeterTests(ctx, pr,  environment, repoName) {
-    
-      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunPerformanceTests.Context, description: GitHubStatus.RunPerformanceTests.Description) {
         try {
           ctx.dir('./test/performance') {
           ctx.sh('mkdir -p -m 777 html-reports')
@@ -172,7 +183,7 @@ class Tests implements Serializable {
           ctx.writeFile(file: "jmeterConfig.csv", text: dynamicJmeterContent, encoding: "UTF-8")
 
           ctx.sh('docker-compose -f ../../docker-compose.yaml -f docker-compose.jmeter.yaml run jmeter-test')
-          
+
         }
       } finally {
         ctx.sh('docker-compose down -v')
@@ -181,25 +192,24 @@ class Tests implements Serializable {
   }
 
   static def runAcceptanceTests(ctx, pr,  environment, repoName) {
-    
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAcceptanceTests.Context, description: GitHubStatus.RunAcceptanceTests.Description) {
         try {
           ctx.withCredentials([
             ctx.usernamePassword(credentialsId: 'browserstack-credentials', usernameVariable: 'browserStackUsername', passwordVariable: 'browserStackAccessToken')
           ]) {
+            def envVars = Provision.getPrQueueEnvVars(ctx, repoName, pr)
+            envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
+            envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
+            def url = buildUrl(ctx, pr, environment, repoName)
+            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
+
             ctx.dir('./test/acceptance') {
             ctx.sh('mkdir -p -m 777 html-reports')
 
-            def url = buildUrl(ctx, pr,  environment, repoName)
-            def envVars = []
-
-            envVars.push("BROWSERSTACK_USERNAME=${ctx.browserStackUsername}")
-            envVars.push("BROWSERSTACK_ACCESS_KEY=${ctx.browserStackAccessToken}")
-            envVars.push("TEST_ENVIRONMENT_ROOT_URL=https://${url}")
-
             ctx.withEnv(envVars) {
-            ctx.sh('docker-compose -f docker-compose.yaml build')
-            ctx.sh('docker-compose run wdio-cucumber')
+              // Intentionally only use `docker-compose.yaml`. Abort on
+              // container exit ensures exit code is returned from `sh` step.
+              ctx.sh('docker-compose -f docker-compose.yaml up --build --abort-on-container-exit')
             }
           }
         }

@@ -94,6 +94,10 @@ class Version implements Serializable {
     return ctx.sh(returnStdout: true, script: "xmllint $projName/${projName}.csproj --xpath '//Project/PropertyGroup/Version/text()'").trim()
   }
 
+  static def getCSTargetFramework(ctx, projName) {
+    return ctx.sh(returnStdout: true, script: "xmllint $projName/${projName}.csproj --xpath '//Project/PropertyGroup/TargetFramework/text()'").trim()
+  }
+
   static def getPackageJsonVersion(ctx) {
     return ctx.sh(returnStdout: true, script: "jq -r '.version' package.json").trim()
   }

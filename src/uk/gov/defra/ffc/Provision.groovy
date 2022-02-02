@@ -53,7 +53,7 @@ class Provision implements Serializable {
 
   static def hasResourcesToProvision(ctx, filePath) {
     return ctx.fileExists(filePath)
-  }  
+  }
 
   static def deleteBuildResources(ctx, repoName, pr) {
     deleteServiceBusEntities(ctx, getBuildQueuePrefix(ctx, repoName, pr), 'queue')
@@ -111,7 +111,7 @@ class Provision implements Serializable {
     validateQueueName(queueName)
     String azCommand = 'az servicebus queue create'
     ctx.sh("$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024 $sessionOption")
-  }  
+  }
 
   static def getSessionOption(ctx, filePath, resource, name) {
     String script = "yq r $filePath resources.${resource}*\\(name==${name}\\).enableSessions"
@@ -132,7 +132,7 @@ class Provision implements Serializable {
     return "$repoName-pr$pr-$queueName"
   }
 
-  static def getBuildQueueEnvVars(ctx, repoName, pr, environment) {
+  private static def getMessageQueueCreds(ctx) {
     // There is a single set of keys for the message queue host (as there is
     // only one). The keys are set to the `dev` env. If the PR env was to use a
     // different message queue host it would be checked here and
@@ -148,23 +148,45 @@ class Provision implements Serializable {
     ]
     def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
     def envVars = []
-
-    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
-      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
-      queues.each {
-        envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
-      }
-      def topics = readManifest(ctx, azureProvisionConfigFile, 'topics')
-      topics.each {
-        envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
-        envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
-      }
-    }
     envVars.push("MESSAGE_QUEUE_HOST=${appConfigValues[messageQueueHost]}")
     envVars.push("MESSAGE_QUEUE_PASSWORD=${escapeQuotes(appConfigValues[messageQueuePassword])}")
     envVars.push("MESSAGE_QUEUE_USER=${appConfigValues[messageQueueUser]}")
     return envVars
-  }  
+  }
+
+  static def getBuildQueueEnvVars(ctx, repoName, pr) {
+    return getQueueEnvVars(ctx, repoName, pr, 'build')
+  }
+
+  static def getPrQueueEnvVars(ctx, repoName, pr) {
+    return getQueueEnvVars(ctx, repoName, pr, 'pr')
+  }
+
+  private static def getQueueEnvVars(ctx, repoName, pr, queueType) {
+    def envVars = getMessageQueueCreds(ctx)
+
+    if (hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      def queues = readManifest(ctx, azureProvisionConfigFile, 'queues')
+      queues.each {
+        if (queueType == 'pr') {
+          envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getPrQueueName(repoName, pr, it)}")
+        } else if (queueType == 'build') {
+          envVars.push("${it.toUpperCase()}_QUEUE_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+        }
+      }
+      def topics = readManifest(ctx, azureProvisionConfigFile, 'topics')
+      topics.each {
+        if (queueType == 'pr') {
+          envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getPrQueueName(repoName, pr, it)}")
+          envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getPrQueueName(repoName, pr, it)}")
+        } else if (queueType == 'build') {
+          envVars.push("${it.toUpperCase()}_TOPIC_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+          envVars.push("${it.toUpperCase()}_SUBSCRIPTION_ADDRESS=${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+        }
+      }
+    }
+    return envVars
+  }
 
   static def getProvisionedQueueConfigValues(ctx, repoName, pr) {
     def queueConfigValues = [:]
@@ -182,7 +204,7 @@ class Provision implements Serializable {
       }
     }
     return queueConfigValues + topicConfigValues
-  }  
+  }
 
   private static def validateQueueName(name) {
     assert name ==~ /^[A-Za-z0-9]$|^[A-Za-z0-9][\w-\.\/\~]*[A-Za-z0-9]$/ : "Invalid queue name: '$name'"
@@ -190,7 +212,7 @@ class Provision implements Serializable {
 
   private static def escapeQuotes(value) {
     return value.replace("\"", "\\\"")
-  }  
+  }
 
   static def readManifest(ctx, filePath, resource) {
     def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*.name").trim()
@@ -217,7 +239,7 @@ class Provision implements Serializable {
         ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run --no-deps database-up")
       }
     }
-  }  
+  }
 
   private static def repoHasMigration(ctx, repoName) {
     def migrationFile = "docker-compose.migrate.yaml"
@@ -246,7 +268,7 @@ class Provision implements Serializable {
 
   private static def getResourceScript(ctx, resourcePath, filename, destinationFolder){
     getResourceFile(ctx, resourcePath, filename, destinationFolder, true)
-  }  
+  }
 
   public static def getSchemaName(repoName, pr) {
     if(pr != '') {
@@ -271,8 +293,8 @@ class Provision implements Serializable {
       postgresHostKey
     ]
 
-    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)    
-    
+    def appConfigValues = Utils.getConfigValues(ctx, searchKeys, appConfigPrefix, Utils.defaultNullLabel, false)
+
     return [
       "POSTGRES_ADMIN_USERNAME=${appConfigValues[adminUserKey]}",
       "POSTGRES_ADMIN_PASSWORD=${escapeQuotes(appConfigValues[adminPasswordKey])}",
@@ -306,16 +328,16 @@ class Provision implements Serializable {
     def postgresUserKey = 'postgresService.postgresUser'
 
     def appConfigValues = isPr
-      ? Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, Utils.defaultNullLabel, false) 
+      ? Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, Utils.defaultNullLabel, false)
       : Utils.getConfigValues(ctx, [postgresUserKey], appConfigPrefix, repoName, false)
-    
+
     def schemaUser = appConfigValues[postgresUserKey]
     if (!schemaUser) {
       throw new Exception("No $postgresUserKey AppConfig in $environment environment")
     }
     def schemaRole = schemaUser.split('@')[0]
     def token = getSchemaToken(ctx, schemaRole)
-    
+
     return [
       "POSTGRES_SCHEMA_USERNAME=$schemaUser",
       "POSTGRES_SCHEMA_PASSWORD=$token",
@@ -336,5 +358,5 @@ class Provision implements Serializable {
     def repoEnvVars = getRepoPostgresEnvVars(ctx, environment, repoName, pr)
     def userEnvVars = getUserPostgresEnvVars(ctx, environment, repoName, pr)
     return envVars + repoEnvVars + userEnvVars
-  }  
+  }
 }

@@ -20,8 +20,8 @@ void analyseNodeJsCode(String sonarQubeEnv, String sonarScanner, String repoName
   Tests.analyseNodeJsCode(this, sonarQubeEnv, sonarScanner, buildCodeAnalysisNodeJsParams(repoName, branch, defaultBranch, pr))
 }
 
-void analyseDotNetCode(String repoName, String branch, String defaultBranch, String pr) {
-  Tests.analyseDotNetCode(this, buildCodeAnalysisDotNetParams(repoName, branch, defaultBranch, pr))
+void analyseDotNetCode(String repoName, String projectName, String branch, String defaultBranch, String pr) {
+  Tests.analyseDotNetCode(this, projectName, buildCodeAnalysisDotNetParams(repoName, branch, defaultBranch, pr))
 }
 
 def buildCodeAnalysisNodeJsParams(String projectName, String branch, String defaultBranch, String pr) {
@@ -44,6 +44,6 @@ void runZapScan(String projectName, String buildNumber, String tag) {
   Tests.runZapScan(this, projectName, buildNumber, tag)
 }
 
-void runAccessibility(String projectName, String buildNumber, String tag, String accessibilityTestType) {
-  Tests.runAccessibility(this, projectName, buildNumber, tag, accessibilityTestType)
+void runAccessibilityTests(String projectName, String buildNumber, String tag, String accessibilityTestType) {
+  Tests.runAccessibilityTests(this, projectName, buildNumber, tag, accessibilityTestType)
 }
