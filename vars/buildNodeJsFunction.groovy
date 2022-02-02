@@ -60,12 +60,8 @@ void call(Map config=[:]) {
       }
 
       if (fileExists('./docker-compose.test.yaml')) {
-        stage('Build test image') {
-          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-        }
-
-        stage('Run tests') {
-          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
+        stage('run test image') {
+          build.runTestImage()
         }
 
         stage('Create JUnit report') {
@@ -75,22 +71,10 @@ void call(Map config=[:]) {
         stage('Fix lcov report') {
           utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
-
-        if (pr == '') {
-          stage('Publish pact broker') {
-            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
-          }
-        }
       }
 
       stage('SonarCloud analysis') {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
-      }
-
-      if (fileExists('./docker-compose.zap.yaml')) {
-        stage('Run Zap Scan') {
-          test.runZapScan(repoName, BUILD_NUMBER, tag)
-        }
       }
 
       if (config.containsKey('testClosure')) {

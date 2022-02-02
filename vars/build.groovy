@@ -18,6 +18,10 @@ void buildTestImage(String credentialsId, String registry, String projectName, S
   Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, tag)
 }
 
+void runTestImage() {
+  Docker.runTestImage(this)
+}
+
 void runTests(String projectName, String serviceName, String buildNumber, String tag, String pr, String environment) {
   Tests.runTests(this, projectName, serviceName, buildNumber, tag, pr, environment)
 }
