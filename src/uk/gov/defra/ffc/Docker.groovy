@@ -3,7 +3,7 @@ package uk.gov.defra.ffc
 class Docker implements Serializable {
 
   static def runTestImage(ctx) {
-    ctx.sh("docker run --rm -t -i -v \$(pwd)/:/home/node defradigital/node-development:1.2.11-node16.13.0 /bin/sh -c 'cd /home/node; npm install; npm test'")
+    ctx.sh("docker run --rm -v \$(pwd)/:/home/node defradigital/node-development:1.2.11-node16.13.0 /bin/sh -c 'cd /home/node; npm install; npm test'")
   }
 
   static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
