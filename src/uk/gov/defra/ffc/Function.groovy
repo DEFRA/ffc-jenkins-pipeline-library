@@ -38,7 +38,7 @@ class Function implements Serializable {
   }
 
   static def getStorageAccountName(ctx, azureProvisionConfigFile, pr) {
-    def storage = readManifest(ctx, azureProvisionConfigFile, 'storage')
+    def storage = readManifest(ctx, azureProvisionConfigFile, 'resources', 'storage')
     
     if (pr != '') {
       storage = "$storage-pr$pr"
@@ -82,20 +82,14 @@ class Function implements Serializable {
     return ctx.fileExists(filePath)
   } 
 
-  static def readManifest(ctx, filePath, resource) {
-    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*").trim()
-    ctx.echo("resources: ${resources}")
+  static def readManifest(ctx, filePath, root, resource) {
+    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath ${resource}.${resource}.*").trim()
     return resources.tokenize('\n')[0]
   }
 
-  static def readSettings(ctx, filePath) {
-    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath settings.values.*")
-    ctx.echo("resources: ${azureFunctionConfigFile} ${resources}")
-
-  }
-
   static def setFunctionAppSettings(ctx, functionName) {
-    readSettings(ctx, azureFunctionConfigFile)
+    def settings = readManifest(ctx, azureFunctionConfigFile, 'settings', 'values')
+    ctx.echo("settings: ${settings}")
     ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings 'testAppSettings2=test-storage'")
   }
 
