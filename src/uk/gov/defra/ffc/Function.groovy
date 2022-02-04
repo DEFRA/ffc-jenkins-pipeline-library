@@ -18,7 +18,7 @@ class Function implements Serializable {
       def functionName = createFunctionName(repoName, pr)
 
       if(!checkFunctionAppExists(ctx, functionName)) {
-        def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile)
+        def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile, pr)
         createFunctionStorage(ctx, storageAccountName)
         createFunction(ctx, functionName, branch, storageAccountName)
       }
@@ -35,8 +35,13 @@ class Function implements Serializable {
     return checkExists
   }
 
-  static def getStorageAccountName(ctx, azureProvisionConfigFile) {
+  static def getStorageAccountName(ctx, azureProvisionConfigFile, pr) {
     def storage = readManifest(ctx, azureProvisionConfigFile, 'storage')
+    
+    if (pr != '') {
+      storage = "$storage-pr$pr"
+    }
+
     validateStorageName(storage)
     return storage
   }
