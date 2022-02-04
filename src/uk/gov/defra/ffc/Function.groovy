@@ -89,7 +89,7 @@ class Function implements Serializable {
   }
 
   static def readSettings(ctx, filePath) {
-    def resources = ctx.sh(returnStdout: true, script: "yq -P '.' $filePath")
+    def resources = ctx.sh(returnStdout: true, script: "yq -P $filePath .")
     ctx.echo("resources: ${azureFunctionConfigFile} ${resources}")
 
   }
