@@ -89,6 +89,8 @@ class Function implements Serializable {
   }
 
   static def setFunctionAppSettings(ctx, functionName) {
+    String settingsJson = new File(classLoader.getResource(azureFunctionConfigFile).getFile()).text
+    ctx.echo("settingsJson: ${settingsJson}")
     def appSettingsKeys = getFunctionAppSettings(ctx)
     ctx.echo("appSettingsKey: ${appSettingsKeys}")
     appSettingsKeys.each {
