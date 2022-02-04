@@ -3,6 +3,7 @@ package uk.gov.defra.ffc
 class Function implements Serializable {
 
   static String azureProvisionConfigFile = './provision.azure.yaml'
+  static String azureFunctionConfigFile = './function.azure.yaml'
 
   static String createFunctionName(repoName, pr) {
     if (pr != '') {
@@ -13,7 +14,7 @@ class Function implements Serializable {
   }
 
   static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
-    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+    if(hasResourcesToProvision(ctx, azureProvisionConfigFile) && hasResourcesToProvision(ctx, azureFunctionConfigFile)) {
       
       def functionName = createFunctionName(repoName, pr)
 
@@ -88,11 +89,14 @@ class Function implements Serializable {
 
   static def setFunctionAppSettings(ctx, functionName) {
     def appSettingsKeys = getFunctionAppSettings(ctx, "settings.json")
+    appSettingsKeys.each {
+      ctx.echo("appSettingsKey ${it.name}")
+    }
     ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage'")
   }
 
   static def getFunctionAppSettings(ctx, appSettingsFileLocation) {
-    def appSettingsKeys = ctx.sh(returnStdout: true, script:"yq r $appSettingsFileLocation --printMode p \"**\"").trim()
+    def appSettings = readManifest(ctx, azureFunctionConfigFile, 'values')
     // yq outputs arrays elements as .[ but the --set syntax for the helm command doesn't use the dot so remove it
     return appSettingsKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
   }
