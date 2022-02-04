@@ -61,7 +61,7 @@ void call(Map config=[:]) {
 
 
       stage('run test image') {
-        build.runTestImage()
+        build.runNodeTestImage()
       }
 
       stage('Create JUnit report') {

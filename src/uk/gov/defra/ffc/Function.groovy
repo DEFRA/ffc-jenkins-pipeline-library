@@ -25,6 +25,7 @@ class Function implements Serializable {
 
       enableGitAuth(ctx, gitToken)
       deployFunction(ctx, functionName, branch, gitToken)
+      setFunctionAppSettings(ctx, functionName)
     }
   }
   
@@ -83,6 +84,10 @@ class Function implements Serializable {
   static def readManifest(ctx, filePath, resource) {
     def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}.*.name").trim()
     return resources.tokenize('\n')[0]
+  }
+
+  static def setFunctionAppSettings(ctx, functionName) {
+    ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage'")
   }
 
   private static def validateStorageName(name) {
