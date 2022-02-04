@@ -4,7 +4,7 @@ class Docker implements Serializable {
 
   static def runTestImage(ctx) {
     ctx.sh('mkdir -p -m 777 test-output')
-    ctx.sh("docker run --rm -i -v \$(pwd)/jest.config.js:/home/node/jest.config.js -v \$(pwd)/test-output:/home/node/test-output -v \$(pwd)/app:/home/node/app -v \$(pwd)/test:/home/node/test -v \$(pwd)/package.json:/home/node/package.json defradigital/node-development:1.2.11-node16.13.0 /bin/sh -c 'npm install; npm run test'")
+    ctx.sh("docker run --rm -i -v \$(pwd)/jest.setup.js:/home/node/jest.setup.js -v \$(pwd)/jest.config.js:/home/node/jest.config.js -v \$(pwd)/test-output:/home/node/test-output -v \$(pwd)/app:/home/node/app -v \$(pwd)/test:/home/node/test -v \$(pwd)/package.json:/home/node/package.json defradigital/node-development:1.2.11-node16.13.0 /bin/sh -c 'npm install; npm run test'")
   }
 
   static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
