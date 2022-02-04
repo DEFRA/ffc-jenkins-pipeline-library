@@ -88,24 +88,15 @@ class Function implements Serializable {
     return resources.tokenize('\n')[0]
   }
 
-  static def setFunctionAppSettings(ctx, functionName) {
-    def appSettingsKeys = getFunctionAppSettings(ctx)
-    ctx.echo("appSettingsKey: ${appSettingsKeys} ${azureFunctionConfigFile} ")
+  static def readSettings(ctx, filePath) {
+    def resources = ctx.sh(returnStdout: true, script: "yq -P '.' $filePath")
+    ctx.echo("resources: ${azureFunctionConfigFile} ${resources}")
 
-    def data = readFile(file: "${azureFunctionConfigFile}")
-    echo "$data"
-    def list = new JsonSlurper().parseText( data )
-    list.each { println it }
-    
-    appSettingsKeys.each {
-      ctx.echo("appSettingsKey: ${it.name}")
-    }
-    ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings 'testAppSettings2=test-storage'")
   }
 
-  static def getFunctionAppSettings(ctx) {
-    def appSettingsKeys = readManifest(ctx, azureFunctionConfigFile, 'values')
-    return appSettingsKeys
+  static def setFunctionAppSettings(ctx, functionName) {
+    readSettings(ctx, azureFunctionConfigFile)
+    ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings 'testAppSettings2=test-storage'")
   }
 
   private static def validateStorageName(name) {
