@@ -96,9 +96,8 @@ class Function implements Serializable {
   }
 
   static def getFunctionAppSettings(ctx, appSettingsFileLocation) {
-    def appSettings = readManifest(ctx, azureFunctionConfigFile, 'values')
-    // yq outputs arrays elements as .[ but the --set syntax for the helm command doesn't use the dot so remove it
-    return appSettingsKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
+    def appSettingsKeys = readManifest(ctx, azureFunctionConfigFile, 'values')
+    return appSettingsKeys
   }
 
   private static def validateStorageName(name) {
