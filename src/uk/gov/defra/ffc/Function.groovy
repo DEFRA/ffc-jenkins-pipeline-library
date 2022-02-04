@@ -91,6 +91,12 @@ class Function implements Serializable {
   static def setFunctionAppSettings(ctx, functionName) {
     def appSettingsKeys = getFunctionAppSettings(ctx)
     ctx.echo("appSettingsKey: ${appSettingsKeys} ${azureFunctionConfigFile} ")
+
+    def data = readFile(file: "${azureFunctionConfigFile}")
+    echo "$data"
+    def list = new JsonSlurper().parseText( data )
+    list.each { println it }
+    
     appSettingsKeys.each {
       ctx.echo("appSettingsKey: ${it.name}")
     }
