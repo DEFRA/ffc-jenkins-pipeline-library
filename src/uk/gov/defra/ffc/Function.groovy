@@ -87,7 +87,14 @@ class Function implements Serializable {
   }
 
   static def setFunctionAppSettings(ctx, functionName) {
+    def appSettingsKeys = getFunctionAppSettings(ctx, "settings.json")
     ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage'")
+  }
+
+  static def getFunctionAppSettings(ctx, appSettingsFileLocation) {
+    def appSettingsKeys = ctx.sh(returnStdout: true, script:"yq r $appSettingsFileLocation --printMode p \"**\"").trim()
+    // yq outputs arrays elements as .[ but the --set syntax for the helm command doesn't use the dot so remove it
+    return appSettingsKeys.tokenize('\n').collect { it.replace('.[', '[').trim() }
   }
 
   private static def validateStorageName(name) {
