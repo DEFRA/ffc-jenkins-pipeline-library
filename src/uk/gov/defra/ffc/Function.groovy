@@ -82,13 +82,20 @@ class Function implements Serializable {
     return ctx.fileExists(filePath)
   } 
 
+  static def readSettings(ctx, filePath, root, resource) {
+    def resources = ctx.sh(returnStdout: true, script: "yq -o=json $filePath").trim()
+    ctx.echo("resources: ${resources}")
+  }
+
   static def readManifest(ctx, filePath, root, resource) {
-    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath ${resource}.${resource}.*").trim()
+    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath ${root}.${resource}.*").trim()
+    ctx.echo("resources: ${resources}")
     return resources.tokenize('\n')[0]
   }
 
   static def setFunctionAppSettings(ctx, functionName) {
-    def settings = readManifest(ctx, azureFunctionConfigFile, 'settings', 'values')
+    readSettings(ctx, azureFunctionConfigFile, 'settings', 'values')
+    readManifest(ctx, azureProvisionConfigFile, 'settings', 'values')
     ctx.echo("settings: ${settings}")
     ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings 'testAppSettings2=test-storage'")
   }
