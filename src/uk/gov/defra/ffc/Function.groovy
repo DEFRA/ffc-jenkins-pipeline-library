@@ -95,7 +95,6 @@ class Function implements Serializable {
 
   static def setFunctionAppSettings(ctx, functionName) {
     readSettings(ctx, azureFunctionConfigFile, 'settings', 'values')
-    readManifest(ctx, azureProvisionConfigFile, 'settings', 'values')
     ctx.echo("settings: ${settings}")
     ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings 'testAppSettings2=test-storage'")
   }
