@@ -4,6 +4,7 @@ class Function implements Serializable {
 
   static String azureProvisionConfigFile = './provision.azure.yaml'
   static String azureFunctionConfigFile = './function.azure.yaml'
+  static String azureSettingsFile = './settings.json'
 
   static String createFunctionName(repoName, pr) {
     if (pr != '') {
@@ -83,8 +84,8 @@ class Function implements Serializable {
   } 
 
   static def readSettings(ctx, filePath, root, resource) {
-    def resources = ctx.sh(returnStdout: true, script: "yq -o=json $filePath").trim()
-    ctx.echo("resources: ${resources}")
+    def settings = ctx.sh(returnStdout: true, script: "yq -o=json $filePath").trim()
+    ctx.echo("settings: ${settings}")
   }
 
   static def readManifest(ctx, filePath, root, resource) {
@@ -94,9 +95,8 @@ class Function implements Serializable {
   }
 
   static def setFunctionAppSettings(ctx, functionName) {
-    readSettings(ctx, azureFunctionConfigFile, 'settings', 'values')
-    ctx.echo("settings: ${settings}")
-    ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings 'testAppSettings2=test-storage'")
+    // readSettings(ctx, azureFunctionConfigFile, 'settings', 'values')
+    ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings @${azureSettingsFile}")
   }
 
   private static def validateStorageName(name) {
