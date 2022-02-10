@@ -84,7 +84,9 @@ class Function implements Serializable {
   } 
 
   static def readSettings(ctx, filePath, root, resource) {
-    def settings = ctx.sh(returnStdout: true, script: "yq -o=json $filePath").trim()
+    def settingPlaceholder = "ffc-pay-event-response"
+    def settingValue = "CHANGED!! ffc-pay-event-response"
+    def settings = ctx.sh(returnStdout: true, script: "jq map((select(.value == ${settingPlaceholder}) | .value) |= ${settingValue}) $filePath").trim()
     ctx.echo("settings: ${settings}")
   }
 
@@ -96,10 +98,10 @@ class Function implements Serializable {
 
   static def setFunctionAppSettings(ctx, functionName) {
     // readSettings(ctx, azureFunctionConfigFile, 'settings', 'values')
-    ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings @${azureSettingsFile}")
-  }
-
-  private static def validateStorageName(name) {
-    assert name ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '$name'"
+    if(hasResourcesToProvision(ctx, azureSettingsFile)) {
+      ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings @${azureSettingsFile}")
+    } else {
+      ctx.echo("Function app settings.json not found. Skipping.")
+    }
   }
 }
