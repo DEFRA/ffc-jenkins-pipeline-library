@@ -86,7 +86,7 @@ class Function implements Serializable {
   static def readSettings(ctx, filePath) {
     def settingPlaceholder = "ffc-pay-event-response"
     def settingValue = "CHANGED!! ffc-pay-event-response"
-    def settings = ctx.sh(returnStdout: true, script: "jq map((select(.value == ${settingPlaceholder}) | .value) |= ${settingValue}) $filePath").trim()
+    def settings = ctx.sh(returnStdout: true, script: "jq 'map((select(.value == \"${settingPlaceholder}\") | .value) |= \"${settingValue}\")' $filePath").trim()
     ctx.echo("settings: ${settings}")
   }
 
