@@ -87,7 +87,7 @@ class Function implements Serializable {
     def settingPlaceholder = "ffc-pay-event-response"
     def settingValue = "CHANGED!! ffc-pay-event-response"
     def settings = ctx.sh(returnStdout: true, script: "jq 'map((select(.value == \"${settingPlaceholder}\") | .value) |= \"${settingValue}\")' $filePath").trim()
-    ctx.echo("settings: ${settings}")
+    return settings
   }
 
   static def readManifest(ctx, filePath, root, resource) {
@@ -98,8 +98,8 @@ class Function implements Serializable {
 
   static def setFunctionAppSettings(ctx, functionName) {
     if(hasResourcesToProvision(ctx, azureSettingsFile)) {
-      readSettings(ctx, azureSettingsFile)
-      ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings 'testAppSettings=test-storage' --settings @${azureSettingsFile}")
+      def settings = readSettings(ctx, azureSettingsFile)
+      ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings ${settings}")
     } else {
       ctx.echo("Function app settings.json not found. Skipping.")
     }
