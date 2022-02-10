@@ -14,7 +14,7 @@ class Function implements Serializable {
     return "$repoName"
   }
 
-  static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
+  static def createFunctionResources(ctx, environment, repoName, pr, gitToken, branch) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile) && hasResourcesToProvision(ctx, azureFunctionConfigFile)) {
       
       def functionName = createFunctionName(repoName, pr)
@@ -27,7 +27,7 @@ class Function implements Serializable {
 
       enableGitAuth(ctx, gitToken)
       deployFunction(ctx, functionName, branch, gitToken)
-      setFunctionAppSettings(ctx, functionName)
+      setFunctionAppSettings(ctx, environment, functionName)
     }
   }
   
@@ -83,12 +83,20 @@ class Function implements Serializable {
     return ctx.fileExists(filePath)
   } 
 
-  static def readSettings(ctx, filePath) {
+  static def getAppConfigValues(ctx, environment, filePath) {
+    def appConfigPrefix = environment + '/'
+    def settingsKeys = ctx.sh(returnStdout: true, script: "jq -r '.[].value' ${filePath}").trim()
+    def settingsKeysTokenized = settingsKeys.tokenize('\n')[0]
+    ctx.echo("settingsKeys: ${settingsKeysTokenized}")
+    def appConfigValues = Utils.getConfigValues(ctx, settingsKeysTokenized, appConfigPrefix, Utils.defaultNullLabel, false)
+    ctx.echo("appConfigValues: ${appConfigValues}")
+  }
+
+  static def readSettings(ctx, environment, filePath) {
+    getAppConfigValues(ctx, environment, filePath)
     def settingPlaceholder = "ffc-pay-event-response"
     def settingValue = "CHANGED!! ffc-pay-event-response"
     def settings = ctx.sh(returnStdout: true, script: "jq 'map((select(.value == \"${settingPlaceholder}\") | .value) |= \"${settingValue}\")' ${filePath} > settings.tmp && mv settings.tmp ${filePath}").trim()
-    def settingsKeys = ctx.sh(returnStdout: true, script: "jq -r '.[].value' ${filePath}").trim()
-    ctx.echo("settingsKeys: ${settingsKeys}")
     return settings
   }
 
@@ -98,7 +106,7 @@ class Function implements Serializable {
     return resources.tokenize('\n')[0]
   }
 
-  static def setFunctionAppSettings(ctx, functionName) {
+  static def setFunctionAppSettings(ctx, environment, functionName) {
     if(hasResourcesToProvision(ctx, azureSettingsFile)) {
       def settings = readSettings(ctx, azureSettingsFile)
       ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings @${azureSettingsFile}")
