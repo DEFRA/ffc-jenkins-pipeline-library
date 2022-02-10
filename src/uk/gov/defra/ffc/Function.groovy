@@ -88,7 +88,7 @@ class Function implements Serializable {
     def settingValue = "CHANGED!! ffc-pay-event-response"
     def settings = ctx.sh(returnStdout: true, script: "jq 'map((select(.value == \"${settingPlaceholder}\") | .value) |= \"${settingValue}\")' ${filePath} > settings.tmp && mv settings.tmp ${filePath}").trim()
     def settingsKeys = ctx.sh(returnStdout: true, script: "jq -r '.[].value' json").trim()
-    console.log("settingsKeys: ${settingsKeys}")
+    ctx.echo("settingsKeys: ${settingsKeys}")
     return settings
   }
 
