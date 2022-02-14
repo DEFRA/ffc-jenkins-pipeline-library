@@ -81,13 +81,12 @@ class Function implements Serializable {
   } 
 
   static def readManifest(ctx, filePath, root, resource) {
-    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath ${root}.${resource}.*").trim()
+    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath ${root}.${resource}.*.name").trim()
     ctx.echo("resources: ${resources}")
     return resources.tokenize('\n')[0]
   }
 
   private static def validateStorageName(name) {
-    name = name.replaceAll('-', '')
-    assert name ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '${name}'"
+    assert name.replaceAll('-', '') ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '${name}'"
   }
 }
