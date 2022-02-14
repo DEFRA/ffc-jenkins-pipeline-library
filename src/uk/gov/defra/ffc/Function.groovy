@@ -85,4 +85,8 @@ class Function implements Serializable {
     ctx.echo("resources: ${resources}")
     return resources.tokenize('\n')[0]
   }
+
+  private static def validateStorageName(name) {
+    assert name ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '$name'"
+  }
 }
