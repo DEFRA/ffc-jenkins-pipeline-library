@@ -39,7 +39,7 @@ class Function implements Serializable {
     def storage = readManifest(ctx, azureProvisionConfigFile, 'resources', 'storage')
     
     if (pr != '') {
-      storage = "$storage-pr$pr"
+      storage = "$storagepr$pr"
     }
 
     validateStorageName(storage)
@@ -87,6 +87,6 @@ class Function implements Serializable {
   }
 
   private static def validateStorageName(name) {
-    assert name.replaceAll('-', '') ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '${name}'"
+    assert name ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '${name}'"
   }
 }
