@@ -1,4 +1,4 @@
-# buildNodeJs
+# buildFunctionNodeJs
 
 > The default build configuration for a Azure Function Node.js project.
 
