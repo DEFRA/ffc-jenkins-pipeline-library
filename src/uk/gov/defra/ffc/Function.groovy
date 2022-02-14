@@ -39,7 +39,7 @@ class Function implements Serializable {
     def storage = readManifest(ctx, azureProvisionConfigFile, 'resources', 'storage')
     
     if (pr != '') {
-      storage = "$storagepr$pr"
+      storage = "${storage}pr${pr}"
     }
 
     validateStorageName(storage)
