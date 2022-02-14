@@ -3,8 +3,6 @@ package uk.gov.defra.ffc
 class Function implements Serializable {
 
   static String azureProvisionConfigFile = './provision.azure.yaml'
-  static String azureFunctionConfigFile = './function.azure.yaml'
-  static String azureSettingsFile = './settings.json'
 
   static String createFunctionName(repoName, pr) {
     if (pr != '') {
@@ -15,7 +13,7 @@ class Function implements Serializable {
   }
 
   static def createFunctionResources(ctx, environment, repoName, pr, gitToken, branch) {
-    if(hasResourcesToProvision(ctx, azureProvisionConfigFile) && hasResourcesToProvision(ctx, azureFunctionConfigFile)) {
+    if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       
       def functionName = createFunctionName(repoName, pr)
 
@@ -27,7 +25,6 @@ class Function implements Serializable {
 
       enableGitAuth(ctx, gitToken)
       deployFunction(ctx, functionName, branch, gitToken)
-      setFunctionAppSettings(ctx, environment, functionName)
     }
   }
   
@@ -83,35 +80,9 @@ class Function implements Serializable {
     return ctx.fileExists(filePath)
   } 
 
-  static def getAppConfigValues(ctx, environment, filePath) {
-    def appConfigPrefix = environment + '/'
-    def settingsKeys = ctx.sh(returnStdout: true, script: "jq -r '.[].value' ${filePath}").trim()
-    def settingsKeysTokenized = settingsKeys.tokenize('\n')[0]
-    ctx.echo("settingsKeys: ${settingsKeysTokenized}")
-    def appConfigValues = Utils.getConfigValues(ctx, settingsKeysTokenized, appConfigPrefix, Utils.defaultNullLabel, false)
-    ctx.echo("appConfigValues: ${appConfigValues}")
-  }
-
-  static def readSettings(ctx, environment, filePath) {
-    getAppConfigValues(ctx, environment, filePath)
-    def settingPlaceholder = "ffc-pay-event-response"
-    def settingValue = "CHANGED!! ffc-pay-event-response"
-    def settings = ctx.sh(returnStdout: true, script: "jq 'map((select(.value == \"${settingPlaceholder}\") | .value) |= \"${settingValue}\")' ${filePath} > settings.tmp && mv settings.tmp ${filePath}").trim()
-    return settings
-  }
-
   static def readManifest(ctx, filePath, root, resource) {
     def resources = ctx.sh(returnStdout: true, script: "yq r $filePath ${root}.${resource}.*").trim()
     ctx.echo("resources: ${resources}")
     return resources.tokenize('\n')[0]
-  }
-
-  static def setFunctionAppSettings(ctx, environment, functionName) {
-    if(hasResourcesToProvision(ctx, azureSettingsFile)) {
-      def settings = readSettings(ctx, azureSettingsFile)
-      ctx.sh("az functionapp config appsettings set --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --settings @${azureSettingsFile}")
-    } else {
-      ctx.echo("Function app settings.json not found. Skipping.")
-    }
   }
 }
