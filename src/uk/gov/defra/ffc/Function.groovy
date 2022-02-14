@@ -12,7 +12,7 @@ class Function implements Serializable {
     return "$repoName"
   }
 
-  static def createFunctionResources(ctx, environment, repoName, pr, gitToken, branch) {
+  static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       
       def functionName = createFunctionName(repoName, pr)
