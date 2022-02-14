@@ -60,16 +60,18 @@ void call(Map config=[:]) {
       }
 
 
-      stage('run test image') {
-        build.runNodeTestImage()
-      }
+      if (fileExists('./test')) {
+        stage('run test image') {
+          build.runNodeTestImage()
+        }
 
-      stage('Create JUnit report') {
-        test.createJUnitReport()
-      }
+        stage('Create JUnit report') {
+          test.createJUnitReport()
+        }
 
-      stage('Fix lcov report') {
-        utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+        stage('Fix lcov report') {
+          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+        }
       }
 
 
