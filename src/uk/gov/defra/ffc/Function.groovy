@@ -88,6 +88,6 @@ class Function implements Serializable {
 
   private static def validateStorageName(name) {
     name = name.replaceAll('-', '')
-    assert name ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '$name'"
+    assert name ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '${name}'"
   }
 }
