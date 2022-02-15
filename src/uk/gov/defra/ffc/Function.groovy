@@ -15,10 +15,10 @@ class Function implements Serializable {
   static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       
-      def functionName = createFunctionName(repoName, pr)
+      String functionName = createFunctionName(repoName, pr)
 
       if(!checkFunctionAppExists(ctx, functionName)) {
-        def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile, pr)
+        String storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile, pr)
         createFunctionStorage(ctx, storageAccountName)
         createFunction(ctx, functionName, branch, storageAccountName)
       }
@@ -30,7 +30,7 @@ class Function implements Serializable {
   
   static Boolean checkFunctionAppExists(ctx, functionName) {
     def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[].{Name:name}'")
-    def checkExists = functionApps.contains("$functionName")
+    Boolean checkExists = functionApps.contains("$functionName")
     ctx.echo("Function app $functionName exists: $checkExists")
     return checkExists
   }
