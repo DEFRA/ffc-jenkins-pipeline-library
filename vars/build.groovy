@@ -10,6 +10,10 @@ String getDefaultBranch(String defaultBranch, String requestedBranch) {
   return Build.getDefaultBranch(defaultBranch, requestedBranch)
 }
 
+String getNodeTestVersion(String defaultNodeTestVersion, String requestedNodeTestVersion) {
+  return Build.getNodeTestVersion(defaultNodeTestVersion, requestedNodeTestVersion)
+}
+
 String checkoutSourceCode(String defaultBranch) {
   return Build.checkoutSourceCode(this, defaultBranch)
 }

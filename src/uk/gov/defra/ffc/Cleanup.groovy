@@ -20,6 +20,10 @@ class Cleanup implements Serializable {
         Provision.deletePrResources(ctx, environment, repoName, closedPrNo)
         ctx.echo("Removing container image for PR $closedPrNo of $repoName after branch $branchName deleted")
         Docker.deleteContainerImage(ctx, repoName, "pr$closedPrNo")
+        String functionName = Function.createFunctionName(repoName, closedPrNo)
+        ctx.echo("Removing function $functionName after branch $branchName deleted")
+        Function.deleteFunction(ctx, functionName, closedPrNo)
+        ctx.echo("Removing storage account for PR $closedPrNo of $repoName after branch $branchName deleted")
       }
     }
   }

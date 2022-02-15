@@ -71,7 +71,8 @@ class Function implements Serializable {
     ctx.sh("$azDeleteFunction")
   }
 
-  private static def deleteFunctionStorage(ctx, repoName, pr, storageAccountName) {
+  private static def deleteFunctionStorage(ctx, repoName, pr) {
+    def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile, pr)
     def azDeleteFunctionStorage = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --yes"
     ctx.sh("$azDeleteFunctionStorage")
   }

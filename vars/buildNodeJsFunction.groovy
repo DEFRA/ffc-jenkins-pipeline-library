@@ -3,7 +3,7 @@ void call(Map config=[:]) {
   String environment = 'snd'
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
-  String nodeTestImage = 'defradigital/node-development:1.2.11-node16.13.0'
+  String nodeTestImage = "${nodeDevelopmentImage}:1.2.11-node16.13.0"
   String localSrcFolder = '.'
   String lcovFile = './test-output/lcov.info'
   String repoName = ''
@@ -19,6 +19,10 @@ void call(Map config=[:]) {
 
       stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
+      }
+
+      stage('Set default node test version') {
+        nodeTestImage = build.getNodeTestVersion(nodeTestImage, config.defaultNodeTestVersion)
       }
 
       stage('Set environment') {
