@@ -2,6 +2,7 @@ package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Helm
 import uk.gov.defra.ffc.Provision
+import uk.gov.defra.ffc.Function
 
 class Cleanup implements Serializable {
   static def prResources(ctx, environment, repoName, branchName) {
