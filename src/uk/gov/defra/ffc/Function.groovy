@@ -71,8 +71,12 @@ class Function implements Serializable {
     ctx.sh("$azDeleteFunction")
   }
 
-  private static def deleteFunctionStorage(ctx, repoName, pr) {
-    def storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile, pr)
+  private static def deleteFunctionStorage(ctx, functionName) {
+    def jqCommand = "jq -r '.[0] | split(\";\")[2] | split(\"=\")[1]'"
+    def storageAccountName = "az functionapp config appsettings list --name ${functionName} --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --query \"[?name=='AzureWebJobsStorage'].value\" | ${jqCommand}"
+    ctx.sh("$storageAccountName")
+    ctx.echo("Storage account name: $storageAccountName")
+
     def azDeleteFunctionStorage = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --yes"
     ctx.sh("$azDeleteFunctionStorage")
   }

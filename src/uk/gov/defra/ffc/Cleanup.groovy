@@ -25,7 +25,7 @@ class Cleanup implements Serializable {
         ctx.echo("Removing function $functionName after branch $branchName deleted")
         Function.deleteFunction(ctx, functionName)
         ctx.echo("Removing storage account for PR $closedPrNo of $repoName after branch $branchName deleted")
-        Function.deleteFunctionStorage(ctx, repoName, closedPrNo)
+        Function.deleteFunctionStorage(ctx, functionName)
       }
     }
   }
