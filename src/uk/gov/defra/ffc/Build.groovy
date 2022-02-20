@@ -26,8 +26,8 @@ class Build implements Serializable {
     return requestedBranch != null ? requestedBranch : defaultBranch
   }
 
-  static def getNodeTestVersion(defaultNodeTestVersion, requestedNodeTestVersion) {
-    return requestedNodeTestVersion != null ? requestedNodeTestVersion : defaultNodeTestVersion
+  static def getImageTestVersion(defaultImageTestVersion, requestedImageTestVersion) {
+    return requestedImageTestVersion != null ? requestedImageTestVersion : defaultImageTestVersion
   }
 
   static def checkoutSourceCode(ctx, defaultBranch) {

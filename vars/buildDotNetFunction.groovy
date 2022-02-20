@@ -1,10 +1,10 @@
 void call(Map config=[:]) {
   String defaultBranch = 'main'
   String environment = 'snd'
-  String containerSrcFolder = '\\/home\\/node'
-  String nodeDevelopmentImage = 'defradigital/node-development'
-  String nodeTestVersion = "1.2.11-node16.13.0"
-  String nodeTestImage = ''
+  String containerSrcFolder = '\\/home\\/dotnet'
+  String dotNetDevelopmentImage = 'defradigital/dotnetcore-development'
+  String dotNetTestVersion = "1.2.12-dotnet6.0"
+  String dotNetTestImage = ''
   String localSrcFolder = '.'
   String lcovFile = './test-output/lcov.info'
   String repoName = ''
@@ -22,9 +22,9 @@ void call(Map config=[:]) {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
 
-      stage('Set default node test version') {
-        nodeTestVersion = build.getImageTestVersion(nodeTestVersion, config.nodeTestVersion)
-        nodeTestImage = "${nodeDevelopmentImage}:${nodeTestVersion}"
+      stage('Set default .Net test version') {
+        dotNetTestVersion = build.getImageTestVersion(dotNetTestVersion, config.dotNetTestVersion)
+        dotNetTestImage = "${dotNetDevelopmentImage}:${dotNetTestVersion}"
       }
 
       stage('Set environment') {
@@ -50,14 +50,6 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
-      }
-
-      stage('Snyk test') {
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
-      }
-
       stage('Provision any required resources') {
          provision.createResources(environment, repoName, pr)
       }
@@ -69,21 +61,13 @@ void call(Map config=[:]) {
 
       if (fileExists('./test')) {
         stage('Run tests') {
-          build.runNodeTestImage(nodeTestImage)
-        }
-
-        stage('Create JUnit report') {
-          test.createJUnitReport()
-        }
-
-        stage('Fix lcov report') {
-          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+          build.runDotNetTestImage(dotNetTestImage)
         }
       }
 
 
       stage('SonarCloud analysis') {
-        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
+        test.analyseDotNetCode(repoName, config.project, BRANCH_NAME, defaultBranch, pr)
       }
 
       if (config.containsKey('testClosure')) {
@@ -128,7 +112,7 @@ void call(Map config=[:]) {
       throw e
     } finally {
       stage('Change ownership of outputs') {
-        test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
+        test.changeOwnershipOfWorkspace(dotNetDevelopmentImage, containerSrcFolder)
       }      
  
       stage('Clean up resources') {

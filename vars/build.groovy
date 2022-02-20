@@ -10,8 +10,8 @@ String getDefaultBranch(String defaultBranch, String requestedBranch) {
   return Build.getDefaultBranch(defaultBranch, requestedBranch)
 }
 
-String getNodeTestVersion(String defaultNodeTestVersion, String requestedNodeTestVersion) {
-  return Build.getNodeTestVersion(defaultNodeTestVersion, requestedNodeTestVersion)
+String getImageTestVersion(String defaultImageTestVersion, String requestedImageTestVersion) {
+  return Build.getNodeTestVersion(defaultImageTestVersion, requestedImageTestVersion)
 }
 
 String checkoutSourceCode(String defaultBranch) {
@@ -24,6 +24,10 @@ void buildTestImage(String credentialsId, String registry, String projectName, S
 
 void runNodeTestImage(nodeTestImage) {
   Docker.runNodeTestImage(this, nodeTestImage)
+}
+
+void runDotNetTestImage(dotNetTestImage) {
+  Docker.runDotNetTestImage(this, dotNetTestImage)
 }
 
 void runTests(String projectName, String serviceName, String buildNumber, String tag, String pr, String environment) {

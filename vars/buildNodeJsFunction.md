@@ -67,5 +67,5 @@ If a different environment within the Sandpit environment should be used for thi
 For example:
 
 ```
-buildNodeJsFunction project: 'FFCDemoDotNetCoreProjectName', environment: 'snd2'
+buildNodeJsFunction environment: 'snd2'
 ```
