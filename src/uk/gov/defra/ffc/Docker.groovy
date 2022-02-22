@@ -1,6 +1,12 @@
 package uk.gov.defra.ffc
 
 class Docker implements Serializable {
+
+  static def runNodeTestImage(ctx, nodeTestImage) {
+    ctx.sh('mkdir -p -m 777 test-output')
+    ctx.sh("docker run --rm -i -v \$(pwd)/jest.setup.js:/home/node/jest.setup.js -v \$(pwd)/jest.config.js:/home/node/jest.config.js -v \$(pwd)/test-output:/home/node/test-output -v \$(pwd)/app:/home/node/app -v \$(pwd)/test:/home/node/test -v \$(pwd)/package.json:/home/node/package.json ${nodeTestImage} /bin/sh -c 'npm install; npm run test'")
+  }
+
   static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
    ctx.docker.withRegistry("https://$registry", credentialsId) {
     ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build")

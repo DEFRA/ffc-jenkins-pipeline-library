@@ -2,6 +2,7 @@ package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.Helm
 import uk.gov.defra.ffc.Provision
+import uk.gov.defra.ffc.Function
 
 class Cleanup implements Serializable {
   static def prResources(ctx, environment, repoName, branchName) {
@@ -20,6 +21,11 @@ class Cleanup implements Serializable {
         Provision.deletePrResources(ctx, environment, repoName, closedPrNo)
         ctx.echo("Removing container image for PR $closedPrNo of $repoName after branch $branchName deleted")
         Docker.deleteContainerImage(ctx, repoName, "pr$closedPrNo")
+        String functionName = Function.createFunctionName(repoName, closedPrNo)
+        ctx.echo("Removing storage account for PR $closedPrNo of $repoName after branch $branchName deleted")
+        Function.deleteFunctionStorage(ctx, functionName)
+        ctx.echo("Removing function $functionName after branch $branchName deleted")
+        Function.deleteFunction(ctx, functionName)
       }
     }
   }
