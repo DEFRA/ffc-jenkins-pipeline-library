@@ -29,11 +29,7 @@ class Build implements Serializable {
   static def getNodeTestVersion(defaultNodeTestVersion, requestedNodeTestVersion) {
     return requestedNodeTestVersion != null ? requestedNodeTestVersion : defaultNodeTestVersion
   }
-
-  static def getDefaultFunctionVersion(defaultFunctionVersion, requestedFunctionVersion) {
-    return requestedFunctionVersion != null ? requestedFunctionVersion : defaultFunctionVersion
-  }
-
+  
   static def checkoutSourceCode(ctx, defaultBranch) {
     ctx.checkout(ctx.scm)
     ctx.sh("git remote set-branches --add origin ${defaultBranch}")
