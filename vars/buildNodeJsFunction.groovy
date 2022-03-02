@@ -1,5 +1,6 @@
 void call(Map config=[:]) {
   String defaultBranch = 'main'
+  String defaultFunctionVersion = '3'
   String environment = 'snd'
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
@@ -25,6 +26,10 @@ void call(Map config=[:]) {
       stage('Set default node test version') {
         nodeTestVersion = build.getNodeTestVersion(nodeTestVersion, config.nodeTestVersion)
         nodeTestImage = "${nodeDevelopmentImage}:${nodeTestVersion}"
+      }
+
+      stage('Set default function version') {
+        defaultFunctionVersion = build.getDefaultBranch(defaultFunctionVersion, config.defaultFunctionVersion)
       }
 
       stage('Set environment') {

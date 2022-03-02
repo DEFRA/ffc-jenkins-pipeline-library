@@ -12,7 +12,7 @@ class Function implements Serializable {
     return "$repoName"
   }
 
-  static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
+  static def createFunctionResources(ctx, repoName, pr, gitToken, branch, functionVersion) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       
       String functionName = createFunctionName(repoName, pr)
@@ -20,7 +20,7 @@ class Function implements Serializable {
       if(!checkFunctionAppExists(ctx, functionName)) {
         String storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile, pr)
         createFunctionStorage(ctx, storageAccountName)
-        createFunction(ctx, functionName, branch, storageAccountName)
+        createFunction(ctx, functionName, branch, storageAccountName, functionVersion)
       }
 
       enableGitAuth(ctx, gitToken)
@@ -50,8 +50,8 @@ class Function implements Serializable {
     ctx.sh("az functionapp deployment source update-token --git-token $gitToken")
   }
 
-  static def createFunction(ctx, functionName, defaultBranch, storageAccountName){
-    def azCreateFunction = "az functionapp create -n $functionName --storage-account $storageAccountName --consumption-plan-location ${ctx.AZURE_REGION} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
+  static def createFunction(ctx, functionName, defaultBranch, storageAccountName, functionVersion){
+    def azCreateFunction = "az functionapp create -n $functionName --storage-account $storageAccountName --plan ${AZURE_FUNCTION_APP_SERVICE_PLAN} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version $functionVersion"
     ctx.sh("$azCreateFunction")
   }
 

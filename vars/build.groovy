@@ -10,6 +10,10 @@ String getDefaultBranch(String defaultBranch, String requestedBranch) {
   return Build.getDefaultBranch(defaultBranch, requestedBranch)
 }
 
+String getDefaultFunctionVersion(String defaultFunctionVersion, String requestedFunctionVersion) {
+  return Build.getDefaultFunctionVersion(defaultFunctionVersion, requestedFunctionVersion)
+}
+
 String getNodeTestVersion(String defaultNodeTestVersion, String requestedNodeTestVersion) {
   return Build.getNodeTestVersion(defaultNodeTestVersion, requestedNodeTestVersion)
 }
