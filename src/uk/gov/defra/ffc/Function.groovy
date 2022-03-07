@@ -51,7 +51,7 @@ class Function implements Serializable {
   }
 
   static def createFunction(ctx, functionName, defaultBranch, storageAccountName){
-    def azCreateFunction = "az functionapp create -n $functionName --storage-account $storageAccountName --plan ${AZURE_FUNCTION_APP_SERVICE_PLAN} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
+    def azCreateFunction = "az functionapp create -n $functionName --storage-account $storageAccountName --plan ${ctx.AZURE_FUNCTION_APP_SERVICE_PLAN} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} --runtime node -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --functions-version 3"
     ctx.sh("$azCreateFunction")
   }
 
