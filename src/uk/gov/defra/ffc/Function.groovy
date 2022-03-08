@@ -21,10 +21,11 @@ class Function implements Serializable {
         String storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile, pr)
         createFunctionStorage(ctx, storageAccountName)
         createFunction(ctx, functionName, branch, storageAccountName)
+        enableGitAuth(ctx, gitToken)
+        deployFunction(ctx, functionName, branch, gitToken)
       }
 
-      enableGitAuth(ctx, gitToken)
-      deployFunction(ctx, functionName, branch, gitToken)
+      syncWithRepoFunction(ctx, functionName)
     }
   }
   
@@ -62,8 +63,13 @@ class Function implements Serializable {
 
   static def deployFunction(ctx, functionName, branch, gitToken){
     def repoUrl = Utils.getRepoUrl(ctx)
-    def azDeployFunction = "az functionapp deployment source config --git-token $gitToken --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch"
+    def azDeployFunction = "az functionapp deployment source config --git-token $gitToken --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch --manual-integration"
     ctx.sh("$azDeployFunction")
+  }
+
+  static def syncWithRepoFunction(ctx, functionName){
+    def azDeploySyncFunction = "az functionapp deployment source sync --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP}"
+    ctx.sh("$azDeploySyncFunction")
   }
 
   private static def deleteFunction(ctx, functionName) {
