@@ -69,7 +69,7 @@ void call(Map config=[:]) {
 
       if (fileExists('./test')) {
         stage('run test image') {
-          build.runNodeTestImage(nodeTestImage)
+          build.runNodeTestImage(nodeTestImage, repoName)
         }
 
         stage('Create JUnit report') {
