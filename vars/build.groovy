@@ -22,8 +22,8 @@ void buildTestImage(String credentialsId, String registry, String projectName, S
   Docker.buildTestImage(this, credentialsId, registry, projectName, buildNumber, tag)
 }
 
-void runNodeTestImage(nodeTestImage) {
-  Docker.runNodeTestImage(this, nodeTestImage)
+void runNodeTestImage(nodeTestImage, repoName) {
+  Docker.runNodeTestImage(this, nodeTestImage, repoName)
 }
 
 void runTests(String projectName, String serviceName, String buildNumber, String tag, String pr, String environment) {
