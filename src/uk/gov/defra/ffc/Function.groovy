@@ -30,7 +30,7 @@ class Function implements Serializable {
   }
   
   static Boolean checkFunctionAppExists(ctx, functionName) {
-    def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[].{Name:name}'")
+    def functionApps = ctx.sh(returnStdout: true, script: "az functionapp list --query '[].name'")
     Boolean checkExists = functionApps.contains("$functionName")
     ctx.echo("Function app $functionName exists: $checkExists")
     return checkExists
