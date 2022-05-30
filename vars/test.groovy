@@ -32,8 +32,8 @@ def buildCodeAnalysisDotNetParams(String projectName, String branch, String defa
   return Tests.buildCodeAnalysisDotNetParams(projectName, branch, defaultBranch, pr)
 }
 
-void runAcceptanceTests(String pr, String environment, String repoName) {
-  Tests.runAcceptanceTests(this, pr, environment, repoName)
+void runAcceptanceTests(String pr, String environment, String repoName, String buildNumber, String tag) {
+  Tests.runAcceptanceTests(this, pr, environment, repoName, buildNumber, tag)
 }
 
 void runJmeterTests(String pr, String environment, String repoName) {

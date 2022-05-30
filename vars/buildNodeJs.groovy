@@ -178,7 +178,7 @@ void call(Map config=[:]) {
 
       if (fileExists('./test/acceptance/docker-compose.yaml') && hasHelmChart) {
         stage('Run Acceptance Tests') {
-          test.runAcceptanceTests(pr, environment, repoName)
+          test.runAcceptanceTests(pr, environment, repoName, BUILD_NUMBER, tag)
         }
       }
 
