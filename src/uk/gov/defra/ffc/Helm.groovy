@@ -49,17 +49,17 @@ class Helm implements Serializable {
         // read Helm values file to get list of keys to match in Azure Application Configuration
         def helmValuesKeys = getHelmValuesKeys(ctx, helmValuesFilePath)
 
-        // first get all common keys from Azure Applicaiton Configuration matching Helm values
+        // first get all common keys from Azure Application Configuration matching Helm values
         String commonPrefix = 'common/'
         def commonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix))
         def commonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix, chartName))
 
-        // next get all environment specific keys from Azure Applicaiton Configuration matching Helm values
+        // next get all environment specific keys from Azure Application Configuration matching Helm values
         String environmentPrefix = environment + '/'
         def environmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix))
         def environmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix, chartName))
 
-        // next get all service specific keys from Azure Applicaiton Configuration if the values file includes a workstream property
+        // next get all service specific keys from Azure Application Configuration if the values file includes a workstream property
         String serviceName = ctx.sh(returnStdout: true, script: "yq r $helmValuesFilePath workstream").trim()
         def serviceCommonConfigValues
         def serviceCommonConfigValuesChart
@@ -180,17 +180,17 @@ class Helm implements Serializable {
 
             def helmValuesKeys = getHelmValuesKeys(ctx, helmValuesFilePath)
 
-            // first get all common keys from Azure Applicaiton Configuration matching Helm values
+            // first get all common keys from Azure Application Configuration matching Helm values
             String commonPrefix = 'common/'
             def commonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix))
             def commonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix, chartName))
 
-            // next get all environment specific keys from Azure Applicaiton Configuration matching Helm values
+            // next get all environment specific keys from Azure Application Configuration matching Helm values
             String environmentPrefix = environment + '/'
             def environmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix))
             def environmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, environmentPrefix, chartName))
 
-            // next get all service specific keys from Azure Applicaiton Configuration if the values file includes a workstream property
+            // next get all service specific keys from Azure Application Configuration if the values file includes a workstream property
             String serviceName = ctx.sh(returnStdout: true, script: "yq r $helmValuesFilePath workstream").trim()
             def serviceCommonConfigValues
             def serviceCommonConfigValuesChart
