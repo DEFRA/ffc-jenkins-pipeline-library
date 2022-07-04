@@ -118,7 +118,7 @@ class Build implements Serializable {
     item = null // CPS -- remove reference to non-serializable object
     for (job in jobs) {
       String branchName = job.fullName.substring(job.fullName.lastIndexOf('/') + 1)
-      if (branchName != defaultBranch) {
+      if (branchName != defaultBranch && branchName != ctx.BRANCH_NAME) {
         ctx.echo("Triggering build for branch: $branchName")
         job.scheduleBuild()
       }
