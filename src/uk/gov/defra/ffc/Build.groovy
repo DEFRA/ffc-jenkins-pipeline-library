@@ -119,8 +119,8 @@ class Build implements Serializable {
     for (jobName in jobNames) {
       String branchName = jobName.substring(jobName.lastIndexOf('/') + 1)
       if (branchName != defaultBranch) {
-        ctx.echo("Triggering build for branch: $branchName $jobName")
-        def job = Jenkins.instance.getJob(jobName)
+        ctx.echo("Triggering build for branch: $branchName")
+        def job = Jenkins.get().getJob(jobName)
         ctx.echo(job)
         job.scheduleBuild()
       }
