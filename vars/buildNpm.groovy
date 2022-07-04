@@ -30,10 +30,10 @@ def call(Map config=[:]) {
         stage('Verify version incremented') {
            version.verifyPackageJsonIncremented(defaultBranch)
         }
-      }
-
-      stage('Rebuild all feature branches') {
-        build.triggerMultiBranchBuilds()
+      } else {
+        stage('Rebuild all feature branches') {
+          build.triggerMultiBranchBuilds()
+        }
       }
 
       if (config.containsKey('validateClosure')) {
