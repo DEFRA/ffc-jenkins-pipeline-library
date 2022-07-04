@@ -121,6 +121,7 @@ class Build implements Serializable {
         ctx.echo("Triggering build for branch: $branchName")
         def job = Hudson.instance.getJob(jobName)
         job.scheduleBuild()
+      }
     }
   }
 }
