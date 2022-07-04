@@ -1,6 +1,7 @@
 package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.GitHubStatus
+import jenkins.model.Jenkins
 
 class Build implements Serializable {
   /**
@@ -112,14 +113,15 @@ class Build implements Serializable {
   static void triggerMultiBranchBuilds(def ctx, String defaultBranch) {
     String jobPath = ctx.JOB_NAME
     String multiBranchJob = jobPath.substring(0, jobPath.lastIndexOf('/'))
-    def item = jenkins.model.Jenkins.get().getItemByFullName(multiBranchJob)
+    def item = Jenkins.get().getItemByFullName(multiBranchJob)
     def jobNames = item.allJobs.collect {it.fullName}
     item = null // CPS -- remove reference to non-serializable object
     for (jobName in jobNames) {
       String branchName = jobName.substring(jobName.lastIndexOf('/') + 1)
       if (branchName != defaultBranch) {
-        ctx.echo("Triggering build for branch: $branchName")
-        def job = hudson.model.Hudson.instance.getJob(jobName)
+        ctx.echo("Triggering build for branch: $branchName $jobName")
+        def job = Jenkins.instance.getJob(jobName)
+        ctx.echo(job)
         job.scheduleBuild()
       }
     }
