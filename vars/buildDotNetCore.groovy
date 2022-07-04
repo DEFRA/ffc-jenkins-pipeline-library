@@ -43,6 +43,10 @@ void call(Map config=[:]) {
         stage('Verify version incremented') {
           version.verifyCSProjIncremented(config.project, defaultBranch)
         }
+      } else {
+        stage('Rebuild all feature branches') {
+          build.triggerMultiBranchBuilds()
+        }
       }
 
       if (config.containsKey('validateClosure')) {

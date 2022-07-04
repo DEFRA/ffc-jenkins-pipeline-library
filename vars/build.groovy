@@ -61,3 +61,7 @@ void pushContainerImage(String imageName) {
 Boolean containerTagExists(String imageName) {
   return Docker.containerTagExists(this, imageName)
 }
+
+void triggerMultiBranchBuilds() {
+  Build.triggerMultiBranchBuilds(this)
+}
