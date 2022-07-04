@@ -114,14 +114,12 @@ class Build implements Serializable {
     String jobPath = ctx.JOB_NAME
     String multiBranchJob = jobPath.substring(0, jobPath.lastIndexOf('/'))
     def item = Jenkins.get().getItemByFullName(multiBranchJob)
-    def jobNames = item.allJobs.collect {it.fullName}
+    def jobs = item.allJobs.collect { it }
     item = null // CPS -- remove reference to non-serializable object
-    for (jobName in jobNames) {
-      String branchName = jobName.substring(jobName.lastIndexOf('/') + 1)
+    for (job in jobs) {
+      String branchName = job.fullName.substring(job.fullName.lastIndexOf('/') + 1)
       if (branchName != defaultBranch) {
         ctx.echo("Triggering build for branch: $branchName")
-        def job = Jenkins.get().getJob(jobName)
-        ctx.echo(job)
         job.scheduleBuild()
       }
     }
