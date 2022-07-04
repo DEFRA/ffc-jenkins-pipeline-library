@@ -116,7 +116,7 @@ class Build implements Serializable {
     def jobNames = item.allJobs.collect {it.fullName}
     item = null // CPS -- remove reference to non-serializable object
     for (jobName in jobNames) {
-      String branchName = jobName.substring(jobName.lastIndexOf('/'))
+      String branchName = jobName.substring(jobName.lastIndexOf('/') + 1)
       ctx.echo(branchName)
       if(branchName != defaultBranch)
         // build job: jobName
