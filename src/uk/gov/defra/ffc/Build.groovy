@@ -110,13 +110,14 @@ class Build implements Serializable {
   }
 
   static void triggerMultiBranchBuilds(def ctx, String defaultBranch) {
-    String jobPath = ctx.JOB_NAME
-    String multiBranchJob = jobPath.substring(0, jobPath.lastIndexOf('/'))
+    String multiBranchJob = jobPath.substring(0, ctx.JOB_NAME.lastIndexOf('/'))
     def item = jenkins.model.Jenkins.get().getItemByFullName(multiBranchJob)
     def jobNames = item.allJobs.collect {it.fullName}
     item = null // CPS -- remove reference to non-serializable object
     for (jobName in jobNames) {
-      if(jobName.substring(jobName.lastIndexOf('/')) != defaultBranch)
+      String branchName = jobName.substring(jobName.lastIndexOf('/'))
+      ctx.echo(branchName)
+      if(branchName != defaultBranch)
         // build job: jobName
         ctx.echo(jobName)
     }
