@@ -119,7 +119,7 @@ class Build implements Serializable {
       String branchName = jobName.substring(jobName.lastIndexOf('/') + 1)
       if (branchName != defaultBranch) {
         ctx.echo("Triggering build for branch: $branchName")
-        ctx.'build job': jobName
+        ctx.build: jobName
     }
   }
 }
