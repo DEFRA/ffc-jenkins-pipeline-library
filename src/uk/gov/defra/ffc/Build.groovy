@@ -119,7 +119,8 @@ class Build implements Serializable {
       String branchName = jobName.substring(jobName.lastIndexOf('/') + 1)
       if (branchName != defaultBranch) {
         ctx.echo("Triggering build for branch: $branchName")
-        ctx.build: jobName
+        def job = Hudson.instance.getJob(jobName)
+        job.scheduleBuild()
     }
   }
 }
