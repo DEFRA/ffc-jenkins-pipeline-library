@@ -36,7 +36,7 @@ def call(Map config=[:]) {
         }
       } else {
         stage('Rebuild all feature branches') {
-          build.triggerMultiBranchBuilds()
+          build.triggerMultiBranchBuilds(defaultBranch)
         }
       }
 
