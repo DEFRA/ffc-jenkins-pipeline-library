@@ -1,6 +1,7 @@
 package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.GitHubStatus
+import jenkins.model.Jenkins
 
 class Build implements Serializable {
   /**
@@ -107,5 +108,19 @@ class Build implements Serializable {
           }
         }
       }
+  }
+
+  static void triggerMultiBranchBuilds(def ctx, String defaultBranch) {
+    String jobPath = ctx.JOB_NAME
+    String multiBranchJob = jobPath.substring(0, jobPath.lastIndexOf('/'))
+    def item = Jenkins.get().getItemByFullName(multiBranchJob)
+    def jobs = item.allJobs.collect { it }
+    for (job in jobs) {
+      String branchName = job.fullName.substring(job.fullName.lastIndexOf('/') + 1)
+      if (branchName != defaultBranch && branchName != ctx.BRANCH_NAME) {
+        ctx.echo("Triggering build for branch: $branchName")
+        job.scheduleBuild()
+      }
+    }
   }
 }
