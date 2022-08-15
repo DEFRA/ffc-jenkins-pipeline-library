@@ -11,15 +11,15 @@ class Tests implements Serializable {
       try {
         ctx.sh('mkdir -p -m 777 test-output')
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
-          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.migrate.yaml run database-up")
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.migrate.yaml run database-up")
         }
         ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr)) {
-          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
         }
       } finally {
-        ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
+        ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
-          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.migrate.yaml down -v")
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.migrate.yaml down -v")
         }
       }
     }
@@ -32,9 +32,9 @@ class Tests implements Serializable {
         try {
           // test-output exists if stage is run after 'runTests', take no risks and create it
           ctx.sh('mkdir -p -m 666 test-output')
-          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ zap-baseline-scan")
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ zap-baseline-scan")
         } finally {
-          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile down -v")
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile down -v")
         }
       }
   }
@@ -45,9 +45,9 @@ class Tests implements Serializable {
         String sanitizedTag = Utils.sanitizeTag(tag)
         try {
           ctx.sh('mkdir -p -m 666 test-output')
-          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f $dockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ $accessibilityTestType")
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f $dockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ $accessibilityTestType")
         } finally {
-          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f $dockerComposeFile down -v")
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f $dockerComposeFile down -v")
         }
       }
   }
