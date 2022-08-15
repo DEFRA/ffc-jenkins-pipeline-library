@@ -126,4 +126,8 @@ class Utils implements Serializable {
       false
     }
   }
+
+  static String sanitizeTag(String tag) {
+    return tag.replaceAll(".", "p")
+  }
 }

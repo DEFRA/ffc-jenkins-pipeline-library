@@ -7,18 +7,19 @@ import uk.gov.defra.ffc.Version
 class Tests implements Serializable {
   static def runTests(ctx, projectName, serviceName, buildNumber, tag, pr, environment) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunTests.Context, description: GitHubStatus.RunTests.Description) {
+      String sanitizedTag = Utils.sanitizeTag(tag)
       try {
         ctx.sh('mkdir -p -m 777 test-output')
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml run database-up")
+          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.migrate.yaml run database-up")
         }
         ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr)) {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
+          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml run $serviceName")
         }
       } finally {
-        ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
+        ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml down -v")
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.migrate.yaml down -v")
+          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.migrate.yaml down -v")
         }
       }
     }
@@ -27,12 +28,13 @@ class Tests implements Serializable {
   static def runZapScan(ctx, projectName, buildNumber, tag) {
     def zapDockerComposeFile = 'docker-compose.zap.yaml'
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.ZapScan.Context, description: GitHubStatus.ZapScan.Description) {
+        String sanitizedTag = Utils.sanitizeTag(tag)
         try {
           // test-output exists if stage is run after 'runTests', take no risks and create it
           ctx.sh('mkdir -p -m 666 test-output')
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ zap-baseline-scan")
+          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ zap-baseline-scan")
         } finally {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile down -v")
+          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f $zapDockerComposeFile down -v")
         }
       }
   }
@@ -40,11 +42,12 @@ class Tests implements Serializable {
   static def runAccessibilityTests(ctx, projectName, buildNumber, tag, accessibilityTestType) {
     def dockerComposeFile = "docker-compose.${accessibilityTestType}.yaml"
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunAccessibilityTests.Contexts[accessibilityTestType], description: GitHubStatus.RunAccessibilityTests.Description) {
+        String sanitizedTag = Utils.sanitizeTag(tag)
         try {
           ctx.sh('mkdir -p -m 666 test-output')
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $dockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ $accessibilityTestType")
+          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f $dockerComposeFile run -v /etc/ssl/certs/:/etc/ssl/certs/ -v /usr/local/share/ca-certificates/:/usr/local/share/ca-certificates/ $accessibilityTestType")
         } finally {
-          ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f $dockerComposeFile down -v")
+          ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f $dockerComposeFile down -v")
         }
       }
   }
