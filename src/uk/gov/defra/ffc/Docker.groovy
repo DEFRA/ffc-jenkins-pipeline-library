@@ -11,7 +11,7 @@ class Docker implements Serializable {
   static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
    ctx.docker.withRegistry("https://$registry", credentialsId) {
     String sanitizedTag = Utils.sanitizeTag(tag)
-    ctx.sh("docker-compose -p $projectName-$sanitizedTag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build")
+    ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build")
    }
   }
 
