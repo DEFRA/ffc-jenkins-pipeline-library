@@ -1,6 +1,8 @@
 package uk.gov.defra.ffc
 
 import uk.gov.defra.ffc.GitHubStatus
+import jenkins.model.Jenkins
+import uk.gov.defra.ffc.Utils
 
 class Build implements Serializable {
   /**
@@ -84,10 +86,11 @@ class Build implements Serializable {
   }
 
   static def extractSynkFiles(ctx, projectName, buildNumber, tag) {
+    String sanitizedTag = Utils.sanitizeTag(tag)
     try {
-      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.snyk.yaml up")
+      ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.snyk.yaml up")
     } finally {
-      ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.snyk.yaml down -v")
+      ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.snyk.yaml down -v")
     }
   }
 
@@ -107,5 +110,19 @@ class Build implements Serializable {
           }
         }
       }
+  }
+
+  static void triggerMultiBranchBuilds(def ctx, String defaultBranch) {
+    String jobPath = ctx.JOB_NAME
+    String multiBranchJob = jobPath.substring(0, jobPath.lastIndexOf('/'))
+    def item = Jenkins.get().getItemByFullName(multiBranchJob)
+    def jobs = item.allJobs.collect { it }
+    for (job in jobs) {
+      String branchName = job.fullName.substring(job.fullName.lastIndexOf('/') + 1)
+      if (branchName != defaultBranch && branchName != ctx.BRANCH_NAME) {
+        ctx.echo("Triggering build for branch: $branchName")
+        job.scheduleBuild()
+      }
+    }
   }
 }

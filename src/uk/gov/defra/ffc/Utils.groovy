@@ -96,6 +96,8 @@ class Utils implements Serializable {
 
     if (configValues.size() > 0) {
       ctx.echo("Following keys found with prefix=$appConfigPrefix and label=$appConfigLabel: ${configValues.keySet()}")
+    } else {
+      ctx.echo("No keys were found with prefix=$appConfigPrefix and label=$appConfigLabel. If you were expecting values for this configuration, check that 'environment', 'name', 'namespace', 'workstream' & 'image' are correct in the project's 'values.yaml'.")
     }
 
     return configValues
@@ -123,5 +125,9 @@ class Utils implements Serializable {
     } catch (_) {
       false
     }
+  }
+
+  static String sanitizeTag(String tag) {
+    return tag.replace(".", "p")
   }
 }

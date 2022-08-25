@@ -83,9 +83,11 @@ class Function implements Serializable {
     def storageAccountName = ctx.sh(returnStdout: true, script: "$functionAppSettingsCommand").trim()
     ctx.echo("Storage account name: $storageAccountName")
 
-    def azDeleteFunctionStorage = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} -y"
-    ctx.echo("Command: $azDeleteFunctionStorage")
-    ctx.sh("$azDeleteFunctionStorage")
+    if(storageAccountName != '') {
+      def azDeleteFunctionStorage = "az storage account delete -n $storageAccountName -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} -y"
+      ctx.echo("Command: $azDeleteFunctionStorage")
+      ctx.sh("$azDeleteFunctionStorage")
+    }
   }
 
   static def hasResourcesToProvision(ctx, filePath) {

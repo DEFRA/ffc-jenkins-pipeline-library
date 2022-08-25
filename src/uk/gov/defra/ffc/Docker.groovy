@@ -1,4 +1,5 @@
 package uk.gov.defra.ffc
+import uk.gov.defra.ffc.Utils
 
 class Docker implements Serializable {
 
@@ -9,7 +10,8 @@ class Docker implements Serializable {
 
   static def buildTestImage(ctx, credentialsId, registry, projectName, buildNumber, tag) {
    ctx.docker.withRegistry("https://$registry", credentialsId) {
-    ctx.sh("docker-compose -p $projectName-$tag-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build")
+    String sanitizedTag = Utils.sanitizeTag(tag)
+    ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.test.yaml build")
    }
   }
 
@@ -88,5 +90,5 @@ class Docker implements Serializable {
 
   static String[] getImageTags(def ctx, String image) {
     return ctx.sh(script: "curl https://index.docker.io/v1/repositories/$image/tags", returnStdout: true)
-  }
+  }  
 }
