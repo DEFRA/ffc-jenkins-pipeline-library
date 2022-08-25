@@ -210,9 +210,10 @@ class Tests implements Serializable {
             ctx.sh('mkdir -p -m 777 html-reports')
 
             ctx.withEnv(envVars) {
+              String sanitizedTag = Utils.sanitizeTag(tag)
               // Intentionally only use `docker-compose.yaml`. Abort on
               // container exit ensures exit code is returned from `sh` step.
-              ctx.sh("docker-compose -p $repoName-$tag-$buildNumber -f docker-compose.yaml up --build --abort-on-container-exit")
+              ctx.sh("docker-compose -p $repoName-${sanitizedTag}-$buildNumber -f docker-compose.yaml up --build --abort-on-container-exit")
             }
           }
         }
