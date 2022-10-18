@@ -2,7 +2,7 @@ package uk.gov.defra.ffc
 
 class ADO implements Serializable {
 
-  static void triggerPipeline(String namespace, String chartName, String chartVersion) {
+  static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion) {
     ctx.withCredentials([
       ctx.usernamePassword(credentialsId: 'ado-credentials', usernameVariable: 'username', passwordVariable: 'password')
     ]) {
