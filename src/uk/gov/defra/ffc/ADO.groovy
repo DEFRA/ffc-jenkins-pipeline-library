@@ -13,23 +13,23 @@ class ADO implements Serializable {
     ctx.echo "Triggering ADO Database pipeline for ${database} ${version}"
     String pipelineId = ctx.ADO_DATABASE_PIPELINE_ID
     def data = "'{\"templateParameters\": {\"database\":\"$database\",\"tagValue\":\"$version\"}}'"
-    triggerBuild(ctx, pipelineId, data)
+    triggerBuild(ctx, pipelineId, data, database, version)
   }
 
   static void triggerHelmPipeline(def ctx, String namespace, String chartName, String chartVersion) {
     ctx.echo "Triggering ADO Helm pipeline for ${chartName} ${chartVersion} in ${namespace}"
     String pipelineId = ctx.ADO_HELM_PIPELINE_ID
     def data = "'{\"templateParameters\": {\"namespace\": \"$namespace\",\"chart\":\"$chartName\",\"chartVersion\":\"$chartVersion\"}}'"
-    triggerBuild(ctx, pipelineId, data)
+    triggerBuild(ctx, pipelineId, data, chartName, chartVersion)
   }
 
-  static void triggerBuild(def ctx, pipelineId, data) {
+  static void triggerBuild(def ctx, pipelineId, data, repository, version) {
     ctx.withCredentials([
       ctx.usernamePassword(credentialsId: 'ado-credentials', usernameVariable: 'username', passwordVariable: 'password')
     ]) {
       String buildId = ctx.sh(returnStdout: true, script: "curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?api-version=6.0-preview.1 -H 'Content-Type: application/json' -d $data | jq '.id'").trim()
       if(buildId) {
-        tagBuild(ctx, buildId, database, version)
+        tagBuild(ctx, buildId, repository, version)
       }
     }
   }
