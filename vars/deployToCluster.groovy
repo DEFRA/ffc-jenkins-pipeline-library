@@ -1,11 +1,11 @@
 void call(Map config=[:], Closure body={}) {
-  Boolean hasDatabase = true
+  Boolean hasDatabase = false
 
   node {
     try {
-      // stage('Deploy Database') {
-      //   hasDatabase = database.runRemoteMigrations(config.environment, config.chartName, config.chartVersion)
-      // }
+      stage('Deploy Database') {
+        hasDatabase = database.runRemoteMigrations(config.environment, config.chartName, config.chartVersion)
+      }
       stage('Deploy Helm chart') {
         helm.deployRemoteChart(config.environment, config.namespace, config.chartName, config.chartVersion, config.helmChartRepoType)
       }
