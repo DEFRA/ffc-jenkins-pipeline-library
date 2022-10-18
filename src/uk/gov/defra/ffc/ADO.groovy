@@ -28,6 +28,7 @@ class ADO implements Serializable {
       ctx.usernamePassword(credentialsId: 'ado-credentials', usernameVariable: 'username', passwordVariable: 'password')
     ]) {
       String buildId = ctx.sh(returnStdout: true, script: "curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?api-version=6.0-preview.1 -H 'Content-Type: application/json' -d $data | jq '.id'").trim()
+      ctx.echo "Build ID: ${buildId}"
       if(buildId) {
         tagBuild(ctx, buildId, database, version)
       }
