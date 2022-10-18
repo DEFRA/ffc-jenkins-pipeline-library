@@ -7,8 +7,11 @@ Below are the methods available on the script. They can be executed by calling
 
 ## triggerPipeline
 
-Triggers an Azure DevOps pipeline.
+Triggers Azure DevOps pipeline for Kubernetes deployments.
 
-Takes two parameters
-- the default branch to use if one is not supplied, e.g. `main`
-- optional override to the default
+Takes four parameters:
+- target namespace <String>
+- Helm chart name <String>
+- Helm chart version <String>
+- whether the application has a database <Boolean>
+
