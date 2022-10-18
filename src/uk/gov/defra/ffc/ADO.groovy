@@ -39,7 +39,6 @@ class ADO implements Serializable {
     ctx.withCredentials([
       ctx.usernamePassword(credentialsId: 'ado-credentials', usernameVariable: 'username', passwordVariable: 'password')
     ]) {
-      ctx.echo("Tagging build ${buildId} with ${repository} ${version}")
       def data = "'[\"$repository\", \"$version\"]'"
       ctx.sh("curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/build/builds/${buildId}/tags?api-version=6.0 -H 'Content-Type: application/json' -d $data")
     }
