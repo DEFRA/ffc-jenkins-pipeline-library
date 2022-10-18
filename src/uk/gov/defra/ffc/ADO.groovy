@@ -35,13 +35,13 @@ class ADO implements Serializable {
   }
 
   static void tagBuild(def ctx, String buildId, String repository, String version) {
-    ctx.withCredentials([
-      ctx.usernamePassword(credentialsId: 'ado-credentials', usernameVariable: 'username', passwordVariable: 'password')
-    ]) {
-      ctx.echo "Tagging build ${buildId} with ${repository} ${version}"
-      //def data = '[\"$repository\", \"$version\"]'"
-      def data = "[]"
-      ctx.sh("curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/build/builds/${buildId}/tags?api-version=6.0 -H 'Content-Type: application/json' -d ${data} ")
-    }
+    // ctx.withCredentials([
+    //   ctx.usernamePassword(credentialsId: 'ado-credentials', usernameVariable: 'username', passwordVariable: 'password')
+    // ]) {
+    //   //def data = '[\"$repository\", \"$version\"]'"
+    //   def data = "[]"
+    //   ctx.sh("curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/build/builds/${buildId}/tags?api-version=6.0 -H 'Content-Type: application/json' -d ${data} ")
+    // }
+    ctx.echo "Tagging build ${buildId} with ${repository} ${version}"
   }
 }
