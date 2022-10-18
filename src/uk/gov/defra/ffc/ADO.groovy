@@ -6,20 +6,20 @@ class ADO implements Serializable {
     if (hasDatabase) {
       triggerDatabasePipeline(ctx, chartName, chartVersion)
     }
-    triggerHelmPipeline(ctx, namespace, chartName, chartVersion)  
+    triggerHelmPipeline(ctx, namespace, chartName, chartVersion)
   }
 
   static void triggerDatabasePipeline(def ctx, String database, String version) {
     ctx.echo "Triggering ADO Database pipeline for ${database} ${version}"
     String pipelineId = ctx.ADO_DATABASE_PIPELINE_ID
-    def data = '{\"templateParameters\": {\"database\":\"$database\",\"tagValue\":\"$version\"}}'
+    def data = "{\"templateParameters\": {\"database\":\"$database\",\"tagValue\":\"$version\"}}"
     triggerBuild(ctx, pipelineId, data)
   }
 
   static void triggerHelmPipeline(def ctx, String namespace, String chartName, String chartVersion) {
     ctx.echo "Triggering ADO Helm pipeline for ${chartName} ${chartVersion} in ${namespace}"
     String pipelineId = ctx.ADO_HELM_PIPELINE_ID
-    def data = '{\"templateParameters\": {\"namespace\": \"$namespace\",\"chart\":\"$chartName\",\"chartVersion\":\"$chartVersion\"}}'
+    def data = "{\"templateParameters\": {\"namespace\": \"$namespace\",\"chart\":\"$chartName\",\"chartVersion\":\"$chartVersion\"}}"
     triggerBuild(ctx, pipelineId, data)
   }
 
