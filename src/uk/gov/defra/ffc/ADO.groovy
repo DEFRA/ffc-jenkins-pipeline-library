@@ -13,7 +13,7 @@ class ADO implements Serializable {
     ]) {
       ctx.echo "Triggering ADO Database pipeline for ${database} ${version}"
       String pipelineId = ctx.ADO_DATABASE_PIPELINE_ID
-      ctx.sh("curl -v -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?api-version=6.0-preview.1 -H 'Content-Type: application/json' -d '{\"templateParameters\": {\"database\":\"$database\",\"tagValue\":\"$version\"}}'")
+      ctx.sh("curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?api-version=6.0-preview.1 -H 'Content-Type: application/json' -d '{\"templateParameters\": {\"database\":\"$database\",\"tagValue\":\"$version\"}}'")
     }
   }
 
@@ -23,7 +23,7 @@ class ADO implements Serializable {
     ]) {
       ctx.echo "Triggering ADO Helm pipeline for ${chartName} ${chartVersion} in ${namespace}"
       String pipelineId = ctx.ADO_HELM_PIPELINE_ID
-      ctx.sh("curl -v -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?api-version=6.0-preview.1 -H 'Content-Type: application/json' -d '{\"templateParameters\": {\"namespace\": \"$namespace\",\"chart\":\"$chartName\",\"chartVersion\":\"$chartVersion\"}}'")
+      ctx.sh("curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?api-version=6.0-preview.1 -H 'Content-Type: application/json' -d '{\"templateParameters\": {\"namespace\": \"$namespace\",\"chart\":\"$chartName\",\"chartVersion\":\"$chartVersion\"}}'")
     }
   }
 }

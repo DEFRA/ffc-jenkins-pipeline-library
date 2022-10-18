@@ -7,7 +7,7 @@ void call(Map config=[:], Closure body={}) {
       // stage('Deploy Helm chart') {
       //   helm.deployRemoteChart(config.environment, config.namespace, config.chartName, config.chartVersion, config.helmChartRepoType)
       // }
-      stage('Trigger ADO pipeline') {
+      stage('Trigger ADO pipelines') {
         ado.triggerPipeline(config.namespace, config.chartName, config.chartVersion)
       }
       body()
