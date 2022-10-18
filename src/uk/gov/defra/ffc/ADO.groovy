@@ -2,8 +2,10 @@ package uk.gov.defra.ffc
 
 class ADO implements Serializable {
 
-  static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion) {
-    triggerDatabasePipeline(ctx, chartName, chartVersion)
+  static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion, Boolean hasDatabase) {
+    if (hasDatabase) {
+      triggerDatabasePipeline(ctx, chartName, chartVersion)
+    }
     triggerHelmPipeline(ctx, namespace, chartName, chartVersion)
   }
 
