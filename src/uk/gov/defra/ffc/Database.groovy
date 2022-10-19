@@ -66,7 +66,7 @@ class Database implements Serializable {
     }
   }
 
-  static runRemoteMigrations(ctx, environment, repoName, version) {
+  static Boolean runRemoteMigrations(ctx, environment, repoName, version) {
     ctx.sh("rm -rf DEFRA-${repoName}*")
     ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
     ctx.sh("tar -xvf release")
@@ -77,7 +77,10 @@ class Database implements Serializable {
         ctx.echo("release has migrations - applying...")
         ctx.withEnv(Provision.getMigrationEnvVars(ctx, environment, repoName, '')) {
           ctx.sh("docker-compose -p $repoName-${ctx.BUILD_NUMBER} -f docker-compose.migrate.yaml run --no-deps database-up")
+          return true
         }
+      } else {
+        return false
       }
     }
   }
