@@ -47,7 +47,7 @@ class ADO implements Serializable {
   }
 
   static String getToken(ctx) {
-    String getTokenCommand = "az account get-access–token —resource 499b84ac-1321-427f-aa17-267ca6975798 | jq '.token'"
+    String getTokenCommand = "az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 | jq '.token'"
     String token = ctx.sh(returnStdout: true, script: "$getTokenCommand").trim()
     return token
   }
