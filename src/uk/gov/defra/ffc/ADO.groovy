@@ -51,7 +51,7 @@ class ADO implements Serializable {
     String token = ctx.sh(returnStdout: true, script: "$getTokenCommand").trim()
     String encodedToken = token.bytes.encodeBase64().toString()
     ctx.echo "Token: ${encodedToken}"
-    ctx.sh("az ad signed-in-user show")
+    ctx.sh("az account show")
     return encodedToken
   }
 }
