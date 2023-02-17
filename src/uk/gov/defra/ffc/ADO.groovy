@@ -1,7 +1,6 @@
 package uk.gov.defra.ffc
 
 class ADO implements Serializable {
-
   static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion, Boolean hasDatabase) {
     String service = getServiceName(chartName)
     if (hasDatabase) {
@@ -11,13 +10,6 @@ class ADO implements Serializable {
   }
 
   static String getServiceName(String chartName) {
-    // ffc-demo* -> demo
-    // ffc-pay* -> payments
-    // ffc-ahwr* -> vetvisits
-    // ffc-pr* -> pr
-    // ea-wq* -> ea-wq
-    // ffc-grants* -> grants
-    // ffc-mpdp* -> mpdp
     String[] parts = chartName.split('-')
     String prefix = "${parts[0]}-${parts[1]}"
     switch(prefix) {
