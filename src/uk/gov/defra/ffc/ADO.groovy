@@ -2,33 +2,27 @@ package uk.gov.defra.ffc
 
 class ADO implements Serializable {
   static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion, Boolean hasDatabase) {
-    String service = getServiceName(chartName)
+    String service = getServiceName(namespace)
     if (hasDatabase) {
       triggerDatabasePipeline(ctx, service, chartName, chartVersion)
     }
     triggerHelmPipeline(ctx, service, namespace, chartName, chartVersion)
   }
 
-  static String getServiceName(String chartName) {
-    String[] parts = chartName.split('-')
-    String prefix = "${parts[0]}-${parts[1]}"
-    switch(prefix) {
-      case 'ffc-demo':
-        return 'demo'
-      case 'ffc-pay':
-        return 'payments'
-      case 'ffc-ahwr':
-        return 'vetvisits'
-      case 'ffc-pr':
-        return 'pr'
-      case 'ea-wq':
-        return 'ea-wq'
-      case 'ffc-grants':
-        return 'grants'
-      case 'ffc-mpdp':
-        return 'mpdp'
-      default:
-        throw new Exception("Unable to determine service name for chart ${chartName}")
+  static String getServiceName(String namespace) {
+    def services = [
+      'ffc-demo': 'demo',
+      'ffc-pay': 'payments',
+      'ffc-ahwr': 'vetvisits',
+      'ffc-pr': 'pr',
+      'ea-wq': 'ea-wq',
+      'ffc-grants': 'grants',
+      'ffc-mpdp': 'mpdp'
+    ]
+
+    String service = services[namespace]
+    if (!service) {
+      throw new Exception("Unable to determine service name for namespace ${namespace}")
     }
   }
 
