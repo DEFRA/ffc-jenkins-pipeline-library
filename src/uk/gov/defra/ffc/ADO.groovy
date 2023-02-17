@@ -3,10 +3,12 @@ package uk.gov.defra.ffc
 class ADO implements Serializable {
   static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion, Boolean hasDatabase) {
     String service = getServiceName(namespace)
-    if (hasDatabase) {
-      triggerDatabasePipeline(ctx, service, chartName, chartVersion)
+    if(service) {
+      if (hasDatabase) {
+        triggerDatabasePipeline(ctx, service, chartName, chartVersion)
+      }
+      triggerHelmPipeline(ctx, service, namespace, chartName, chartVersion)
     }
-    triggerHelmPipeline(ctx, service, namespace, chartName, chartVersion)
   }
 
   static String getServiceName(String namespace) {
@@ -20,11 +22,7 @@ class ADO implements Serializable {
       'ffc-mpdp': 'mpdp'
     ]
 
-    String service = services[namespace]
-    if (!service) {
-      throw new Exception("Unable to determine service name for namespace ${namespace}")
-    }
-    return service
+    return services[namespace]
   }
 
   static void triggerDatabasePipeline(def ctx, String service, String database, String version) {
