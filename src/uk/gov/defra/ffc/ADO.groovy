@@ -1,25 +1,43 @@
 package uk.gov.defra.ffc
 
 class ADO implements Serializable {
-
   static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion, Boolean hasDatabase) {
-    if (hasDatabase) {
-      triggerDatabasePipeline(ctx, chartName, chartVersion)
+    String service = getServiceName(namespace)
+    if(service) {
+      if (hasDatabase) {
+        triggerDatabasePipeline(ctx, service, chartName, chartVersion)
+      }
+      triggerHelmPipeline(ctx, service, namespace, chartName, chartVersion)
+    } else {
+      ctx.echo "No ADO pipeline configured for ${namespace}"
     }
-    triggerHelmPipeline(ctx, namespace, chartName, chartVersion)
   }
 
-  static void triggerDatabasePipeline(def ctx, String database, String version) {
+  static String getServiceName(String namespace) {
+    def services = [
+      'ffc-demo': 'demo',
+      'ffc-pay': 'payments',
+      'ffc-ahwr': 'vetvisits',
+      'ffc-pr': 'pr',
+      'ea-wq': 'ea-wq',
+      'ffc-grants': 'grants',
+      'ffc-mpdp': 'mpdp'
+    ]
+
+    return services[namespace]
+  }
+
+  static void triggerDatabasePipeline(def ctx, String service, String database, String version) {
     ctx.echo "Triggering ADO Database pipeline for ${database} ${version}"
     String pipelineId = ctx.ADO_DATABASE_PIPELINE_ID
-    def data = "'{\"templateParameters\": {\"database\":\"$database\",\"tagValue\":\"$version\"}}'"
+    def data = "'{\"templateParameters\": {\"databaseRepo\":\"$database\",\"version\":\"$version\",\"service\":\"$service\"}}'"
     triggerBuild(ctx, pipelineId, data, database, version)
   }
 
-  static void triggerHelmPipeline(def ctx, String namespace, String chartName, String chartVersion) {
+  static void triggerHelmPipeline(def ctx, String service, String namespace, String chartName, String chartVersion) {
     ctx.echo "Triggering ADO Helm pipeline for ${chartName} ${chartVersion} in ${namespace}"
     String pipelineId = ctx.ADO_HELM_PIPELINE_ID
-    def data = "'{\"templateParameters\": {\"chart\":\"$chartName\",\"chartVersion\":\"$chartVersion\"}}'"
+    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"version\":\"$chartVersion\",\"service\":\"$service\"}}'"
     triggerBuild(ctx, pipelineId, data, chartName, chartVersion)
   }
 
