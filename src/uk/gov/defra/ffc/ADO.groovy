@@ -3,23 +3,54 @@ package uk.gov.defra.ffc
 class ADO implements Serializable {
 
   static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion, Boolean hasDatabase) {
+    String service = getServiceName(chartName)
     if (hasDatabase) {
-      triggerDatabasePipeline(ctx, chartName, chartVersion)
+      triggerDatabasePipeline(ctx, service, chartName, chartVersion)
     }
-    triggerHelmPipeline(ctx, namespace, chartName, chartVersion)
+    triggerHelmPipeline(ctx, service, namespace, chartName, chartVersion)
   }
 
-  static void triggerDatabasePipeline(def ctx, String database, String version) {
+  static String getServiceName(String chartName) {
+    // ffc-demo* -> demo
+    // ffc-pay* -> payments
+    // ffc-ahwr* -> vetvisits
+    // ffc-pr* -> pr
+    // ea-wq* -> ea-wq
+    // ffc-grants* -> grants
+    // ffc-mpdp* -> mpdp
+    String[] parts = chartName.split('-')
+    String prefix = "${parts[0]}-${parts[1]}"
+    switch(prefix) {
+      case 'ffc-demo':
+        return 'demo'
+      case 'ffc-pay':
+        return 'payments'
+      case 'ffc-ahwr':
+        return 'vetvisits'
+      case 'ffc-pr':
+        return 'pr'
+      case 'ea-wq':
+        return 'ea-wq'
+      case 'ffc-grants':
+        return 'grants'
+      case 'ffc-mpdp':
+        return 'mpdp'
+      default:
+        throw new Exception("Unable to determine service name for chart ${chartName}")
+    }
+  }
+
+  static void triggerDatabasePipeline(def ctx, String service, String database, String version) {
     ctx.echo "Triggering ADO Database pipeline for ${database} ${version}"
     String pipelineId = ctx.ADO_DATABASE_PIPELINE_ID
-    def data = "'{\"templateParameters\": {\"database\":\"$database\",\"tagValue\":\"$version\"}}'"
+    def data = "'{\"templateParameters\": {\"databaseRepo\":\"$database\",\"version\":\"$version\",\"service\":\"$service\"}}'"
     triggerBuild(ctx, pipelineId, data, database, version)
   }
 
-  static void triggerHelmPipeline(def ctx, String namespace, String chartName, String chartVersion) {
+  static void triggerHelmPipeline(def ctx, String service, String namespace, String chartName, String chartVersion) {
     ctx.echo "Triggering ADO Helm pipeline for ${chartName} ${chartVersion} in ${namespace}"
     String pipelineId = ctx.ADO_HELM_PIPELINE_ID
-    def data = "'{\"templateParameters\": {\"chart\":\"$chartName\",\"chartVersion\":\"$chartVersion\"}}'"
+    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"version\":\"$chartVersion\",\"service\":\"$service\"}}'"
     triggerBuild(ctx, pipelineId, data, chartName, chartVersion)
   }
 
