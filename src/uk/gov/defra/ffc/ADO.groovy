@@ -8,6 +8,8 @@ class ADO implements Serializable {
         triggerDatabasePipeline(ctx, service, chartName, chartVersion)
       }
       triggerHelmPipeline(ctx, service, namespace, chartName, chartVersion)
+    } else {
+      ctx.echo "No ADO pipeline configured for ${namespace}"
     }
   }
 
