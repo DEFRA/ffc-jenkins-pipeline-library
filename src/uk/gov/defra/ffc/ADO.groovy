@@ -24,6 +24,7 @@ class ADO implements Serializable {
     if (!service) {
       throw new Exception("Unable to determine service name for namespace ${namespace}")
     }
+    return service
   }
 
   static void triggerDatabasePipeline(def ctx, String service, String database, String version) {
