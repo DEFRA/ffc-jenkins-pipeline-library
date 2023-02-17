@@ -62,7 +62,7 @@ buildNodeJs defaultBranch: 'master'
 ## Environment
 
 As part of the PR workflow, every commit will be dynamically deployed to the default Sandpit cluster, `snd`.  This also applied to all main branch code post merge.  
-If a different environment within the Sandpit environment should be used for this purpose then the default can be overriden.
+If a different environment within the Sandpit environment should be used for this purpose then the default can be overridden.
 
 For example:
 
@@ -78,7 +78,7 @@ For example:
 buildNodeJs triggerDeployment: false
 ```
 
-The build will assume the deployment pipeline has the naming convention `<repsitory name>-deploy`.  This can be overridden for custom naming conventions.
+The build will assume the deployment pipeline has the naming convention `<repository name>-deploy`.  This can be overridden for custom naming conventions.
 
 For example:
 
