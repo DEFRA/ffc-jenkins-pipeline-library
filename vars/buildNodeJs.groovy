@@ -68,9 +68,9 @@ void call(Map config=[:]) {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
 
-      stage('Provision any required resources') {
-        provision.createResources(environment, repoName, pr)
-      }
+      // stage('Provision any required resources') {
+      //   provision.createResources(environment, repoName, pr)
+      // }
 
       if (config.containsKey('buildClosure')) {
         config['buildClosure']()
