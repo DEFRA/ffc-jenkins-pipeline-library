@@ -83,7 +83,7 @@ class Tests implements Serializable {
           args = args + " -D$param.key=$param.value"
         }
 
-        ctx.sh("$scannerHome/bin/sonar-scanner$args")
+        ctx.sh("$scannerHome/bin/sonar-scanner$args -X")
       }
     }
   }
