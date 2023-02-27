@@ -233,9 +233,9 @@ class Provision implements Serializable {
       getMigrationFiles(ctx, migrationFolder)
 
       ctx.withEnv(getMigrationEnvVars(ctx, environment, repoName, pr)) {
-        // ctx.dir(migrationFolder) {
-        //   ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
-        // }
+        ctx.dir(migrationFolder) {
+          ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run schema-up")
+        }
         ctx.sh("docker-compose -p $repoName-$pr -f docker-compose.migrate.yaml run --no-deps database-up")
       }
     }
