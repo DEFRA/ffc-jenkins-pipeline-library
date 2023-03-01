@@ -21,7 +21,8 @@ class ADO implements Serializable {
       'ffc-pr': 'pr',
       'ea-wq': 'ea-wq',
       'ffc-grants': 'grants',
-      'ffc-mpdp': 'mpdp'
+      'ffc-mpdp': 'mpdp',
+      'ffc-doc': 'documents'
     ]
 
     return services[namespace]
