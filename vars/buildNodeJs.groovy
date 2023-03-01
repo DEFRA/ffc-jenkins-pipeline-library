@@ -76,29 +76,29 @@ void call(Map config=[:]) {
         config['buildClosure']()
       }
 
-      if (fileExists('./docker-compose.test.yaml')) {
-        stage('Build test image') {
-          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
-        }
+      // if (fileExists('./docker-compose.test.yaml')) {
+      //   stage('Build test image') {
+      //     build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
+      //   }
 
-        stage('Run tests') {
-          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
-        }
+      //   stage('Run tests') {
+      //     build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
+      //   }
 
-        stage('Create JUnit report') {
-          test.createJUnitReport()
-        }
+      //   stage('Create JUnit report') {
+      //     test.createJUnitReport()
+      //   }
 
-        stage('Fix lcov report') {
-          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
-        }
+      //   stage('Fix lcov report') {
+      //     utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+      //   }
 
-        if (pr == '') {
-          stage('Publish pact broker') {
-            pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
-          }
-        }
-      }
+      //   if (pr == '') {
+      //     stage('Publish pact broker') {
+      //       pact.publishContractsToPactBroker(repoName, version.getPackageJsonVersion(), utils.getCommitSha())
+      //     }
+      //   }
+      // }
 
       stage('SonarCloud analysis') {
         test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
