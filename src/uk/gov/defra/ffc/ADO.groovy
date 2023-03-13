@@ -2,14 +2,10 @@ package uk.gov.defra.ffc
 
 class ADO implements Serializable {
   static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion, Boolean hasDatabase) {
-    if(service) {
-      if (hasDatabase) {
-        triggerDatabasePipeline(ctx, namespace, chartName, chartVersion)
-      }
-      triggerHelmPipeline(ctx, namespace, chartName, chartVersion)
-    } else {
-      ctx.echo "No ADO pipeline configured for ${namespace}"
+    if (hasDatabase) {
+      triggerDatabasePipeline(ctx, namespace, chartName, chartVersion)
     }
+    triggerHelmPipeline(ctx, namespace, chartName, chartVersion)
   }
 
   static void triggerDatabasePipeline(def ctx, String service, String database, String version) {
