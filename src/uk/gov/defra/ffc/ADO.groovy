@@ -2,30 +2,10 @@ package uk.gov.defra.ffc
 
 class ADO implements Serializable {
   static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion, Boolean hasDatabase) {
-    String service = getServiceName(namespace)
-    if(service) {
-      if (hasDatabase) {
-        triggerDatabasePipeline(ctx, service, chartName, chartVersion)
-      }
-      triggerHelmPipeline(ctx, service, namespace, chartName, chartVersion)
-    } else {
-      ctx.echo "No ADO pipeline configured for ${namespace}"
+    if (hasDatabase) {
+      triggerDatabasePipeline(ctx, namespace, chartName, chartVersion)
     }
-  }
-
-  static String getServiceName(String namespace) {
-    def services = [
-      'ffc-demo': 'demo',
-      'ffc-pay': 'payments',
-      'ffc-ahwr': 'vetvisits',
-      'ffc-pr': 'pr',
-      'ea-wq': 'ea-wq',
-      'ffc-grants': 'grants',
-      'ffc-mpdp': 'mpdp',
-      'ffc-doc': 'documents'
-    ]
-
-    return services[namespace]
+    triggerHelmPipeline(ctx, namespace, chartName, chartVersion)
   }
 
   static void triggerDatabasePipeline(def ctx, String service, String database, String version) {
@@ -35,10 +15,10 @@ class ADO implements Serializable {
     triggerBuild(ctx, pipelineId, data, database, version)
   }
 
-  static void triggerHelmPipeline(def ctx, String service, String namespace, String chartName, String chartVersion) {
+  static void triggerHelmPipeline(def ctx, String namespace, String chartName, String chartVersion) {
     ctx.echo "Triggering ADO Helm pipeline for ${chartName} ${chartVersion} in ${namespace}"
     String pipelineId = ctx.ADO_HELM_PIPELINE_ID
-    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"version\":\"$chartVersion\",\"service\":\"$service\"}}'"
+    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"version\":\"$chartVersion\",\"service\":\"$namespace\"}}'"
     triggerBuild(ctx, pipelineId, data, chartName, chartVersion)
   }
 
