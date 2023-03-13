@@ -16,14 +16,16 @@ class ADO implements Serializable {
   static void triggerDatabasePipeline(def ctx, String service, String database, String version) {
     ctx.echo "Triggering ADO Database pipeline for ${database} ${version}"
     String pipelineId = ctx.ADO_DATABASE_PIPELINE_ID
-    def data = "'{\"templateParameters\": {\"databaseRepo\":\"$database\",\"version\":\"$version\",\"service\":\"$service\"}}'"
+    String branch = "marty/apply-real-service-names"
+    def data = "'{\"templateParameters\": {\"databaseRepo\":\"$database\",\"version\":\"$version\",\"service\":\"$service\",\"branch\":\"$branch\"}}'"
     triggerBuild(ctx, pipelineId, data, database, version)
   }
 
   static void triggerHelmPipeline(def ctx, String namespace, String chartName, String chartVersion) {
     ctx.echo "Triggering ADO Helm pipeline for ${chartName} ${chartVersion} in ${namespace}"
     String pipelineId = ctx.ADO_HELM_PIPELINE_ID
-    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"version\":\"$chartVersion\",\"service\":\"$namespace\"}}'"
+    String branch = "marty/apply-real-service-names"
+    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"version\":\"$chartVersion\",\"service\":\"$namespace\",\"branch\":\"$branch\"}}'"
     triggerBuild(ctx, pipelineId, data, chartName, chartVersion)
   }
 
@@ -31,7 +33,7 @@ class ADO implements Serializable {
     ctx.withCredentials([
       ctx.usernamePassword(credentialsId: 'ado-credentials', usernameVariable: 'username', passwordVariable: 'password')
     ]) {
-      String buildId = ctx.sh(returnStdout: true, script: "curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?pipelineVersion=marty%2fapply-real-service-names&api-version=6.0-preview.1 -H 'Content-Type: application/json' -d $data | jq '.id'").trim()
+      String buildId = ctx.sh(returnStdout: true, script: "curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?api-version=6.0-preview.1 -H 'Content-Type: application/json' -d $data | jq '.id'").trim()
       if(buildId) {
         tagBuild(ctx, buildId, repository, version)
       }
