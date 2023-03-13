@@ -2,7 +2,6 @@ package uk.gov.defra.ffc
 
 class ADO implements Serializable {
   static void triggerPipeline(def ctx, String namespace, String chartName, String chartVersion, Boolean hasDatabase) {
-    String service = getServiceName(namespace)
     if(service) {
       if (hasDatabase) {
         triggerDatabasePipeline(ctx, namespace, chartName, chartVersion)
