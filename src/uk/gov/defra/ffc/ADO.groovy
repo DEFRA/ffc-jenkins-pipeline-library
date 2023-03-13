@@ -31,7 +31,7 @@ class ADO implements Serializable {
     ctx.withCredentials([
       ctx.usernamePassword(credentialsId: 'ado-credentials', usernameVariable: 'username', passwordVariable: 'password')
     ]) {
-      String buildId = ctx.sh(returnStdout: true, script: "curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?api-version=6.0-preview.1 -H 'Content-Type: application/json' -d $data | jq '.id'").trim()
+      String buildId = ctx.sh(returnStdout: true, script: "curl -u $ctx.username:$ctx.password https://dev.azure.com/defragovuk/DEFRA-FFC/_apis/pipelines/${pipelineId}/runs?pipelineVersion=marty/apply-real-service-names&api-version=6.0-preview.1 -H 'Content-Type: application/json' -d $data | jq '.id'").trim()
       if(buildId) {
         tagBuild(ctx, buildId, repository, version)
       }
