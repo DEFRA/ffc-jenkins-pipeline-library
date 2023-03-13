@@ -17,7 +17,7 @@ class ADO implements Serializable {
     ctx.echo "Triggering ADO Database pipeline for ${database} ${version}"
     String pipelineId = ctx.ADO_DATABASE_PIPELINE_ID
     String branch = "marty/apply-real-service-names"
-    def data = "'{\"templateParameters\": {\"databaseRepo\":\"$database\",\"version\":\"$version\",\"service\":\"$service\",\"branch\":\"$branch\"}}'"
+    def data = "'{\"templateParameters\": {\"databaseRepo\":\"$database\",\"version\":\"$version\",\"service\":\"$service\",\"ref\":\"$branch\"}}'"
     triggerBuild(ctx, pipelineId, data, database, version)
   }
 
@@ -25,7 +25,7 @@ class ADO implements Serializable {
     ctx.echo "Triggering ADO Helm pipeline for ${chartName} ${chartVersion} in ${namespace}"
     String pipelineId = ctx.ADO_HELM_PIPELINE_ID
     String branch = "marty/apply-real-service-names"
-    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"version\":\"$chartVersion\",\"service\":\"$namespace\",\"branch\":\"$branch\"}}'"
+    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"version\":\"$chartVersion\",\"service\":\"$namespace\",\"ref\":\"$branch\"}}'"
     triggerBuild(ctx, pipelineId, data, chartName, chartVersion)
   }
 
