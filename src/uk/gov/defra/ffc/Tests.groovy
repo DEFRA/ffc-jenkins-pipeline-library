@@ -229,8 +229,7 @@ static def runServiceAcceptanceTests(ctx, pr,  environment, repoName) {
             ctx.usernamePassword(credentialsId: 'browserstack-credentials', usernameVariable: 'browserStackUsername', passwordVariable: 'browserStackAccessToken')
           ]) {
             def envVars = Provision.getPrQueueEnvVars(ctx, repoName, pr)
-            def url = buildUrl(ctx, pr, environment, repoName)
-
+            
             ctx.dir('./test/acceptance') {
             ctx.sh('mkdir -p -m 777 test-output')
 
