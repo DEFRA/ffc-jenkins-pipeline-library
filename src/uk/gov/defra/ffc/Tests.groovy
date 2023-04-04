@@ -221,7 +221,6 @@ class Tests implements Serializable {
         }
       }
   }
-}
 
 static def runServiceAcceptanceTests(ctx, pr,  environment, repoName) {
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunServiceAcceptanceTests.Context, description: GitHubStatus.RunServiceAcceptanceTests.Description) {
@@ -249,4 +248,4 @@ static def runServiceAcceptanceTests(ctx, pr,  environment, repoName) {
         }
       }
   }
-  
+}
