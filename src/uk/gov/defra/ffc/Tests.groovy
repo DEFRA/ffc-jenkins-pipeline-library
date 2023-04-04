@@ -222,3 +222,33 @@ class Tests implements Serializable {
       }
   }
 }
+
+static def runServiceAcceptanceTests(ctx, pr,  environment, repoName) {
+      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunServiceAcceptanceTests.Context, description: GitHubStatus.RunServiceAcceptanceTests.Description) {
+        try {
+          ctx.withCredentials([
+            ctx.usernamePassword(credentialsId: 'browserstack-credentials', usernameVariable: 'browserStackUsername', passwordVariable: 'browserStackAccessToken')
+          ]) {
+            def envVars = Provision.getPrQueueEnvVars(ctx, repoName, pr)
+            def url = buildUrl(ctx, pr, environment, repoName)
+
+            ctx.dir('./test/acceptance') {
+            ctx.sh('mkdir -p -m 777 test-output')
+
+            ctx.withEnv(envVars) {
+              // Intentionally only use `docker-compose.yaml`. Abort on
+              // container exit ensures exit code is returned from `sh` step.
+              ctx.sh('docker-compose -f docker-compose.yaml -f docker-compose.acceptance.yaml -p "${service}-acceptance-test" --build --abort-on-container-exit')
+              ctx.sh('docker-compose -f docker-compose.yaml -f docker-compose.migrate.yaml -p "${service}-acceptance-test" run database-up --abort-on-container-exit')
+              ctx.sh('docker-compose -f docker-compose.yaml -f docker-compose.acceptance.yaml -p "${service}-acceptance-test" run --rm "${service}-test-runner" ${command} --abort-on-container-exit')
+            }
+          }
+        }
+    } finally {
+          ctx.sh('docker-compose down -v')
+        }
+      }
+  }
+}
+
+

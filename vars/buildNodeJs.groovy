@@ -5,6 +5,7 @@ void call(Map config=[:]) {
   String nodeDevelopmentImage = 'defradigital/node-development'
   String localSrcFolder = '.'
   String lcovFile = './test-output/lcov.info'
+  String acceptanceReport = './test-output/cucumber.html'
   String repoName = ''
   String pr = ''
   String tag = ''
@@ -84,6 +85,12 @@ void call(Map config=[:]) {
         stage('Run tests') {
           build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
         }
+
+        if (fileExists('./docker-compose.acceptance.yaml')) {
+        stage('Run Service Acceptance Tests') {
+          test.runServiceAcceptanceTests(pr, environment, repoName)
+        }
+      }
 
         stage('Create JUnit report') {
           test.createJUnitReport()
