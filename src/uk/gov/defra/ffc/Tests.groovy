@@ -249,6 +249,4 @@ static def runServiceAcceptanceTests(ctx, pr,  environment, repoName) {
         }
       }
   }
-}
-
-
+  
