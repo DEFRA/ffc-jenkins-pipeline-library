@@ -28,7 +28,7 @@ class Tests implements Serializable {
   static def runServiceAcceptanceTests(ctx, projectName, serviceName, buildNumber, tag, pr, environment) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunTests.Context, description: GitHubStatus.RunTests.Description) {
       String sanitizedTag = Utils.sanitizeTag(tag)
-      String acceptanceTestService = "acceptance-test"
+      String acceptanceTestService = "test-runner"
       try {
         ctx.sh('mkdir -p -m 777 test-output')
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
