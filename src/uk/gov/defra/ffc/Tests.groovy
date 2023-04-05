@@ -36,8 +36,14 @@ class Tests implements Serializable {
         }
         ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr)) {
           ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.acceptance.yaml run $serviceName-$acceptanceTestService")
+        } 
+        
+      } finally {
+        ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.acceptance.yaml down -v")
+        if (ctx.fileExists('./docker-compose.migrate.yaml')) {
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.migrate.yaml down -v")
         }
-              publishHTML target: [
+        ctx.publishHTML(target: [
               allowMissing: true,
               alwaysLinkToLastBuild: false,
               keepAll: true,
@@ -45,14 +51,7 @@ class Tests implements Serializable {
               reportFiles: 'cucumber-report.html',
               reportName: 'Service Acceptance Test Report',
               reportTitles: "$projectName - Service Acceptance Test Report"
-            ]
-       
-        
-      } finally {
-        ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.acceptance.yaml down -v")
-        if (ctx.fileExists('./docker-compose.migrate.yaml')) {
-          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.migrate.yaml down -v")
-        }
+            ])
       }
     }
   }

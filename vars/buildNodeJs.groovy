@@ -5,7 +5,6 @@ void call(Map config=[:]) {
   String nodeDevelopmentImage = 'defradigital/node-development'
   String localSrcFolder = '.'
   String lcovFile = './test-output/lcov.info'
-  String acceptanceReport = './test-output/cucumber.html'
   String repoName = ''
   String pr = ''
   String tag = ''
