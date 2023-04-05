@@ -30,6 +30,10 @@ void runTests(String projectName, String serviceName, String buildNumber, String
   Tests.runTests(this, projectName, serviceName, buildNumber, tag, pr, environment)
 }
 
+void runServiceAcceptanceTests(String projectName, String serviceName, String buildNumber, String tag, String pr, String environment) {
+  Tests.runServiceAcceptanceTests(this, projectName, serviceName, buildNumber, tag, pr, environment)
+}
+
 void buildAndPushContainerImage(String credentialsId, String registry, String imageName, String tag) {
   Docker.buildAndPushContainerImage(this, credentialsId, registry, imageName, tag)
 }
