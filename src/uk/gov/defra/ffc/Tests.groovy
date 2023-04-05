@@ -37,9 +37,6 @@ class Tests implements Serializable {
         ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr)) {
           ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.acceptance.yaml run $serviceName-$acceptanceTestService")
         }
-
-        post{
-          success {
               publishHTML target: [
               allowMissing: true,
               alwaysLinkToLastBuild: false,
@@ -49,8 +46,8 @@ class Tests implements Serializable {
               reportName: 'Service Acceptance Test Report',
               reportTitles: "$projectName - Service Acceptance Test Report"
             ]
-          }
-        }
+       
+        
       } finally {
         ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.acceptance.yaml down -v")
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
