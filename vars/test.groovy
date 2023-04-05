@@ -36,10 +36,6 @@ void runAcceptanceTests(String pr, String environment, String repoName) {
   Tests.runAcceptanceTests(this, pr, environment, repoName)
 }
 
-void runServiceAcceptanceTests(String pr, String environment, String repoName) {
-  Tests.runServiceAcceptanceTests(this, pr, environment, repoName)
-}
-
 void runJmeterTests(String pr, String environment, String repoName) {
   Tests.runJmeterTests(this, pr, environment, repoName)
 }

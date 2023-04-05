@@ -25,6 +25,26 @@ class Tests implements Serializable {
     }
   }
 
+  static def runServiceAcceptanceTests(ctx, projectName, serviceName, buildNumber, tag, pr, environment) {
+    ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunTests.Context, description: GitHubStatus.RunTests.Description) {
+      String sanitizedTag = Utils.sanitizeTag(tag)
+      try {
+        ctx.sh('mkdir -p -m 777 test-output')
+        if (ctx.fileExists('./docker-compose.migrate.yaml')) {
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.migrate.yaml run database-up")
+        }
+        ctx.withEnv(Provision.getBuildQueueEnvVars(ctx, serviceName, pr)) {
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.acceptance.yaml run $serviceName")
+        }
+      } finally {
+        ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.acceptance.yaml down -v")
+        if (ctx.fileExists('./docker-compose.migrate.yaml')) {
+          ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.migrate.yaml down -v")
+        }
+      }
+    }
+  }
+
   static def runZapScan(ctx, projectName, buildNumber, tag) {
     def zapDockerComposeFile = 'docker-compose.zap.yaml'
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.ZapScan.Context, description: GitHubStatus.ZapScan.Description) {
@@ -216,27 +236,6 @@ class Tests implements Serializable {
             }
           }
         }
-    } finally {
-          ctx.sh('docker-compose down -v')
-        }
-      }
-  }
-
-static def runServiceAcceptanceTests(ctx, pr,  environment, repoName) {
-      ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.RunServiceAcceptanceTests.Context, description: GitHubStatus.RunServiceAcceptanceTests.Description) {
-        try {
-            def envVars = Provision.getPrQueueEnvVars(ctx, repoName, pr)
-            ctx.dir('./test/acceptance') {
-            ctx.sh('mkdir -p -m 777 test-output')
-
-            ctx.withEnv(envVars) {
-              // Intentionally only use `docker-compose.yaml`. Abort on
-              // container exit ensures exit code is returned from `sh` step.
-              ctx.sh('docker-compose -f docker-compose.yaml -f docker-compose.acceptance.yaml --build --abort-on-container-exit')
-              ctx.sh('docker-compose -f docker-compose.yaml -f docker-compose.migrate.yaml run database-up --abort-on-container-exit')
-              ctx.sh('docker-compose -f docker-compose.yaml -f docker-compose.acceptance.yaml run ${command} --abort-on-container-exit')
-            }
-          }
     } finally {
           ctx.sh('docker-compose down -v')
         }
