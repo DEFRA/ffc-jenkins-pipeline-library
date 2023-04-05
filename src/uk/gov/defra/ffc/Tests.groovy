@@ -43,6 +43,7 @@ class Tests implements Serializable {
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
           ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.migrate.yaml down -v")
         }
+        ctx.sh('ll test-output')
         ctx.publishHTML(target: [
               allowMissing: true,
               alwaysLinkToLastBuild: false,

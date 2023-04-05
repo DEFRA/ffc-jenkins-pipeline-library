@@ -113,7 +113,6 @@ class Build implements Serializable {
   }
 
   static void triggerMultiBranchBuilds(def ctx, String defaultBranch) {
-    ctx.echo(ctx)
     String jobPath = ctx.JOB_NAME
     String multiBranchJob = jobPath.substring(0, jobPath.lastIndexOf('/'))
     def item = Jenkins.get().getItemByFullName(multiBranchJob)
