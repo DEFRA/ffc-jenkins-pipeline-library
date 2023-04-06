@@ -42,8 +42,15 @@ class Tests implements Serializable {
         ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.acceptance.yaml down -v")
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
           ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.migrate.yaml down -v")
+          generateHtmlReport(ctx)
         }
-        ctx.publishHTML(target: [
+      }
+    }
+  }
+  
+  @NonCPS
+  private static def generateHtmlReport(ctx){
+    ctx.publishHTML(target: [
               allowMissing: false,
               alwaysLinkToLastBuild: false,
               keepAll: true,
@@ -53,7 +60,6 @@ class Tests implements Serializable {
               reportTitles: "$projectName - Service Acceptance Test Report"
             ])
       }
-    }
   }
 
   static def runZapScan(ctx, projectName, buildNumber, tag) {
