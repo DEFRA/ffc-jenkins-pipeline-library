@@ -58,9 +58,8 @@ class Tests implements Serializable {
               reportName: 'Service Acceptance Test Report',
               reportTitles: "$projectName - Service Acceptance Test Report"
             ])
-      }
   }
-
+  
   static def runZapScan(ctx, projectName, buildNumber, tag) {
     def zapDockerComposeFile = 'docker-compose.zap.yaml'
       ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.ZapScan.Context, description: GitHubStatus.ZapScan.Description) {
@@ -254,6 +253,7 @@ class Tests implements Serializable {
         }
     } finally {
           ctx.sh('docker-compose down -v')
-        }
-      }
+    }
   }
+}
+}
