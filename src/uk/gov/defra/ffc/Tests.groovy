@@ -48,7 +48,6 @@ class Tests implements Serializable {
     }
   }
   
-  @NonCPS
   private static def generateHtmlReport(ctx){
     ctx.publishHTML(target: [
               allowMissing: false,
