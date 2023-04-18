@@ -42,13 +42,13 @@ class Tests implements Serializable {
         ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.yaml -f docker-compose.acceptance.yaml down -v")
         if (ctx.fileExists('./docker-compose.migrate.yaml')) {
           ctx.sh("docker-compose -p $projectName-${sanitizedTag}-$buildNumber -f docker-compose.migrate.yaml down -v")
-          generateHtmlReport(ctx)
+          generateHtmlReport(ctx, projectName)
         }
       }
     }
   }
   
-  private static def generateHtmlReport(ctx){
+  private static def generateHtmlReport(ctx, projectName){
     ctx.publishHTML(target: [
               allowMissing: false,
               alwaysLinkToLastBuild: false,
