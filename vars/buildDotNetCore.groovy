@@ -85,6 +85,11 @@ void call(Map config=[:]) {
           build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
         }
 
+        if (fileExists('./docker-compose.acceptance.yaml')) {
+        stage('Run Service Acceptance Tests') {
+          build.runServiceAcceptanceTests(repoName, repoName, BUILD_NUMBER, tag, pr)
+        }
+
         if (pr == '') {
           stage('Publish pact broker') {
               pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
