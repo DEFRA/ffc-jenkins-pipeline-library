@@ -85,6 +85,12 @@ void call(Map config=[:]) {
           build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
         }
 
+        if (fileExists('./docker-compose.acceptance.yaml')) {
+        stage('Run Service Acceptance Tests') {
+          test.runServiceAcceptanceTests(repoName, repoName, BUILD_NUMBER, tag, pr)
+        }
+      }
+
         stage('Create JUnit report') {
           test.createJUnitReport()
         }
