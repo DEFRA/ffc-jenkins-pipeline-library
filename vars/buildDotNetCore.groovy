@@ -86,8 +86,9 @@ void call(Map config=[:]) {
         }
 
         if (fileExists('./docker-compose.acceptance.yaml')) {
-        stage('Run Service Acceptance Tests') {
-          test.runServiceAcceptanceTests(repoName, repoName, BUILD_NUMBER, tag, pr)
+          stage('Run Service Acceptance Tests') {
+            test.runServiceAcceptanceTests(repoName, repoName, BUILD_NUMBER, tag, pr)
+          }
         }
 
         if (pr == '') {
