@@ -80,7 +80,6 @@ void call(Map config=[:]) {
         stage('Build test image') {
           build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
         }
-      }
 
         stage('Run tests') {
           build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
