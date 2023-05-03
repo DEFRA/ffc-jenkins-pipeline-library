@@ -132,7 +132,7 @@ class Tests implements Serializable {
         args = args + " -e $param.key=$param.value"
       }
       String imageTag = getDotNetSonarImageVersion(ctx, projectName)
-      ctx.sh("docker run -v \$(pwd)/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar:1.2.3-dotnet3.1")
+      ctx.sh("docker run -v \$(pwd)/:/home/dotnet/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-dotnet-core-sonar:$imageTag")
     }
   }
 
