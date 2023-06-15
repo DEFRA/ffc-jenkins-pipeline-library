@@ -38,11 +38,11 @@ class Function implements Serializable {
 
   static def getStorageAccountName(ctx, azureProvisionConfigFile, pr) {
     def storage = readManifest(ctx, azureProvisionConfigFile, 'resources', 'storage')
-    
+
     if (pr != '') {
       storage = "${storage}pr${pr}"
     }
-
+    ctx.echo("Storage account name: $storage")
     validateStorageName(storage)
     return storage
   }
