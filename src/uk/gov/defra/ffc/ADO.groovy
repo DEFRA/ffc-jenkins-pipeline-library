@@ -18,7 +18,7 @@ class ADO implements Serializable {
   static void triggerHelmPipeline(def ctx, String namespace, String chartName, String chartVersion) {
     ctx.echo "Triggering ADO Helm pipeline for ${chartName} ${chartVersion} in ${namespace}"
     String pipelineId = ctx.ADO_HELM_PIPELINE_ID
-    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"version\":\"$chartVersion\",\"service\":\"$namespace\"}}'"
+    def data = "'{\"templateParameters\": {\"helmChart\":\"$chartName\",\"chartVersion\":\"$chartVersion\",\"service\":\"$namespace\"}}'"
     triggerBuild(ctx, pipelineId, data, chartName, chartVersion)
   }
 
