@@ -11,6 +11,7 @@ void call(Map config=[:]) {
   Boolean hasHelmChart = false
   Boolean triggerDeployment = config.triggerDeployment != null ? config.triggerDeployment : true
   String deploymentPipelineName = ''
+  String runtime = 'dotnet'
 
   node {
     try {
@@ -100,7 +101,7 @@ void call(Map config=[:]) {
         withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            function.createFunctionResources(repoName, pr, gitToken, BRANCH_NAME, "dotnet")
+            function.createFunctionResources(repoName, pr, gitToken, BRANCH_NAME, runtime)
           }
       }
 
