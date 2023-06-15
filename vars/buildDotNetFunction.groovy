@@ -1,17 +1,17 @@
 void call(Map config=[:]) {
   String defaultBranch = 'main'
   String environment = 'snd'
-  String containerSrcFolder = '\\/home\\/node'
-  String nodeDevelopmentImage = 'defradigital/node-development'
-  String nodeTestVersion = "1.2.11-node16.13.0"
-  String nodeTestImage = ''
-  String localSrcFolder = '.'
-  String lcovFile = './test-output/lcov.info'
-  String repoName = ''
-  String pr = ''
   String tag = ''
   String mergedPrNo = ''
-  String runtime = 'node'
+  String pr = ''
+  String repoName = ''
+  String csProjVersion = ''
+  String containerSrcFolder = '\\/home\\/dotnet'
+  String dotnetDevelopmentImage = 'defradigital/dotnetcore-development'
+  Boolean hasHelmChart = false
+  Boolean triggerDeployment = config.triggerDeployment != null ? config.triggerDeployment : true
+  String deploymentPipelineName = ''
+  String runtime = 'dotnet'
 
   node {
     try {
@@ -23,11 +23,6 @@ void call(Map config=[:]) {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
 
-      stage('Set default node test version') {
-        nodeTestVersion = build.getNodeTestVersion(nodeTestVersion, config.nodeTestVersion)
-        nodeTestImage = "${nodeDevelopmentImage}:${nodeTestVersion}"
-      }
-
       stage('Set environment') {
         environment = config.environment != null ? config.environment : environment
       }
@@ -37,13 +32,13 @@ void call(Map config=[:]) {
       }
 
       stage('Set PR and tag variables') {
-        def version = version.getPackageJsonVersion()
-        (repoName, pr, tag, mergedPrNo) = build.getVariables(version, defaultBranch)
+        csProjVersion = version.getCSProjVersion(config.project)
+        (repoName, pr, tag, mergedPrNo) = build.getVariables(csProjVersion, defaultBranch)
       }
 
       if (pr != '') {
         stage('Verify version incremented') {
-          version.verifyPackageJsonIncremented(defaultBranch)
+          version.verifyCSProjIncremented(config.project, defaultBranch)
         }
       } else {
         stage('Rebuild all feature branches') {
@@ -55,40 +50,47 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
-      }
-
-      stage('Snyk test') {
-        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
-      }
-
-      stage('Provision any required resources') {
-         provision.createResources(environment, repoName, pr)
-      }
-
       if (config.containsKey('buildClosure')) {
         config['buildClosure']()
       }
 
+      if (fileExists('./docker-compose.snyk.yaml')){
+       stage('Snyk test') {
+         // ensure obj folder exists and is writable by all
+         sh("chmod 777 ${config.project}/obj || mkdir -p -m 777 ${config.project}/obj")
+         build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
+         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln", pr)
+       }
+     }
 
-      if (fileExists('./test')) {
-        stage('run test image') {
-          build.runNodeTestImage(nodeTestImage, repoName)
+      stage('Provision any required resources') {
+        provision.createResources(environment, repoName, pr)
+      }
+
+      if (fileExists('./docker-compose.test.yaml')) {
+        stage('Build test image') {
+          build.buildTestImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, BUILD_NUMBER, tag)
         }
 
-        stage('Create JUnit report') {
-          test.createJUnitReport()
+        stage('Run tests') {
+          build.runTests(repoName, repoName, BUILD_NUMBER, tag, pr, environment)
         }
 
-        stage('Fix lcov report') {
-          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+        if (fileExists('./docker-compose.acceptance.yaml')) {
+          stage('Run Service Acceptance Tests') {
+            test.runServiceAcceptanceTests(repoName, repoName, BUILD_NUMBER, tag, pr)
+          }
+        }
+
+        if (pr == '') {
+          stage('Publish pact broker') {
+              pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
+            }
         }
       }
 
-
       stage('SonarCloud analysis') {
-        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
+        test.analyseDotNetCode(repoName, config.project, BRANCH_NAME, defaultBranch, pr)
       }
 
       if (config.containsKey('testClosure')) {
@@ -117,10 +119,8 @@ void call(Map config=[:]) {
       if (config.containsKey('deployClosure')) {
         config['deployClosure']()
       }
-
     } catch(e) {
-      def errMsg = utils.getErrorMessage(e)
-      echo("Build failed with message: $errMsg")
+      echo("Build failed with message: $e.message")
 
       stage('Send build failure slack notification') {
         notifySlack.buildFailure('generalbuildfailures', defaultBranch)
@@ -133,9 +133,9 @@ void call(Map config=[:]) {
       throw e
     } finally {
       stage('Change ownership of outputs') {
-        test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
-      }      
- 
+        test.changeOwnershipOfWorkspace(dotnetDevelopmentImage, containerSrcFolder)
+      }
+
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)
       }

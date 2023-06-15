@@ -1,5 +1,5 @@
 import uk.gov.defra.ffc.Function
 
-void createFunctionResources(String repoName, String pr, String gitToken, String defaultBranch) {
-  Function.createFunctionResources(this, repoName, pr, gitToken, defaultBranch)
+void createFunctionResources(String runtime, String repoName, String pr, String gitToken, String defaultBranch) {
+  Function.createFunctionResources(this, runtime, repoName, pr, gitToken, defaultBranch)
 }

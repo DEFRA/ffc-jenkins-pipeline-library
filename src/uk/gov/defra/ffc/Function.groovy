@@ -12,7 +12,8 @@ class Function implements Serializable {
     return "$repoName"
   }
 
-  static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
+  static def createFunctionResources(ctx, runtime, repoName, pr, gitToken, branch) {
+    ctx.echo("Creating function resources for runtime: $runtime")
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       
       String functionName = createFunctionName(repoName, pr)
@@ -20,7 +21,7 @@ class Function implements Serializable {
       if(!checkFunctionAppExists(ctx, functionName)) {
         String storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile, pr)
         createFunctionStorage(ctx, storageAccountName)
-        createFunction(ctx, functionName, branch, storageAccountName)
+        createFunction(ctx, functionName, branch, storageAccountName, runtime)
         enableGitAuth(ctx, gitToken)
         deployFunction(ctx, functionName, branch, gitToken)
       }
@@ -38,36 +39,41 @@ class Function implements Serializable {
 
   static def getStorageAccountName(ctx, azureProvisionConfigFile, pr) {
     def storage = readManifest(ctx, azureProvisionConfigFile, 'resources', 'storage')
-    
+
     if (pr != '') {
       storage = "${storage}pr${pr}"
     }
-
-    validateStorageName(storage)
+    ctx.echo("Storage account name: $storage")
+    validateStorageName(ctx, storage)
     return storage
   }
 
   static def enableGitAuth(ctx, gitToken){
+    ctx.echo("Enabling git auth")
     ctx.sh("az functionapp deployment source update-token --git-token $gitToken")
   }
 
-  static def createFunction(ctx, functionName, defaultBranch, storageAccountName){
-    def azCreateFunction = "az functionapp create -n $functionName --storage-account $storageAccountName --plan ${ctx.AZURE_FUNCTION_APP_SERVICE_PLAN} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --runtime node --functions-version 4"
+  static def createFunction(ctx, functionName, defaultBranch, storageAccountName, runtime){
+    ctx.echo("Creating function: $functionName")
+    def azCreateFunction = "az functionapp create -n $functionName --storage-account $storageAccountName --plan ${ctx.AZURE_FUNCTION_APP_SERVICE_PLAN} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --runtime $runtime --functions-version 4"
     ctx.sh("$azCreateFunction")
   }
 
   static def createFunctionStorage(ctx, storageAccountName){
+    ctx.echo("Creating function Storage account: $storageAccountName")
     def azCreateFunctionStorage = "az storage account create -n $storageAccountName -l ${ctx.AZURE_REGION} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --sku Standard_LRS"
     ctx.sh("$azCreateFunctionStorage")
   }
 
   static def deployFunction(ctx, functionName, branch, gitToken){
+    ctx.echo("Deploying function: $functionName")
     def repoUrl = Utils.getRepoUrl(ctx)
     def azDeployFunction = "az functionapp deployment source config --git-token $gitToken --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --repo-url $repoUrl --branch $branch --manual-integration"
     ctx.sh("$azDeployFunction")
   }
 
   static def syncWithRepoFunction(ctx, functionName){
+    ctx.echo("Syncing function: $functionName")
     def azDeploySyncFunction = "az functionapp deployment source sync --name $functionName --resource-group ${ctx.AZURE_FUNCTION_RESOURCE_GROUP}"
     ctx.sh("$azDeploySyncFunction")
   }
@@ -100,7 +106,7 @@ class Function implements Serializable {
     return resources.tokenize('\n')[0]
   }
 
-  private static def validateStorageName(name) {
+  private static def validateStorageName(ctx, name) {
     assert name ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '${name}'"
   }
 }
