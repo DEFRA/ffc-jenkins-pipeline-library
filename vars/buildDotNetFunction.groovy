@@ -100,7 +100,7 @@ void call(Map config=[:]) {
         withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            function.createFunctionResources(repoName, pr, gitToken, BRANCH_NAME, 'dotnet')
+            function.createFunctionResources(repoName, pr, gitToken, BRANCH_NAME, "dotnet")
           }
       }
 

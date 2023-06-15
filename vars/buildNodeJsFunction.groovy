@@ -98,7 +98,7 @@ void call(Map config=[:]) {
         withCredentials([
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
-            function.createFunctionResources(repoName, pr, gitToken, BRANCH_NAME, 'node')
+            function.createFunctionResources(repoName, pr, gitToken, BRANCH_NAME, "node")
           }
       }
 
