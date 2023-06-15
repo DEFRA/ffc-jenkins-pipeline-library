@@ -12,7 +12,7 @@ class Function implements Serializable {
     return "$repoName"
   }
 
-  static def createFunctionResources(ctx, repoName, pr, gitToken, branch) {
+  static def createFunctionResources(ctx, repoName, pr, gitToken, branch, runtime) {
     if(hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
       
       String functionName = createFunctionName(repoName, pr)
@@ -20,7 +20,7 @@ class Function implements Serializable {
       if(!checkFunctionAppExists(ctx, functionName)) {
         String storageAccountName = getStorageAccountName(ctx, azureProvisionConfigFile, pr)
         createFunctionStorage(ctx, storageAccountName)
-        createFunction(ctx, functionName, branch, storageAccountName)
+        createFunction(ctx, functionName, branch, storageAccountName, runtime)
         enableGitAuth(ctx, gitToken)
         deployFunction(ctx, functionName, branch, gitToken)
       }
@@ -43,7 +43,7 @@ class Function implements Serializable {
       storage = "${storage}pr${pr}"
     }
     ctx.echo("Storage account name: $storage")
-    validateStorageName(storage)
+    validateStorageName(ctx, storage)
     return storage
   }
 
@@ -52,9 +52,9 @@ class Function implements Serializable {
     ctx.sh("az functionapp deployment source update-token --git-token $gitToken")
   }
 
-  static def createFunction(ctx, functionName, defaultBranch, storageAccountName){
+  static def createFunction(ctx, functionName, defaultBranch, storageAccountName, runtime){
     ctx.echo("Creating function: $functionName")
-    def azCreateFunction = "az functionapp create -n $functionName --storage-account $storageAccountName --plan ${ctx.AZURE_FUNCTION_APP_SERVICE_PLAN} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --runtime node --functions-version 4"
+    def azCreateFunction = "az functionapp create -n $functionName --storage-account $storageAccountName --plan ${ctx.AZURE_FUNCTION_APP_SERVICE_PLAN} --app-insights ${ctx.AZURE_FUNCTION_APPLICATION_INSIGHTS} -g ${ctx.AZURE_FUNCTION_RESOURCE_GROUP} --runtime $runtime --functions-version 4"
     ctx.sh("$azCreateFunction")
   }
 
@@ -105,7 +105,7 @@ class Function implements Serializable {
     return resources.tokenize('\n')[0]
   }
 
-  private static def validateStorageName(name) {
+  private static def validateStorageName(ctx, name) {
     assert name ==~ /[a-z0-9]{3,24}/ : "Invalid storage name: '${name}'"
   }
 }
