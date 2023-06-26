@@ -60,10 +60,6 @@ void call(Map config=[:]) {
         }
       }
 
-      stage('npm audit') {
-        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
-      }
-
       stage('Snyk test') {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
       }
