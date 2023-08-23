@@ -36,10 +36,12 @@ class Release implements Serializable {
    */
   private static def tagCommit(ctx, tag, commitSha, repoName) {
     ctx.dir('attachTag') {
-      ctx.git(credentialsId: 'github-ffcplatform-access-token', url: "https://github.com/DEFRA/${repoName}.git")
-      ctx.sh("git push origin :refs/tags/$tag")
-      ctx.sh("git tag -f $tag $commitSha")
-      ctx.sh("git push origin $tag")
+      ctx.withCredentials([string(credentialsId: 'github-ffcplatform-access-token', variable: 'token')]) {
+        ctx.git(url: "https://${token}@github.com/DEFRA/${repoName}.git")
+        ctx.sh("git push origin :refs/tags/$tag")
+        ctx.sh("git tag -f $tag $commitSha")
+        ctx.sh("git push origin $tag")
+      }
       ctx.deleteDir()
     }
   }
