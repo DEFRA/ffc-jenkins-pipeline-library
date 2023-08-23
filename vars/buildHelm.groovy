@@ -32,6 +32,10 @@ void call(Map config=[:]) {
         }
       }
 
+      if (config.containsKey('validateClosure')) {
+        config['validateClosure']()
+      }
+
       stage('Helm lint') {
         test.lintHelm(repoName)
       }
