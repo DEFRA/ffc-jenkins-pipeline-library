@@ -36,8 +36,8 @@ class Release implements Serializable {
    */
   private static def tagCommit(ctx, tag, commitSha, repoName) {
     ctx.dir('attachTag') {
-      ctx.sshagent(['ffc-jenkins-pipeline-library-deploy-key']) {
-        ctx.git(credentialsId: 'ffc-jenkins-pipeline-library-deploy-key', url: "git@github.com:DEFRA/${repoName}.git")
+      ctx.sshagent(['jenkins-ffc-git-ssh']) {
+        ctx.git(credentialsId: 'jenkins-ffc-git-ssh', url: "git@github.com:DEFRA/${repoName}.git")
         ctx.sh("git push origin :refs/tags/$tag")
         ctx.sh("git tag -f $tag $commitSha")
         ctx.sh("git push origin $tag")
