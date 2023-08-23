@@ -5,6 +5,7 @@ void call(Map config=[:]) {
   String defaultBranch = 'main'
   String environment = 'snd'
   Boolean triggerDeployment = config.triggerDeployment != null ? config.triggerDeployment : true
+  Boolean skipLint = config.skipLint != null ? config.skipLint : false
   String deploymentPipelineName = ''
 
   node {
@@ -36,8 +37,10 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      stage('Helm lint') {
-        test.lintHelm(repoName)
+      if (!skipLint) {
+        stage('Helm lint') {
+          test.lintHelm(repoName)
+        }
       }
 
       if (pr != '') {
