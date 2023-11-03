@@ -39,26 +39,30 @@ class Build implements Serializable {
   }
 
   static def getVariables(ctx, version, defaultBranch) {
-    def branch = ctx.BRANCH_NAME
-    def repoName = Utils.getRepoName(ctx)
+    withCredentials([
+      string(credentialsId: 'github-auth-token', variable: 'gitToken')
+    ]) {
+      def branch = ctx.BRANCH_NAME
+      def repoName = Utils.getRepoName(ctx)
 
-    // use the git API to get the open PR for a branch
-    // Note: This will cause issues if one branch has two open PRs
-    def pr = ctx.sh(returnStdout: true, script: "curl https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
-    verifyCommitBuildable(ctx, pr, defaultBranch)
+      // use the git API to get the open PR for a branch
+      // Note: This will cause issues if one branch has two open PRs
+      def pr = ctx.sh(returnStdout: true, script: "curl -H 'Authorization: token $gitToken' https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
+      verifyCommitBuildable(ctx, pr, defaultBranch)
 
-    def tag
+      def tag
 
-    if (branch == defaultBranch) {
-      tag = version
-    } else {
-      def rawTag = pr ? "pr$pr" : branch
-      tag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
+      if (branch == defaultBranch) {
+        tag = version
+      } else {
+        def rawTag = pr ? "pr$pr" : branch
+        tag = rawTag.replaceAll(/[^a-zA-Z0-9]/, '-').toLowerCase()
+      }
+
+      def mergedPrNo = Utils.getMergedPrNo(ctx)
+      def repoUrl = Utils.getRepoUrl(ctx)
+      return [repoName, pr, tag, mergedPrNo]
     }
-
-    def mergedPrNo = Utils.getMergedPrNo(ctx)
-    def repoUrl = Utils.getRepoUrl(ctx)
-    return [repoName, pr, tag, mergedPrNo]
   }
 
   static def shouldFailOnIssues(failOnIssues, pr) {
