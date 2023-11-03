@@ -39,8 +39,8 @@ class Build implements Serializable {
   }
 
   static def getVariables(ctx, version, defaultBranch) {
-    withCredentials([
-      string(credentialsId: 'github-auth-token', variable: 'gitToken')
+    ctx.withCredentials([
+      ctx.string(credentialsId: 'github-auth-token', variable: 'gitToken')
     ]) {
       def branch = ctx.BRANCH_NAME
       def repoName = Utils.getRepoName(ctx)
