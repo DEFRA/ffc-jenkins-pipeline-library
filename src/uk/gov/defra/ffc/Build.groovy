@@ -47,7 +47,7 @@ class Build implements Serializable {
 
       // use the git API to get the open PR for a branch
       // Note: This will cause issues if one branch has two open PRs
-      def pr = ctx.sh(returnStdout: true, script: "curl -H 'Authorization: token $gitToken' https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
+      def pr = ctx.sh(returnStdout: true, script: "curl -H 'Authorization: token $ctx.gitToken' https://api.github.com/repos/DEFRA/$repoName/pulls?state=open | jq '.[] | select(.head.ref == \"$branch\") | .number'").trim()
       verifyCommitBuildable(ctx, pr, defaultBranch)
 
       def tag
