@@ -33,8 +33,13 @@ class Build implements Serializable {
   }
   
   static def checkoutSourceCode(ctx, defaultBranch) {
+    ctx.echo('Checking out source code')
+    ctx.echo("git remote set-branches --add origin ${defaultBranch}")
+    ctx.echo('Check out')
     ctx.checkout(ctx.scm)
+    ctx.echo('Remote set-branches')
     ctx.sh("git remote set-branches --add origin ${defaultBranch}")
+    ctx.echo('Fetching source code')
     ctx.sh("git fetch")
   }
 
