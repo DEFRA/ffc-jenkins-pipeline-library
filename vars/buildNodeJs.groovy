@@ -28,7 +28,7 @@ void call(Map config=[:]) {
       }
 
       stage('Checkout source code') {
-        build.checkoutSourceCode(defaultBranch)
+        // build.checkoutSourceCode(defaultBranch)
       }
 
       if (fileExists('./helm/')) {
