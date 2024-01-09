@@ -33,14 +33,13 @@ class Build implements Serializable {
   }
   
   static def checkoutSourceCode(ctx, defaultBranch) {
-    ctx.echo('Checking out source code')
-    ctx.echo("git remote set-branches --add origin ${defaultBranch}")
-    ctx.echo("Check out ${ctx.scm}")
-    //ctx.checkout(ctx.scm)
-    ctx.sh("git checkout ${defaultBranch}")
-    ctx.sh("git remote set-branches --add origin ${defaultBranch}")
-    ctx.echo('Fetching source code')
-    ctx.sh("git fetch")
+    ctx.withCredentials([
+      ctx.string(credentialsId: 'github-auth-token', variable: 'gitToken')
+    ]) {
+      ctx.checkout(ctx.scm)
+      ctx.sh("git remote set-branches --add origin ${defaultBranch}")
+      ctx.sh("git fetch")
+    }
   }
 
   static def getVariables(ctx, version, defaultBranch) {
