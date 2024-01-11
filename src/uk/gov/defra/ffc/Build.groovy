@@ -35,8 +35,15 @@ class Build implements Serializable {
   static def checkoutSourceCode(ctx, defaultBranch) {
     ctx.echo("Checking out ${ctx.BRANCH_NAME} branch")
     ctx.checkout(ctx.scm)
+    ctx.echo("Checked out ${ctx.BRANCH_NAME} branch")
+
+    ctx.echo("Setting default branch to ${defaultBranch}")
     ctx.sh("git remote set-branches --add origin ${defaultBranch}")
+    ctx.echo("Set default branch to ${defaultBranch}")
+
+    ctx.echo("Fetching ${defaultBranch} branch")
     ctx.sh("git fetch")
+    ctx.echo("Fetched ${defaultBranch} branch")
   }
 
   static def getVariables(ctx, version, defaultBranch) {
