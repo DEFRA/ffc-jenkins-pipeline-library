@@ -34,7 +34,7 @@ class Build implements Serializable {
   
   static def checkoutSourceCode(ctx, defaultBranch) {
     ctx.withCredentials([
-      ctx.string(credentialsId: 'github-token', variable: 'gitToken')
+      ctx.string(credentialsId: 'github-auth-token', variable: 'gitToken')
     ]) {
       ctx.checkout(ctx.scm)
       ctx.sh("git remote set-branches --add origin ${defaultBranch}")
