@@ -142,7 +142,7 @@ class Tests implements Serializable {
       case "netcoreapp3.1":
         return "1.2.3-dotnet3.1"
       case "net6.0":
-        return "1.3.5-dotnet6.0"
+        return "1.3.6-dotnet6.0"
     }
   }
 
