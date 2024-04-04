@@ -4,7 +4,6 @@ void call(Map config=[:]) {
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
   String localSrcFolder = '.'
-  String lcovFile = './test-output/lcov.info'
   String repoName = ''
   String pr = ''
   String tag = ''
@@ -93,10 +92,6 @@ void call(Map config=[:]) {
 
         stage('Create JUnit report') {
           test.createJUnitReport()
-        }
-
-        stage('Fix lcov report') {
-          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
         }
 
         if (pr == '') {

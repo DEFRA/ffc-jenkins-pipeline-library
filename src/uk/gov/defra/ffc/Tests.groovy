@@ -111,14 +111,14 @@ class Tests implements Serializable {
 
   static void analyseNodeJsCode(ctx, sonarQubeEnv, sonarScanner, params) {
     ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.CodeAnalysis.Context, description: GitHubStatus.CodeAnalysis.Description) {
-      def scannerHome = ctx.tool sonarScanner
-      ctx.withSonarQubeEnv(sonarQubeEnv) {
+      ctx.withCredentials([
+        ctx.string(credentialsId: 'sonarcloud-token', variable: 'token'),
+      ]) {
         def args = ''
         params.each { param ->
-          args = args + " -D$param.key=$param.value"
+          args = args + " -e $param.key=$param.value"
         }
-
-        ctx.sh("$scannerHome/bin/sonar-scanner$args")
+        ctx.sh("docker run -v \$(pwd)/:/home/node/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-node-sonar:1.0.2-node20")
       }
     }
   }
@@ -146,50 +146,26 @@ class Tests implements Serializable {
     }
   }
 
-  static def buildCodeAnalysisNodeJsParams(projectName, branch, defaultBranch, pr) {
-    def params = [
-    'sonar.organization': 'defra',
-    'sonar.projectKey': projectName,
-    'sonar.sources': '.'
-    ];
-
-    if (pr != '') {
-      params = params + buildCodeAnalysisNodeJsPRParams(projectName, branch, defaultBranch, pr)
-    }
-
-    return params
-  }
-
-  static def buildCodeAnalysisNodeJsPRParams(projectName, branch, defaultBranch, pr) {
-    return [
-    'sonar.pullrequest.base': defaultBranch,
-    'sonar.pullrequest.branch': branch,
-    'sonar.pullrequest.key': pr,
-    'sonar.pullrequest.provider': 'GitHub',
-    'sonar.pullrequest.github.repository': "defra/${projectName}"
-    ];
-  }
-
-  static def buildCodeAnalysisDotNetParams(projectName, branch, defaultBranch, pr) {
+  static def buildCodeAnalysisParams(projectName, branch, defaultBranch, pr) {
     def params = [
     'SONAR_ORGANIZATION': 'defra',
     'SONAR_PROJECT_KEY': projectName
     ];
 
     if (pr != '') {
-      params = params + buildCodeAnalysisDotNetPRParams(projectName, branch, defaultBranch, pr)
+      params = params + buildCodeAnalysisPRParams(projectName, branch, defaultBranch, pr)
     }
 
     return params
   }
 
-  static def buildCodeAnalysisDotNetPRParams(projectName, branch, defaultBranch, pr) {
+  static def buildCodeAnalysisPRParams(projectName, branch, defaultBranch, pr) {
     return [
-    'SONAR_PR_BASE': defaultBranch,
-    'SONAR_PR_BRANCH': branch,
-    'SONAR_PR_KEY': pr,
-    'SONAR_PR_PROVIDER': 'GitHub',
-    'SONAR_PR_REPOSITORY': "defra/${projectName}"
+      'SONAR_PR_BASE': defaultBranch,
+      'SONAR_PR_BRANCH': branch,
+      'SONAR_PR_KEY': pr,
+      'SONAR_PR_PROVIDER': 'GitHub',
+      'SONAR_PR_REPOSITORY': "defra/${projectName}"
     ];
   }
 

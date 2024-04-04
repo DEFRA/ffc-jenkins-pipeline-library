@@ -17,19 +17,15 @@ void changeOwnershipOfWorkspace(String containerImage, String containerWorkDir) 
 }
 
 void analyseNodeJsCode(String sonarQubeEnv, String sonarScanner, String repoName, String branch, String defaultBranch, String pr) {
-  Tests.analyseNodeJsCode(this, sonarQubeEnv, sonarScanner, buildCodeAnalysisNodeJsParams(repoName, branch, defaultBranch, pr))
+  Tests.analyseNodeJsCode(this, sonarQubeEnv, sonarScanner, buildCodeAnalysisParams(repoName, branch, defaultBranch, pr))
 }
 
 void analyseDotNetCode(String repoName, String projectName, String branch, String defaultBranch, String pr) {
-  Tests.analyseDotNetCode(this, projectName, buildCodeAnalysisDotNetParams(repoName, branch, defaultBranch, pr))
+  Tests.analyseDotNetCode(this, projectName, buildCodeAnalysisParams(repoName, branch, defaultBranch, pr))
 }
 
-def buildCodeAnalysisNodeJsParams(String projectName, String branch, String defaultBranch, String pr) {
-  return Tests.buildCodeAnalysisNodeJsParams(projectName, branch, defaultBranch, pr)
-}
-
-def buildCodeAnalysisDotNetParams(String projectName, String branch, String defaultBranch, String pr) {
-  return Tests.buildCodeAnalysisDotNetParams(projectName, branch, defaultBranch, pr)
+def buildCodeAnalysisParams(String projectName, String branch, String defaultBranch, String pr) {
+  return Tests.buildCodeAnalysisParams(projectName, branch, defaultBranch, pr)
 }
 
 void runAcceptanceTests(String pr, String environment, String repoName) {
