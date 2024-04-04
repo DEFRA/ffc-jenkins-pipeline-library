@@ -118,7 +118,7 @@ class Tests implements Serializable {
         params.each { param ->
           args = args + " -e $param.key=$param.value"
         }
-        ctx.sh("docker run -v \$(pwd)/:/home/node/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-node-sonar:1.0.1-node20")
+        ctx.sh("docker run -v \$(pwd)/:/home/node/project -e SONAR_TOKEN=$ctx.token $args defradigital/ffc-node-sonar:1.0.2-node20")
       }
     }
   }
