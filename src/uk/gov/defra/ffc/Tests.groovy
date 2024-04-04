@@ -161,7 +161,7 @@ class Tests implements Serializable {
 
   static def buildCodeAnalysisPRParams(projectName, branch, defaultBranch, pr) {
     return [
-     'SONAR_PR_BASE': defaultBranch,
+      'SONAR_PR_BASE': defaultBranch,
       'SONAR_PR_BRANCH': branch,
       'SONAR_PR_KEY': pr,
       'SONAR_PR_PROVIDER': 'GitHub',
