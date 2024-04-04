@@ -161,11 +161,11 @@ class Tests implements Serializable {
 
   static def buildCodeAnalysisPRParams(projectName, branch, defaultBranch, pr) {
     return [
-    'sonar.pullrequest.base': defaultBranch,
-    'sonar.pullrequest.branch': branch,
-    'sonar.pullrequest.key': pr,
-    'sonar.pullrequest.provider': 'GitHub',
-    'sonar.pullrequest.github.repository': "defra/${projectName}"
+     'SONAR_PR_BASE': defaultBranch,
+      'SONAR_PR_BRANCH': branch,
+      'SONAR_PR_KEY': pr,
+      'SONAR_PR_PROVIDER': 'GitHub',
+      'SONAR_PR_REPOSITORY': "defra/${projectName}"
     ];
   }
 
