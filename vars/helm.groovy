@@ -33,7 +33,7 @@ void publishChart(String registry, String chartName, String tag, String helmChar
   }
 }
 
-void deployRemoteChart(String environment, String namespace, String chartName, String chartVersion, String helmChartRepoType='artifactory') {
+void deployRemoteChart(String environment, String namespace, String chartName, String chartVersion, String helmChartRepoType='acr') {
   if (helmChartRepoType) {
     switch (helmChartRepoType.toLowerCase()) {
       case 'artifactory':
