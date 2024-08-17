@@ -133,7 +133,7 @@ void call(Map config=[:]) {
     } finally {
       stage('Change ownership of outputs') {
         test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
-      }      
+      }
  
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)

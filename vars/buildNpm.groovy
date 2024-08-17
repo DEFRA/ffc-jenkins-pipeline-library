@@ -21,6 +21,11 @@ def call(Map config=[:]) {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
       }
 
+      stage('Set default node test version') {
+        nodeTestVersion = build.getNodeTestVersion(nodeTestVersion, config.nodeTestVersion)
+        nodeTestImage = "${nodeDevelopmentImage}:${nodeTestVersion}"
+      }
+
       stage('Checkout source code') {
         build.checkoutSourceCode(defaultBranch)
       }
