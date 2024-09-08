@@ -3,7 +3,7 @@ void call(Map config=[:]) {
   String environment = 'snd'
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
-  String nodeTestVersion = "1.2.11-node16.13.0"
+  String nodeTestVersion = "2.3.0-node20.15.0"
   String nodeTestImage = ''
   String localSrcFolder = '.'
   String lcovFile = './test-output/lcov.info'
@@ -133,7 +133,7 @@ void call(Map config=[:]) {
     } finally {
       stage('Change ownership of outputs') {
         test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
-      }      
+      }
  
       stage('Clean up resources') {
         provision.deleteBuildResources(repoName, pr)

@@ -6,6 +6,10 @@ def call(Map config=[:]) {
   String defaultBranch = 'main'
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
+  String nodeTestVersion = "2.3.0-node20.15.0"
+  String nodeTestImage = ''
+  String localSrcFolder = '.'
+  String lcovFile = './test-output/lcov.info'
 
   node {
     try {
@@ -15,6 +19,11 @@ def call(Map config=[:]) {
 
       stage('Set default branch') {
         defaultBranch = build.getDefaultBranch(defaultBranch, config.defaultBranch)
+      }
+
+      stage('Set default node test version') {
+        nodeTestVersion = build.getNodeTestVersion(nodeTestVersion, config.nodeTestVersion)
+        nodeTestImage = "${nodeDevelopmentImage}:${nodeTestVersion}"
       }
 
       stage('Checkout source code') {
@@ -40,6 +49,36 @@ def call(Map config=[:]) {
         config['validateClosure']()
       }
 
+      stage('npm audit') {
+        build.npmAudit(config.npmAuditLevel, config.npmAuditLogType, config.npmAuditFailOnIssues, nodeDevelopmentImage, containerSrcFolder, pr)
+      }
+
+      stage('Snyk test') {
+        build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
+      }
+
+       if (fileExists('./test')) {
+        stage('run test image') {
+          build.runNodeTestImage(nodeTestImage, repoName)
+        }
+
+        stage('Create JUnit report') {
+          test.createJUnitReport()
+        }
+
+        stage('Fix lcov report') {
+          utils.replaceInFile(containerSrcFolder, localSrcFolder, lcovFile)
+        }
+      }
+
+      stage('SonarCloud analysis') {
+        test.analyseNodeJsCode(SONARCLOUD_ENV, SONAR_SCANNER, repoName, BRANCH_NAME, defaultBranch, pr)
+      }
+
+      if (config.containsKey('testClosure')) {
+        config['testClosure']()
+      }
+
       if(pr != '') {
         stage("Publish to Npm (Next)") {
           def version = version.getPackageJsonVersion()
@@ -55,7 +94,7 @@ def call(Map config=[:]) {
             string(credentialsId: 'github-auth-token', variable: 'gitToken')
           ]) {
             String commitMessage = utils.getCommitMessage()
-            release.trigger(tag, repoName, commitMessage, gitToken)            
+            release.trigger(tag, repoName, commitMessage, gitToken)
           }
         }
       }
