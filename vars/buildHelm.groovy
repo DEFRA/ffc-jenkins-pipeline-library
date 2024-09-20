@@ -83,9 +83,8 @@ void call(Map config=[:]) {
       notifySlack.buildFailure(e.message, "#generalbuildfailures")
       throw e
     } finally {
-
-      stage('Publish to Log Analytics') {
-        consoleLogs.save('/var/log/jenkins/console')
+      if (config.containsKey('finallyClosure')) {
+        config['finallyClosure']()
       }
     }
   }
