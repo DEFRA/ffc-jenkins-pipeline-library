@@ -26,12 +26,13 @@ The resources are creating using a manifest in the root directory of the repo wh
 Takes three parameters:
 - the environment to provision resources in
 - repository name
+- tag to create manage identity federation for PR
 - pull request number
 
 Example usage:
 ```
  stage('Provision resources') {
-        provision.createResources(environment, repoName, pr)
+        provision.createResources(environment, repoName, tag, pr)
       }
 ```
 
