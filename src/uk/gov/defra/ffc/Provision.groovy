@@ -5,16 +5,18 @@ import uk.gov.defra.ffc.Utils
 class Provision implements Serializable {
   static String azureProvisionConfigFile = './provision.azure.yaml'
 
-  static def createResources(ctx, environment, repoName, pr) {
+  static def createResources(ctx, environment, repoName, tag, pr) {
     deletePrResources(ctx, environment, repoName, pr)
     createServiceBusEntities(ctx, environment, repoName, pr)
     createPrDatabase(ctx, environment, repoName, pr)
+    createPrIdentityFederation(ctx, environment, repoName, tag, pr)
   }
 
   private static def deletePrResources(ctx, environment, repoName, pr) {
     deleteServiceBusEntities(ctx, "$repoName-pr$pr-", 'queue')
     deleteServiceBusEntities(ctx, "$repoName-pr$pr-", 'topic')
     deletePrDatabase(ctx, environment, repoName, pr)
+    deletePrIdentityFederation(ctx, environment, repoName, pr)
   }
 
   private static def deleteServiceBusEntities(ctx, prefix, entity) {
@@ -240,6 +242,29 @@ class Provision implements Serializable {
       }
     }
   }
+
+  private static def createPrIdentityFederation(ctx, environment, repoName, tag, pr) {
+    if (pr != '') {
+      def federatedName = repoName
+      def identityName = "ffc-snd-pr-role"
+      def resourceGroup = "SNDFFCAKSRG1001"
+      def oidcIssuer= "https://northeurope.oic.prod-aks.azure.com/c9d74090-b4e6-4b04-981d-e6757a160812/69ebfc94-f6ae-493e-b63d-51561c5cdb43/"
+      def namespace = "$repoName-$tag"
+      def subject = "system:serviceaccount:$repoName-$tag:$repoName"
+      def audience = "api://AzureADTokenExchange"
+      ctx.sh("az identity federated-credential create --name ${federatedName} --identity-name ${identityName} --resource-group ${resourceGroup} --issuer ${oidcIssuer} --subject ${subject} --audience ${audience}")
+    }
+  }
+
+    private static def deletePrIdentityFederation(ctx, environment, repoName, pr) {
+    if (pr != '') {
+      def federatedName = repoName
+      def identityName = "ffc-snd-pr-role"
+      def resourceGroup = "SNDFFCAKSRG1001"
+      ctx.sh("az identity federated-credential delete --name ${federatedName} --identity-name ${identityName} --resource-group ${resourceGroup} --yes")
+    }
+  }
+
 
   private static def repoHasMigration(ctx, repoName) {
     def migrationFile = "docker-compose.migrate.yaml"

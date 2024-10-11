@@ -1,6 +1,6 @@
 import uk.gov.defra.ffc.Provision
 
-void createResources(String environment, String repoName, String pr) {
+void createResources(String environment, String repoName, String tag, String pr) {
   Provision.createResources(this, environment, repoName, pr)
 }
 

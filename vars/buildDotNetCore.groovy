@@ -69,7 +69,7 @@ void call(Map config=[:]) {
      }
 
       stage('Provision any required resources') {
-        provision.createResources(environment, repoName, pr)
+        provision.createResources(environment, repoName, tag, pr)
       }
 
       if (fileExists('./docker-compose.test.yaml')) {
