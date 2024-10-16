@@ -9,14 +9,14 @@ class Provision implements Serializable {
     deletePrResources(ctx, environment, repoName, pr)
     createServiceBusEntities(ctx, environment, repoName, pr)
     createPrDatabase(ctx, environment, repoName, pr)
-    // createPrIdentityFederation(ctx, environment, repoName, tag, pr)
+    createPrIdentityFederation(ctx, environment, repoName, tag, pr)
   }
 
   private static def deletePrResources(ctx, environment, repoName, pr) {
     deleteServiceBusEntities(ctx, "$repoName-pr$pr-", 'queue')
     deleteServiceBusEntities(ctx, "$repoName-pr$pr-", 'topic')
     deletePrDatabase(ctx, environment, repoName, pr)
-    // deletePrIdentityFederation(ctx, environment, repoName, pr)
+    deletePrIdentityFederation(ctx, environment, repoName, pr)
   }
 
   private static def deleteServiceBusEntities(ctx, prefix, entity) {
