@@ -46,7 +46,7 @@ class Release implements Serializable {
     }
   }
 
-  static def trigger(ctx, versionTag, repoName, releaseDescription, token) {
+  static def trigger(ctx, versionTag, repoName, releaseDescription, token, prerelease=false) {
     if (exists(ctx, versionTag, repoName, token)) {
       ctx.echo("Release $versionTag already exists")
       return false
@@ -56,7 +56,7 @@ class Release implements Serializable {
     boolean result = false
 
     // create json body for GitHub curl request, using JsonOutput will automatically escape all special characters
-    def releaseBody = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}"])
+    def releaseBody = JsonOutput.toJson(["tag_name":versionTag, "name": "Release ${versionTag}", "body": "${releaseDescription}", "prerelease":prerelease])
 
     // saving JSON to a file avoids the issue of escaping the already escaped characters and the special characters behind them in shell command
     ctx.sh('mkdir -p -m 777 release-data')

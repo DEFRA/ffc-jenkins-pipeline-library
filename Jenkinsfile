@@ -17,6 +17,14 @@ node {
       stage('Verify version incremented') {
         version.verifyFileIncremented(versionFileName)
       }
+      stage('Trigger GitHub pre release') {
+        withCredentials([
+          string(credentialsId: 'github-auth-token', variable: 'gitToken')
+        ]) {
+          def betaVer = "beta-${version.getFileVersion(versionFileName)}"
+          def releaseSuccess = release.trigger(betaVer, repoName, betaVer, gitToken, true)
+        }
+      }
     }
 
     if (pr == '') {
