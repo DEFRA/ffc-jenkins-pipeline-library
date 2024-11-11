@@ -1,16 +1,14 @@
 void call(Map config=[:]) {
   String defaultBranch = 'main'
-  String environment = 'snd'
+  String environment = 'snd2'
   String containerSrcFolder = '\\/home\\/node'
   String nodeDevelopmentImage = 'defradigital/node-development'
-  String localSrcFolder = '.'
   String repoName = ''
   String pr = ''
   String tag = ''
   String mergedPrNo = ''
   Boolean hasHelmChart = false
   Boolean triggerDeployment = config.triggerDeployment != null ? config.triggerDeployment : true
-  String deploymentPipelineName = ''
 
   node {
     try {
@@ -49,7 +47,7 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      if(hasHelmChart) {
+      if (hasHelmChart) {
         stage('Helm lint') {
           test.lintHelm(repoName)
         }
@@ -81,10 +79,10 @@ void call(Map config=[:]) {
         }
 
         if (fileExists('./docker-compose.acceptance.yaml')) {
-        stage('Run Service Acceptance Tests') {
-          test.runServiceAcceptanceTests(repoName, repoName, BUILD_NUMBER, tag, pr)
+          stage('Run Service Acceptance Tests') {
+            test.runServiceAcceptanceTests(repoName, repoName, BUILD_NUMBER, tag, pr)
+          }
         }
-      }
 
         stage('Create JUnit report') {
           test.createJUnitReport()
@@ -127,7 +125,7 @@ void call(Map config=[:]) {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
-      if(hasHelmChart) {
+      if (hasHelmChart) {
         if (pr != '') {
           stage('Helm install') {
             helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
@@ -138,7 +136,6 @@ void call(Map config=[:]) {
           }
         }
       }
-
 
       if (pr == '') {
         stage('Trigger GitHub release') {
@@ -151,44 +148,32 @@ void call(Map config=[:]) {
         }
       }
 
-      if(triggerDeployment && hasHelmChart && pr == '') {
-        stage('Set deployment pipeline name') {
-          deploymentPipelineName = config.deploymentPipelineName != null ? config.deploymentPipelineName : "${repoName}-deploy"
-        }
+      if (triggerDeployment && hasHelmChart && pr == '') {
+        // Deploy start
 
-        stage('Trigger Deployment') {
-          if (utils.checkCredentialsExist("$repoName-deploy-token")) {
-            withCredentials([
-              string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
-            ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
-            }
-          } else {
-            withCredentials([
-              string(credentialsId: 'default-deploy-token', variable: 'jenkinsToken')
-            ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
-            }
+          stage('Trigger ADO pipelines') {
+            namespace = helm.getNamespace(repoName)
+            ado.triggerNewFFCPipeline(namespace, repoName, tag)
           }
-        }
+
+      // Deploy End
       }
 
       if (config.containsKey('deployClosure')) {
         config['deployClosure']()
       }
 
-      if (fileExists('./test/acceptance/docker-compose.yaml') && hasHelmChart) {
+      if (pr != '' && fileExists('./test/acceptance/docker-compose.yaml') && hasHelmChart) {
         stage('Run Acceptance Tests') {
           test.runAcceptanceTests(pr, environment, repoName)
         }
       }
 
-      if (fileExists('./test/performance/docker-compose.jmeter.yaml') && fileExists('./test/performance/jmeterConfig.csv') && hasHelmChart) {
+      if (pr != '' && fileExists('./test/performance/docker-compose.jmeter.yaml') && fileExists('./test/performance/jmeterConfig.csv') && hasHelmChart) {
         stage('Run Jmeter Tests') {
           test.runJmeterTests(pr, environment, repoName)
         }
       }
-
     } catch(e) {
       def errMsg = utils.getErrorMessage(e)
       echo("Build failed with message: $errMsg")

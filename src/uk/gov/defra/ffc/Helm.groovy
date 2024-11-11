@@ -50,7 +50,7 @@ class Helm implements Serializable {
         def helmValuesKeys = getHelmValuesKeys(ctx, helmValuesFilePath)
 
         // first get all common keys from Azure Application Configuration matching Helm values
-        String commonPrefix = 'common/'
+        String commonPrefix = 'commonSnd2/'
         def commonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix))
         def commonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix, chartName))
 
@@ -66,7 +66,7 @@ class Helm implements Serializable {
         def serviceEnvironmentConfigValues
         def serviceEnvironmentConfigValuesChart
 
-        if(serviceName != '') {
+        if (serviceName != '') {
           // get common values for a service
           String serviceCommonPrefix = serviceName + '/common/'
           serviceCommonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix))
@@ -85,13 +85,16 @@ class Helm implements Serializable {
 
         // finally get all dynamically provisioned values
         def prProvisionedValues = configItemsToSetString(
-          Provision.getProvisionedQueueConfigValues(ctx, chartName, pr) +
+          // Provision.getProvisionedQueueConfigValues(ctx, chartName, pr) +
           Provision.getProvisionedDbSchemaConfigValues(ctx, chartName, pr)
         )
 
+        //Get Application Configuration
+        def identityConfigValues =  configItemsToSetString(Utils.getApplicationConfigValue(ctx, pr))
+
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.echo('Running helm upgrade, console output suppressed')
-        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $prCommands $extraCommands")
+        ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $identityConfigValues $prCommands $extraCommands")
         writeUrlIfIngress(ctx, deploymentName)
       }
     }
@@ -181,7 +184,7 @@ class Helm implements Serializable {
             def helmValuesKeys = getHelmValuesKeys(ctx, helmValuesFilePath)
 
             // first get all common keys from Azure Application Configuration matching Helm values
-            String commonPrefix = 'common/'
+            String commonPrefix = 'commonSnd2/'
             def commonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix))
             def commonConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, commonPrefix, chartName))
 
@@ -197,7 +200,7 @@ class Helm implements Serializable {
             def serviceEnvironmentConfigValues
             def serviceEnvironmentConfigValuesChart
 
-            if(serviceName != '') {
+            if (serviceName != '') {
               // get common values for a service
               String serviceCommonPrefix = serviceName + '/common/'
               serviceCommonConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceCommonPrefix))
@@ -208,10 +211,12 @@ class Helm implements Serializable {
               serviceEnvironmentConfigValues = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceEnvironmentPrefix))
               serviceEnvironmentConfigValuesChart = configItemsToSetString(Utils.getConfigValues(ctx, helmValuesKeys, serviceEnvironmentPrefix, chartName))
             }
+            //Get Application Configuration
+            def identityConfigValues =  configItemsToSetString(Utils.getApplicationConfigValue(ctx, ""))
 
             ctx.sh("kubectl get namespaces $namespace || kubectl create namespace $namespace")
             ctx.echo('Running helm upgrade, console output suppressed')
-            ctx.sh("$Utils.suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart --set namespace=$namespace $extraCommands")
+            ctx.sh("$Utils.suppressConsoleOutput helm upgrade $chartName $chartName --namespace=$namespace $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $identityConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart --set namespace=$namespace $extraCommands")
 
             ctx.deleteDir()
           }
@@ -219,4 +224,11 @@ class Helm implements Serializable {
       }
     }
   }
+
+  static def getNamespace(ctx, chartName) {
+    String helmValuesFilePath = "helm/$chartName/values.yaml"
+    def configs = ctx.readYaml file: helmValuesFilePath
+    return configs["namespace"]
+  }
+
 }

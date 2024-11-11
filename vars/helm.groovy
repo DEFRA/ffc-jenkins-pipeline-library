@@ -33,6 +33,10 @@ void publishChart(String registry, String chartName, String tag, String helmChar
   }
 }
 
+String getNamespace(chartName) {
+  return Helm.getNamespace(this, chartName)
+}
+
 void deployRemoteChart(String environment, String namespace, String chartName, String chartVersion, String helmChartRepoType='artifactory') {
   if (helmChartRepoType) {
     switch (helmChartRepoType.toLowerCase()) {
