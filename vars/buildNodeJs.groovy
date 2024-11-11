@@ -49,6 +49,10 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
+      stage('Build & push container image') {
+        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
+      }
+      
       if(hasHelmChart) {
         stage('Helm lint') {
           test.lintHelm(repoName)
@@ -61,10 +65,6 @@ void call(Map config=[:]) {
 
       stage('Snyk test') {
         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, pr)
-      }
-
-      stage('Provision any required resources') {
-        provision.createResources(environment, repoName, tag, pr)
       }
 
       if (config.containsKey('buildClosure')) {
@@ -123,16 +123,8 @@ void call(Map config=[:]) {
         config['testClosure']()
       }
 
-      stage('Build & push container image') {
-        build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
-      }
-
       if(hasHelmChart) {
-        if (pr != '') {
-          stage('Helm install') {
-            helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
-          }
-        } else {
+        if (pr == '')  {
           stage('Publish chart') {
             helm.publishChart(DOCKER_REGISTRY, repoName, tag, HELM_CHART_REPO_TYPE)
           }
@@ -205,10 +197,6 @@ void call(Map config=[:]) {
     } finally {
       stage('Change ownership of outputs') {
         test.changeOwnershipOfWorkspace(nodeDevelopmentImage, containerSrcFolder)
-      }
-
-      stage('Clean up resources') {
-        provision.deleteBuildResources(repoName, pr)
       }
 
       if (config.containsKey('finallyClosure')) {
