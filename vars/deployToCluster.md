@@ -8,7 +8,7 @@ chart to the SND Kubernetes cluster and subsequently triggering the Azure DevOps
 Below is an example of how this can be achieved.
 
 ```
-@Library('defra-library@v-6') _
+@Library('defra-library@v-9') _
 
 deployToCluster environment: 'snd', namespace: 'ffc-demo', chartName: 'ffc-demo-web', chartVersion: '1.0.0', helmChartRepoType: 'acr'
 ```
