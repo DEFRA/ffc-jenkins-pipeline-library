@@ -3,11 +3,13 @@ void call(Map config=[:], Closure body={}) {
 
   node {
     try {
-      stage('Deploy Database') {
-        hasDatabase = database.runRemoteMigrations(config.environment, config.chartName, config.chartVersion)
-      }
-      stage('Deploy Helm chart') {
-        helm.deployRemoteChart(config.environment, config.namespace, config.chartName, config.chartVersion, config.helmChartRepoType)
+      if (config.environment != null) {
+        stage('Deploy Database') {
+          hasDatabase = database.runRemoteMigrations(config.environment, config.chartName, config.chartVersion)
+        }
+        stage('Deploy Helm chart') {
+          helm.deployRemoteChart(config.environment, config.namespace, config.chartName, config.chartVersion, config.helmChartRepoType)
+        }
       }
       stage('Trigger ADO pipelines') {
         ado.triggerPipeline(config.namespace, config.chartName, config.chartVersion, hasDatabase)
