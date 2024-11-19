@@ -87,11 +87,7 @@ class Database implements Serializable {
 
   static Boolean hasDatabase (ctx) {
     if(ctx.fileExists("changelog")) {
-      ctx.echo("release has migrations - applying...")
-      ctx.withEnv(Provision.getMigrationEnvVars(ctx, environment, repoName, '')) {
-        ctx.sh("docker-compose -p $repoName-${ctx.BUILD_NUMBER} -f docker-compose.migrate.yaml run --no-deps database-up")
-        return true
-      }
+      return true
     }
     return false
   }
