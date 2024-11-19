@@ -3,7 +3,7 @@ void call(Map config=[:], Closure body={}) {
 
   node {
     try {
-      if(config.environment != '') {
+      if (config.environment != null) {
         stage('Deploy Database') {
           hasDatabase = database.runRemoteMigrations(config.environment, config.chartName, config.chartVersion)
         }
