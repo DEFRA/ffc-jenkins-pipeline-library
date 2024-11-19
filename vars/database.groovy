@@ -12,6 +12,6 @@ void runRemoteMigrations(String environment, String repoName, String version) {
   Database.runRemoteMigrations(this, environment, repoName, version)
 }
 
-Boolean hasDatabase () {
-  return Database.hasDatabase(this)
+Boolean hasDatabase (String repoName, String version) {
+  return Database.hasDatabase(this, repoName, version)
 }

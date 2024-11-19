@@ -4,7 +4,7 @@ void call(Map config=[:], Closure body={}) {
   node {
     try {
       stage('Confirm if database') {
-        hasDatabase = database.hasDatabase()
+        hasDatabase = database.hasDatabase(config.chartName, config.chartVersion)
       }
 
       if (config.environment != null) {
