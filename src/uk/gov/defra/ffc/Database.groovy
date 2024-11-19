@@ -67,11 +67,7 @@ class Database implements Serializable {
   }
 
   static Boolean runRemoteMigrations(ctx, environment, repoName, version) {
-    ctx.sh("rm -rf DEFRA-${repoName}*")
-    ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
-    ctx.sh("tar -xvf release")
-    def workingFolder = ctx.sh(returnStdout: true, script: "ls -d */ | grep DEFRA-${repoName}").trim()
-    ctx.echo(workingFolder)
+    def workingFolder = getReleaseDirectory(ctx, repoName, version)
     ctx.dir(workingFolder) {
       if(ctx.fileExists("changelog")) {
         ctx.echo("release has migrations - applying...")
@@ -85,10 +81,21 @@ class Database implements Serializable {
     }
   }
 
-  static Boolean hasDatabase (ctx) {
-    if(ctx.fileExists("changelog")) {
-      return true
+  static Boolean hasDatabase (ctx, repoName, version) {
+    def workingFolder = getReleaseDirectory(ctx, repoName, version)
+    ctx.dir(workingFolder) {
+      if(ctx.fileExists("changelog")) {
+        return true
+      }
+      return false
     }
-    return false
+  }
+
+  static void getReleaseDirectory (ctx, repoName, version) {
+    ctx.sh("rm -rf DEFRA-${repoName}*")
+    ctx.sh("wget https://api.github.com/repos/defra/${repoName}/tarball/${version} -O release")
+    ctx.sh("tar -xvf release")
+    def workingFolder = ctx.sh(returnStdout: true, script: "ls -d */ | grep DEFRA-${repoName}").trim()
+    return workingFolder
   }
 }
