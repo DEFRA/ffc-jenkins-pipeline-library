@@ -11,3 +11,7 @@ String destroyPrDbRoleAndSchema(String host, String dbName, String jenkinsUserCr
 void runRemoteMigrations(String environment, String repoName, String version) {
   Database.runRemoteMigrations(this, environment, repoName, version)
 }
+
+Boolean hasDatabase (String repoName, String version) {
+  return Database.hasDatabase(this, repoName, version)
+}
