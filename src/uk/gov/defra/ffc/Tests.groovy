@@ -182,7 +182,8 @@ class Tests implements Serializable {
     def endpoint = endpointConfig['ingress.endpoint'].trim()
     def domain = serverConfig['ingress.server'].trim()
     def hostname = pr == '' ? endpoint : "${repoName}-pr${pr}"
-
+    // domain = ffc.snd.azure.defra.cloud
+    // hostname = {application name}
     return "${hostname}.${domain}"
   }
 

@@ -1,6 +1,7 @@
 package uk.gov.defra.ffc
 
 class Utils implements Serializable {
+
   static String suppressConsoleOutput = '#!/bin/bash +x\n'
   static String defaultNullLabel = '\\\\0'
   static int appConfigReturnLimit = 1000
@@ -78,6 +79,75 @@ class Utils implements Serializable {
    *   set to the default null label
    */
 
+  static final String azureProvisionConfigFile = './provision.azure.yaml'
+  static final String appConfigCommon = 'appconfig/common.yaml'
+  static final String appConfigSnd = 'appconfig/snd.yaml'
+  static final String subscriptionSND2 = 'dc785a20-057f-4023-b51f-f23a00f1ca2e' // AZD-FFC-SND2
+  static final String subscriptionSND1 = 'cd4e9a00-99d8-45a2-98bb-7648ef12c26d' // AZD-FFC-SND1
+  static final String identityPrefix = 'SNDFFCINFMID2001'
+
+  static def runAzCommand(ctx, command) {
+    ctx.withCredentials([ctx.azureServicePrincipal('SSVFFCJENSR1001-Jenkins')]) {
+      return ctx.sh(returnStdout: true, script:"""
+      docker run --rm -v ${ctx.pwd}/jenkins-azure/.azure:/root/.azure \
+      mcr.microsoft.com/azure-cli:cbl-mariner2.0 \
+      $command
+      """)
+    }
+  }
+
+  static def getApplicationConfigValue(ctx, pr) {
+    def configValues = [:]
+    if (ctx.fileExists(azureProvisionConfigFile)) {
+      def identityNameArray = ctx.sh(returnStdout: true, script: "yq r $azureProvisionConfigFile resources.identity").trim()
+      def identity = identityNameArray.tokenize('\n')[0]
+      def identityName = "${identityPrefix}-${identity}"
+      def clientId = runAzCommand(ctx, "az identity show --resource-group $ctx.AZURE_POSTGRES_RESOURCE_GROUP_SND2 --name $identityName --query clientId --output tsv").trim()
+      def resourceId = runAzCommand(ctx, "az identity show --resource-group $ctx.AZURE_POSTGRES_RESOURCE_GROUP_SND2 --name $identityName --query id --output tsv").trim()
+      configValues["azureIdentity.clientID"] = clientId
+      configValues["azureIdentity.resourceID"] = resourceId
+      configValues["postgresService.postgresUser"] = identityName
+      def postgresDbArray = ctx.sh(returnStdout: true, script: "yq r $azureProvisionConfigFile resources.postgreSql").trim()
+      def dbs = postgresDbArray.tokenize('\n')
+      if (dbs.size() > 0 && dbs[0] != "") {
+        def postgresDb = dbs[0]
+        configValues["postgresService.postgresDb"] = "$postgresDb-snd"
+      }
+    }
+    def repoName = getRepoName(ctx)
+    if (ctx.fileExists(appConfigCommon)) {
+      def configs = ctx.readYaml file: appConfigCommon
+      configs.each { k, v ->
+        if (k != "") {
+          def value = v
+          if (value.startsWith("queue:")) {
+            value = value.split(":")[1]
+            if (pr != "") {
+              value = "${repoName}-pr${pr}-${value}"
+            }
+          }
+          configValues[k] = value
+        }
+      }
+    }
+    if (ctx.fileExists(appConfigSnd)) {
+      def configs = ctx.readYaml file: appConfigSnd
+      configs.each { k, v ->
+        if (k != "") {
+          def value = v
+          if (value.startsWith("queue:")) {
+            value = value.split(":")[1]
+            if (pr != "") {
+              value = "${repoName}-pr${pr}-${value}"
+            }
+          }
+          configValues[k] = value
+        }
+      }
+    }
+    return configValues
+  }
+
   static def getConfigValues(ctx, searchKeys, appConfigPrefix, appConfigLabel=defaultNullLabel, escapeChars = true) {
     // The jq command in the follow assumes there is only one value per key
     // This is true ONLY if you specify a label in the az appconfig kv command
@@ -107,11 +177,9 @@ class Utils implements Serializable {
     return ctx.sh(returnStdout: true, script:"curl -s -w \"%{http_code}\\n\" $url -o /dev/null").trim()
   }
 
-  static def sendNotification(ctx, channel, msg, color){
-
+  static def sendNotification(ctx, channel, msg, color) {
     ctx.withCredentials([ctx.string(credentialsId: "slack-$channel-channel-webhook", variable: 'webHook')
     ]) {
-
       def script = "docker run -e SLACK_WEBHOOK=$ctx.webHook -e SLACK_MESSAGE=$msg -e SLACK_COLOR=$color technosophos/slack-notify:latest"
       ctx.sh(returnStatus: true, script: script)
     }
@@ -130,4 +198,5 @@ class Utils implements Serializable {
   static String sanitizeTag(String tag) {
     return tag.replace(".", "p")
   }
+
 }

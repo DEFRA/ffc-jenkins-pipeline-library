@@ -5,6 +5,7 @@ import jenkins.model.Jenkins
 import uk.gov.defra.ffc.Utils
 
 class Build implements Serializable {
+
   /**
    * If the build is a branch with a Pull Request (PR), or the main branch a
    * message will be `echoed` describing the type of build.
@@ -31,7 +32,7 @@ class Build implements Serializable {
   static def getNodeTestVersion(defaultNodeTestVersion, requestedNodeTestVersion) {
     return requestedNodeTestVersion != null ? requestedNodeTestVersion : defaultNodeTestVersion
   }
-  
+
   static def checkoutSourceCode(ctx, defaultBranch) {
     ctx.checkout(ctx.scm)
     ctx.sh("git remote set-branches --add origin ${defaultBranch}")
@@ -112,8 +113,8 @@ class Build implements Serializable {
           ctx.gitStatusWrapper(credentialsId: 'github-token', sha: Utils.getCommitSha(ctx), repo: Utils.getRepoName(ctx), gitHubContext: GitHubStatus.SnykTest.Context, description: GitHubStatus.SnykTest.Description) {
             ctx.sh(returnStatus: !failOnIssues, script: script)
           }
-        }
       }
+    }
   }
 
   static void triggerMultiBranchBuilds(def ctx, String defaultBranch) {
@@ -129,4 +130,5 @@ class Build implements Serializable {
       }
     }
   }
+
 }

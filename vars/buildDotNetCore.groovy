@@ -1,6 +1,6 @@
 void call(Map config=[:]) {
   String defaultBranch = 'main'
-  String environment = 'snd'
+  String environment = 'snd2'
   String tag = ''
   String mergedPrNo = ''
   String pr = ''
@@ -49,7 +49,7 @@ void call(Map config=[:]) {
         config['validateClosure']()
       }
 
-      if(hasHelmChart) {
+      if (hasHelmChart) {
         stage('Helm lint') {
           test.lintHelm(repoName)
         }
@@ -59,14 +59,14 @@ void call(Map config=[:]) {
         config['buildClosure']()
       }
 
-      if (fileExists('./docker-compose.snyk.yaml')){
-       stage('Snyk test') {
-         // ensure obj folder exists and is writable by all
-         sh("chmod 777 ${config.project}/obj || mkdir -p -m 777 ${config.project}/obj")
-         build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
-         build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln", pr)
-       }
-     }
+      if (fileExists('./docker-compose.snyk.yaml')) {
+        stage('Snyk test') {
+          // ensure obj folder exists and is writable by all
+          sh("chmod 777 ${config.project}/obj || mkdir -p -m 777 ${config.project}/obj")
+          build.extractSynkFiles(repoName, BUILD_NUMBER, tag)
+          build.snykTest(config.snykFailOnIssues, config.snykOrganisation, config.snykSeverity, "${config.project}.sln", pr)
+        }
+      }
 
       stage('Provision any required resources') {
         provision.createResources(environment, repoName, tag, pr)
@@ -90,7 +90,7 @@ void call(Map config=[:]) {
         if (pr == '') {
           stage('Publish pact broker') {
               pact.publishContractsToPactBroker(repoName, csProjVersion, utils.getCommitSha())
-            }
+          }
         }
       }
 
@@ -106,7 +106,7 @@ void call(Map config=[:]) {
         build.buildAndPushContainerImage(DOCKER_REGISTRY_CREDENTIALS_ID, DOCKER_REGISTRY, repoName, tag)
       }
 
-      if(hasHelmChart) {
+      if (hasHelmChart) {
         if (pr != '') {
           stage('Helm install') {
             helm.deployChart(environment, DOCKER_REGISTRY, repoName, tag, pr)
@@ -130,26 +130,15 @@ void call(Map config=[:]) {
         }
       }
 
-      if(triggerDeployment && hasHelmChart && pr == '') {
-        stage('Set deployment pipeline name') {
-          deploymentPipelineName = config.deploymentPipelineName != null ? config.deploymentPipelineName : "${repoName}-deploy"
-        }
+      if (triggerDeployment && hasHelmChart && pr == '') {
+        // Deploy start
 
-        stage('Trigger Deployment') {
-          if (utils.checkCredentialsExist("$repoName-deploy-token")) {
-            withCredentials([
-              string(credentialsId: "$repoName-deploy-token", variable: 'jenkinsToken')
-            ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
-            }
-          } else {
-            withCredentials([
-              string(credentialsId: 'default-deploy-token', variable: 'jenkinsToken')
-            ]) {
-              deploy.trigger(JENKINS_DEPLOY_SITE_ROOT, deploymentPipelineName, jenkinsToken, ['chartVersion': tag, 'environment': environment, 'helmChartRepoType': HELM_CHART_REPO_TYPE])
-            }
+          stage('Trigger ADO pipelines') {
+            namespace = helm.getNamespace(repoName)
+            ado.triggerNewFFCPipeline(namespace, repoName, tag)
           }
-        }
+
+      // Deploy End
       }
 
       if (config.containsKey('deployClosure')) {
