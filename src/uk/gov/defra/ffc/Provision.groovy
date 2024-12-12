@@ -17,6 +17,7 @@ class Provision implements Serializable {
     createManagedIdentity(ctx)
     createDatabase(ctx)
     createDatabaseUser(ctx)
+    addDatabaseExtensions(ctx)
     deletePrResources(ctx, environment, repoName, pr)
     createPrDatabase(ctx, environment, repoName, pr)
     grantDbPrivileges(ctx, repoName, pr)
@@ -281,6 +282,11 @@ class Provision implements Serializable {
     return resources.tokenize('\n')[0]
   }
 
+  private static def readManifestList(ctx, filePath, resource) {
+    def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}").trim()
+    return resources.tokenize('\n')
+  }
+
   private static def getResGroupAndNamespace (ctx) {
     return "--resource-group $ctx.AZURE_SERVICE_BUS_RESOURCE_GROUP_SND2 --namespace-name $ctx.AZURE_SERVICE_BUS_NAMESPACE_SND2"
   }
@@ -437,7 +443,7 @@ class Provision implements Serializable {
   private static def createDatabaseName(ctx, database="") {
     String databaseName = database
     if (databaseName == "" && hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
-      databaseName = readManifestSingle(ctx, azureProvisionConfigFile, 'postgreSql')
+      databaseName = readManifestSingle(ctx, azureProvisionConfigFile, 'postgreSql.name')
     }
     return (databaseName != null && databaseName != '' ) ? "$databaseName-snd" : ''
   }
@@ -447,14 +453,29 @@ class Provision implements Serializable {
     if (databaseName != "") {
       try {
         def result = runPsqlCommand(ctx, "-lqt | cut -d \\| -f 1 | grep \"$databaseName\"")
-        if (result) {
-          ctx.echo("Database Exist!")
-        }
-        else {
-          runDatabaseCommand(ctx, "\'CREATE DATABASE \"$databaseName\"\'")
-        }
+        ctx.echo("Database Exists result: $result")
+        // if (result) {
+        //   ctx.echo("Database Exist!")
+        // }
+        // else {
+        runDatabaseCommand(ctx, "\'CREATE DATABASE \"$databaseName\"\'")
+      // }
       } catch(e) {
         ctx.echo("Database Exists: $e.message")
+      }
+    }
+  }
+
+  private static def addDatabaseExtensions(ctx, database="") {
+    String databaseName = createDatabaseName(ctx, database)
+    if (databaseName != "" && hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
+      def databaseExtensions = readManifestList(ctx, azureProvisionConfigFile, 'postgreSql.extensions')
+      databaseExtensions.each {
+        try {
+          runDatabaseCommand(ctx, "\'CREATE EXTENSION IF NOT EXISTS \"$it\"\'",  databaseName)
+        } catch(e) {
+          ctx.echo("Extension Exists: $e.message")
+        }
       }
     }
   }
