@@ -107,7 +107,7 @@ class Utils implements Serializable {
       configValues["azureIdentity.clientID"] = clientId
       configValues["azureIdentity.resourceID"] = resourceId
       configValues["postgresService.postgresUser"] = identityName
-      def postgresDbArray = ctx.sh(returnStdout: true, script: "yq r $azureProvisionConfigFile resources.postgreSql").trim()
+      def postgresDbArray = ctx.sh(returnStdout: true, script: "yq r $azureProvisionConfigFile resources.postgreSql.name").trim()
       def dbs = postgresDbArray.tokenize('\n')
       if (dbs.size() > 0 && dbs[0] != "") {
         def postgresDb = dbs[0]
