@@ -447,15 +447,10 @@ class Provision implements Serializable {
     String databaseName = createDatabaseName(ctx, database)
     if (databaseName != "") {
       try {
-        def result = runPsqlCommand(ctx, "-lqt | cut -d \\| -f 1 | grep \"$databaseName\"")
-        if (result == databaseName) {
-          ctx.echo("Database Exist!")
-        }
-        else {
-          runDatabaseCommand(ctx, "\'CREATE DATABASE \"$databaseName\"\'")
-        }
+        ctx.echo("Trying to create the database: $databaseName")
+        runDatabaseCommand(ctx, "\'CREATE DATABASE \"$databaseName\"\'")
       } catch(e) {
-        ctx.echo("Database Exists: $e.message")
+        ctx.echo("Database Creation: $e.message")
       }
     }
   }
@@ -535,20 +530,6 @@ class Provision implements Serializable {
     -e PGUSER=${ctx.POSTGRES_ADMIN_USERNAME} \
     -e PGDATABASE=$database \
     alpine/psql -c $query
-    """)
-    }
-  }
-
-  private static def runPsqlCommand(ctx, command, database="postgres") {
-    def envVars = getPostgresAdminEnvVars(ctx)
-    ctx.withEnv(envVars) {
-      return ctx.sh(returnStdout: true, script: """
-    docker run --rm --name psql-runner \
-    -e PGPASSWORD="${ctx.POSTGRES_ADMIN_PASSWORD}" \
-    -e PGHOST=${ctx.POSTGRES_HOST} \
-    -e PGUSER=${ctx.POSTGRES_ADMIN_USERNAME} \
-    -e PGDATABASE=$database \
-    alpine/psql $command
     """)
     }
   }
