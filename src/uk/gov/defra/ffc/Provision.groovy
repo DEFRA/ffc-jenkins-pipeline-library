@@ -10,6 +10,10 @@ class Provision implements Serializable {
   static final String subscriptionSND1 = 'cd4e9a00-99d8-45a2-98bb-7648ef12c26d' // AZD-FFC-SND1
   static final String defraCloudDevTenant = 'c9d74090-b4e6-4b04-981d-e6757a160812'
 
+  static final Map repoNames =  [
+    ffcahwrsfdmessagingproxy: 'sfdmsgprx',
+    ffcahwrapplication: "ahwrapp"]
+
   // Public Methods
 
   static def createResources(ctx, environment, repoName, tag, pr) {
@@ -27,8 +31,12 @@ class Provision implements Serializable {
 
   static def deletePrResources(ctx, environment, repoName, pr) {
     init(ctx, true, repoName)
-    deleteServiceBusEntities(ctx, "$repoName-pr$pr-", 'queue')
-    deleteServiceBusEntities(ctx, "$repoName-pr$pr-", 'topic')
+    String smalRepoName = repoName
+    if (repoNames.containsKey(repoName.replaceAll('-', ''))) {
+      smalRepoName = repoNames[repoName.replaceAll('-', '')]
+    }
+    deleteServiceBusEntities(ctx, "$smalRepoName-pr$pr-", 'queue')
+    deleteServiceBusEntities(ctx, "$smalRepoName-pr$pr-", 'topic')
     deletePrDatabase(ctx, environment, repoName, pr)
     deletePrIdentityFederation(ctx, environment, repoName, pr)
   }
@@ -192,10 +200,14 @@ class Provision implements Serializable {
   }
 
   private static def createQueue(ctx, queueName, sessionOption = '') {
-    validateQueueName(queueName)
+    String trimedQueueName = queueName.take(50)
+    if (trimedQueueName != null && trimedQueueName.length() > 0 && trimedQueueName.charAt(trimedQueueName.length() - 1) == '-') {
+      trimedQueueName = trimedQueueName.substring(0, trimedQueueName.length() - 1)
+    }
+    validateQueueName(trimedQueueName)
     String azCommand = 'az servicebus queue create'
-    Utils.runAzCommand(ctx, "$azCommand ${getResGroupAndNamespace(ctx)} --name $queueName --max-size 1024 $sessionOption")
-    grantBusPrivileges(ctx, 'queue', queueName)
+    Utils.runAzCommand(ctx, "$azCommand ${getResGroupAndNamespace(ctx)} --name $trimedQueueName --max-size 1024 $sessionOption")
+    grantBusPrivileges(ctx, 'queue', trimedQueueName)
   }
 
   static def getSessionOption(ctx, filePath, resource, name) {
@@ -206,16 +218,24 @@ class Provision implements Serializable {
   }
 
   private static def createTopicAndSubscription(ctx, topicName) {
-    validateQueueName(topicName)
+    String trimedTopicName = topicName.take(50)
+    if (trimedTopicName != null && trimedTopicName.length() > 0 && trimedTopicName.charAt(trimedTopicName.length() - 1) == '-') {
+      trimedTopicName = trimedTopicName.substring(0, trimedTopicName.length() - 1)
+    }
+    validateQueueName(trimedTopicName)
     def azTopicCommand = 'az servicebus topic create'
-    Utils.runAzCommand(ctx, "$azTopicCommand ${getResGroupAndNamespace(ctx)} --name $topicName --max-size 1024")
-    grantBusPrivileges(ctx, 'topic', topicName)
+    Utils.runAzCommand(ctx, "$azTopicCommand ${getResGroupAndNamespace(ctx)} --name $trimedTopicName --max-size 1024")
+    grantBusPrivileges(ctx, 'topic', trimedTopicName)
     def azSubscriptionCommand = 'az servicebus topic subscription create'
-    Utils.runAzCommand(ctx, "$azSubscriptionCommand ${getResGroupAndNamespace(ctx)} --name $topicName --topic-name $topicName")
+    Utils.runAzCommand(ctx, "$azSubscriptionCommand ${getResGroupAndNamespace(ctx)} --name $trimedTopicName --topic-name $trimedTopicName")
   }
 
   static def getPrQueueName(repoName, pr, queueName) {
-    return "$repoName-pr$pr-$queueName"
+    String smalRepoName = repoName
+    if (repoNames.containsKey(repoName.replaceAll('-', ''))) {
+      smalRepoName = repoNames[repoName.replaceAll('-', '')]
+    }
+    return "$smalRepoName-pr$pr-$queueName"
   }
 
   private static def getMessageQueueCreds(ctx) {
@@ -287,7 +307,11 @@ class Provision implements Serializable {
   }
 
   private static def getBuildQueuePrefix(ctx, repoName, pr) {
-    return "$repoName-b$ctx.BUILD_NUMBER-$pr-"
+    String smalRepoName = repoName
+    if (repoNames.containsKey(repoName.replaceAll('-', ''))) {
+      smalRepoName = repoNames[repoName.replaceAll('-', '')]
+    }
+    return "$smalRepoName-b$ctx.BUILD_NUMBER-$pr-"
   }
 
   private static def createPrIdentityFederation(ctx, environment, repoName, tag, pr) {
@@ -524,7 +548,7 @@ class Provision implements Serializable {
     def envVars = getPostgresAdminEnvVars(ctx)
     ctx.withEnv(envVars) {
       ctx.sh("""
-    docker run --rm --name psql-runner \
+    docker run --rm \
     -e PGPASSWORD="${ctx.POSTGRES_ADMIN_PASSWORD}" \
     -e PGHOST=${ctx.POSTGRES_HOST} \
     -e PGUSER=${ctx.POSTGRES_ADMIN_USERNAME} \
