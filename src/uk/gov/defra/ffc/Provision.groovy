@@ -12,7 +12,10 @@ class Provision implements Serializable {
 
   static final Map repoNames =  [
     ffcahwrsfdmessagingproxy: 'sfdmsgprx',
-    ffcahwrapplication: "ahwrapp"]
+    ffcahwrapplication: "ahwrapp",
+    ffcdocstatementdata: "doctdt",
+    ffcdocstatementpublisher: "doctdpb",
+    ffcdocstatementconstructor: "doctdcon"]
 
   // Public Methods
 
