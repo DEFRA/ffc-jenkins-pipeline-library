@@ -86,6 +86,13 @@ class Utils implements Serializable {
   static final String subscriptionSND1 = 'cd4e9a00-99d8-45a2-98bb-7648ef12c26d' // AZD-FFC-SND1
   static final String identityPrefix = 'SNDFFCINFMID2001'
 
+  static final Map repoNames =  [
+    ffcahwrsfdmessagingproxy: 'sfdmsgprx',
+    ffcahwrapplication: "ahwrapp",
+    ffcdocstatementdata: "doctdt",
+    ffcdocstatementpublisher: "doctdpb",
+    ffcdocstatementconstructor: "doctdcon"]
+
   static def runAzCommand(ctx, command) {
     ctx.withCredentials([ctx.azureServicePrincipal('SSVFFCJENSR1001-Jenkins')]) {
       return ctx.sh(returnStdout: true, script:"""
@@ -94,6 +101,14 @@ class Utils implements Serializable {
       $command
       """)
     }
+  }
+
+  static def getPrQueueName(repoName, pr, queueName) {
+    String smalRepoName = repoName
+    if (Utils.repoNames.containsKey(repoName.replaceAll('-', ''))) {
+      smalRepoName = Utils.repoNames[repoName.replaceAll('-', '')]
+    }
+    return "$smalRepoName-pr$pr-$queueName"
   }
 
   static def getApplicationConfigValue(ctx, pr) {
@@ -123,7 +138,7 @@ class Utils implements Serializable {
           if (value.startsWith("queue:")) {
             value = value.split(":")[1]
             if (pr != "") {
-              value = "${repoName}-pr${pr}-${value}"
+              value = getPrQueueName(repoName, pr, value)
             }
           }
           configValues[k] = value
@@ -138,7 +153,7 @@ class Utils implements Serializable {
           if (value.startsWith("queue:")) {
             value = value.split(":")[1]
             if (pr != "") {
-              value = "${repoName}-pr${pr}-${value}"
+              value = getPrQueueName(repoName, pr, value)
             }
           }
           configValues[k] = value

@@ -10,13 +10,6 @@ class Provision implements Serializable {
   static final String subscriptionSND1 = 'cd4e9a00-99d8-45a2-98bb-7648ef12c26d' // AZD-FFC-SND1
   static final String defraCloudDevTenant = 'c9d74090-b4e6-4b04-981d-e6757a160812'
 
-  static final Map repoNames =  [
-    ffcahwrsfdmessagingproxy: 'sfdmsgprx',
-    ffcahwrapplication: "ahwrapp",
-    ffcdocstatementdata: "doctdt",
-    ffcdocstatementpublisher: "doctdpb",
-    ffcdocstatementconstructor: "doctdcon"]
-
   // Public Methods
 
   static def createResources(ctx, environment, repoName, tag, pr) {
@@ -35,8 +28,8 @@ class Provision implements Serializable {
   static def deletePrResources(ctx, environment, repoName, pr) {
     init(ctx, true, repoName)
     String smalRepoName = repoName
-    if (repoNames.containsKey(repoName.replaceAll('-', ''))) {
-      smalRepoName = repoNames[repoName.replaceAll('-', '')]
+    if (Utils.repoNames.containsKey(repoName.replaceAll('-', ''))) {
+      smalRepoName = Utils.repoNames[repoName.replaceAll('-', '')]
     }
     deleteServiceBusEntities(ctx, "$smalRepoName-pr$pr-", 'queue')
     deleteServiceBusEntities(ctx, "$smalRepoName-pr$pr-", 'topic')
@@ -185,7 +178,7 @@ class Provision implements Serializable {
 
   private static def createBuildTopics(ctx, topics, repoName, pr) {
     topics.each {
-      createTopicAndSubscription(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it")
+      createTopicAndSubscription(ctx, "${getBuildQueuePrefix(ctx, repoName, pr)}$it", it)
     }
   }
 
@@ -198,7 +191,7 @@ class Provision implements Serializable {
 
   private static def createPrTopics(ctx, topics, repoName, pr) {
     topics.each {
-      createTopicAndSubscription(ctx, getPrQueueName(repoName, pr, it))
+      createTopicAndSubscription(ctx, getPrQueueName(repoName, pr, it), it)
     }
   }
 
@@ -220,7 +213,7 @@ class Provision implements Serializable {
     return option.toBoolean() ? '--enable-session' : ''
   }
 
-  private static def createTopicAndSubscription(ctx, topicName) {
+  private static def createTopicAndSubscription(ctx, topicName, originalTopicName) {
     String trimedTopicName = topicName.take(50)
     if (trimedTopicName != null && trimedTopicName.length() > 0 && trimedTopicName.charAt(trimedTopicName.length() - 1) == '-') {
       trimedTopicName = trimedTopicName.substring(0, trimedTopicName.length() - 1)
@@ -229,14 +222,19 @@ class Provision implements Serializable {
     def azTopicCommand = 'az servicebus topic create'
     Utils.runAzCommand(ctx, "$azTopicCommand ${getResGroupAndNamespace(ctx)} --name $trimedTopicName --max-size 1024")
     grantBusPrivileges(ctx, 'topic', trimedTopicName)
+
     def azSubscriptionCommand = 'az servicebus topic subscription create'
-    Utils.runAzCommand(ctx, "$azSubscriptionCommand ${getResGroupAndNamespace(ctx)} --name $trimedTopicName --topic-name $trimedTopicName")
+    def subNames = readSubscriptionsFromManifest(ctx, azureProvisionConfigFile, originalTopicName)
+    ctx.echo("Loop on Subscriptions: ${subNames}")
+    subNames.each {
+      Utils.runAzCommand(ctx, "$azSubscriptionCommand ${getResGroupAndNamespace(ctx)} --name $it --topic-name $trimedTopicName")
+    }
   }
 
   static def getPrQueueName(repoName, pr, queueName) {
     String smalRepoName = repoName
-    if (repoNames.containsKey(repoName.replaceAll('-', ''))) {
-      smalRepoName = repoNames[repoName.replaceAll('-', '')]
+    if (Utils.repoNames.containsKey(repoName.replaceAll('-', ''))) {
+      smalRepoName = Utils.repoNames[repoName.replaceAll('-', '')]
     }
     return "$smalRepoName-pr$pr-$queueName"
   }
@@ -300,6 +298,24 @@ class Provision implements Serializable {
     return resources.tokenize('\n')
   }
 
+  static def readSubscriptionsFromManifest(ctx, filePath, topicName) {
+    def provisionFile = ctx.readYaml file: filePath
+    def subs = []
+    provisionFile["resources"]["topics"].each {
+      ctx.echo("topic name: ${topicName}")
+      ctx.echo("provision file topic name: ${it['name']}")
+      if (it["name"] == topicName) {
+        ctx.echo("Subscriptions: ${it['subscriptions']}")
+        if (it["subscriptions"] != null) {
+          subs = it["subscriptions"]*.name
+          ctx.echo("Subscription list: ${subs}")
+          return subs
+        }
+      }
+    }
+    return subs
+  }
+
   private static def readManifestSingle(ctx, filePath, resource) {
     def resources = ctx.sh(returnStdout: true, script: "yq r $filePath resources.${resource}").trim()
     return resources.tokenize('\n')[0]
@@ -311,8 +327,8 @@ class Provision implements Serializable {
 
   private static def getBuildQueuePrefix(ctx, repoName, pr) {
     String smalRepoName = repoName
-    if (repoNames.containsKey(repoName.replaceAll('-', ''))) {
-      smalRepoName = repoNames[repoName.replaceAll('-', '')]
+    if (Utils.repoNames.containsKey(repoName.replaceAll('-', ''))) {
+      smalRepoName = Utils.repoNames[repoName.replaceAll('-', '')]
     }
     return "$smalRepoName-b$ctx.BUILD_NUMBER-$pr-"
   }
