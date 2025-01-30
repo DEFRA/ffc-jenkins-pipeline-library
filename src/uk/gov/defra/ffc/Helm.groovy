@@ -141,9 +141,18 @@ class Helm implements Serializable {
           addHelmRepo(ctx, 'ffc-public', ctx.HELM_CHART_REPO_PUBLIC)
           ctx.sh("helm package ../helm/$chartName --version $tag --dependency-update")
 
+          ctx.sh("pwd")
+          ctx.sh("ls ../helm/$chartName ")
+          ctx.sh("ls")
+          ctx.sh("ls ../")
+
+
           ctx.sh("helm registry login $registry --username $ctx.username --password $ctx.password")
           ctx.sh("helm chart save $chartName-${tag}.tgz $helmChartName")
+          ctx.sh("tar -tf $chartName-${tag}.tgz")
+          ctx.sh("ls")
           ctx.sh("helm chart push $helmChartName")
+          
 
           ctx.deleteDir()
         }
