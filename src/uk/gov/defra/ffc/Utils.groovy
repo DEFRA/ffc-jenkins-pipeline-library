@@ -91,7 +91,8 @@ class Utils implements Serializable {
     ffcahwrapplication: "ahwrapp",
     ffcdocstatementdata: "doctdt",
     ffcdocstatementpublisher: "doctdpb",
-    ffcdocstatementconstructor: "doctdcon"]
+    ffcdocstatementconstructor: "doctdcon",
+    ffcpaydatahub: "pdhb"]
 
   static def runAzCommand(ctx, command) {
     ctx.withCredentials([ctx.azureServicePrincipal('SSVFFCJENSR1001-Jenkins')]) {

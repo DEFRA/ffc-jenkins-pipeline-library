@@ -357,6 +357,9 @@ class Provision implements Serializable {
   // Identity Operations
   private static def createManagedIdentity(ctx) {
     String identity = readManifestSingle(ctx, azureProvisionConfigFile, 'identity')
+    if (identity == '' || identity == null) {
+      throw new Exception("Identity is not defined in the provision file!")
+    }
     def identityName = "${identityPrefix}-${identity}"
     Utils.runAzCommand(ctx, "az identity create -g $ctx.AZURE_POSTGRES_RESOURCE_GROUP_SND2 -n $identityName --tags 'ServiceCode=FFC' 'serviceName=FutureFarming' 'ServiceType=LOB' 'Environment=SND' 'Tier=ManagedIdentity' 'Location=northeurope' 'CreatedBy=JenkinsPipeline'")
   }
@@ -393,13 +396,17 @@ class Provision implements Serializable {
     String entityId = entityType == "queue" ? "queues/$entityName" :
     entityType == "topic" ? "topics/$entityName" : ""
     if (entityId != "") {
-      String serviceBusRole = "Azure Service Bus Data Owner" // Will read from provition yaml file (Azure Service Bus Data Sender/Azure Service Bus Data Receiver)
-      ctx.sh("""
+      try {
+        String serviceBusRole = "Azure Service Bus Data Owner" // Will read from provition yaml file (Azure Service Bus Data Sender/Azure Service Bus Data Receiver)
+        ctx.sh("""
     az role assignment delete \
     --role '${serviceBusRole}' \
     --assignee $clientId \
     --scope ${busNamespace}/${entityId}
     """)
+    } catch(e) {
+        ctx.echo("Error: $e.message")
+      }
     } else {
       ctx.echo("No EntityType!")
     }
