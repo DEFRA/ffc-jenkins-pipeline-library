@@ -393,13 +393,17 @@ class Provision implements Serializable {
     String entityId = entityType == "queue" ? "queues/$entityName" :
     entityType == "topic" ? "topics/$entityName" : ""
     if (entityId != "") {
-      String serviceBusRole = "Azure Service Bus Data Owner" // Will read from provition yaml file (Azure Service Bus Data Sender/Azure Service Bus Data Receiver)
-      ctx.sh("""
+      try {
+        String serviceBusRole = "Azure Service Bus Data Owner" // Will read from provition yaml file (Azure Service Bus Data Sender/Azure Service Bus Data Receiver)
+        ctx.sh("""
     az role assignment delete \
     --role '${serviceBusRole}' \
     --assignee $clientId \
     --scope ${busNamespace}/${entityId}
     """)
+    } catch(e) {
+        ctx.echo("Error: $e.message")
+      }
     } else {
       ctx.echo("No EntityType!")
     }
