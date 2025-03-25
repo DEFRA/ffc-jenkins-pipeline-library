@@ -9,6 +9,11 @@ class Helm implements Serializable {
     ctx.sh("kubectl get ingress -n $deploymentName -o json --ignore-not-found | jq '.items[0].spec.rules[0].host // empty' | xargs --no-run-if-empty printf 'Build available for review at https://%s\n'")
   }
 
+  static def createSelfSignedCertificate(ctx, deploymentName) {
+    ctx.sh("openssl req -x509 -nodes -days 1780 -newkey rsa:2048 -keyout /tmp/tls.key -out /tmp/tls.crt -subj \"/CN=ffc-demo-apply-web-pr13.ffc.snd.azure.defra.cloud/O=ffc\"")
+    ctx.sh("kubectl create secret generic tls --from-file=tls.crt=/tmp/tls.crt --from-file=tls.key=/tmp/tls.key -n $deploymentName")
+  }
+
   static def addHelmRepo(ctx, repoName, url) {
     ctx.sh("helm repo add --force-update $repoName $url")
     ctx.sh('helm repo update')
@@ -92,6 +97,8 @@ class Helm implements Serializable {
         //Get Application Configuration
         def identityConfigValues =  configItemsToSetString(Utils.getApplicationConfigValue(ctx, pr))
 
+        ctx.echo('Generating self signed cert to be used on ingress')
+        createSelfSignedCertificate(ctx, deploymentName)
         ctx.sh("kubectl get namespaces $deploymentName || kubectl create namespace $deploymentName")
         ctx.echo('Running helm upgrade, console output suppressed')
         ctx.sh("$Utils.suppressConsoleOutput helm upgrade $deploymentName --namespace=$deploymentName ./helm/$chartName $commonConfigValues $commonConfigValuesChart $environmentConfigValues $environmentConfigValuesChart $serviceCommonConfigValues $serviceCommonConfigValuesChart $serviceEnvironmentConfigValues $serviceEnvironmentConfigValuesChart $prConfigValues $prConfigValuesChart $prProvisionedValues $identityConfigValues $prCommands $extraCommands")
