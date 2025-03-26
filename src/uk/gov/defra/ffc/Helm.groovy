@@ -10,8 +10,8 @@ class Helm implements Serializable {
   }
 
   static def createSelfSignedCertificate(ctx, deploymentName) {
-    ctx.sh("openssl req -x509 -nodes -days 1780 -newkey rsa:2048 -keyout /tmp/tls.key -out /tmp/tls.crt -subj \"/CN=ffc-demo-apply-web-pr13.ffc.snd.azure.defra.cloud/O=ffc\"")
-    ctx.sh("kubectl create secret generic tls --from-file=tls.crt=/tmp/tls.crt --from-file=tls.key=/tmp/tls.key -n $deploymentName")
+    ctx.sh("openssl req -x509 -nodes -days 1780 -newkey rsa:2048 -keyout /tmp/tls.key -out /tmp/tls.crt -subj \"/CN=AKS-Ingress/O=ffc\"")
+    ctx.sh("kubectl create secret tls tls --from-file=tls.crt=/tmp/tls.crt --from-file=tls.key=/tmp/tls.key -n $deploymentName")
   }
 
   static def addHelmRepo(ctx, repoName, url) {
