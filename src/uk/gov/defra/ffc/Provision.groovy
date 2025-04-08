@@ -26,6 +26,7 @@ class Provision implements Serializable {
   }
 
   static def deletePrResources(ctx, environment, repoName, pr) {
+    ctx.deleteDir()
     init(ctx, true, repoName)
     String smalRepoName = repoName
     if (Utils.repoNames.containsKey(repoName.replaceAll('-', ''))) {
@@ -88,7 +89,8 @@ class Provision implements Serializable {
         ctx.withCredentials([
           ctx.string(credentialsId: 'github-auth-token', variable: 'gitToken')
         ]) {
-          ctx.sh("curl -O -H 'Authorization: token $ctx.gitToken' https://raw.githubusercontent.com/DEFRA/$repoName/refs/heads/main/provision.azure.yaml ")
+          ctx.echo("Downloading provision.azure.yaml from GitHub...")
+          ctx.sh("curl -O -H 'Authorization: token $ctx.gitToken' https://raw.githubusercontent.com/DEFRA/$repoName/refs/heads/main/provision.azure.yaml")
         }
         if (!hasResourcesToProvision(ctx, azureProvisionConfigFile)) {
           ctx.echo("The ${azureProvisionConfigFile} file is not exist!")
