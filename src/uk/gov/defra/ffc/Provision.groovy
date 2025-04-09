@@ -26,7 +26,6 @@ class Provision implements Serializable {
   }
 
   static def deletePrResources(ctx, environment, repoName, pr) {
-    ctx.deleteDir()
     init(ctx, true, repoName)
     String smalRepoName = repoName
     if (Utils.repoNames.containsKey(repoName.replaceAll('-', ''))) {
