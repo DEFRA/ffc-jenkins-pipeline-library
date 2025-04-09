@@ -9,6 +9,7 @@ class Cleanup implements Serializable {
     if (repoName == '' || branchName == '') {
       ctx.echo('Unable to determine repo name and branch name, cleanup cancelled')
     } else {
+      ctx.deleteDir()
       def apiParams = "state=closed&sort=closed&direction=desc&head=DEFRA:$branchName"
       def apiUrl = "https://api.github.com/repos/DEFRA/$repoName/pulls?$apiParams"
       def closedPrNo = ctx.sh(returnStdout: true, script: "curl '$apiUrl' | jq 'first | .number'").trim()
